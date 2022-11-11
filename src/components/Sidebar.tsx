@@ -21,7 +21,7 @@ export const Sidebar = () => {
           className="h-5 w-5 cursor-pointer text-white "
           onClick={() => setIsOpen(true)}
         />
-        <h1 className="mx-auto text-lg text-white">見る Miru</h1>
+        <h1 className="mx-auto text-lg text-white">みる Miru</h1>
       </div>
       <aside
         className={`${
@@ -32,7 +32,7 @@ export const Sidebar = () => {
         aria-label="Sidenav"
       >
         <div>
-          <h1 className="pl-4 pb-6 pt-4 text-lg text-white">見る Miru</h1>
+          <h1 className="pl-4 pb-6 pt-4 text-lg text-white">みる Miru</h1>
         </div>
         <main className="flex flex-col p-2">
           <nav>
