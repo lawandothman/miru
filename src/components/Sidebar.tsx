@@ -13,7 +13,7 @@ import OutsideClickHandler from "react-outside-click-handler";
 
 export const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { data: genres } = trpc.movies.getGenres.useQuery();
+  const { data } = trpc.movies.getGenres.useQuery();
 
   return (
     <>
@@ -34,8 +34,8 @@ export const Sidebar = () => {
         <aside
           className={`${
             isOpen
-              ? "absolute inset-y-0 left-0 translate-x-0"
-              : "absolute inset-y-0 -translate-x-full"
+              ? "fixed inset-y-0 left-0 translate-x-0"
+              : "fixed inset-y-0 -translate-x-full"
           }  z-30 h-full w-60 transform overflow-y-auto border-r border-gray-200 bg-white transition duration-200 ease-in-out dark:border-neutral-700 dark:bg-neutral-900 lg:z-auto lg:translate-x-0 `}
           aria-label="Sidenav"
         >
@@ -54,7 +54,7 @@ export const Sidebar = () => {
                 <li>
                   <Link
                     className="flex items-center rounded-lg p-2 text-base font-normal text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-neutral-700"
-                    href="#"
+                    href="/popular"
                   >
                     <FiHeart />
                     <span className="ml-3 text-sm">Popular</span>
@@ -83,7 +83,7 @@ export const Sidebar = () => {
             <nav>
               <p className="pl-3 pb-2 pt-4 text-sm text-white">Genres</p>
               <ul className="space-y-2">
-                {genres?.map((genre) => (
+                {data?.genres?.map((genre) => (
                   <li key={genre.id}>
                     <Link
                       className="flex items-center rounded-lg p-2 text-base font-normal text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-neutral-700"
