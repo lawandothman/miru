@@ -1,13 +1,20 @@
 import tmdbAPI from "services/tmdbAPI";
-import type { Genre } from "types/tmdbAPI";
+import type { GenreResponseType, PopularResponseType } from "types/tmdbAPI";
 import { publicProcedure, router } from "../trpc";
 
 export const moviesRouter = router({
-  getGenres: publicProcedure.query<Genre[]>(async () => {
+  getGenres: publicProcedure.query<GenreResponseType>(async () => {
     try {
-      return await (
-        await tmdbAPI.get(`/3/genre/movie/list`)
-      ).data.genres;
+      const res = await tmdbAPI.get("/3/genre/movie/list");
+      return res.data;
+    } catch (error) {
+      console.log(error);
+    }
+  }),
+  getPopular: publicProcedure.query<PopularResponseType>(async () => {
+    try {
+      const res = await tmdbAPI.get("/3/movie/popular");
+      return res.data;
     } catch (error) {
       console.log(error);
     }
