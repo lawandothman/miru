@@ -1,5 +1,7 @@
 import type { NextPage } from "next";
 import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/router";
 import { FiStar } from "react-icons/fi";
 import { trpc } from "utils/trpc";
 
@@ -8,7 +10,16 @@ const getImage = (path: string) => {
 };
 
 const Popular: NextPage = () => {
-  const { data } = trpc.movies.getPopular.useQuery();
+  const { query, pathname } = useRouter();
+  const page = Array.isArray(query.page) ? query.page[0] : query.page;
+  const pageNumber = parseInt(page ? page : "1", 10);
+
+  const { data, isLoading } = trpc.movies.getPopular.useQuery({ page });
+
+  if (isLoading) {
+    return <div className="text-3xl text-white">LOADING</div>;
+  }
+
   return (
     <div className="px-20 pt-20">
       <h1 className="text-3xl font-thin uppercase tracking-widest dark:text-white">
@@ -46,6 +57,35 @@ const Popular: NextPage = () => {
             </div>
           );
         })}
+      </div>
+
+      <div className="mb-8 flex w-full items-center justify-between px-20">
+        {page && page !== "1" && (
+          <Link
+            href={{
+              pathname,
+              query: {
+                ...query,
+                page: pageNumber - 1,
+              },
+            }}
+            className="flex h-10 items-center rounded bg-neutral-800 px-10 text-white dark:bg-neutral-100 dark:text-black"
+          >
+            Prev
+          </Link>
+        )}
+        <Link
+          href={{
+            pathname,
+            query: {
+              ...query,
+              page: pageNumber + 1,
+            },
+          }}
+          className="ml-auto flex h-10 items-center rounded bg-neutral-800 px-10 text-white dark:bg-neutral-100 dark:text-black"
+        >
+          Next
+        </Link>
       </div>
     </div>
   );
