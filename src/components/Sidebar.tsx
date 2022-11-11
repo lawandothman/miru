@@ -12,7 +12,7 @@ import { useState } from "react";
 import OutsideClickHandler from "react-outside-click-handler";
 
 export const Sidebar = () => {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
   const { data: genres } = trpc.movies.getGenres.useQuery();
 
   return (
