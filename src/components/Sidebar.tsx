@@ -1,13 +1,34 @@
 import Link from "next/link";
 import { trpc } from "utils/trpc";
-import { FiCalendar, FiHeart, FiTrendingUp, FiUser } from "react-icons/fi";
+import {
+  FiCalendar,
+  FiHeart,
+  FiMenu,
+  FiTrendingUp,
+  FiUser,
+} from "react-icons/fi";
+import { useState } from "react";
+import OutsideClickHandler from "react-outside-click-handler";
 
 export const Sidebar = () => {
+  const [isOpen, setIsOpen] = useState(false);
   const { data: genres } = trpc.movies.getGenres.useQuery();
+
   return (
-    <div>
+    <OutsideClickHandler onOutsideClick={() => setIsOpen(false)}>
+      <div className="m-4 flex items-center lg:hidden">
+        <FiMenu
+          className="h-5 w-5 cursor-pointer text-white "
+          onClick={() => setIsOpen(true)}
+        />
+        <h1 className="mx-auto text-lg text-white">見る Miru</h1>
+      </div>
       <aside
-        className="fixed top-0 bottom-0 left-0 h-full w-60 overflow-auto border-r border-gray-200 bg-white dark:border-neutral-700 dark:bg-neutral-900"
+        className={`${
+          isOpen
+            ? "absolute inset-y-0 left-0 translate-x-0 shadow-lg"
+            : "absolute -translate-x-full"
+        } h-full w-60 transform overflow-y-auto border-r border-gray-200 bg-white transition duration-200 ease-in-out dark:border-neutral-700 dark:bg-neutral-900 lg:z-auto lg:w-56 lg:translate-x-0 `}
         aria-label="Sidenav"
       >
         <div>
@@ -74,6 +95,6 @@ export const Sidebar = () => {
           </div>
         </footer>
       </aside>
-    </div>
+    </OutsideClickHandler>
   );
 };

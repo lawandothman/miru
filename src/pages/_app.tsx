@@ -14,7 +14,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
   return (
     <SessionProvider session={session}>
       <Sidebar />
-      <main className="pl-60">
+      <main className="lg:pl-60">
       <Component {...pageProps} />
       </main>
     </SessionProvider>
