@@ -6,12 +6,13 @@ import {
   FiMenu,
   FiTrendingUp,
   FiUser,
+  FiX,
 } from "react-icons/fi";
 import { useState } from "react";
 import OutsideClickHandler from "react-outside-click-handler";
 
 export const Sidebar = () => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
   const { data: genres } = trpc.movies.getGenres.useQuery();
 
   return (
@@ -21,18 +22,30 @@ export const Sidebar = () => {
           className="h-5 w-5 cursor-pointer text-white "
           onClick={() => setIsOpen(true)}
         />
-        <h1 className="mx-auto text-lg text-white">ミル Miru</h1>
+        <h1
+          className={`mx-auto text-lg text-white ${
+            isOpen && "opacity-0"
+          } transition-opacity`}
+        >
+          ミル Miru
+        </h1>
       </div>
       <aside
         className={`${
           isOpen
-            ? "absolute inset-y-0 left-0 translate-x-0 shadow-lg"
-            : "absolute -translate-x-full"
-        } h-full w-60 transform overflow-y-auto border-r border-gray-200 bg-white transition duration-200 ease-in-out dark:border-neutral-700 dark:bg-neutral-900 lg:z-auto lg:translate-x-0 `}
+            ? "absolute inset-y-0 left-0 translate-x-0"
+            : "absolute inset-y-0 -translate-x-full"
+        }  h-full w-60 transform overflow-y-auto border-r border-gray-200 bg-white transition duration-200 ease-in-out dark:border-neutral-700 dark:bg-neutral-900 lg:translate-x-0 `}
         aria-label="Sidenav"
       >
-        <div>
-          <h1 className="pl-4 pb-6 pt-4 text-lg text-white">ミル Miru</h1>
+        <div className="mb-6 mt-4 flex items-center justify-between pl-4 dark:text-white">
+          <h1 className="text-lg">ミル Miru</h1>
+          <button
+            onClick={() => setIsOpen(false)}
+            className="lg:hidden mr-2 rounded p-1 hover:bg-neutral-700"
+          >
+            <FiX />
+          </button>
         </div>
         <main className="flex flex-col p-2">
           <nav>
