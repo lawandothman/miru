@@ -1,10 +1,11 @@
 import axios from "axios";
+import { env } from "env/server.mjs";
 
 const tmdbAPI = axios.create({
-  baseURL: process.env.TMDB_API_BASE_URL,
+  baseURL: env.TMDB_API_BASE_URL,
   headers: {
     "Content-Type": "application/json",
-    Authorization: `Bearer ${process.env.TMDB_API_READ_ACCESS_TOKEN}`,
+    Authorization: `Bearer ${env.TMDB_API_READ_ACCESS_TOKEN}`,
   },
 });
 
