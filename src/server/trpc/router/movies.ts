@@ -1,4 +1,4 @@
-import tmdbAPI from "../../../services/tmdbApi";
+import tmdbAPI from "services/tmdbAPI";
 import { publicProcedure, router } from "../trpc";
 
 interface IGenre {
