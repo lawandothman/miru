@@ -1,13 +1,9 @@
 import tmdbAPI from "services/tmdbAPI";
+import type { Genre } from "types/tmdbAPI";
 import { publicProcedure, router } from "../trpc";
 
-interface IGenre {
-  id: number;
-  name: string;
-}
-
 export const moviesRouter = router({
-  getGenres: publicProcedure.query<IGenre[]>(async () => {
+  getGenres: publicProcedure.query<Genre[]>(async () => {
     try {
       return await (
         await tmdbAPI.get(`/3/genre/movie/list`)
