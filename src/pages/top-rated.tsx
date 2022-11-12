@@ -5,13 +5,13 @@ import type { NextPage } from "next";
 import { useRouter } from "next/router";
 import { trpc } from "utils/trpc";
 
-const Popular: NextPage = () => {
+const TopRated: NextPage = () => {
   const { query } = useRouter();
   const page = Array.isArray(query.page)
     ? Number(query.page[0])
     : Number(query.page ?? 1);
 
-  const { data, isLoading } = trpc.movies.getPopular.useQuery({ page });
+  const { data, isLoading } = trpc.movies.getTopRated.useQuery({ page });
 
   if (isLoading) {
     return <div className="text-3xl text-white">LOADING</div>;
@@ -19,11 +19,11 @@ const Popular: NextPage = () => {
 
   return (
     <div className="px-20 pt-20">
-      <PageHeader title="Popular" />
+      <PageHeader title="Top Rated" />
       <MoviesList movies={data?.results} />
       <Pagination page={page} />
     </div>
   );
 };
 
-export default Popular;
+export default TopRated;

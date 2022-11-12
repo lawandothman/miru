@@ -72,7 +72,7 @@ export const Sidebar = () => {
                 <li>
                   <Link
                     className="flex items-center rounded-lg p-2 text-base font-normal text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-neutral-700"
-                    href="#"
+                    href="/top-rated"
                   >
                     <FiTrendingUp />
                     <span className="ml-3 text-sm">Top Rated</span>
