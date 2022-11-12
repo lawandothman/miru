@@ -73,7 +73,7 @@ export const moviesRouter = router({
     .input(
       z.object({
         id: z.number(),
-        page: z.number().optional()
+        page: z.number().optional(),
       })
     )
     .query(async ({ input }) => {
@@ -81,7 +81,7 @@ export const moviesRouter = router({
         const res = await tmdbAPI.get("/3/discover/movie", {
           params: {
             with_genres: input.id,
-            page: input.page
+            page: input.page,
           },
         });
         return res.data;

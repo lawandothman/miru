@@ -12,8 +12,19 @@ const Genre: NextPage = () => {
     ? Number(query.page[0])
     : Number(query.page ?? 1);
 
-  const { data } = trpc.movies.getByGenre.useQuery({ id: genreId, page });
-  const { data: genresData } = trpc.movies.getGenres.useQuery();
+  const { data, isLoading: moviesLoading } = trpc.movies.getByGenre.useQuery({
+    id: genreId,
+    page,
+  });
+
+  const { data: genresData, isLoading: genresLoading } =
+    trpc.movies.getGenres.useQuery();
+
+  const isLoading = genresLoading || moviesLoading;
+
+  if (isLoading) {
+    return <div className="text-3xl text-white">LOADING</div>;
+  }
 
   return (
     <div className="px-20 pt-20">
