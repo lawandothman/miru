@@ -15,7 +15,7 @@ export const moviesRouter = router({
   getPopular: publicProcedure
     .input(
       z.object({
-        page: z.string().optional(),
+        page: z.number().optional(),
       })
     )
     .query<PopularResponseType>(async ({ input }) => {
