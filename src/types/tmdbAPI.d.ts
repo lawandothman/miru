@@ -21,13 +21,7 @@ export interface Movie {
   video?: boolean;
   vote_average?: number;
 }
-export type PopularResponseType = {
-  page?: number;
-  results?: Movie[];
-  total_results?: number;
-  total_pages?: number;
-};
-export type TopRatedResponseType = {
+export type PaginatedMoviesResponseType = {
   page?: number;
   results?: Movie[];
   total_results?: number;
