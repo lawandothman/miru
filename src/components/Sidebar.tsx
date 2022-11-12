@@ -87,7 +87,7 @@ export const Sidebar = () => {
                   <li key={genre.id}>
                     <Link
                       className="flex items-center rounded-lg p-2 text-base font-normal text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-neutral-700"
-                      href="#"
+                      href={`/genre/${genre.id}`}
                     >
                       <span className="ml-3 text-sm">{genre.name}</span>
                     </Link>

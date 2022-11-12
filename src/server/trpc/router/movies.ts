@@ -69,4 +69,24 @@ export const moviesRouter = router({
         console.log(error);
       }
     }),
+  getByGenre: publicProcedure
+    .input(
+      z.object({
+        id: z.number(),
+        page: z.number().optional()
+      })
+    )
+    .query(async ({ input }) => {
+      try {
+        const res = await tmdbAPI.get("/3/discover/movie", {
+          params: {
+            with_genres: input.id,
+            page: input.page
+          },
+        });
+        return res.data;
+      } catch (error) {
+        console.log(error);
+      }
+    }),
 });
