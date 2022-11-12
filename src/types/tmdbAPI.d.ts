@@ -6,7 +6,7 @@ export type GenreResponseType = {
   genres: Genre[];
 };
 
-interface Movie {
+export interface Movie {
   poster_path?: string | null;
   adult?: boolean;
   overview?: string;
@@ -22,6 +22,12 @@ interface Movie {
   vote_average?: number;
 }
 export type PopularResponseType = {
+  page?: number;
+  results?: Movie[];
+  total_results?: number;
+  total_pages?: number;
+};
+export type TopRatedResponseType = {
   page?: number;
   results?: Movie[];
   total_results?: number;
