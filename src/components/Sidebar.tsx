@@ -63,7 +63,7 @@ export const Sidebar = () => {
                 <li>
                   <Link
                     className="flex items-center rounded-lg p-2 text-base font-normal text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-neutral-700"
-                    href="#"
+                    href="/upcoming"
                   >
                     <FiCalendar />
                     <span className="ml-3 text-sm">Upcoming</span>
