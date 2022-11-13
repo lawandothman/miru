@@ -7,6 +7,7 @@ import { trpc } from "utils/trpc";
 import { getYear } from "date-fns";
 import { FiLink, FiYoutube } from "react-icons/fi";
 import { FaImdb } from "react-icons/fa";
+import { Loader } from "components/Loader";
 
 const Movie: NextPage = () => {
   const { query } = useRouter();
@@ -14,12 +15,17 @@ const Movie: NextPage = () => {
     ? Number(query.id[0])
     : Number(query.id);
 
-  const { data: movie } = trpc.movies.getDetails.useQuery({ id: movieId });
+  const { data: movie, isLoading } = trpc.movies.getDetails.useQuery({
+    id: movieId,
+  });
 
   const trailer = movie?.videos?.results?.find(
     (video) => video.type === "Trailer" && video.site === "YouTube"
   );
 
+  if (isLoading) {
+    return <Loader />;
+  }
   return (
     <div className="flex flex-col px-8 pt-10">
       <div className="mx-auto flex flex-col gap-24 pt-10 md:flex-row">

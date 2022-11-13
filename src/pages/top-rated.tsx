@@ -1,3 +1,4 @@
+import { Loader } from "components/Loader";
 import { MoviesList } from "components/MoviesList";
 import { PageHeader } from "components/PageHeader";
 import { Pagination } from "components/Pagination";
@@ -14,7 +15,7 @@ const TopRated: NextPage = () => {
   const { data, isLoading } = trpc.movies.getTopRated.useQuery({ page });
 
   if (isLoading) {
-    return <div className="text-3xl text-white">LOADING</div>;
+    return <Loader />;
   }
 
   return (
