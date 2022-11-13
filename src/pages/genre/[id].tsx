@@ -1,3 +1,4 @@
+import { Loader } from "components/Loader";
 import { MoviesList } from "components/MoviesList";
 import { PageHeader } from "components/PageHeader";
 import { Pagination } from "components/Pagination";
@@ -23,7 +24,7 @@ const Genre: NextPage = () => {
   const isLoading = genresLoading || moviesLoading;
 
   if (isLoading) {
-    return <div className="text-3xl text-white">LOADING</div>;
+    return <Loader />;
   }
 
   return (
