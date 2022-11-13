@@ -1,6 +1,7 @@
 import tmdbAPI from "services/tmdbAPI";
 import type {
   GenreResponseType,
+  MovieDetailResponseType,
   PaginatedMoviesResponseType,
 } from "types/tmdbAPI";
 import { z } from "zod";
@@ -82,6 +83,24 @@ export const moviesRouter = router({
           params: {
             with_genres: input.id,
             page: input.page,
+          },
+        });
+        return res.data;
+      } catch (error) {
+        console.log(error);
+      }
+    }),
+  getDetails: publicProcedure
+    .input(
+      z.object({
+        id: z.number().optional(),
+      })
+    )
+    .query<MovieDetailResponseType>(async ({ input }) => {
+      try {
+        const res = await tmdbAPI.get(`/3/movie/${input.id}`, {
+          params: {
+            append_to_response: "videos",
           },
         });
         return res.data;
