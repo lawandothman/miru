@@ -36,7 +36,7 @@ const Genre: NextPage = () => {
         }
       />
       <MoviesList movies={data?.results} />
-      <Pagination page={page} />
+      <Pagination page={page} totalPages={data?.total_pages} />
     </div>
   );
 };

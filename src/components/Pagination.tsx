@@ -4,8 +4,9 @@ import type { FC } from "react";
 
 interface PaginationProps {
   page: number;
+  totalPages?: number;
 }
-export const Pagination: FC<PaginationProps> = ({ page }) => {
+export const Pagination: FC<PaginationProps> = ({ page, totalPages }) => {
   const { pathname, query } = useRouter();
 
   return (
@@ -25,18 +26,20 @@ export const Pagination: FC<PaginationProps> = ({ page }) => {
             Prev
           </Link>
         )}
-        <Link
-          href={{
-            pathname,
-            query: {
-              ...query,
-              page: page + 1,
-            },
-          }}
-          className="flex h-10 items-center rounded bg-neutral-800 px-10 text-white dark:bg-neutral-100 dark:text-black"
-        >
-          Next
-        </Link>
+        {page && totalPages && page !== totalPages && (
+          <Link
+            href={{
+              pathname,
+              query: {
+                ...query,
+                page: page + 1,
+              },
+            }}
+            className="flex h-10 items-center rounded bg-neutral-800 px-10 text-white dark:bg-neutral-100 dark:text-black"
+          >
+            Next
+          </Link>
+        )}
       </div>
     </>
   );

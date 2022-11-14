@@ -108,4 +108,24 @@ export const moviesRouter = router({
         console.log(error);
       }
     }),
+  search: publicProcedure
+    .input(
+      z.object({
+        query: z.string(),
+        page: z.number().optional(),
+      })
+    )
+    .query<PaginatedMoviesResponseType>(async ({ input }) => {
+      try {
+        const res = await tmdbAPI.get(`/3/search/movie`, {
+          params: {
+            query: input.query,
+            page: input.page,
+          },
+        });
+        return res.data;
+      } catch (error) {
+        console.log(error);
+      }
+    }),
 });

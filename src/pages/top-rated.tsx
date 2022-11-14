@@ -22,7 +22,7 @@ const TopRated: NextPage = () => {
     <div className="px-20 pt-20">
       <PageHeader title="Top Rated" />
       <MoviesList movies={data?.results} />
-      <Pagination page={page} />
+      <Pagination page={page} totalPages={data?.total_pages} />
     </div>
   );
 };
