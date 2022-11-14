@@ -5,7 +5,6 @@ import { FiSearch } from "react-icons/fi";
 
 export const SearchInput = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
 
   const formRef = useRef<HTMLFormElement>(null);
@@ -16,7 +15,6 @@ export const SearchInput = () => {
     if (searchQuery.length === 0) {
       return;
     }
-    setIsOpen(false);
     router.push({
       pathname: "/search",
       query: {
@@ -27,7 +25,6 @@ export const SearchInput = () => {
   };
 
   const onClick = () => {
-    setIsOpen(true);
     inputRef.current?.focus();
   };
 
@@ -36,22 +33,21 @@ export const SearchInput = () => {
   };
 
   return (
-    <form
-      className="relative flex h-10 items-center  justify-center rounded border border-neutral-300 p-2 outline-none"
-      onSubmit={onSubmit}
-      onClick={onClick}
-      ref={formRef}
-    >
-      <button aria-label="Search" className="pr-2">
-        <FiSearch className="text-neutral-300 " />
-      </button>
-      <input
-        placeholder="Search..."
-        type="text"
-        ref={inputRef}
-        onChange={onChange}
-        className="bg-transparent text-neutral-300 focus:outline-none "
-      />
-    </form>
+    <div>
+      <form
+        ref={formRef}
+        onSubmit={onSubmit}
+        className="relative mx-auto w-max"
+      >
+        <input
+          type="text"
+          onClick={onClick}
+          placeholder="Search.."
+          className="h-12 w-full cursor-auto bg-transparent pl-12 text-neutral-300 outline-none"
+          onChange={onChange}
+        />
+        <FiSearch className="absolute inset-y-0 my-auto h-8 w-12 stroke-neutral-400 px-3.5" />
+      </form>
+    </div>
   );
 };
