@@ -1,3 +1,4 @@
+import { Loader } from "components/Loader";
 import { MoviesList } from "components/MoviesList";
 import { PageHeader } from "components/PageHeader";
 import { Pagination } from "components/Pagination";
@@ -20,13 +21,20 @@ const Search: NextPage = () => {
     return <div>Ooops something went wrong</div>;
   }
 
-  const { data } = trpc.movies.search.useQuery({ query: searchQuery });
+  const { data, isLoading } = trpc.movies.search.useQuery({
+    query: searchQuery,
+    page,
+  });
+
+  if (isLoading) {
+    return <Loader />;
+  }
 
   return (
     <div className="px-20 pt-20">
       <PageHeader title={searchQuery} subtitle="Search results" />
       <MoviesList movies={data?.results} />
-      {data?.page && data.page > 1 && <Pagination page={page} />}
+      <Pagination page={page} totalPages={data?.total_pages} />
     </div>
   );
 };
