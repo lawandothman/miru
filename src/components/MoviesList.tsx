@@ -15,7 +15,7 @@ function cn(...classes: string[]) {
 
 export const MoviesList: FC<MoviesListProps> = ({ movies }) => {
   return (
-    <div className="my-8 mx-auto max-w-2xl lg:max-w-7xl">
+    <div className="my-8">
       <div className="grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 xl:gap-x-8">
         {movies?.map((movie) => {
           return <BlurImage key={movie.id} movie={movie} />;
