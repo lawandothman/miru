@@ -8,12 +8,43 @@ import {
   FiUser,
   FiX,
 } from "react-icons/fi";
-import { useState } from "react";
+import type { FC, PropsWithChildren } from "react";
+import React, { useState } from "react";
 import OutsideClickHandler from "react-outside-click-handler";
+import { cn } from "utils/cn";
+import { useRouter } from "next/router";
+
+interface NavItemProps {
+  href: string;
+  isSelected: boolean;
+  icon?: React.ReactNode;
+}
+const NavItem: FC<PropsWithChildren<NavItemProps>> = ({
+  href,
+  isSelected,
+  icon,
+  children,
+}) => {
+  return (
+    <li>
+      <Link
+        className={cn(
+          "flex items-center rounded-lg p-2 text-base font-normal text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-neutral-700",
+          isSelected ? "bg-gray-100 dark:bg-neutral-700" : "bg-transparent"
+        )}
+        href={href}
+      >
+        {icon}
+        <span className="ml-3 text-sm">{children}</span>
+      </Link>
+    </li>
+  );
+};
 
 export const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { data } = trpc.movies.getGenres.useQuery();
+  const router = useRouter();
 
   return (
     <>
@@ -32,11 +63,12 @@ export const Sidebar = () => {
           </h1>
         </div>
         <aside
-          className={`${
+          className={cn(
+            "z-30 h-full w-60 transform overflow-y-auto border-r border-gray-200 bg-white transition duration-200 ease-in-out dark:border-neutral-700 dark:bg-neutral-900 lg:z-auto lg:translate-x-0",
             isOpen
               ? "fixed inset-y-0 left-0 translate-x-0"
               : "fixed inset-y-0 -translate-x-full"
-          }  z-30 h-full w-60 transform overflow-y-auto border-r border-gray-200 bg-white transition duration-200 ease-in-out dark:border-neutral-700 dark:bg-neutral-900 lg:z-auto lg:translate-x-0 `}
+          )}
           aria-label="Sidenav"
         >
           <div className="mb-6 mt-4 flex items-center justify-between pl-4 dark:text-white">
@@ -51,47 +83,40 @@ export const Sidebar = () => {
           <main className="flex flex-col p-2">
             <nav>
               <ul className="space-y-2">
-                <li>
-                  <Link
-                    className="flex items-center rounded-lg p-2 text-base font-normal text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-neutral-700"
-                    href="/popular"
-                  >
-                    <FiHeart />
-                    <span className="ml-3 text-sm">Popular</span>
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    className="flex items-center rounded-lg p-2 text-base font-normal text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-neutral-700"
-                    href="/upcoming"
-                  >
-                    <FiCalendar />
-                    <span className="ml-3 text-sm">Upcoming</span>
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    className="flex items-center rounded-lg p-2 text-base font-normal text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-neutral-700"
-                    href="/top-rated"
-                  >
-                    <FiTrendingUp />
-                    <span className="ml-3 text-sm">Top Rated</span>
-                  </Link>
-                </li>
+                <NavItem
+                  isSelected={router.pathname === "/popular"}
+                  href="/popular"
+                  icon={<FiHeart />}
+                >
+                  Popular
+                </NavItem>
+                <NavItem
+                  isSelected={router.pathname === "/upcoming"}
+                  href="/upcoming"
+                  icon={<FiCalendar />}
+                >
+                  Upcoming
+                </NavItem>
+                <NavItem
+                  isSelected={router.pathname === "/top-rated"}
+                  href="/top-rated"
+                  icon={<FiTrendingUp />}
+                >
+                  Top Rated
+                </NavItem>
               </ul>
             </nav>
             <nav>
               <p className="pl-3 pb-2 pt-4 text-sm text-white">Genres</p>
               <ul className="space-y-2">
                 {data?.genres?.map((genre) => (
-                  <li key={genre.id}>
-                    <Link
-                      className="flex items-center rounded-lg p-2 text-base font-normal text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-neutral-700"
-                      href={`/genre/${genre.id}`}
-                    >
-                      <span className="ml-3 text-sm">{genre.name}</span>
-                    </Link>
-                  </li>
+                  <NavItem
+                    href={`/genre/${genre.id}`}
+                    isSelected={router.asPath === `/genre/${genre.id}`}
+                    key={genre.id}
+                  >
+                    {genre.name}
+                  </NavItem>
                 ))}
               </ul>
             </nav>

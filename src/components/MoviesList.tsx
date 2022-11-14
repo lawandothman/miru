@@ -3,14 +3,11 @@ import Link from "next/link";
 import type { FC } from "react";
 import { useState } from "react";
 import type { Movie } from "types/tmdbAPI";
+import { cn } from "utils/cn";
 import { getImage } from "utils/image";
 
 interface MoviesListProps {
   movies?: Movie[];
-}
-
-function cn(...classes: string[]) {
-  return classes.filter(Boolean).join(" ");
 }
 
 export const MoviesList: FC<MoviesListProps> = ({ movies }) => {
