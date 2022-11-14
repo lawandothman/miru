@@ -15,8 +15,8 @@ function cn(...classes: string[]) {
 
 export const MoviesList: FC<MoviesListProps> = ({ movies }) => {
   return (
-    <div className="mx-auto max-w-2xl py-16 px-4 sm:py-24 sm:px-6 lg:max-w-7xl lg:px-8">
-      <div className="grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
+    <div className="my-8 max-w-2xl lg:max-w-7xl">
+      <div className="grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 xl:gap-x-8">
         {movies?.map((movie) => {
           return <BlurImage key={movie.id} movie={movie} />;
         })}
@@ -28,8 +28,8 @@ export const MoviesList: FC<MoviesListProps> = ({ movies }) => {
 const BlurImage = ({ movie }: { movie: Movie }) => {
   const [isLoading, setLoading] = useState(true);
   return (
-    <Link key={movie?.id} href={`/movie/${movie.id}`} className=" group h-full">
-      <div className="aspect-w-1 aspect-h-1 xl:aspect-w-7 xl:aspect-h-8 relative h-96 w-full overflow-hidden rounded-lg lg:h-96">
+    <Link href={`/movie/${movie.id}`} className="group h-full">
+      <div className="aspect-w-1 aspect-h-1 xl:aspect-w-7 xl:aspect-h-8 relative h-[500px] w-full overflow-hidden rounded-lg lg:h-[500px]">
         {movie.poster_path && (
           <Image
             alt=""
