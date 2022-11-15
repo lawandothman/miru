@@ -29,7 +29,7 @@ const BlurImage = ({ movie }: { movie: Movie }) => {
       <div className="aspect-w-1 aspect-h-1 xl:aspect-w-7 xl:aspect-h-8 relative h-[500px] w-full overflow-hidden rounded-lg lg:h-[500px]">
         {movie.poster_path && (
           <Image
-            alt=""
+            alt={movie.title ?? ""}
             src={getImage(movie.poster_path)}
             layout="fill"
             objectFit="cover"
