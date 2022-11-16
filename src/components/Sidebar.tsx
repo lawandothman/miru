@@ -132,7 +132,7 @@ export const Sidebar = () => {
                     </div>
                   </div>
                   <button
-                    className="mt-2 flex justify-center p-2 text-base font-normal text-red-500 dark:bg-neutral-900"
+                    className="mx-auto mt-2 flex justify-center p-2 text-base font-normal text-red-500 dark:bg-neutral-900"
                     onClick={() => signOut()}
                   >
                     Sign out
@@ -140,7 +140,7 @@ export const Sidebar = () => {
                 </>
               ) : (
                 <button
-                  className="mx-auto mt-2 flex justify-center py-1 text-base font-normal dark:bg-white dark:text-black px-8 rounded"
+                  className="mx-auto mt-2 flex justify-center rounded py-1 px-8 text-base font-normal dark:bg-white dark:text-black"
                   onClick={() => signIn()}
                 >
                   Login
