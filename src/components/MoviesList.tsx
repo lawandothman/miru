@@ -32,6 +32,7 @@ const BlurImage = ({ movie }: { movie: Movie }) => {
             alt={movie.title ?? ""}
             src={getImage(movie.poster_path)}
             layout="fill"
+            loading="lazy"
             objectFit="cover"
             className={cn(
               "absolute top-0 left-0 bottom-0 right-0 min-h-full min-w-full duration-200 ease-in-out group-hover:scale-110",

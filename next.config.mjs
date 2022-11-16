@@ -16,9 +16,9 @@ const config = {
   images: {
     remotePatterns: [
       {
-        hostname: 'image.tmdb.org'
-      }
-    ]
-  }
+        hostname: "image.tmdb.org",
+      },
+    ],
+  },
 };
 export default config;
