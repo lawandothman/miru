@@ -1,18 +1,13 @@
 import Link from "next/link";
 import { trpc } from "utils/trpc";
-import {
-  FiCalendar,
-  FiHeart,
-  FiMenu,
-  FiTrendingUp,
-  FiUser,
-  FiX,
-} from "react-icons/fi";
+import { FiCalendar, FiHeart, FiMenu, FiTrendingUp, FiX } from "react-icons/fi";
 import type { FC, PropsWithChildren } from "react";
 import React, { useState } from "react";
 import OutsideClickHandler from "react-outside-click-handler";
 import { cn } from "utils/cn";
 import { useRouter } from "next/router";
+import { signIn, signOut } from "next-auth/react";
+import { ProfilePicture } from "./Avatar";
 
 interface NavItemProps {
   href: string;
@@ -44,7 +39,9 @@ const NavItem: FC<PropsWithChildren<NavItemProps>> = ({
 export const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { data } = trpc.movies.getGenres.useQuery();
+
   const router = useRouter();
+  const { data: session } = trpc.auth.getSession.useQuery();
 
   return (
     <>
@@ -124,14 +121,33 @@ export const Sidebar = () => {
           <footer className="sticky bottom-0 left-0 w-60">
             <div className="h-8 bg-gradient-to-t from-white dark:from-neutral-900"></div>
             <div className="p-4 dark:bg-neutral-900">
-              <Link
-                className="flex items-center rounded-lg p-2 text-base font-normal text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-neutral-700"
-                href="#"
-              >
-                <FiUser />
-                <span className="ml-3 text-sm">Profile</span>
-              </Link>
+              {session?.user ? (
+                <>
+                  <div className="flex w-full items-center justify-between rounded-lg p-2 text-base font-normal text-gray-900  dark:text-white ">
+                    <div>
+                      <ProfilePicture user={session.user} />
+                      <span className="ml-3 text-sm">
+                        {session?.user?.name ?? "Profile"}
+                      </span>
+                    </div>
+                  </div>
+                  <button
+                    className="mt-2 flex justify-center p-2 text-base font-normal text-red-500 dark:bg-neutral-900"
+                    onClick={() => signOut()}
+                  >
+                    Sign out
+                  </button>
+                </>
+              ) : (
+                <button
+                  className="mx-auto mt-2 flex justify-center py-1 text-base font-normal dark:bg-white dark:text-black px-8 rounded"
+                  onClick={() => signIn()}
+                >
+                  Login
+                </button>
+              )}
             </div>
+            <div className="p-4 dark:bg-neutral-900"></div>
           </footer>
         </aside>
       </OutsideClickHandler>
