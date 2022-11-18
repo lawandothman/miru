@@ -230,6 +230,62 @@ export const moviesRouter = router({
         console.log(error);
       }
     }),
+  watchMovie: protectedProcedure
+    .input(
+      z.object({
+        movieId: z.number(),
+        title: z.string(),
+        releaseDate: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      try {
+        await prisma?.movie.upsert({
+          create: {
+            tmdbId: input.movieId,
+            title: input.title,
+            releaseDate: input.releaseDate,
+            watchedBy: {
+              connectOrCreate: {
+                create: {
+                  id: ctx?.session?.user?.id,
+                },
+                where: {
+                  id: ctx?.session?.user?.id,
+                },
+              },
+            },
+          },
+          update: {
+            likedBy: {
+              disconnect: {
+                id: ctx?.session?.user?.id,
+              },
+            },
+            dislikedBy: {
+              disconnect: {
+                id: ctx?.session?.user?.id,
+              },
+            },
+            watchedBy: {
+              connectOrCreate: {
+                create: {
+                  id: ctx?.session?.user?.id,
+                },
+                where: {
+                  id: ctx?.session?.user?.id,
+                },
+              },
+            },
+          },
+          where: {
+            tmdbId: input.movieId,
+          },
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    }),
   getLiked: protectedProcedure.query(async ({ ctx }) => {
     try {
       return await prisma?.movie.findMany({
@@ -250,6 +306,21 @@ export const moviesRouter = router({
       return await prisma?.movie.findMany({
         where: {
           dislikedBy: {
+            some: {
+              id: ctx.session?.user?.id,
+            },
+          },
+        },
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }),
+  getWatched: protectedProcedure.query(async ({ ctx }) => {
+    try {
+      return await prisma?.movie.findMany({
+        where: {
+          watchedBy: {
             some: {
               id: ctx.session?.user?.id,
             },

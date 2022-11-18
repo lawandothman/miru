@@ -26,6 +26,7 @@ const Movie: NextPage = () => {
   const { data: session } = trpc.auth.getSession.useQuery();
   const { mutate: likeMovie } = trpc.movies.likeMovie.useMutation();
   const { mutate: dislikeMovie } = trpc.movies.dislikeMovie.useMutation();
+  const { mutate: watchMovie } = trpc.movies.watchMovie.useMutation();
 
   if (isLoading) {
     return <Loader />;
@@ -104,7 +105,16 @@ const Movie: NextPage = () => {
             </div>
             {session && session.user && (
               <div className="mt-12 flex gap-8">
-                <button className="rounded border p-2 text-black dark:bg-white">
+                <button
+                  onClick={() => {
+                    watchMovie({
+                      movieId: movie?.id ?? 1,
+                      releaseDate: movie?.release_date ?? "",
+                      title: movie?.title ?? "",
+                    });
+                  }}
+                  className="rounded border p-2 text-black dark:bg-white"
+                >
                   Seen it
                 </button>
                 <button
