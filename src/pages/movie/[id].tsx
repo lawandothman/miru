@@ -23,9 +23,14 @@ const Movie: NextPage = () => {
     (video) => video.type === "Trailer" && video.site === "YouTube"
   );
 
+  const { data: session } = trpc.auth.getSession.useQuery();
+  const { mutate: likeMovie } = trpc.movies.likeMovie.useMutation();
+  const { mutate: dislikeMovie } = trpc.movies.dislikeMovie.useMutation();
+
   if (isLoading) {
     return <Loader />;
   }
+
   return (
     <div className="flex flex-col px-8 pt-10">
       <div className="mx-auto flex flex-col gap-24 pt-10 md:flex-row">
@@ -97,6 +102,37 @@ const Movie: NextPage = () => {
                 </Link>
               )}
             </div>
+            {session && session.user && (
+              <div className="mt-12 flex gap-8">
+                <button className="rounded border p-2 text-black dark:bg-white">
+                  Seen it
+                </button>
+                <button
+                  onClick={() => {
+                    likeMovie({
+                      movieId: movie?.id ?? 1,
+                      releaseDate: movie?.release_date ?? "",
+                      title: movie?.title ?? "",
+                    });
+                  }}
+                  className="rounded border p-2 text-black dark:bg-white"
+                >
+                  Want to watch
+                </button>
+                <button
+                  onClick={() => {
+                    dislikeMovie({
+                      movieId: movie?.id ?? 1,
+                      releaseDate: movie?.release_date ?? "",
+                      title: movie?.title ?? "",
+                    });
+                  }}
+                  className="rounded border p-2 text-black dark:bg-white"
+                >
+                  Not Interested
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>

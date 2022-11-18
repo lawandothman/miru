@@ -44,13 +44,16 @@ model Session {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
-  accounts      Account[]
-  sessions      Session[]
+  id             String    @id @default(cuid())
+  name           String?
+  email          String?   @unique
+  emailVerified  DateTime?
+  image          String?
+  accounts       Account[]
+  sessions       Session[]
+  likedMovies    Movie[]   @relation("like")
+  dislikedMovies Movie[]   @relation("dislike")
+  watchedMovies  Movie[]   @relation("watch")
 }
 
 model VerificationToken {
@@ -59,4 +62,16 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model Movie {
+  id          String @id @default(cuid())
+  tmdbId      Int    @unique
+  title       String
+  releaseDate String
+  likedBy     User[] @relation("like")
+  dislikedBy  User[] @relation("dislike")
+  watchedBy   User[] @relation("watch")
+
+  @@index([tmdbId])
 }

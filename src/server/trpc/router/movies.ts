@@ -5,7 +5,7 @@ import type {
   PaginatedMoviesResponseType,
 } from "types/tmdbAPI";
 import { z } from "zod";
-import { publicProcedure, router } from "../trpc";
+import { protectedProcedure, publicProcedure, router } from "../trpc";
 
 export const moviesRouter = router({
   getGenres: publicProcedure.query<GenreResponseType>(async () => {
@@ -128,4 +128,136 @@ export const moviesRouter = router({
         console.log(error);
       }
     }),
+  likeMovie: protectedProcedure
+    .input(
+      z.object({
+        movieId: z.number(),
+        title: z.string(),
+        releaseDate: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      try {
+        await prisma?.movie.upsert({
+          create: {
+            tmdbId: input.movieId,
+            title: input.title,
+            releaseDate: input.releaseDate,
+            likedBy: {
+              connectOrCreate: {
+                create: {
+                  id: ctx?.session?.user?.id,
+                },
+                where: {
+                  id: ctx?.session?.user?.id,
+                },
+              },
+            },
+          },
+          update: {
+            dislikedBy: {
+              disconnect: {
+                id: ctx?.session?.user?.id,
+              },
+            },
+            likedBy: {
+              connectOrCreate: {
+                create: {
+                  id: ctx?.session?.user?.id,
+                },
+                where: {
+                  id: ctx?.session?.user?.id,
+                },
+              },
+            },
+          },
+          where: {
+            tmdbId: input.movieId,
+          },
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    }),
+  dislikeMovie: protectedProcedure
+    .input(
+      z.object({
+        movieId: z.number(),
+        title: z.string(),
+        releaseDate: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      try {
+        await prisma?.movie.upsert({
+          create: {
+            tmdbId: input.movieId,
+            title: input.title,
+            releaseDate: input.releaseDate,
+            dislikedBy: {
+              connectOrCreate: {
+                create: {
+                  id: ctx?.session?.user?.id,
+                },
+                where: {
+                  id: ctx?.session?.user?.id,
+                },
+              },
+            },
+          },
+          update: {
+            likedBy: {
+              disconnect: {
+                id: ctx?.session?.user?.id,
+              },
+            },
+            dislikedBy: {
+              connectOrCreate: {
+                create: {
+                  id: ctx?.session?.user?.id,
+                },
+                where: {
+                  id: ctx?.session?.user?.id,
+                },
+              },
+            },
+          },
+          where: {
+            tmdbId: input.movieId,
+          },
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    }),
+  getLiked: protectedProcedure.query(async ({ ctx }) => {
+    try {
+      return await prisma?.movie.findMany({
+        where: {
+          likedBy: {
+            some: {
+              id: ctx.session?.user?.id,
+            },
+          },
+        },
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }),
+  getDisliked: protectedProcedure.query(async ({ ctx }) => {
+    try {
+      return await prisma?.movie.findMany({
+        where: {
+          dislikedBy: {
+            some: {
+              id: ctx.session?.user?.id,
+            },
+          },
+        },
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }),
 });

@@ -69,7 +69,7 @@ export const Sidebar = () => {
           aria-label="Sidenav"
         >
           <div className="mb-6 mt-4 flex items-center justify-between pl-4 dark:text-white">
-            <h1 className="text-lg">ミル Miru</h1>
+            <Link href='/' className="text-lg">ミル Miru</Link>
             <button
               onClick={() => setIsOpen(false)}
               className="mr-2 rounded p-1 hover:bg-neutral-700 lg:hidden"
