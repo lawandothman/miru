@@ -12,7 +12,6 @@ type Movie {
 }
 
 type Query {
-  movies: [Movie]
   movie(id: ID): Movie
   search(query: String): [Movie]
 }

@@ -14,11 +14,6 @@ export interface Context {
   movieRepo: MovieRepo
 }
 
-const movies: Movie[] = [
-  //@ts-ignore
-  { title: 'The Awakening', }, { title: 'City of Glass', },
-];
-
 const resolvers: Resolvers = {
   Query: {
     movie: async (_parent, { id }, { movieRepo }) => {
