@@ -1,0 +1,32 @@
+{
+  "name": "omni",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "generate": "graphql-codegen --config codegen.yaml",
+    "compile": "npm run generate && tsc",
+    "dev": "nodemon -e ts --exec \\\"tsc && node dist/index.js\\\"",
+    "start": "npm run compile && node ./dist/index.js"
+  },
+  "dependencies": {
+    "@apollo/server": "^4.3.0",
+    "dotenv": "^16.0.3",
+    "esm": "^3.2.25",
+    "graphql": "^16.6.0",
+    "neo4j-driver": "^5.3.0",
+    "omni": "^0.2.6",
+    "workspace": "^0.0.1-preview.1"
+  },
+  "devDependencies": {
+    "@graphql-codegen/cli": "^2.16.1",
+    "@graphql-codegen/typescript": "^2.8.5",
+    "@graphql-codegen/typescript-resolvers": "^2.7.10",
+    "@types/axios": "^0.14.0",
+    "@types/node": "^18.11.16",
+    "axios": "^1.2.1",
+    "neo4j-driver": "^5.3.0",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.9.4"
+  }
+}

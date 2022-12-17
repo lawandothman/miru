@@ -1,0 +1,25 @@
+type Movie {
+  title: String!
+  posterUrl: String
+  adult: Boolean
+  overview: String
+  releaseDate: String
+  id: ID!
+  originalTitle: String
+  backdropUrl: String
+  popularity: Float
+  # genre_ids?: number[]
+}
+
+type Query {
+  movies: [Movie]
+  movie(id: ID): Movie
+  search(query: String): [Movie]
+}
+
+
+# interface MutationResponse {
+#   code: String!
+#   success: Boolean!
+#   message: String!
+# }

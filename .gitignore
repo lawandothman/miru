@@ -1,7 +1,8 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-/node_modules
+node_modules
+dist
 /.pnp
 .pnp.js
 
@@ -13,8 +14,8 @@
 /prisma/db.sqlite-journal
 
 # next.js
-/.next/
-/out/
+.next
+out/
 
 # production
 /build
@@ -38,3 +39,4 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
+.turbo
