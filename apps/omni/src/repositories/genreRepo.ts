@@ -7,6 +7,7 @@ export interface Repository<T> {
   upsert(obj: T): Promise<T | null>
 }
 
+// We will slowly deprecate this for loading of data
 export class GenreRepo implements Repository<Genre> {
   constructor(
     private readonly driver: Driver) {

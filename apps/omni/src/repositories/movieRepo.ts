@@ -35,6 +35,7 @@ function mapTo<T>(record: Dict<PropertyKey, any> | null, key: string): T | null 
   }
 }
 
+// We will slowly deprecate this for reading of data 
 export class MovieRepo implements Repository<Movie> {
   constructor(
     private readonly driver: Driver) {

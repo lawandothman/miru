@@ -1,6 +1,5 @@
-import { Driver } from "neo4j-driver-core";
+import type { Driver } from "neo4j-driver-core";
 import { readdirSync, readFileSync } from "fs";
-import { timeStamp } from "console";
 
 export class Migrator {
   constructor(private readonly driver: Driver) {}

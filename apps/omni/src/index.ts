@@ -1,9 +1,8 @@
-import * as dotenv from 'dotenv'
-dotenv.config()
+import dotenv from 'dotenv'
 import { ApolloServer } from '@apollo/server';
 import { startStandaloneServer } from '@apollo/server/standalone';
 import { readFileSync } from 'fs';
-import { Movie, Resolvers } from './__generated__/resolvers-types';
+import type { Movie, Resolvers } from './__generated__/resolvers-types';
 import neo4j from 'neo4j-driver'
 import { MovieRepo, NeoDataSource } from './repositories/movieRepo';
 import { MovieDbService } from './services/movieDbService';
@@ -11,6 +10,8 @@ import { SyncService } from './services/syncService';
 import { Migrator } from './migrator';
 import { GenreRepo } from './repositories/genreRepo';
 import DataLoader from 'dataloader';
+
+dotenv.config()
 
 const schema = (readFileSync('./schema.graphql')).toString()
 
@@ -65,8 +66,9 @@ async function main() {
   syncService.start()
     .catch(console.error)
 
+  const port = +(process.env?.PORT ?? "4000")
   const { url } = await startStandaloneServer(server, {
-    listen: { port: 4000 },
+    listen: { port },
     context: async () => {
       const neo = new NeoDataSource(driver)
       const context: Context = {

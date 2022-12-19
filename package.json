@@ -9,7 +9,11 @@
   "workspaces": [
     "apps/*"
   ],
-  "scripts": {},
+  "scripts": {
+    "lint": "turbo lint",
+    "lint:fix": "turbo lint:fix",
+    "dev": "turbo dev"
+  },
   "devDependencies": {
     "nodemon": "^2.0.20",
     "turbo": "^1.6.3"
