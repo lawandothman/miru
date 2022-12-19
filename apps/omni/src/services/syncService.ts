@@ -16,13 +16,10 @@ export class SyncService {
     let page = 1 
     await this.syncGenres()
     while(true) {
-      console.debug('Get movies')
       try {
         const movies = await this.getPopularMovies(page)
-        console.debug('movies got')
         movies.forEach((movie) => this.movieRepo.upsert(movie))
         page = this.getNextPage(page)
-        console.debug('next page calculated', page)
       } catch(e) {
         console.error('Failed to fetch page', e)
       }
@@ -33,7 +30,6 @@ export class SyncService {
 
   async syncGenres(): Promise<void> {
     const genres = await this.movieDbService.getGenres()
-    console.log('Syncing genres')
     genres.forEach(g => (
       this.genreRepo.upsert(g)
     ))

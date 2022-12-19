@@ -15,11 +15,11 @@ type Movie {
 type Genre {
   id: ID!
   name: String!
-  movies: [Movie]
 }
 
 type Query {
   movie(id: ID!): Movie
+  moviesByGenre(genreId: ID!): [Movie]
   search(query: String!): [Movie]
 }
 

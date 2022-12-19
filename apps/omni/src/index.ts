@@ -3,40 +3,40 @@ dotenv.config()
 import { ApolloServer } from '@apollo/server';
 import { startStandaloneServer } from '@apollo/server/standalone';
 import { readFileSync } from 'fs';
-import { Genre, Movie, Resolvers } from './__generated__/resolvers-types';
+import { Movie, Resolvers } from './__generated__/resolvers-types';
 import neo4j from 'neo4j-driver'
-import { MovieRepo } from './repositories/movieRepo';
+import { MovieRepo, NeoDataSource } from './repositories/movieRepo';
 import { MovieDbService } from './services/movieDbService';
 import { SyncService } from './services/syncService';
 import { Migrator } from './migrator';
 import { GenreRepo } from './repositories/genreRepo';
+import DataLoader from 'dataloader';
 
 const schema = (readFileSync('./schema.graphql')).toString()
 
 export interface Context {
   movieRepo: MovieRepo
   genreRepo: GenreRepo
+  movieLoader: DataLoader<string, Movie>
 }
 
 const resolvers: Resolvers = {
   Query: {
-    movie: async (_parent, { id }, { movieRepo }) => {
-      return await movieRepo.get(id)
+    movie: async (_parent, { id }, { movieLoader }) => {
+      return await movieLoader.load(id)
     },
     search: async (_parent, { query }, { movieRepo }) => {
       return await movieRepo.search(query)
     },
+    moviesByGenre: async (_parent, { genreId }, { movieRepo }) => {
+      return await movieRepo.getMoviesByGenre(genreId)
+    }
   },
   Movie: {
     genres: async (parent, _, { movieRepo }) => {
       return await movieRepo.getGenres(parent)
     }
   },
-  Genre: { 
-    movies: async (parent, _, { movieRepo }) => {
-      return await movieRepo.getMoviesByGenre(parent)
-    }
-  }
 };
 
 const driver = neo4j.driver(
@@ -52,7 +52,7 @@ const server = new ApolloServer({
 const movieDbService = new MovieDbService()
 
 const syncService = new SyncService(
-  new MovieRepo(driver, movieDbService),
+  new MovieRepo(driver),
   new GenreRepo(driver),
   movieDbService
 )
@@ -68,9 +68,11 @@ async function main() {
   const { url } = await startStandaloneServer(server, {
     listen: { port: 4000 },
     context: async () => {
+      const neo = new NeoDataSource(driver)
       const context: Context = {
-        movieRepo: new MovieRepo(driver, movieDbService),
-        genreRepo: new GenreRepo(driver)
+        movieRepo: new MovieRepo(driver),
+        genreRepo: new GenreRepo(driver),
+        movieLoader: new DataLoader(neo.getMovies.bind(neo))
       }
       return context
     }

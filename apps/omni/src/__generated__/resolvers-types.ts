@@ -18,7 +18,6 @@ export type Scalars = {
 export type Genre = {
   __typename?: 'Genre';
   id: Scalars['ID'];
-  movies?: Maybe<Array<Maybe<Movie>>>;
   name: Scalars['String'];
 };
 
@@ -39,12 +38,18 @@ export type Movie = {
 export type Query = {
   __typename?: 'Query';
   movie?: Maybe<Movie>;
+  moviesByGenre?: Maybe<Array<Maybe<Movie>>>;
   search?: Maybe<Array<Maybe<Movie>>>;
 };
 
 
 export type QueryMovieArgs = {
   id: Scalars['ID'];
+};
+
+
+export type QueryMoviesByGenreArgs = {
+  genreId: Scalars['ID'];
 };
 
 
@@ -144,7 +149,6 @@ export type ResolversParentTypes = ResolversObject<{
 
 export type GenreResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Genre'] = ResolversParentTypes['Genre']> = ResolversObject<{
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  movies?: Resolver<Maybe<Array<Maybe<ResolversTypes['Movie']>>>, ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
@@ -165,6 +169,7 @@ export type MovieResolvers<ContextType = Context, ParentType extends ResolversPa
 
 export type QueryResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
   movie?: Resolver<Maybe<ResolversTypes['Movie']>, ParentType, ContextType, RequireFields<QueryMovieArgs, 'id'>>;
+  moviesByGenre?: Resolver<Maybe<Array<Maybe<ResolversTypes['Movie']>>>, ParentType, ContextType, RequireFields<QueryMoviesByGenreArgs, 'genreId'>>;
   search?: Resolver<Maybe<Array<Maybe<ResolversTypes['Movie']>>>, ParentType, ContextType, RequireFields<QuerySearchArgs, 'query'>>;
 }>;
 

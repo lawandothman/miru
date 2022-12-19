@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@apollo/server": "^4.3.0",
+    "dataloader": "^2.1.0",
     "dotenv": "^16.0.3",
     "esm": "^3.2.25",
     "graphql": "^16.6.0",
