@@ -1,7 +1,7 @@
-import { Driver } from "neo4j-driver";
+import { Driver, session } from "neo4j-driver";
 import { Dict } from "neo4j-driver-core/types/record";
 import { MovieDbService } from "../services/movieDbService";
-import { Movie } from "../__generated__/resolvers-types";
+import { Genre, Movie } from "../__generated__/resolvers-types";
 
 export interface Repository<T> {
   get(id: string): Promise<T | null>
@@ -30,16 +30,46 @@ export class MovieRepo implements Repository<Movie> {
 
   async upsert(movie: Movie): Promise<Movie|null> {
     const session = this.driver.session()
-    const res = await session.run(`MERGE (m:Movie {
-          id: $id
-      })
-      ${this.builtSetQuery(movie, 'm')}
-      RETURN m`,
-      { ...movie }
-    )
-    session.close()
+    const res = await session.executeWrite(async (tx) => {
+      const res = await tx.run(`merge (m:Movie {
+            id: $id
+        })
+        ${this.builtSetQuery(movie, 'm')}
+        return m`,
+        { ...movie }
+      )
+      await Promise.all(movie.genres?.map((genre) => {
+        return tx.run(`
+          MATCH (m:Movie {id: $movieId}), (g:Genre {id: $genreId}) 
+          MERGE (m)-[r:IS_A]->(g) 
+          RETURN m,r,g`,
+          { movieId: movie.id, genreId: genre!.id })
+      }) ?? [])
+
+      return res 
+    })
 
     return this.mapTo<Movie>(res.records[0].toObject(), 'm')
+  }
+
+  async getMoviesByGenre(genre: Genre): Promise<Movie[]> {
+    const session = this.driver.session()
+    const res = await session.run(`
+      MATCH (m:Movie)-[r:IS_A]->(g:Genre {id: $id})
+      RETURN m LIMIT 20
+    `, { id: genre.id })
+
+    return res.records.map(record => this.mapTo<Movie>(record.toObject(), 'm')) as Movie[]
+  }
+
+  async getGenres(movie: Movie): Promise<Genre[]> {
+    const session = this.driver.session()
+    const res = await session.run(`
+      MATCH (m:Movie {id: $id})-[r:IS_A]->(g:Genre)
+      RETURN g
+    `, { id: movie.id })
+
+    return res.records.map(record => this.mapTo<Genre>(record.toObject(), 'g')) as Genre[]
   }
 
   async search(query: string): Promise<Movie[]> {
@@ -57,6 +87,7 @@ export class MovieRepo implements Repository<Movie> {
   
   private builtSetQuery(obj: any, entryKey: string): string {
     return Object.entries(obj)
+      .filter(([_, value]) => !Array.isArray(value))
       .filter(([_,value]) => value != null)
       .map(([key,_]) => `SET ${entryKey}.${key} = $${key}`).join('\n')
 

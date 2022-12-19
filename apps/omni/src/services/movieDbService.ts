@@ -1,5 +1,4 @@
 import axios from 'axios'
-import { isDataView } from 'util/types'
 import { Genre, Movie } from '../__generated__/resolvers-types'
 
 export class MovieDbService {

@@ -3,7 +3,7 @@ dotenv.config()
 import { ApolloServer } from '@apollo/server';
 import { startStandaloneServer } from '@apollo/server/standalone';
 import { readFileSync } from 'fs';
-import { Movie, Resolvers } from './__generated__/resolvers-types';
+import { Genre, Movie, Resolvers } from './__generated__/resolvers-types';
 import neo4j from 'neo4j-driver'
 import { MovieRepo } from './repositories/movieRepo';
 import { MovieDbService } from './services/movieDbService';
@@ -15,6 +15,7 @@ const schema = (readFileSync('./schema.graphql')).toString()
 
 export interface Context {
   movieRepo: MovieRepo
+  genreRepo: GenreRepo
 }
 
 const resolvers: Resolvers = {
@@ -26,6 +27,16 @@ const resolvers: Resolvers = {
       return await movieRepo.search(query)
     },
   },
+  Movie: {
+    genres: async (parent, _, { movieRepo }) => {
+      return await movieRepo.getGenres(parent)
+    }
+  },
+  Genre: { 
+    movies: async (parent, _, { movieRepo }) => {
+      return await movieRepo.getMoviesByGenre(parent)
+    }
+  }
 };
 
 const driver = neo4j.driver(
@@ -58,7 +69,8 @@ async function main() {
     listen: { port: 4000 },
     context: async () => {
       const context: Context = {
-        movieRepo: new MovieRepo(driver, movieDbService)
+        movieRepo: new MovieRepo(driver, movieDbService),
+        genreRepo: new GenreRepo(driver)
       }
       return context
     }
