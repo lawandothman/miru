@@ -5,6 +5,7 @@ export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
+export type RequireFields<T, K extends keyof T> = Omit<T, K> & { [P in K]-?: NonNullable<T[P]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -14,10 +15,18 @@ export type Scalars = {
   Float: number;
 };
 
+export type Genre = {
+  __typename?: 'Genre';
+  id: Scalars['ID'];
+  movies?: Maybe<Array<Maybe<Movie>>>;
+  name: Scalars['String'];
+};
+
 export type Movie = {
   __typename?: 'Movie';
   adult?: Maybe<Scalars['Boolean']>;
   backdropUrl?: Maybe<Scalars['String']>;
+  genres?: Maybe<Array<Maybe<Genre>>>;
   id: Scalars['ID'];
   originalTitle?: Maybe<Scalars['String']>;
   overview?: Maybe<Scalars['String']>;
@@ -30,18 +39,17 @@ export type Movie = {
 export type Query = {
   __typename?: 'Query';
   movie?: Maybe<Movie>;
-  movies?: Maybe<Array<Maybe<Movie>>>;
   search?: Maybe<Array<Maybe<Movie>>>;
 };
 
 
 export type QueryMovieArgs = {
-  id?: InputMaybe<Scalars['ID']>;
+  id: Scalars['ID'];
 };
 
 
 export type QuerySearchArgs = {
-  query?: InputMaybe<Scalars['String']>;
+  query: Scalars['String'];
 };
 
 export type WithIndex<TObject> = TObject & Record<string, any>;
@@ -116,6 +124,7 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 export type ResolversTypes = ResolversObject<{
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
   Float: ResolverTypeWrapper<Scalars['Float']>;
+  Genre: ResolverTypeWrapper<Genre>;
   ID: ResolverTypeWrapper<Scalars['ID']>;
   Movie: ResolverTypeWrapper<Movie>;
   Query: ResolverTypeWrapper<{}>;
@@ -126,15 +135,24 @@ export type ResolversTypes = ResolversObject<{
 export type ResolversParentTypes = ResolversObject<{
   Boolean: Scalars['Boolean'];
   Float: Scalars['Float'];
+  Genre: Genre;
   ID: Scalars['ID'];
   Movie: Movie;
   Query: {};
   String: Scalars['String'];
 }>;
 
+export type GenreResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Genre'] = ResolversParentTypes['Genre']> = ResolversObject<{
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  movies?: Resolver<Maybe<Array<Maybe<ResolversTypes['Movie']>>>, ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
 export type MovieResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Movie'] = ResolversParentTypes['Movie']> = ResolversObject<{
   adult?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   backdropUrl?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  genres?: Resolver<Maybe<Array<Maybe<ResolversTypes['Genre']>>>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   originalTitle?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   overview?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
@@ -146,12 +164,12 @@ export type MovieResolvers<ContextType = Context, ParentType extends ResolversPa
 }>;
 
 export type QueryResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
-  movie?: Resolver<Maybe<ResolversTypes['Movie']>, ParentType, ContextType, Partial<QueryMovieArgs>>;
-  movies?: Resolver<Maybe<Array<Maybe<ResolversTypes['Movie']>>>, ParentType, ContextType>;
-  search?: Resolver<Maybe<Array<Maybe<ResolversTypes['Movie']>>>, ParentType, ContextType, Partial<QuerySearchArgs>>;
+  movie?: Resolver<Maybe<ResolversTypes['Movie']>, ParentType, ContextType, RequireFields<QueryMovieArgs, 'id'>>;
+  search?: Resolver<Maybe<Array<Maybe<ResolversTypes['Movie']>>>, ParentType, ContextType, RequireFields<QuerySearchArgs, 'query'>>;
 }>;
 
 export type Resolvers<ContextType = Context> = ResolversObject<{
+  Genre?: GenreResolvers<ContextType>;
   Movie?: MovieResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
 }>;

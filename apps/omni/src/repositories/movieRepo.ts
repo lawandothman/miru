@@ -1,10 +1,11 @@
 import { Driver } from "neo4j-driver";
 import { Dict } from "neo4j-driver-core/types/record";
-import { MovieDbService } from "./movieDbService";
-import { Movie } from "./__generated__/resolvers-types";
+import { MovieDbService } from "../services/movieDbService";
+import { Movie } from "../__generated__/resolvers-types";
 
 export interface Repository<T> {
-  get<T>(id: string): Promise<T>
+  get(id: string): Promise<T | null>
+  upsert(obj: T): Promise<T | null>
 }
 
 export class MovieRepo implements Repository<Movie> {
@@ -13,9 +14,9 @@ export class MovieRepo implements Repository<Movie> {
     private readonly movieDbService: MovieDbService) {
   }
 
-  async get<Movie>(id: string): Promise<Movie| null> {
+  async get(id: string): Promise<Movie| null> {
     const session = this.driver.session()
-    const res = await session.run('MATCH (m:MOVIE) WHERE m.id = $id RETURN m', {
+    const res = await session.run('MATCH (m:Movie) WHERE m.id = $id RETURN m', {
       id, 
     })
 
@@ -25,11 +26,11 @@ export class MovieRepo implements Repository<Movie> {
 
     return this.mapTo<Movie>(res.records[0].toObject(), 'm') ?? null
   }
-  // CREATE CONSTRAINT FOR (m:MOVIE) REQUIRE m.id IS UNIQUE;
+  // CREATE CONSTRAINT FOR (m:Movie) REQUIRE m.id IS UNIQUE;
 
-  async upsert(movie: Movie): Promise<Movie> {
+  async upsert(movie: Movie): Promise<Movie|null> {
     const session = this.driver.session()
-    const res = await session.run(`MERGE (m:MOVIE {
+    const res = await session.run(`MERGE (m:Movie {
           id: $id
       })
       ${this.builtSetQuery(movie, 'm')}
@@ -42,17 +43,21 @@ export class MovieRepo implements Repository<Movie> {
   }
 
   async search(query: string): Promise<Movie[]> {
-    const movies = await this.movieDbService.search(query)
-    movies.forEach((mov) => {
-      this.upsert(mov)
-        .catch(console.error)
-    })
+    const session = this.driver.session()
+    const res = await session.run(`
+      MATCH (m:Movie) WHERE 
+      toLower(m.title) CONTAINS toLower($query) 
+      RETURN m LIMIT 20
+    `, { query })
 
-    return movies
+    session.close()
+    return res.records.map((record) => this.mapTo<Movie>(record.toObject(), 'm')) as Movie[]
+
   }
   
   private builtSetQuery(obj: any, entryKey: string): string {
     return Object.entries(obj)
+      .filter(([_,value]) => value != null)
       .map(([key,_]) => `SET ${entryKey}.${key} = $${key}`).join('\n')
 
   }

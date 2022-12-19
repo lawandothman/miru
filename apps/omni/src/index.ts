@@ -5,8 +5,11 @@ import { startStandaloneServer } from '@apollo/server/standalone';
 import { readFileSync } from 'fs';
 import { Movie, Resolvers } from './__generated__/resolvers-types';
 import neo4j from 'neo4j-driver'
-import { MovieRepo } from './movieRepo';
-import { MovieDbService } from './movieDbService';
+import { MovieRepo } from './repositories/movieRepo';
+import { MovieDbService } from './services/movieDbService';
+import { SyncService } from './services/syncService';
+import { Migrator } from './migrator';
+import { GenreRepo } from './repositories/genreRepo';
 
 const schema = (readFileSync('./schema.graphql')).toString()
 
@@ -35,13 +38,27 @@ const server = new ApolloServer({
   resolvers,
 });
 
+const movieDbService = new MovieDbService()
+
+const syncService = new SyncService(
+  new MovieRepo(driver, movieDbService),
+  new GenreRepo(driver),
+  movieDbService
+)
+
+const migrator = new Migrator(driver)
+
 async function main() {
+  await migrator.up()
+
+  syncService.start()
+    .catch(console.error)
 
   const { url } = await startStandaloneServer(server, {
     listen: { port: 4000 },
     context: async () => {
       const context: Context = {
-        movieRepo: new MovieRepo(driver, new MovieDbService())
+        movieRepo: new MovieRepo(driver, movieDbService)
       }
       return context
     }

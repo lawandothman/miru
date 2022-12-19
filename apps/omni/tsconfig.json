@@ -3,11 +3,12 @@
   "compilerOptions": {
     "rootDirs": ["src"],
     "outDir": "dist",
-    "lib": ["es2020"],
+    "lib": ["es2021"],
     "module": "CommonJS",
     "target": "es2020",
     "moduleResolution": "node",
     "esModuleInterop": true,
-    "types": ["node"]
+    "types": ["node"],
+    "strict": true
   }
 }

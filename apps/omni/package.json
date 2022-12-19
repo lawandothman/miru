@@ -6,7 +6,7 @@
   "scripts": {
     "generate": "graphql-codegen --config codegen.yaml",
     "compile": "npm run generate && tsc",
-    "dev": "nodemon -e ts --exec \\\"tsc && node dist/index.js\\\"",
+    "dev": "nodemon -e ts --exec \\\"(tsc || exit 1) && node dist/index.js\\\"",
     "start": "npm run compile && node ./dist/index.js"
   },
   "dependencies": {
@@ -15,7 +15,6 @@
     "esm": "^3.2.25",
     "graphql": "^16.6.0",
     "neo4j-driver": "^5.3.0",
-    "omni": "^0.2.6",
     "workspace": "^0.0.1-preview.1"
   },
   "devDependencies": {

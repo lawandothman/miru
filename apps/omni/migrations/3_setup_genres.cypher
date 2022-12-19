@@ -1,0 +1,1 @@
+CREATE CONSTRAINT genreId FOR (g:Genre) REQUIRE g.id IS UNIQUE;

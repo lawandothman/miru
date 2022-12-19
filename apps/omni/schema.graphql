@@ -9,11 +9,18 @@ type Movie {
   backdropUrl: String
   popularity: Float
   # genre_ids?: number[]
+  genres: [Genre]
+}
+
+type Genre {
+  id: ID!
+  name: String!
+  movies: [Movie]
 }
 
 type Query {
-  movie(id: ID): Movie
-  search(query: String): [Movie]
+  movie(id: ID!): Movie
+  search(query: String!): [Movie]
 }
 
 
