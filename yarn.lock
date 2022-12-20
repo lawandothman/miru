@@ -1171,6 +1171,13 @@
     "@jridgewell/resolve-uri" "3.1.0"
     "@jridgewell/sourcemap-codec" "1.4.14"
 
+"@next-auth/neo4j-adapter@^1.0.5":
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/@next-auth/neo4j-adapter/-/neo4j-adapter-1.0.5.tgz#46e58f92b51f037611b30ff2545d56497c9bb650"
+  integrity sha512-bCTi+HgzwT9eaPu0e7KpX3CXU4l7yVRUsLbv7Fu/HSezTGLHiuIrD/C5jYO8ixT9aZVfhlHxLpkhHS03GWnnpg==
+  dependencies:
+    uuid "^8.3.2"
+
 "@next-auth/prisma-adapter@^1.0.4":
   version "1.0.5"
   resolved "https://registry.npmjs.org/@next-auth/prisma-adapter/-/prisma-adapter-1.0.5.tgz"
