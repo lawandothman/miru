@@ -10,6 +10,7 @@ type Movie {
   popularity: Float
   # genre_ids?: number[]
   genres: [Genre]
+  inWatchlist: Boolean
 }
 
 type Genre {
@@ -24,6 +25,10 @@ type Query {
   genres: [Genre]
 }
 
+type Mutation {
+  addMovieToWatchlist(movieId: ID!): Movie
+  removeMovieFromWatchlist(movieId: ID!): Movie
+}
 
 # interface MutationResponse {
 #   code: String!
