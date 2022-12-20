@@ -1,7 +1,6 @@
 import NextAuth, { type NextAuthOptions } from "next-auth";
 import FacebookProvider from "next-auth/providers/facebook";
 
-import { env } from "env/server.mjs";
 
 import neo4j from "neo4j-driver";
 import { Neo4jAdapter } from "@next-auth/neo4j-adapter";
@@ -24,8 +23,8 @@ export const authOptions: NextAuthOptions = {
   adapter: Neo4jAdapter(neo4jSession),
   providers: [
     FacebookProvider({
-      clientId: env.FACEBOOK_CLIENT_ID,
-      clientSecret: env.FACEBOOK_CLIENT_SECRET,
+      clientId: process.env.FACEBOOK_CLIENT_ID as string,
+      clientSecret: process.env.FACEBOOK_CLIENT_SECRET as string,
     }),
     // ...add more providers here
   ],
