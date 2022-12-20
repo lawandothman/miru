@@ -20,6 +20,7 @@ type Genre {
 
 type Query {
   movie(id: ID!): Movie
+  watchlist: [Movie]
   moviesByGenre(genreId: ID!): [Movie]
   search(query: String!): [Movie]
   genres: [Genre]
@@ -29,9 +30,3 @@ type Mutation {
   addMovieToWatchlist(movieId: ID!): Movie
   removeMovieFromWatchlist(movieId: ID!): Movie
 }
-
-# interface MutationResponse {
-#   code: String!
-#   success: Boolean!
-#   message: String!
-# }

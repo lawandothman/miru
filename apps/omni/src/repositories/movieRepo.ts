@@ -42,6 +42,24 @@ export class NeoDataSource {
       {movieId, email:user.email}, 'r')
     return rel != null
   }
+
+  async getWatchlist(user: User) {
+    const movies = await runAndMapMany<Movie>(
+      this.driver,
+      `MATCH (m:Movie)-[r:IN_WATCHLIST]->(u:User {email: $email})
+      RETURN m`,
+      {email:user.email}, 'm')
+
+    return movies
+  }
+}
+
+async function runAndMapMany<T>(driver: Driver, query: string, args: any, key: string): Promise<T[]> {
+    const session = driver.session()
+    const res = await session.run(query, args)
+    session.close().then(() => { }).catch(console.error)
+
+    return res.records.map(rec => mapTo<T>(rec.toObject(), key)) as T[] ?? []
 }
 
 async function runAndMap<T>(driver: Driver, query: string, args: any, key: string): Promise<T | null> {

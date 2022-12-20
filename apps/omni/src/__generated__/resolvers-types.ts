@@ -58,6 +58,7 @@ export type Query = {
   movie?: Maybe<Movie>;
   moviesByGenre?: Maybe<Array<Maybe<Movie>>>;
   search?: Maybe<Array<Maybe<Movie>>>;
+  watchlist?: Maybe<Array<Maybe<Movie>>>;
 };
 
 
@@ -198,6 +199,7 @@ export type QueryResolvers<ContextType = Context, ParentType extends ResolversPa
   movie?: Resolver<Maybe<ResolversTypes['Movie']>, ParentType, ContextType, RequireFields<QueryMovieArgs, 'id'>>;
   moviesByGenre?: Resolver<Maybe<Array<Maybe<ResolversTypes['Movie']>>>, ParentType, ContextType, RequireFields<QueryMoviesByGenreArgs, 'genreId'>>;
   search?: Resolver<Maybe<Array<Maybe<ResolversTypes['Movie']>>>, ParentType, ContextType, RequireFields<QuerySearchArgs, 'query'>>;
+  watchlist?: Resolver<Maybe<Array<Maybe<ResolversTypes['Movie']>>>, ParentType, ContextType>;
 }>;
 
 export type Resolvers<ContextType = Context> = ResolversObject<{

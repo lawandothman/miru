@@ -11,9 +11,7 @@ import { SyncService } from './services/syncService';
 import { Migrator } from './migrator';
 import { GenreRepo } from './repositories/genreRepo';
 import DataLoader from 'dataloader';
-import { chooseContentTypeForSingleResultResponse } from '@apollo/server/dist/esm/ApolloServer';
 import { requireUser } from './utils';
-import { stringify } from 'querystring';
 
 dotenv.config()
 
@@ -40,6 +38,10 @@ const resolvers: Resolvers = {
     },
     genres: async (_parent, _args, { neoDataSource }) => {
       return await neoDataSource.getGenres()
+    },
+    watchlist: async (_parent, _args, { neoDataSource, user }) => {
+      return await neoDataSource.getWatchlist(requireUser(user))
+      
     }
   },
   Mutation: {
