@@ -24,6 +24,16 @@ export class NeoDataSource {
     return res.records.map(rec => mapTo<Movie>(rec.toObject(), 'm')) as Movie[] ?? []
   }
 
+  async getGenres(): Promise<Genre[]> {
+    const session = this.driver.session()
+    const res = await session.run('MATCH (g:Genre) RETURN g')
+    session.close()
+      .then(() => { })
+      .catch(console.error)
+
+    return res.records.map(rec => mapTo<Genre>(rec.toObject(), 'g')) as Genre[] ?? []
+  }
+
 }
 
 function mapTo<T>(record: Dict<PropertyKey, any> | null, key: string): T | null {
