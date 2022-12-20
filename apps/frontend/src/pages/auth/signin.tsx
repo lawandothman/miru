@@ -16,9 +16,7 @@ const SignIn: NextPage<
         Object.values(providers).map((provider) => (
           <button
             onClick={() =>
-              signIn(provider.id, {
-                callbackUrl: `${window.location.origin}/`,
-              })
+              signIn(provider.id)
             }
             key={provider.name}
             className="flex w-72 items-center justify-center gap-4 rounded bg-white p-4 text-neutral-900 "

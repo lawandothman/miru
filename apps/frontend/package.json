@@ -21,6 +21,7 @@
     "@trpc/server": "10.0.0-rc.4",
     "axios": "^1.1.3",
     "date-fns": "^2.29.3",
+    "neo4j-driver": "v4",
     "next": "13.0.4",
     "next-auth": "^4.15.1",
     "react": "18.2.0",
