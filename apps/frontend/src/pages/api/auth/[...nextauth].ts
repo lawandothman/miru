@@ -1,10 +1,14 @@
 import NextAuth, { type NextAuthOptions } from "next-auth";
 import FacebookProvider from "next-auth/providers/facebook";
-// Prisma adapter for NextAuth, optional and can be removed
-import { PrismaAdapter } from "@next-auth/prisma-adapter";
 
 import { env } from "env/server.mjs";
-import { prisma } from "server/db/client";
+
+import neo4j from "neo4j-driver";
+import { Neo4jAdapter } from "@next-auth/neo4j-adapter";
+
+const driver = neo4j.driver("neo4j://localhost", neo4j.auth.basic("", ""));
+
+const neo4jSession = driver.session();
 
 export const authOptions: NextAuthOptions = {
   // Include user.id on session
@@ -17,7 +21,7 @@ export const authOptions: NextAuthOptions = {
     },
   },
   // Configure one or more authentication providers
-  adapter: PrismaAdapter(prisma),
+  adapter: Neo4jAdapter(neo4jSession),
   providers: [
     FacebookProvider({
       clientId: env.FACEBOOK_CLIENT_ID,

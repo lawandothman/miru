@@ -1,0 +1,14 @@
+{
+  "esm": true,
+  "compilerOptions": {
+    "rootDirs": ["src"],
+    "outDir": "dist",
+    "lib": ["es2021"],
+    "module": "CommonJS",
+    "target": "es2020",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "types": ["node"],
+    "strict": true
+  }
+}

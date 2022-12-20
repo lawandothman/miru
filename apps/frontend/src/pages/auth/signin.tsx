@@ -10,15 +10,13 @@ const SignIn: NextPage<
   InferGetServerSidePropsType<typeof getServerSideProps>
 > = ({ providers }) => {
   return (
-    <div className="flex h-screen max-w-md mx-auto flex-col gap-8 items-center justify-center">
-      <h1 className="text-white text-4xl">Log in</h1>
+    <div className="mx-auto flex h-screen max-w-md flex-col items-center justify-center gap-8">
+      <h1 className="text-4xl text-white">Log in</h1>
       {providers &&
         Object.values(providers).map((provider) => (
           <button
             onClick={() =>
-              signIn(provider.id, {
-                callbackUrl: `${window.location.origin}/`,
-              })
+              signIn(provider.id)
             }
             key={provider.name}
             className="flex w-72 items-center justify-center gap-4 rounded bg-white p-4 text-neutral-900 "
