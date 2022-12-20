@@ -19,6 +19,7 @@ export interface Context {
   movieRepo: MovieRepo
   genreRepo: GenreRepo
   movieLoader: DataLoader<string, Movie>
+  neoDataSource: NeoDataSource
 }
 
 const resolvers: Resolvers = {
@@ -31,6 +32,9 @@ const resolvers: Resolvers = {
     },
     moviesByGenre: async (_parent, { genreId }, { movieRepo }) => {
       return await movieRepo.getMoviesByGenre(genreId)
+    },
+    genres: async (_parent, _args, { neoDataSource }) => {
+      return await neoDataSource.getGenres()
     }
   },
   Movie: {
@@ -74,7 +78,8 @@ async function main() {
       const context: Context = {
         movieRepo: new MovieRepo(driver),
         genreRepo: new GenreRepo(driver),
-        movieLoader: new DataLoader(neo.getMovies.bind(neo))
+        movieLoader: new DataLoader(neo.getMovies.bind(neo)),
+        neoDataSource: neo
       }
       return context
     }
