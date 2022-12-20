@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { trpc } from "utils/trpc";
 import { FiCalendar, FiHeart, FiMenu, FiTrendingUp, FiX } from "react-icons/fi";
 import type { FC, PropsWithChildren } from "react";
 import React, { useState } from "react";
@@ -8,6 +7,10 @@ import { cn } from "utils/cn";
 import { useRouter } from "next/router";
 import { signIn, signOut } from "next-auth/react";
 import { ProfilePicture } from "./Avatar";
+import { useQuery, gql } from "@apollo/client";
+import type { Genre } from "__generated__/resolvers-types";
+import { useSession } from "next-auth/react";
+import _ from "lodash";
 
 interface NavItemProps {
   href: string;
@@ -36,12 +39,20 @@ const NavItem: FC<PropsWithChildren<NavItemProps>> = ({
   );
 };
 
+const GET_GENRES = gql`
+  query Genres {
+    genres {
+      id
+      name
+    }
+  }
+`;
+
 export const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { data } = trpc.movies.getGenres.useQuery();
-
+  const { data } = useQuery<{ genres: Genre[] }>(GET_GENRES);
+  const { data: session } = useSession();
   const router = useRouter();
-  const { data: session } = trpc.auth.getSession.useQuery();
 
   return (
     <>
@@ -106,7 +117,7 @@ export const Sidebar = () => {
             <nav>
               <p className="pl-3 pb-2 pt-4 text-sm text-white">Genres</p>
               <ul className="space-y-2">
-                {data?.genres?.map((genre) => (
+                {_.sortBy(data?.genres, (genre) => genre.name).map((genre) => (
                   <NavItem
                     href={`/genre/${genre.id}`}
                     isSelected={router.asPath === `/genre/${genre.id}`}

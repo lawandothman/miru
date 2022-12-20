@@ -2,9 +2,9 @@ import Image from "next/image";
 import Link from "next/link";
 import type { FC } from "react";
 import { useState } from "react";
-import type { Movie } from "types/tmdbAPI";
 import { cn } from "utils/cn";
 import { getImage } from "utils/image";
+import type { Movie } from "__generated__/resolvers-types";
 
 interface MoviesListProps {
   movies?: Movie[];
@@ -27,10 +27,10 @@ const BlurImage = ({ movie }: { movie: Movie }) => {
   return (
     <Link href={`/movie/${movie.id}`} className="group h-full">
       <div className="aspect-w-1 aspect-h-1 xl:aspect-w-7 xl:aspect-h-8 relative h-[500px] w-full overflow-hidden rounded-lg lg:h-[500px]">
-        {movie.poster_path && (
+        {movie.posterUrl && (
           <Image
             alt={movie.title ?? ""}
-            src={getImage(movie.poster_path)}
+            src={getImage(movie.posterUrl)}
             layout="fill"
             loading="lazy"
             objectFit="cover"

@@ -3,66 +3,82 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { getImage } from "utils/image";
-import { trpc } from "utils/trpc";
 import { getYear } from "date-fns";
-import { FiLink, FiYoutube } from "react-icons/fi";
-import { FaImdb } from "react-icons/fa";
 import { Loader } from "components/Loader";
+import { gql, useQuery } from "@apollo/client";
+import { Movie } from "__generated__/resolvers-types";
+
+const GET_BY_ID = gql`
+  query Movie($movieId: ID!) {
+    movie(id: $movieId) {
+      posterUrl
+      title
+      releaseDate
+      overview
+      genres {
+        name
+        id
+      }
+    }
+  }
+`;
 
 const Movie: NextPage = () => {
   const { query } = useRouter();
-  const movieId = Array.isArray(query.id)
-    ? Number(query.id[0])
-    : Number(query.id);
+  const movieId = Array.isArray(query.id) ? query.id[0] : query.id;
 
-  const { data: movie, isLoading } = trpc.movies.getDetails.useQuery({
-    id: movieId,
-  });
-
-  const trailer = movie?.videos?.results?.find(
-    (video) => video.type === "Trailer" && video.site === "YouTube"
+  const { data, loading } = useQuery<{ movie: Movie }, { movieId?: string }>(
+    GET_BY_ID,
+    {
+      variables: {
+        movieId,
+      },
+    }
   );
 
-  if (isLoading) {
+  if (loading) {
     return <Loader />;
   }
   return (
     <div className="flex flex-col px-8 pt-10">
       <div className="mx-auto flex flex-col gap-24 pt-10 md:flex-row">
-        {movie?.poster_path && (
+        {data?.movie?.posterUrl && (
           <Image
-            src={getImage(movie.poster_path)}
-            alt={movie.title ?? "movie"}
+            src={getImage(data.movie.posterUrl)}
+            alt={data.movie.title ?? "movie"}
             width={450}
             height={1000}
           />
         )}
         <div className="flex flex-col dark:text-white">
           <h1 className="text-4xl font-thin uppercase tracking-widest ">
-            {movie?.title}
+            {data?.movie.title}
           </h1>
-          <p className="mt-2 text-xl font-thin">{movie?.tagline}</p>
+          {/* <p className="mt-2 text-xl font-thin">{movie?.tagline}</p> */}
           <div className="mt-6 text-sm text-neutral-400">
-            {movie?.spoken_languages?.map((lang) => (
+            {/* {movie?.spoken_languages?.map((lang) => (
               <span key={lang.iso_639_1}>{lang.name} / </span>
-            ))}
+            ))} */}
             <span>
-              {movie?.runtime && movie.runtime + " MIN / "}
-              {movie?.release_date && getYear(new Date(movie?.release_date))}
+              {/* {movie?.runtime && movie.runtime + " MIN / "} */}
+              {data?.movie.releaseDate &&
+                getYear(new Date(data?.movie.releaseDate))}
             </span>
             <div className="mt-8 flex gap-3">
-              {movie?.genres?.map((genre) => (
+              {data?.movie.genres?.map((genre) => (
                 <Link
-                  href={`/genre/${genre.id}`}
+                  href={`/genre/${genre?.id}`}
                   className="rounded border border-neutral-400 p-2 text-xs tracking-wide"
-                  key={genre.id}
+                  key={genre?.id}
                 >
-                  {genre.name}
+                  {genre?.name}
                 </Link>
               ))}
             </div>
-            <p className="mt-8 max-w-xl text-neutral-400">{movie?.overview}</p>
-            <div className=" mt-6 flex gap-3">
+            <p className="mt-8 max-w-xl text-neutral-400">
+              {data?.movie.overview}
+            </p>
+            {/* <div className=" mt-6 flex gap-3">
               {movie?.homepage && (
                 <Link
                   target="_blank"
@@ -96,7 +112,7 @@ const Movie: NextPage = () => {
                   Trailer
                 </Link>
               )}
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
