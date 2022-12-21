@@ -5,7 +5,7 @@ import type { NextPage } from "next";
 import { useQuery, gql } from "@apollo/client";
 import type { Movie } from "__generated__/resolvers-types";
 
-const GET_WATCHLIST = gql`
+export const GET_WATCHLIST = gql`
   query Watchlist {
     watchlist {
       id

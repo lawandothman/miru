@@ -7,6 +7,7 @@ import { getYear } from "date-fns";
 import { Loader } from "components/Loader";
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { Movie } from "__generated__/resolvers-types";
+import { GET_WATCHLIST } from "pages/watchlist";
 
 const GET_BY_ID = gql`
   query Movie($movieId: ID!) {
@@ -45,7 +46,10 @@ const Movie: NextPage = () => {
   );
 
   const [mutateFunction] = useMutation<Movie, { movieId?: string }>(
-    ADD_TO_WATCHLIST
+    ADD_TO_WATCHLIST,
+    {
+      refetchQueries: [{ query: GET_WATCHLIST }, "Watchlist"],
+    }
   );
 
   if (loading) {
