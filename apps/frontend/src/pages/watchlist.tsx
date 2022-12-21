@@ -16,7 +16,9 @@ export const GET_WATCHLIST = gql`
 `;
 
 const Watchlist: NextPage = () => {
-  const { data, loading } = useQuery<{ watchlist: Movie[] }>(GET_WATCHLIST);
+  const { data, loading } = useQuery<{ watchlist: Movie[] }>(GET_WATCHLIST, {
+    fetchPolicy: 'no-cache'
+  });
 
   if (loading) {
     return <Loader />;

@@ -7,11 +7,11 @@ import { getYear } from "date-fns";
 import { Loader } from "components/Loader";
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { Movie } from "__generated__/resolvers-types";
-import { GET_WATCHLIST } from "pages/watchlist";
 
 const GET_BY_ID = gql`
   query Movie($movieId: ID!) {
     movie(id: $movieId) {
+      id
       posterUrl
       title
       releaseDate
@@ -29,6 +29,7 @@ const ADD_TO_WATCHLIST = gql`
   mutation AddMovieToWatchlist($movieId: ID!) {
     addMovieToWatchlist(movieId: $movieId) {
       id
+      inWatchlist
     }
   }
 `;
@@ -37,6 +38,7 @@ const REMOVE_FROM_WATCHLIST = gql`
   mutation RemoveMovieFromWatchlist($movieId: ID!) {
     removeMovieFromWatchlist(movieId: $movieId) {
       id
+      inWatchlist
     }
   }
 `;
@@ -55,16 +57,10 @@ const Movie: NextPage = () => {
   );
 
   const [addToWatchlist] = useMutation<Movie, { movieId?: string }>(
-    ADD_TO_WATCHLIST,
-    {
-      refetchQueries: [{ query: GET_WATCHLIST }, "Watchlist"],
-    }
+    ADD_TO_WATCHLIST
   );
   const [removeFromWatchlist] = useMutation<Movie, { movieId?: string }>(
-    REMOVE_FROM_WATCHLIST,
-    {
-      refetchQueries: [{ query: GET_WATCHLIST }, "Watchlist"],
-    }
+    REMOVE_FROM_WATCHLIST
   );
 
   if (loading) {
