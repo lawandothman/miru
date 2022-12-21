@@ -12,13 +12,10 @@
   "scripts": {
     "lint": "turbo lint",
     "lint:fix": "turbo lint:fix",
-    "dev": "dotenv -- turbo run dev"
+    "dev": "turbo dev"
   },
   "devDependencies": {
     "nodemon": "^2.0.20",
     "turbo": "^1.6.3"
-  },
-  "dependencies": {
-    "dotenv-cli": "^6.0.0"
   }
 }
