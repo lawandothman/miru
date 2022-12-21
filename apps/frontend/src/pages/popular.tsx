@@ -1,28 +1,31 @@
 import { Loader } from "components/Loader";
 import { MoviesList } from "components/MoviesList";
 import { PageHeader } from "components/PageHeader";
-import { Pagination } from "components/Pagination";
 import type { NextPage } from "next";
-import { useRouter } from "next/router";
-import { trpc } from "utils/trpc";
+import { useQuery, gql } from "@apollo/client";
+import type { Movie } from "__generated__/resolvers-types";
+
+const GET_POPULAR = gql`
+  query Search {
+    search(query: " ") {
+      id
+      title
+      posterUrl
+    }
+  }
+`;
 
 const Popular: NextPage = () => {
-  const { query } = useRouter();
-  const page = Array.isArray(query.page)
-    ? Number(query.page[0])
-    : Number(query.page ?? 1);
+  const { data, loading } = useQuery<{ search: Movie[] }>(GET_POPULAR);
 
-  const { data, isLoading } = trpc.movies.getPopular.useQuery({ page });
-
-  if (isLoading) {
+  if (loading) {
     return <Loader />;
   }
 
   return (
     <div className="px-20 pt-20">
       <PageHeader title="Popular" />
-      <MoviesList movies={data?.results} />
-      <Pagination page={page} totalPages={data?.total_pages} />
+      <MoviesList movies={data?.search} />
     </div>
   );
 };

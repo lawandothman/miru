@@ -1,28 +1,30 @@
 import { Loader } from "components/Loader";
 import { MoviesList } from "components/MoviesList";
-import { PageHeader } from "components/PageHeader";
-import { Pagination } from "components/Pagination";
 import type { NextPage } from "next";
-import { useRouter } from "next/router";
-import { trpc } from "utils/trpc";
+import { gql, useQuery } from "@apollo/client";
+import { PageHeader } from "components/PageHeader";
+import type { Movie } from "__generated__/resolvers-types";
+
+const GET_TOP_RATED = gql`
+  query Search {
+    search(query: " ") {
+      id
+      title
+      posterUrl
+    }
+  }
+`;
 
 const TopRated: NextPage = () => {
-  const { query } = useRouter();
-  const page = Array.isArray(query.page)
-    ? Number(query.page[0])
-    : Number(query.page ?? 1);
-
-  const { data, isLoading } = trpc.movies.getTopRated.useQuery({ page });
-
-  if (isLoading) {
+  const { data, loading } = useQuery<{ search: Movie[] }>(GET_TOP_RATED);
+  if (loading) {
     return <Loader />;
   }
 
   return (
     <div className="px-20 pt-20">
       <PageHeader title="Top Rated" />
-      <MoviesList movies={data?.results} />
-      <Pagination page={page} totalPages={data?.total_pages} />
+      <MoviesList movies={data?.search} />
     </div>
   );
 };
