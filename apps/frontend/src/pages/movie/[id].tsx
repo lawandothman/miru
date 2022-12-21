@@ -5,8 +5,9 @@ import { useRouter } from "next/router";
 import { getImage } from "utils/image";
 import { getYear } from "date-fns";
 import { Loader } from "components/Loader";
-import { gql, useQuery } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import { Movie } from "__generated__/resolvers-types";
+import { GET_WATCHLIST } from "pages/watchlist";
 
 const GET_BY_ID = gql`
   query Movie($movieId: ID!) {
@@ -19,6 +20,23 @@ const GET_BY_ID = gql`
         name
         id
       }
+      inWatchlist
+    }
+  }
+`;
+
+const ADD_TO_WATCHLIST = gql`
+  mutation AddMovieToWatchlist($movieId: ID!) {
+    addMovieToWatchlist(movieId: $movieId) {
+      id
+    }
+  }
+`;
+
+const REMOVE_FROM_WATCHLIST = gql`
+  mutation RemoveMovieFromWatchlist($movieId: ID!) {
+    removeMovieFromWatchlist(movieId: $movieId) {
+      id
     }
   }
 `;
@@ -33,6 +51,19 @@ const Movie: NextPage = () => {
       variables: {
         movieId,
       },
+    }
+  );
+
+  const [addToWatchlist] = useMutation<Movie, { movieId?: string }>(
+    ADD_TO_WATCHLIST,
+    {
+      refetchQueries: [{ query: GET_WATCHLIST }, "Watchlist"],
+    }
+  );
+  const [removeFromWatchlist] = useMutation<Movie, { movieId?: string }>(
+    REMOVE_FROM_WATCHLIST,
+    {
+      refetchQueries: [{ query: GET_WATCHLIST }, "Watchlist"],
     }
   );
 
@@ -113,6 +144,34 @@ const Movie: NextPage = () => {
                 </Link>
               )}
             </div> */}
+          </div>
+          <div className="flex gap-8">
+            <button
+              onClick={() =>
+                addToWatchlist({
+                  variables: {
+                    movieId,
+                  },
+                })
+              }
+              disabled={data?.movie.inWatchlist ?? false}
+              className="mt-8 w-44 rounded bg-white p-2 text-sm text-black"
+            >
+              Add to Watchlist
+            </button>
+            <button
+              onClick={() =>
+                removeFromWatchlist({
+                  variables: {
+                    movieId,
+                  },
+                })
+              }
+              disabled={!data?.movie.inWatchlist ?? true}
+              className="mt-8 w-44 rounded bg-white p-2 text-sm text-black"
+            >
+              Remove from Watchlist
+            </button>
           </div>
         </div>
       </div>
