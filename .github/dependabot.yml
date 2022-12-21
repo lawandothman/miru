@@ -8,4 +8,12 @@ updates:
   - package-ecosystem: "npm" # See documentation for possible values
     directory: "/" # Location of package manifests
     schedule:
-      interval: "daily"
+      interval: "monthly"
+  - package-ecosystem: "npm"
+    directory: "/apps/frontend"
+    schedule:
+      interval: "monthly"
+  - package-ecosystem: "npm"
+    directory: "/apps/omni"
+    schedule:
+      interval: "monthly"
