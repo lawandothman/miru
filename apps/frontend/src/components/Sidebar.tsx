@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { FiCalendar, FiHeart, FiMenu, FiTrendingUp, FiX } from "react-icons/fi";
+import { FiCalendar, FiHeart, FiMenu, FiPlay, FiTrendingUp, FiX } from "react-icons/fi";
 import type { FC, PropsWithChildren } from "react";
 import React, { useState } from "react";
 import OutsideClickHandler from "react-outside-click-handler";
@@ -91,6 +91,13 @@ export const Sidebar = () => {
           <main className="flex flex-col p-2">
             <nav>
               <ul className="space-y-2">
+                <NavItem
+                  isSelected={router.pathname === "/watchlist"}
+                  href="/watchlist"
+                  icon={<FiPlay />}
+                >
+                  Watchlist
+                </NavItem>
                 <NavItem
                   isSelected={router.pathname === "/popular"}
                   href="/popular"

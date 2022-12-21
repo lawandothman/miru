@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 import { getImage } from "utils/image";
 import { getYear } from "date-fns";
 import { Loader } from "components/Loader";
-import { gql, useQuery } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import { Movie } from "__generated__/resolvers-types";
 
 const GET_BY_ID = gql`
@@ -23,6 +23,14 @@ const GET_BY_ID = gql`
   }
 `;
 
+const ADD_TO_WATCHLIST = gql`
+  mutation AddMovieToWatchlist($movieId: ID!) {
+    addMovieToWatchlist(movieId: $movieId) {
+      id
+    }
+  }
+`;
+
 const Movie: NextPage = () => {
   const { query } = useRouter();
   const movieId = Array.isArray(query.id) ? query.id[0] : query.id;
@@ -34,6 +42,10 @@ const Movie: NextPage = () => {
         movieId,
       },
     }
+  );
+
+  const [mutateFunction] = useMutation<Movie, { movieId?: string }>(
+    ADD_TO_WATCHLIST
   );
 
   if (loading) {
@@ -114,6 +126,18 @@ const Movie: NextPage = () => {
               )}
             </div> */}
           </div>
+          <button
+            onClick={() =>
+              mutateFunction({
+                variables: {
+                  movieId,
+                },
+              })
+            }
+            className="mt-8 w-36 rounded bg-white p-2 text-black"
+          >
+            Add to Watchlist
+          </button>
         </div>
       </div>
     </div>
