@@ -1,3 +1,1 @@
-# ミル Miru
-
-NextJS App
+# Frontend
