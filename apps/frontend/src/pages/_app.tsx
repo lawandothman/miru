@@ -3,7 +3,6 @@ import { type Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
 import { ApolloProvider, ApolloClient, InMemoryCache } from "@apollo/client";
 
-import { trpc } from "utils/trpc";
 import { Sidebar } from "components/Sidebar";
 
 import "styles/globals.css";
@@ -29,4 +28,4 @@ const MyApp: AppType<{ session: Session | null }> = ({
   );
 };
 
-export default trpc.withTRPC(MyApp);
+export default MyApp;
