@@ -1,7 +1,7 @@
-import { Driver } from "neo4j-driver";
-import { Dict } from "neo4j-driver-core/types/record";
-import { MovieDbService } from "../services/movieDbService";
-import { Genre, Movie } from "../__generated__/resolvers-types";
+import type { Driver } from "neo4j-driver";
+import type { Dict } from "neo4j-driver-core/types/record";
+import type { User } from "..";
+import type { Genre, Movie } from "../__generated__/resolvers-types";
 
 export interface Repository<T> {
   get(id: string): Promise<T | null>
@@ -34,6 +34,40 @@ export class NeoDataSource {
     return res.records.map(rec => mapTo<Genre>(rec.toObject(), 'g')) as Genre[] ?? []
   }
 
+  async isMovieInWatchlist(movieId: string, user: User): Promise<boolean> {
+    const rel = await runAndMap<object>(
+      this.driver,
+      `MATCH (m:Movie {id: $movieId})-[r:IN_WATCHLIST]->(u:User {email: $email})
+      RETURN r`,
+      {movieId, email:user.email}, 'r')
+    return rel != null
+  }
+
+  async getWatchlist(user: User) {
+    const movies = await runAndMapMany<Movie>(
+      this.driver,
+      `MATCH (m:Movie)-[r:IN_WATCHLIST]->(u:User {email: $email})
+      RETURN m`,
+      {email:user.email}, 'm')
+
+    return movies
+  }
+}
+
+async function runAndMapMany<T>(driver: Driver, query: string, args: any, key: string): Promise<T[]> {
+    const session = driver.session()
+    const res = await session.run(query, args)
+    session.close().then(() => { }).catch(console.error)
+
+    return res.records.map(rec => mapTo<T>(rec.toObject(), key)) as T[] ?? []
+}
+
+async function runAndMap<T>(driver: Driver, query: string, args: any, key: string): Promise<T | null> {
+    const session = driver.session()
+    const res = await session.run(query, args)
+    session.close().then(() => { }).catch(console.error)
+
+    return mapTo<T>(res.records[0]?.toObject() ?? null, key)
 }
 
 function mapTo<T>(record: Dict<PropertyKey, any> | null, key: string): T | null {
@@ -120,6 +154,30 @@ export class MovieRepo implements Repository<Movie> {
     session.close()
     return res.records.map((record) => mapTo<Movie>(record.toObject(), 'm')) as Movie[]
 
+  }
+
+  async addToWatchlist(movieId: string, user: User): Promise<Movie> {
+    const session = this.driver.session()
+    const res = await session.run(`
+      MATCH (u:User {email: $email}), (m:Movie {id: $id})
+      MERGE (u)<-[r:IN_WATCHLIST]-(m)
+      RETURN m
+    `, { email: user.email, id: movieId })
+    session.close()
+
+    return mapTo<Movie>(res.records[0].toObject(), 'm') as Movie
+  }
+
+  async removeFromWatchlist(movieId: string, user: User): Promise<Movie> {
+    const session = this.driver.session()
+    const res = await session.run(`
+      MATCH (u:User {email: $email})<-[r:IN_WATCHLIST]-(m:Movie {id: $id})
+      DELETE r
+      RETURN m
+    `, { email: user.email, id: movieId })
+    session.close()
+
+    return mapTo<Movie>(res.records[0].toObject(), 'm') as Movie
   }
 
   private builtSetQuery(obj: any, entryKey: string): string {

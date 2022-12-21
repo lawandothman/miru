@@ -2,6 +2,7 @@ import dotenv from 'dotenv'
 import { ApolloServer } from '@apollo/server';
 import { startStandaloneServer } from '@apollo/server/standalone';
 import { readFileSync } from 'fs';
+import { verify } from 'jsonwebtoken'
 import type { Movie, Resolvers } from './__generated__/resolvers-types';
 import neo4j from 'neo4j-driver'
 import { MovieRepo, NeoDataSource } from './repositories/movieRepo';
@@ -10,6 +11,7 @@ import { SyncService } from './services/syncService';
 import { Migrator } from './migrator';
 import { GenreRepo } from './repositories/genreRepo';
 import DataLoader from 'dataloader';
+import { requireUser } from './utils';
 
 dotenv.config()
 
@@ -20,6 +22,7 @@ export interface Context {
   genreRepo: GenreRepo
   movieLoader: DataLoader<string, Movie>
   neoDataSource: NeoDataSource
+  user: User | null
 }
 
 const resolvers: Resolvers = {
@@ -35,11 +38,29 @@ const resolvers: Resolvers = {
     },
     genres: async (_parent, _args, { neoDataSource }) => {
       return await neoDataSource.getGenres()
+    },
+    watchlist: async (_parent, _args, { neoDataSource, user }) => {
+      return await neoDataSource.getWatchlist(requireUser(user))
+      
+    }
+  },
+  Mutation: {
+    addMovieToWatchlist: async (_parent, { movieId  }, { movieRepo, user }) => {
+      const u = requireUser(user)
+      return await movieRepo.addToWatchlist(movieId, u)
+    },
+    removeMovieFromWatchlist: async (_parent, { movieId  }, { movieRepo, user }) => {
+      const u = requireUser(user)
+      return await movieRepo.removeFromWatchlist(movieId, u)
     }
   },
   Movie: {
     genres: async (parent, _, { movieRepo }) => {
       return await movieRepo.getGenres(parent)
+    },
+    inWatchlist: async (parent, _, { user, neoDataSource }) => {
+      // ⚠️ No data loader code, this is subject to N+1
+      return await neoDataSource.isMovieInWatchlist(parent.id, requireUser(user))
     }
   },
 };
@@ -73,19 +94,41 @@ async function main() {
   const port = +(process.env?.PORT ?? "4000")
   const { url } = await startStandaloneServer(server, {
     listen: { port },
-    context: async () => {
+    context: async ({ req }) => {
       const neo = new NeoDataSource(driver)
       const context: Context = {
         movieRepo: new MovieRepo(driver),
         genreRepo: new GenreRepo(driver),
         movieLoader: new DataLoader(neo.getMovies.bind(neo)),
-        neoDataSource: neo
+        neoDataSource: neo,
+        user: getUser(req.headers.authorization?.toString())
       }
       return context
     }
   });
 
   console.log(`🚀  Server ready at: ${url}`);
+}
+
+export interface User {
+  email: string
+}
+
+function getUser(authHeader: string | undefined): User | null {
+  if(authHeader == null) {
+    return null
+  }
+
+  const [_bearer, token] = authHeader.split(' ')
+  console.log(token)
+
+  try { 
+     // @ts-ignore
+    return verify(token, process.env.OMNI_SECRET) as User 
+  } catch (e) {
+    console.error(e)
+    return null
+  }
 }
 
 main()
