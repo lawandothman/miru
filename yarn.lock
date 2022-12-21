@@ -1485,10 +1485,10 @@
   resolved "https://registry.yarnpkg.com/@tootallnate/once/-/once-2.0.0.tgz#f544a148d3ab35801c1f633a7441fd87c2e484bf"
   integrity sha512-XCuKFP5PS55gnMVu3dty8KPatLqUoy/ZYzDzAGCQ8JNFCkLXzmI7vNHCR+XpbZaMWQK/vQubr7PkYq8g470J/A==
 
-"@trpc/client@10.0.0-rc.4":
-  version "10.0.0-rc.4"
-  resolved "https://registry.npmjs.org/@trpc/client/-/client-10.0.0-rc.4.tgz"
-  integrity sha512-kzyDnFjBaNz/bL/Fir0jr1NgPoZ4Leho5NttAa3Xgml4tMV874LNrCeBbXf6GGU8bjeqTc2XarfnDcJokw2CXg==
+"@trpc/client@10.6.0":
+  version "10.6.0"
+  resolved "https://registry.yarnpkg.com/@trpc/client/-/client-10.6.0.tgz#eb9dd3448a001eb27852140e185c666d87e8514a"
+  integrity sha512-GvZzUQuPStXN9zTyJ+PvlGweEa1mvsbtsAgo6yfnDGjrx1HJbDMtYC+o98lz1T+UOdDPgfDE/R1MaCrWDUrpSA==
 
 "@trpc/next@10.0.0-rc.4":
   version "10.0.0-rc.4"
@@ -1502,10 +1502,10 @@
   resolved "https://registry.npmjs.org/@trpc/react-query/-/react-query-10.0.0-rc.4.tgz"
   integrity sha512-aUG6ejTY3WBkcOw3FUSzlJtWjAbdEETt77WrVRXxfyd/kid+n/vlK+lW87iO0LhUvFMzcqtFG+bQKEi3oEffCw==
 
-"@trpc/server@10.0.0-rc.4":
-  version "10.0.0-rc.4"
-  resolved "https://registry.npmjs.org/@trpc/server/-/server-10.0.0-rc.4.tgz"
-  integrity sha512-svW7FcjoWv4AXPjF0Kyf4c3zGuav/GwzfyldZyQh+qQ5fEHBRe69aNNpifbykuxv4svV8daQtTYqW/PsItO7FQ==
+"@trpc/server@10.6.0":
+  version "10.6.0"
+  resolved "https://registry.yarnpkg.com/@trpc/server/-/server-10.6.0.tgz#fb374403ae8b11d23b7109dddd38b89655180884"
+  integrity sha512-SXqogi536yDpfK0xsCaLvP0bzu5Qzn2rRHVr59NJ0SLwLPPKFjfHIrS+O+QnTA3TVUXvnXG0/Hllu8SJXOm7Zg==
 
 "@tsconfig/node10@^1.0.7":
   version "1.0.9"
