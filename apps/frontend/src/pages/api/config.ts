@@ -7,6 +7,6 @@ export const config = {
     pass: env.get('NEO4J_PASS').required().asString(),
   },
   omni: {
-    baseUrl: env.get('NEXT_PUBLIC_OMNI_UR').required().asString()
+    baseUrl: env.get('NEXT_PUBLIC_OMNI_URL').required().asString()
   }
 }
