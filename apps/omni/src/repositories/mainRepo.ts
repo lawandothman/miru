@@ -1,7 +1,6 @@
 import type { Driver } from "neo4j-driver";
 import type { Dict } from "neo4j-driver-core/types/record";
-import type { User } from "..";
-import type { Genre, Movie } from "../__generated__/resolvers-types";
+import type { Genre, Movie, User } from "../__generated__/resolvers-types";
 
 export interface Repository<T> {
   get(id: string): Promise<T | null>
@@ -18,17 +17,24 @@ export class NeoDataSource {
     })
 
     session.close()
-      .then(() => { })
       .catch(console.error)
 
     return res.records.map(rec => mapTo<Movie>(rec.toObject(), 'm')) as Movie[] ?? []
+  }
+
+  async getUsers(emails: readonly string[]): Promise<User[]> {
+    return await runAndMapMany<User>(
+      this.driver,
+      'MATCH (u:User) WHERE u.email in $emails RETURN u',
+      { emails },
+      'u'
+    )
   }
 
   async getGenres(): Promise<Genre[]> {
     const session = this.driver.session()
     const res = await session.run('MATCH (g:Genre) RETURN g')
     session.close()
-      .then(() => { })
       .catch(console.error)
 
     return res.records.map(rec => mapTo<Genre>(rec.toObject(), 'g')) as Genre[] ?? []

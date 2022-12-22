@@ -2,9 +2,9 @@ import { ApolloServer } from "@apollo/server";
 import { startStandaloneServer } from "@apollo/server/standalone";
 import { readFileSync } from "fs";
 import { verify } from "jsonwebtoken";
-import type { Movie, Resolvers } from "./__generated__/resolvers-types";
+import type { Movie, Resolvers, User } from "./__generated__/resolvers-types";
 import neo4j from "neo4j-driver";
-import { MovieRepo, NeoDataSource } from "./repositories/movieRepo";
+import { MovieRepo, NeoDataSource } from "./repositories/mainRepo";
 import { MovieDbService } from "./services/movieDbService";
 import { SyncService } from "./services/syncService";
 import { Migrator } from "./migrator";
@@ -20,6 +20,7 @@ export interface Context {
   movieRepo: MovieRepo;
   genreRepo: GenreRepo;
   movieLoader: DataLoader<string, Movie>;
+  userLoader: DataLoader<string, User>;
   neoDataSource: NeoDataSource;
   user: User | null;
 }
@@ -28,6 +29,9 @@ const resolvers: Resolvers = {
   Query: {
     movie: async (_parent, { id }, { movieLoader }) => {
       return await movieLoader.load(id);
+    },
+    user: async (_parent, { email }, { userLoader }) => {
+      return await userLoader.load(email);
     },
     search: async (_parent, { query }, { movieRepo }) => {
       return await movieRepo.search(query);
@@ -105,6 +109,7 @@ async function main() {
         movieRepo: new MovieRepo(driver),
         genreRepo: new GenreRepo(driver),
         movieLoader: new DataLoader(neo.getMovies.bind(neo)),
+        userLoader: new DataLoader(neo.getUsers.bind(neo)),
         neoDataSource: neo,
         user: getUser(req.headers.authorization?.toString()),
       };
@@ -115,17 +120,12 @@ async function main() {
   console.log(`🚀  Server ready at: ${url}`);
 }
 
-export interface User {
-  email: string;
-}
-
 function getUser(authHeader: string | undefined): User | null {
   if (authHeader == null) {
     return null;
   }
 
   const [, token] = authHeader.split(" ");
-  console.log(token);
 
   try {
     return verify(

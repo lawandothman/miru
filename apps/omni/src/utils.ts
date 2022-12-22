@@ -1,5 +1,5 @@
 import { GraphQLError } from "graphql";
-import type { User } from ".";
+import type { User } from "./__generated__/resolvers-types";
 
 export function requireUser(user: User | null): User {
   if(user == null){
