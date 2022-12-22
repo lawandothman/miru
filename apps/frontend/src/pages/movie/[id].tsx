@@ -8,6 +8,7 @@ import { Loader } from "components/Loader";
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { Movie } from "__generated__/resolvers-types";
 import { FiMinus, FiPlus } from "react-icons/fi";
+import { useSession } from "next-auth/react";
 
 const GET_BY_ID = gql`
   query Movie($movieId: ID!) {
@@ -47,6 +48,7 @@ const REMOVE_FROM_WATCHLIST = gql`
 const Movie: NextPage = () => {
   const { query } = useRouter();
   const movieId = Array.isArray(query.id) ? query.id[0] : query.id;
+  const { data: session } = useSession();
 
   const { data, loading } = useQuery<{ movie: Movie }, { movieId?: string }>(
     GET_BY_ID,
@@ -142,27 +144,29 @@ const Movie: NextPage = () => {
               )}
             </div> */}
           </div>
-          <button
-            onClick={() => {
-              if (data?.movie.inWatchlist) {
-                removeFromWatchlist({
-                  variables: {
-                    movieId,
-                  },
-                });
-              } else {
-                addToWatchlist({
-                  variables: {
-                    movieId,
-                  },
-                });
-              }
-            }}
-            className="mt-8 mr-auto flex items-center justify-center gap-2 rounded border border-white px-4 py-1 dark:text-white"
-          >
-            {data?.movie.inWatchlist ? <FiMinus /> : <FiPlus />}
-            Watchlist
-          </button>
+          {session && (
+            <button
+              onClick={() => {
+                if (data?.movie.inWatchlist) {
+                  removeFromWatchlist({
+                    variables: {
+                      movieId,
+                    },
+                  });
+                } else {
+                  addToWatchlist({
+                    variables: {
+                      movieId,
+                    },
+                  });
+                }
+              }}
+              className="mt-8 mr-auto flex items-center justify-center gap-2 rounded border border-white px-4 py-1 dark:text-white"
+            >
+              {data?.movie.inWatchlist ? <FiMinus /> : <FiPlus />}
+              Watchlist
+            </button>
+          )}
         </div>
       </div>
     </div>

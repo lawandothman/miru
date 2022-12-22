@@ -1,4 +1,5 @@
 import { gql, useMutation } from "@apollo/client";
+import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import type { FC } from "react";
@@ -31,7 +32,6 @@ const REMOVE_FROM_WATCHLIST = gql`
 `;
 
 export const LoadingSkeleton = () => {
-
   return (
     <div className="my-8">
       <div className="grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 xl:gap-x-8">
@@ -64,6 +64,7 @@ export const MoviesList: FC<MoviesListProps> = ({ movies }) => {
 
 const BlurImage = ({ movie }: { movie: Movie | null }) => {
   const [isLoading, setLoading] = useState(true);
+  const { data: session } = useSession();
   const [addToWatchlist] = useMutation<Movie, { movieId?: string }>(
     ADD_TO_WATCHLIST
   );
@@ -100,29 +101,30 @@ const BlurImage = ({ movie }: { movie: Movie | null }) => {
           {movie?.title}
         </h3>
       )}
-
-      <button
-        onClick={() => {
-          const movieId = movie?.id;
-          if (movie?.inWatchlist) {
-            removeFromWatchlist({
-              variables: {
-                movieId,
-              },
-            });
-          } else {
-            addToWatchlist({
-              variables: {
-                movieId,
-              },
-            });
-          }
-        }}
-        className="mx-auto mb-8 mt-4 flex h-8 w-36 items-center justify-center gap-1 rounded-md border border-neutral-500 dark:text-neutral-300"
-      >
-        {movie?.inWatchlist ? <FiMinus /> : <FiPlus />}
-        Watchlist
-      </button>
+      {session && (
+        <button
+          onClick={() => {
+            const movieId = movie?.id;
+            if (movie?.inWatchlist) {
+              removeFromWatchlist({
+                variables: {
+                  movieId,
+                },
+              });
+            } else {
+              addToWatchlist({
+                variables: {
+                  movieId,
+                },
+              });
+            }
+          }}
+          className="mx-auto mb-8 mt-4 flex h-8 w-36 items-center justify-center gap-1 rounded-md border border-neutral-500 dark:text-neutral-300"
+        >
+          {movie?.inWatchlist ? <FiMinus /> : <FiPlus />}
+          Watchlist
+        </button>
+      )}
     </div>
   );
 };
