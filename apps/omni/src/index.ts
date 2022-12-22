@@ -61,6 +61,9 @@ const resolvers: Resolvers = {
       return await movieRepo.getGenres(parent);
     },
     inWatchlist: async (parent, _, { user, neoDataSource }) => {
+      if(user == null) {
+        return false
+      }
       // ⚠️ No data loader code, this is subject to N+1
       return await neoDataSource.isMovieInWatchlist(
         parent.id,
