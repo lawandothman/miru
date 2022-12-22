@@ -30,15 +30,16 @@ const SignIn: NextPage<
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
 ) => {
-  const { req, res } = context;
+  const { req } = context;
   const session = await getSession({ req });
 
-  if (session && res) {
-    res.writeHead(302, {
-      Location: "/",
-    });
-    res.end();
-    return;
+  if (session) {
+    return {
+      redirect: {
+        destination: "/",
+        statusCode: 302,
+      },
+    };
   }
 
   const providers = await getProviders();
