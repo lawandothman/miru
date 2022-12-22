@@ -1,4 +1,3 @@
-import dotenv from "dotenv";
 import { ApolloServer } from "@apollo/server";
 import { startStandaloneServer } from "@apollo/server/standalone";
 import { readFileSync } from "fs";
@@ -12,8 +11,8 @@ import { Migrator } from "./migrator";
 import { GenreRepo } from "./repositories/genreRepo";
 import DataLoader from "dataloader";
 import { requireUser } from "./utils";
+import { config } from './config'
 
-dotenv.config();
 
 const schema = readFileSync("./schema.graphql").toString();
 
@@ -71,7 +70,8 @@ const resolvers: Resolvers = {
   },
 };
 
-const driver = neo4j.driver("neo4j://localhost", neo4j.auth.basic("", ""));
+const { host, user, pass } = config.neo4j
+const driver = neo4j.driver(host, neo4j.auth.basic(user, pass));
 
 const server = new ApolloServer({
   typeDefs: schema,
@@ -127,7 +127,7 @@ function getUser(authHeader: string | undefined): User | null {
   try {
     return verify(
       token,
-      process.env.NEXTAUTH_SECRET as string
+      process.env.OMNI_SECRET as string
     ) as unknown as User;
   } catch (e) {
     console.error(e);
