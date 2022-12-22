@@ -12,10 +12,9 @@ import { setContext } from "@apollo/client/link/context";
 import { Sidebar } from "components/Sidebar";
 
 import "styles/globals.css";
-import { config } from "./api/config";
 
 const httpLinkt = createHttpLink({
-  uri: `${config.omni.baseUrl}/graphql`,
+  uri: `${process.env.NEXT_PUBLIC_OMNI_URL}/graphql`,
 });
 
 const authLink = setContext(async (_, { headers }) => {
