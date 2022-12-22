@@ -1,7 +1,4 @@
-import dotenv from "dotenv";
 import env from 'env-var'
-
-dotenv.config()
 
 export const config = {
   neo4j: {
