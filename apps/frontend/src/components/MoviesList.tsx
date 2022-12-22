@@ -44,10 +44,10 @@ export const MoviesList: FC<MoviesListProps> = ({ movies }) => {
 
 const BlurImage = ({ movie }: { movie: Movie }) => {
   const [isLoading, setLoading] = useState(true);
-  const [addToWatchlist, {client: addClient}] = useMutation<Movie, { movieId?: string }>(
+  const [addToWatchlist] = useMutation<Movie, { movieId?: string }>(
     ADD_TO_WATCHLIST
   );
-  const [removeFromWatchlist, {client: removeClient}] = useMutation<Movie, { movieId?: string }>(
+  const [removeFromWatchlist] = useMutation<Movie, { movieId?: string }>(
     REMOVE_FROM_WATCHLIST
   );
   return (
@@ -90,32 +90,10 @@ const BlurImage = ({ movie }: { movie: Movie }) => {
                 movieId,
               },
             });
-            removeClient.writeFragment({
-              id: `Movie:${movieId}`,
-              fragment: gql`
-                fragment REMOVED on Movie {
-                  inWatchlist
-                }
-              `,
-              data: {
-                inWatchlist: false,
-              },
-            });
           } else {
             addToWatchlist({
               variables: {
                 movieId,
-              },
-            });
-            addClient.writeFragment({
-              id: `Movie:${movieId}`,
-              fragment: gql`
-                fragment REMOVED on Movie {
-                  inWatchlist
-                }
-              `,
-              data: {
-                inWatchlist: true,
               },
             });
           }
