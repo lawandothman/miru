@@ -1,4 +1,3 @@
-import { chooseContentTypeForSingleResultResponse } from "@apollo/server/dist/esm/ApolloServer";
 import { groupBy } from "lodash";
 import type { Driver } from "neo4j-driver";
 import type { Dict } from "neo4j-driver-core/types/record";
