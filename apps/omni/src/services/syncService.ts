@@ -21,7 +21,9 @@ export class SyncService {
         movies.forEach((movie) => this.movieRepo.upsert(movie))
         page = this.getNextPage(page)
       } catch(e) {
-        console.error('Failed to fetch page', e)
+        if(e instanceof Error) {
+          console.error('Failed to fetch page', e.message)
+        }
       }
       await this.sleep(10000)
     }
