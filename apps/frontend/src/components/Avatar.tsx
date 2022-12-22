@@ -19,7 +19,7 @@ export const ProfilePicture = ({ user }: { user: User }) => {
         />
       )}
       <Avatar.Fallback
-        className="flex h-full w-full items-center bg-white text-sm text-neutral-900 "
+        className="flex h-full w-full items-center justify-center bg-white text-sm text-neutral-900 "
         delayMs={600}
       >
         {user.name && initials(user.name)}
