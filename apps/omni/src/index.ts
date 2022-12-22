@@ -30,8 +30,8 @@ const resolvers: Resolvers = {
     movie: async (_parent, { id }, { movieLoader }) => {
       return await movieLoader.load(id);
     },
-    user: async (_parent, { email }, { userLoader }) => {
-      return await userLoader.load(email);
+    user: async (_parent, { id }, { userLoader }) => {
+      return await userLoader.load(id);
     },
     search: async (_parent, { query }, { movieRepo }) => {
       return await movieRepo.search(query);

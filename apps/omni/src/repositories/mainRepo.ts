@@ -22,11 +22,11 @@ export class NeoDataSource {
     return res.records.map(rec => mapTo<Movie>(rec.toObject(), 'm')) as Movie[] ?? []
   }
 
-  async getUsers(emails: readonly string[]): Promise<User[]> {
+  async getUsers(ids: readonly string[]): Promise<User[]> {
     return await runAndMapMany<User>(
       this.driver,
-      'MATCH (u:User) WHERE u.email in $emails RETURN u',
-      { emails },
+      'MATCH (u:User) WHERE u.id in $ids RETURN u',
+      { ids },
       'u'
     )
   }

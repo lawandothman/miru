@@ -26,7 +26,7 @@ type Genre {
 }
 
 type Query {
-  user(email: String!): User
+  user(id: ID!): User
   movie(id: ID!): Movie
   watchlist: [Movie]
   moviesByGenre(genreId: ID!): [Movie]
