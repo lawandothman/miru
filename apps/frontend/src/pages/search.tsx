@@ -1,5 +1,4 @@
-import { Loader } from "components/Loader";
-import { MoviesList } from "components/MoviesList";
+import { LoadingSkeleton, MoviesList } from "components/MoviesList";
 import { PageHeader } from "components/PageHeader";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
@@ -35,14 +34,10 @@ const Search: NextPage = () => {
     return <div>Ooops something went wrong</div>;
   }
 
-  if (loading) {
-    return <Loader />;
-  }
-
   return (
     <div className="px-20 pt-20">
       <PageHeader title={searchQuery} subtitle="Search results" />
-      <MoviesList movies={data?.search} />
+      {loading ? <LoadingSkeleton /> : <MoviesList movies={data?.search} />}
     </div>
   );
 };
