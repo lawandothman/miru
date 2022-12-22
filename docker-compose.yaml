@@ -9,5 +9,5 @@ services:
     # volumes:
     #     - neo4j_data:/data/
     environment:
-      NEO4J_AUTH: "none"
+      NEO4J_AUTH: "neo4j/pass"
 
