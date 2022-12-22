@@ -26,5 +26,5 @@ docker compose up -d
 yarn dev
 ```
 
-* Frontend app at http://localhost:300
+* Frontend app at http://localhost:3000
 * Omni API at http://localhost:4000
