@@ -4,14 +4,14 @@ import { readFileSync } from "fs";
 import { verify } from "jsonwebtoken";
 import type { Movie, Resolvers, User } from "./__generated__/resolvers-types";
 import neo4j from "neo4j-driver";
-import { MovieRepo, NeoDataSource } from "./repositories/mainRepo";
 import { MovieDbService } from "./services/movieDbService";
 import { SyncService } from "./services/syncService";
 import { Migrator } from "./migrator";
-import { GenreRepo } from "./repositories/genreRepo";
 import DataLoader from "dataloader";
 import { requireUser } from "./utils";
 import { config } from './config'
+import { MovieRepo, NeoDataSource } from "./dataSources/neoDataSource";
+import { GenreRepo } from "./dataSources/genreRepo";
 
 
 const schema = readFileSync("./schema.graphql").toString();
@@ -30,11 +30,14 @@ const resolvers: Resolvers = {
     movie: async (_parent, { id }, { movieLoader }) => {
       return await movieLoader.load(id);
     },
+    search: async (_parent, { query }, { movieRepo }) => {
+      return await movieRepo.search(query);
+    },
     user: async (_parent, { id }, { userLoader }) => {
       return await userLoader.load(id);
     },
-    search: async (_parent, { query }, { movieRepo }) => {
-      return await movieRepo.search(query);
+    searchUsers: async (_parent, { nameQuery }, {neoDataSource}) => {
+      return await neoDataSource.searchUsers(nameQuery)
     },
     moviesByGenre: async (_parent, { genreId }, { movieRepo }) => {
       return await movieRepo.getMoviesByGenre(genreId);

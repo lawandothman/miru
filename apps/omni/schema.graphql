@@ -31,6 +31,7 @@ type Query {
   watchlist: [Movie]
   moviesByGenre(genreId: ID!): [Movie]
   search(query: String!): [Movie]
+  searchUsers(nameQuery: String!): [User]
   genres: [Genre]
 }
 

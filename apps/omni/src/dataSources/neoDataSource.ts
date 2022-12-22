@@ -31,6 +31,15 @@ export class NeoDataSource {
     )
   }
 
+  async searchUsers(query: string): Promise<User[]> {
+    return await runAndMapMany<User>(
+      this.driver,
+      'MATCH (u:User) WHERE toLower(u.name) CONTAINS toLower($query) RETURN u LIMIT 20',
+      { query },
+      'u'
+    )
+  }
+
   async getGenres(): Promise<Genre[]> {
     const session = this.driver.session()
     const res = await session.run('MATCH (g:Genre) RETURN g')
