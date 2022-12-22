@@ -5,6 +5,7 @@ import {
   FiMenu,
   FiPlay,
   FiTrendingUp,
+  FiUser,
   FiX,
 } from "react-icons/fi";
 import type { FC, PropsWithChildren } from "react";
@@ -58,7 +59,7 @@ const GET_GENRES = gql`
 export const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { data } = useQuery<{ genres: Genre[] }>(GET_GENRES, {
-    canonizeResults: true
+    canonizeResults: true,
   });
   const { data: session } = useSession();
   const router = useRouter();
@@ -106,6 +107,13 @@ export const Sidebar = () => {
                   icon={<FiPlay />}
                 >
                   Watchlist
+                </NavItem>
+                <NavItem
+                  isSelected={router.pathname === "/users"}
+                  href="/users"
+                  icon={<FiUser />}
+                >
+                  Users
                 </NavItem>
                 <NavItem
                   isSelected={router.pathname === "/popular"}
