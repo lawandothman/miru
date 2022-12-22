@@ -1,5 +1,4 @@
-import { Loader } from "components/Loader";
-import { MoviesList } from "components/MoviesList";
+import { LoadingSkeleton, MoviesList } from "components/MoviesList";
 import { PageHeader } from "components/PageHeader";
 import type { NextPage } from "next";
 import { useQuery, gql } from "@apollo/client";
@@ -26,14 +25,11 @@ const Watchlist: NextPage = () => {
     refetch();
   }, [refetch]);
 
-  if (loading) {
-    return <Loader />;
-  }
 
   return (
     <div className="px-20 pt-20">
       <PageHeader title="Watchlist" />
-      <MoviesList movies={data?.watchlist} />
+      {loading ? <LoadingSkeleton /> : <MoviesList movies={data?.watchlist} />}
     </div>
   );
 };

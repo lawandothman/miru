@@ -1,6 +1,5 @@
 import { gql, useQuery } from "@apollo/client";
-import { Loader } from "components/Loader";
-import { MoviesList } from "components/MoviesList";
+import { LoadingSkeleton, MoviesList } from "components/MoviesList";
 import { PageHeader } from "components/PageHeader";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
@@ -32,14 +31,14 @@ const Genre: NextPage = () => {
     },
   });
 
-  if (loading) {
-    return <Loader />;
-  }
-
   return (
     <div className="px-20 pt-20">
       <PageHeader title={"Genre"} />
-      <MoviesList movies={data?.moviesByGenre} />
+      {loading ? (
+        <LoadingSkeleton />
+      ) : (
+        <MoviesList movies={data?.moviesByGenre} />
+      )}
     </div>
   );
 };

@@ -30,6 +30,26 @@ const REMOVE_FROM_WATCHLIST = gql`
   }
 `;
 
+export const LoadingSkeleton = () => {
+
+  return (
+    <div className="my-8">
+      <div className="grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 xl:gap-x-8">
+        {new Array(24).fill(true)?.map((item, idx) => {
+          return (
+            <div key={idx} className="h-full w-full">
+              <div className="h-[500px] w-full rounded-lg lg:h-[500px]">
+                <div className="min-h-full min-w-full animate-pulse bg-neutral-700" />
+              </div>
+              <div className="mx-auto mt-4 h-2.5 w-48 animate-pulse rounded-full bg-gray-200 dark:bg-neutral-700"></div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
 export const MoviesList: FC<MoviesListProps> = ({ movies }) => {
   return (
     <div className="my-8">

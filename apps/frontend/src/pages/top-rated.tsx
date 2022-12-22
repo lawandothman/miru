@@ -1,5 +1,4 @@
-import { Loader } from "components/Loader";
-import { MoviesList } from "components/MoviesList";
+import { LoadingSkeleton, MoviesList } from "components/MoviesList";
 import type { NextPage } from "next";
 import { gql, useQuery } from "@apollo/client";
 import { PageHeader } from "components/PageHeader";
@@ -18,14 +17,11 @@ const GET_TOP_RATED = gql`
 
 const TopRated: NextPage = () => {
   const { data, loading } = useQuery<{ search: Movie[] }>(GET_TOP_RATED);
-  if (loading) {
-    return <Loader />;
-  }
 
   return (
     <div className="px-20 pt-20">
       <PageHeader title="Top Rated" />
-      <MoviesList movies={data?.search} />
+      {loading ? <LoadingSkeleton /> : <MoviesList movies={data?.search} />}
     </div>
   );
 };

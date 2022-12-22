@@ -1,5 +1,12 @@
 import Link from "next/link";
-import { FiCalendar, FiHeart, FiMenu, FiPlay, FiTrendingUp, FiX } from "react-icons/fi";
+import {
+  FiCalendar,
+  FiHeart,
+  FiMenu,
+  FiPlay,
+  FiTrendingUp,
+  FiX,
+} from "react-icons/fi";
 import type { FC, PropsWithChildren } from "react";
 import React, { useState } from "react";
 import OutsideClickHandler from "react-outside-click-handler";
@@ -50,7 +57,9 @@ const GET_GENRES = gql`
 
 export const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { data } = useQuery<{ genres: Genre[] }>(GET_GENRES);
+  const { data } = useQuery<{ genres: Genre[] }>(GET_GENRES, {
+    canonizeResults: true
+  });
   const { data: session } = useSession();
   const router = useRouter();
 
