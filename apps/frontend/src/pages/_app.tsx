@@ -15,6 +15,9 @@ import "styles/globals.css";
 
 const httpLinkt = createHttpLink({
   uri: `${process.env.NEXT_PUBLIC_OMNI_URL}/graphql`,
+  fetchOptions: {
+    mode: 'no-cors',
+  }
 });
 
 const authLink = setContext(async (_, { headers }) => {
