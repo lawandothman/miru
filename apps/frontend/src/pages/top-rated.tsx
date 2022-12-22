@@ -11,6 +11,7 @@ const GET_TOP_RATED = gql`
       id
       title
       posterUrl
+      inWatchlist
     }
   }
 `;
