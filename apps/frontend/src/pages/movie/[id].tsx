@@ -7,6 +7,7 @@ import { getYear } from "date-fns";
 import { Loader } from "components/Loader";
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { Movie } from "__generated__/resolvers-types";
+import { FiMinus, FiPlus } from "react-icons/fi";
 
 const GET_BY_ID = gql`
   query Movie($movieId: ID!) {
@@ -141,34 +142,27 @@ const Movie: NextPage = () => {
               )}
             </div> */}
           </div>
-          <div className="flex gap-8">
-            <button
-              onClick={() =>
-                addToWatchlist({
-                  variables: {
-                    movieId,
-                  },
-                })
-              }
-              disabled={data?.movie.inWatchlist ?? false}
-              className="mt-8 w-44 rounded bg-white p-2 text-sm text-black"
-            >
-              Add to Watchlist
-            </button>
-            <button
-              onClick={() =>
+          <button
+            onClick={() => {
+              if (data?.movie.inWatchlist) {
                 removeFromWatchlist({
                   variables: {
                     movieId,
                   },
-                })
+                });
+              } else {
+                addToWatchlist({
+                  variables: {
+                    movieId,
+                  },
+                });
               }
-              disabled={!data?.movie.inWatchlist ?? true}
-              className="mt-8 w-44 rounded bg-white p-2 text-sm text-black"
-            >
-              Remove from Watchlist
-            </button>
-          </div>
+            }}
+            className="mt-8 mr-auto flex items-center justify-center gap-2 rounded border border-white px-4 py-1 dark:text-white"
+          >
+            {data?.movie.inWatchlist ? <FiMinus /> : <FiPlus />}
+            Watchlist
+          </button>
         </div>
       </div>
     </div>
