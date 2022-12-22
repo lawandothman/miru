@@ -72,7 +72,7 @@ export const Sidebar = () => {
         </div>
         <aside
           className={cn(
-            "z-30 h-full w-60 transform overflow-x-hidden overflow-y-auto border-r border-gray-200 bg-white transition duration-200 ease-in-out dark:border-neutral-700 dark:bg-neutral-900 lg:z-auto lg:translate-x-0",
+            "z-30 h-full w-60 transform overflow-y-auto border-r border-gray-200 bg-white transition duration-200 ease-in-out dark:border-neutral-700 dark:bg-neutral-900 lg:z-auto lg:translate-x-0",
             isOpen
               ? "fixed inset-y-0 left-0 translate-x-0"
               : "fixed inset-y-0 -translate-x-full"
@@ -136,7 +136,7 @@ export const Sidebar = () => {
               </ul>
             </nav>
           </main>
-          <footer className="sticky bottom-0 left-0 w-60">
+          <footer className="sticky bottom-0 left-0">
             <div className="h-8 bg-gradient-to-t from-white dark:from-neutral-900"></div>
             <div className="p-4 dark:bg-neutral-900">
               {session?.user ? (
