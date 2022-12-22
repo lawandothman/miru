@@ -12,6 +12,7 @@ const SEARCH = gql`
       id
       title
       posterUrl
+      inWatchlist
     }
   }
 `;

@@ -11,6 +11,7 @@ const GET_UPCOMING = gql`
       id
       title
       posterUrl
+      inWatchlist
     }
   }
 `;

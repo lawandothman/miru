@@ -15,6 +15,7 @@ const GET_BY_GENRE = gql`
       genres {
         name
       }
+      inWatchlist
     }
   }
 `;

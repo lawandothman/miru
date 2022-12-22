@@ -4,6 +4,7 @@ import { PageHeader } from "components/PageHeader";
 import type { NextPage } from "next";
 import { useQuery, gql } from "@apollo/client";
 import type { Movie } from "__generated__/resolvers-types";
+import { useEffect } from "react";
 
 export const GET_WATCHLIST = gql`
   query Watchlist {
@@ -11,14 +12,19 @@ export const GET_WATCHLIST = gql`
       id
       title
       posterUrl
+      inWatchlist
     }
   }
 `;
 
 const Watchlist: NextPage = () => {
-  const { data, loading } = useQuery<{ watchlist: Movie[] }>(GET_WATCHLIST, {
-    fetchPolicy: 'no-cache'
-  });
+  const { data, loading, refetch } = useQuery<{ watchlist: Movie[] }>(
+    GET_WATCHLIST
+  );
+
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
 
   if (loading) {
     return <Loader />;

@@ -136,7 +136,7 @@ export const Sidebar = () => {
               </ul>
             </nav>
           </main>
-          <footer className="sticky bottom-0 left-0 w-60">
+          <footer className="sticky bottom-0 left-0">
             <div className="h-8 bg-gradient-to-t from-white dark:from-neutral-900"></div>
             <div className="p-4 dark:bg-neutral-900">
               {session?.user ? (

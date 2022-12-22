@@ -11,6 +11,7 @@ const GET_POPULAR = gql`
       id
       title
       posterUrl
+      inWatchlist
     }
   }
 `;
