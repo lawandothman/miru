@@ -72,7 +72,7 @@ export const Sidebar = () => {
         </div>
         <aside
           className={cn(
-            "z-30 h-full w-60 transform overflow-y-auto border-r border-gray-200 bg-white transition duration-200 ease-in-out dark:border-neutral-700 dark:bg-neutral-900 lg:z-auto lg:translate-x-0",
+            "z-30 h-full w-60 transform overflow-x-hidden overflow-y-auto border-r border-gray-200 bg-white transition duration-200 ease-in-out dark:border-neutral-700 dark:bg-neutral-900 lg:z-auto lg:translate-x-0",
             isOpen
               ? "fixed inset-y-0 left-0 translate-x-0"
               : "fixed inset-y-0 -translate-x-full"
