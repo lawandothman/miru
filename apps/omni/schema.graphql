@@ -18,6 +18,7 @@ type User {
   name: String!
   image: String
   email: String!
+  matches: [Movie]
 }
 
 type Genre {

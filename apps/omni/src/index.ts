@@ -21,6 +21,7 @@ export interface Context {
   genreRepo: GenreRepo;
   movieLoader: DataLoader<string, Movie>;
   userLoader: DataLoader<string, User>;
+  matchesLoader: DataLoader<string, Movie[]>;
   neoDataSource: NeoDataSource;
   user: User | null;
 }
@@ -78,6 +79,11 @@ const resolvers: Resolvers = {
       );
     },
   },
+  User: {
+    matches: async (parent, _, {matchesLoader})  => {
+      return await matchesLoader.load(parent.id)
+    }
+  }
 };
 
 const { host, user, pass } = config.neo4j
@@ -108,13 +114,15 @@ async function main() {
     listen: { port },
     context: async ({ req }) => {
       const neo = new NeoDataSource(driver);
+      const user = getUser(req.headers.authorization?.toString())
       const context: Context = {
         movieRepo: new MovieRepo(driver),
         genreRepo: new GenreRepo(driver),
         movieLoader: new DataLoader(neo.getMovies.bind(neo)),
         userLoader: new DataLoader(neo.getUsers.bind(neo)),
+        matchesLoader: new DataLoader(neo.getMatchesWith(user).bind(neo)),
         neoDataSource: neo,
-        user: getUser(req.headers.authorization?.toString()),
+        user,
       };
       return context;
     },

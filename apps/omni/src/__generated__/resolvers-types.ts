@@ -93,6 +93,7 @@ export type User = {
   email: Scalars['String'];
   id: Scalars['ID'];
   image?: Maybe<Scalars['String']>;
+  matches?: Maybe<Array<Maybe<Movie>>>;
   name: Scalars['String'];
 };
 
@@ -230,6 +231,7 @@ export type UserResolvers<ContextType = Context, ParentType extends ResolversPar
   email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   image?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  matches?: Resolver<Maybe<Array<Maybe<ResolversTypes['Movie']>>>, ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;

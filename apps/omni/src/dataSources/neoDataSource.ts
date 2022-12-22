@@ -1,3 +1,5 @@
+import { chooseContentTypeForSingleResultResponse } from "@apollo/server/dist/esm/ApolloServer";
+import { groupBy } from "lodash";
 import type { Driver } from "neo4j-driver";
 import type { Dict } from "neo4j-driver-core/types/record";
 import type { Genre, Movie, User } from "../__generated__/resolvers-types";
@@ -29,6 +31,39 @@ export class NeoDataSource {
       { ids },
       'u'
     )
+  }
+
+  getMatchesWith = (me: User | null) => async (ids: readonly string[]): Promise<Movie[][]> => {
+    if(me == null) {
+      return []
+    }
+
+    console.log(ids)
+    console.log(me.email)
+
+    const res = await runMany<Movie & { friendId: string }>(
+      this.driver,
+      `MATCH (f:User)<-[r1:IN_WATCHLIST]-(m:Movie)-[r2]->(me:User {email: $myEmail})
+      WHERE f.id IN $ids
+      RETURN m{
+          .overview,
+          .posterUrl,
+          .releaseDate,
+          .backdropUrl,
+          .originalTitle,
+          .id,
+          .popularity,
+          .title,
+          .adult,
+          friendId: f.id
+      }`, {ids, myEmail: me.email},
+      'm'
+    )
+    const groupedByUser = groupBy(res, (a) => a.friendId)
+
+    return ids.map((id) => {
+      return groupedByUser[id] ?? []
+    })
   }
 
   async searchUsers(query: string): Promise<User[]> {
@@ -69,10 +104,18 @@ export class NeoDataSource {
   }
 }
 
+async function runMany<T>(driver: Driver, query: string, args: any, key: string): Promise<T[]> {
+    const session = driver.session()
+    const res = await session.run(query, args)
+    session.close().catch(console.error)
+
+    return res.records.map(rec => rec.toObject()[key]) as T[] ?? []
+}
+
 async function runAndMapMany<T>(driver: Driver, query: string, args: any, key: string): Promise<T[]> {
     const session = driver.session()
     const res = await session.run(query, args)
-    session.close().then(() => { }).catch(console.error)
+    session.close().catch(console.error)
 
     return res.records.map(rec => mapTo<T>(rec.toObject(), key)) as T[] ?? []
 }
@@ -80,7 +123,7 @@ async function runAndMapMany<T>(driver: Driver, query: string, args: any, key: s
 async function runAndMap<T>(driver: Driver, query: string, args: any, key: string): Promise<T | null> {
     const session = driver.session()
     const res = await session.run(query, args)
-    session.close().then(() => { }).catch(console.error)
+    session.close().catch(console.error)
 
     return mapTo<T>(res.records[0]?.toObject() ?? null, key)
 }
@@ -107,7 +150,6 @@ export class MovieRepo implements Repository<Movie> {
     })
 
     session.close()
-      .then(() => { })
       .catch(console.error)
 
     return mapTo<Movie>(res.records[0].toObject(), 'm') ?? null
