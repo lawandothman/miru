@@ -9,6 +9,7 @@ import { gql, useMutation, useQuery } from "@apollo/client";
 import { Movie } from "__generated__/resolvers-types";
 import { FiMinus, FiPlus } from "react-icons/fi";
 import { useSession } from "next-auth/react";
+import { Spinner } from "components/Spinner";
 
 const GET_BY_ID = gql`
   query Movie($movieId: ID!) {
@@ -59,12 +60,12 @@ const Movie: NextPage = () => {
     }
   );
 
-  const [addToWatchlist] = useMutation<Movie, { movieId?: string }>(
-    ADD_TO_WATCHLIST
-  );
-  const [removeFromWatchlist] = useMutation<Movie, { movieId?: string }>(
-    REMOVE_FROM_WATCHLIST
-  );
+  const [addToWatchlist, { loading: addToWatchlistLoading }] = useMutation<
+    Movie,
+    { movieId?: string }
+  >(ADD_TO_WATCHLIST);
+  const [removeFromWatchlist, { loading: removeFromWatchlistLoading }] =
+    useMutation<Movie, { movieId?: string }>(REMOVE_FROM_WATCHLIST);
 
   if (loading) {
     return <Loader />;
@@ -80,7 +81,7 @@ const Movie: NextPage = () => {
             height={1000}
           />
         )}
-        <div className="flex flex-col dark:text-white">
+        <div className="flex flex-col max-w-xl dark:text-white">
           <h1 className="text-4xl font-thin uppercase tracking-widest ">
             {data?.movie.title}
           </h1>
@@ -163,8 +164,17 @@ const Movie: NextPage = () => {
               }}
               className="mt-8 mr-auto flex items-center justify-center gap-2 rounded border border-white px-4 py-1 dark:text-white"
             >
-              {data?.movie.inWatchlist ? <FiMinus /> : <FiPlus />}
-              Watchlist
+              {addToWatchlistLoading || removeFromWatchlistLoading ? (
+                <>
+                  <Spinner />
+                  Watchlist
+                </>
+              ) : (
+                <>
+                  {data?.movie?.inWatchlist ? <FiMinus /> : <FiPlus />}
+                  Watchlist
+                </>
+              )}
             </button>
           )}
         </div>

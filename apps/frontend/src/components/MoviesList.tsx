@@ -8,6 +8,7 @@ import { FiMinus, FiPlus } from "react-icons/fi";
 import { cn } from "utils/cn";
 import { getImage } from "utils/image";
 import type { Movie } from "__generated__/resolvers-types";
+import { Spinner } from "./Spinner";
 
 interface MoviesListProps {
   movies?: Array<Movie | null>;
@@ -65,12 +66,13 @@ export const MoviesList: FC<MoviesListProps> = ({ movies }) => {
 const BlurImage = ({ movie }: { movie: Movie | null }) => {
   const [isLoading, setLoading] = useState(true);
   const { data: session } = useSession();
-  const [addToWatchlist] = useMutation<Movie, { movieId?: string }>(
-    ADD_TO_WATCHLIST
-  );
-  const [removeFromWatchlist] = useMutation<Movie, { movieId?: string }>(
-    REMOVE_FROM_WATCHLIST
-  );
+  const [addToWatchlist, { loading: addToWatchlistLoading }] = useMutation<
+    Movie,
+    { movieId?: string }
+  >(ADD_TO_WATCHLIST);
+  const [removeFromWatchlist, { loading: removeFromWatchlistLoading }] =
+    useMutation<Movie, { movieId?: string }>(REMOVE_FROM_WATCHLIST);
+
   return (
     <div className="h-full w-full">
       <div className="aspect-w-1 aspect-h-1 xl:aspect-w-7 xl:aspect-h-8 relative h-[500px] w-full overflow-hidden rounded-lg lg:h-[500px]">
@@ -119,10 +121,19 @@ const BlurImage = ({ movie }: { movie: Movie | null }) => {
               });
             }
           }}
-          className="mx-auto mb-8 mt-4 flex h-8 w-36 items-center justify-center gap-1 rounded-md border border-neutral-500 dark:text-neutral-300"
+          className="mx-auto mb-8 mt-4 flex h-8 w-32 items-center justify-center gap-1 rounded-md border border-neutral-500 dark:text-neutral-300"
         >
-          {movie?.inWatchlist ? <FiMinus /> : <FiPlus />}
-          Watchlist
+          {addToWatchlistLoading || removeFromWatchlistLoading ? (
+            <>
+              <Spinner />
+              Watchlist
+            </>
+          ) : (
+            <>
+              {movie?.inWatchlist ? <FiMinus /> : <FiPlus />}
+              Watchlist
+            </>
+          )}
         </button>
       )}
     </div>
