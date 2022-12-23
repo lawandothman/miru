@@ -12,7 +12,6 @@
   },
   "dependencies": {
     "@apollo/server": "^4.3.0",
-    "@types/lodash": "^4.14.191",
     "dataloader": "^2.1.0",
     "dotenv": "^16.0.3",
     "env-var": "^7.3.0",
@@ -28,6 +27,7 @@
     "@graphql-codegen/typescript": "^2.8.5",
     "@graphql-codegen/typescript-resolvers": "^2.7.10",
     "@types/axios": "^0.14.0",
+    "@types/lodash": "^4.14.191",
     "@types/node": "^18.11.16",
     "axios": "^1.2.1",
     "neo4j-driver": "^5.3.0",
