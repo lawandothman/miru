@@ -8,6 +8,8 @@ import {
   createHttpLink,
 } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
+import { DefaultSeo } from "next-seo";
+import SEO from "../../next-seo.config";
 
 import { Sidebar } from "components/Sidebar";
 
@@ -38,14 +40,17 @@ const MyApp: AppType<{ session: Session | null }> = ({
   pageProps: { session, ...pageProps },
 }) => {
   return (
-    <SessionProvider session={session}>
-      <ApolloProvider client={client}>
-        <Sidebar />
-        <main className="lg:pl-60">
-          <Component {...pageProps} />
-        </main>
-      </ApolloProvider>
-    </SessionProvider>
+    <>
+      <SessionProvider session={session}>
+        <ApolloProvider client={client}>
+          <DefaultSeo {...SEO} />
+          <Sidebar />
+          <main className="lg:pl-60">
+            <Component {...pageProps} />
+          </main>
+        </ApolloProvider>
+      </SessionProvider>
+    </>
   );
 };
 
