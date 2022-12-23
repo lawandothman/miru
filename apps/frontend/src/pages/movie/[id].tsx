@@ -81,7 +81,7 @@ const Movie: NextPage = () => {
             height={1000}
           />
         )}
-        <div className="flex flex-col max-w-xl dark:text-white">
+        <div className="flex max-w-xl flex-col dark:text-white">
           <h1 className="text-4xl font-thin uppercase tracking-widest ">
             {data?.movie.title}
           </h1>
