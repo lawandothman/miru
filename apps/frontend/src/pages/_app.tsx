@@ -1,5 +1,4 @@
-import { type AppType } from 'next/app'
-import { type Session } from 'next-auth'
+import type { AppProps } from 'next/app'
 import { getSession, SessionProvider } from 'next-auth/react'
 import {
   ApolloProvider,
@@ -14,6 +13,7 @@ import SEO from 'next-seo.config'
 import { Sidebar } from 'components/Sidebar'
 
 import 'styles/globals.css'
+import type { Genre } from '__generated__/resolvers-types'
 
 const httpLinkt = createHttpLink({
   uri: `${process.env.NEXT_PUBLIC_OMNI_URL}/graphql`,
@@ -35,16 +35,19 @@ const client = new ApolloClient({
   cache: new InMemoryCache(),
 })
 
-const MyApp: AppType<{ session: Session | null }> = ({
-  Component,
-  pageProps: { session, ...pageProps },
-}) => {
+const MyApp = (props: AppProps & { genres: Genre[] }) => {
+  const {
+    Component,
+    genres,
+    pageProps: { session, ...pageProps },
+  } = props
+
   return (
     <>
       <SessionProvider session={session}>
         <ApolloProvider client={client}>
           <DefaultSeo {...SEO} />
-          <Sidebar />
+          <Sidebar genres={genres} />
           <main className='lg:pl-60'>
             <Component {...pageProps} />
           </main>
