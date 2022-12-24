@@ -160,7 +160,7 @@ export const Sidebar = () => {
                 <>
                   <div className="flex w-full items-center justify-between rounded-lg p-2 text-base font-normal text-gray-900  dark:text-white ">
                     <div>
-                      <ProfilePicture user={session.user} />
+                      <ProfilePicture size="sm" user={session.user} />
                       <span className="ml-3 text-sm">
                         {session?.user?.name ?? "Profile"}
                       </span>

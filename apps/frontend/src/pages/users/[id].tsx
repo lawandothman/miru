@@ -1,4 +1,5 @@
 import { gql, useQuery } from "@apollo/client";
+import { ProfilePicture } from "components/Avatar";
 import { MoviesList } from "components/MoviesList";
 import { useRouter } from "next/router";
 import { User } from "__generated__/resolvers-types";
@@ -27,14 +28,27 @@ const User = () => {
     },
   });
 
+
   return (
     <div className="px-20 pt-20">
-      <h1 className="text-3xl font-thin uppercase tracking-widest dark:text-white">
-        {data?.user.name}
-      </h1>
-      <h3 className="mt-8 text-xl text-neutral-300 font-thin">Matches with Pedro</h3>
-      {data?.user.matches && data.user.matches.length > 0 && (
-        <MoviesList movies={data?.user.matches} />
+      {data?.user && (
+        <>
+          <div className="flex items-center gap-4">
+            <ProfilePicture size="lg" user={data.user} />
+            <h1 className="text-3xl  dark:text-neutral-300">
+              {data?.user.name}
+            </h1>
+          </div>
+
+          {data?.user.matches && data.user.matches.length > 0 && (
+            <>
+              <h3 className="my-8 text-xl font-thin text-neutral-300">
+                Your matches with {data?.user.name}
+              </h3>
+              <MoviesList movies={data?.user.matches} />
+            </>
+          )}
+        </>
       )}
     </div>
   );

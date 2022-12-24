@@ -3,14 +3,14 @@ import { SearchInput } from "./SearchInput";
 
 interface PageHeaderProps {
   title: string;
-  subtitle?: string
+  subtitle?: string;
 }
 export const PageHeader: FC<PageHeaderProps> = ({
   title,
   subtitle = "Movies",
 }) => {
   return (
-    <div className="flex justify-between">
+    <div className="mb-4 flex justify-between">
       <div>
         <h1 className="text-3xl font-thin uppercase tracking-widest dark:text-white">
           {title}

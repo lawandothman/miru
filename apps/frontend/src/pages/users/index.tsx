@@ -1,6 +1,7 @@
 import { gql, useLazyQuery } from "@apollo/client";
 import { ProfilePicture } from "components/Avatar";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import type { ChangeEvent, FormEvent } from "react";
 import { useState } from "react";
 import { FiSearch } from "react-icons/fi";
@@ -21,6 +22,7 @@ const SEARCH_USERS = gql`
 `;
 
 const Users = () => {
+  const router = useRouter();
   const [query, setQuery] = useState("");
   const [searchUsers, { data }] = useLazyQuery<
     { searchUsers: User[] },
@@ -32,6 +34,12 @@ const Users = () => {
     searchUsers({
       variables: {
         nameQuery: query,
+      },
+    });
+    router.push({
+      pathname: "/users",
+      query: {
+        q: query,
       },
     });
   };
@@ -53,17 +61,32 @@ const Users = () => {
         <FiSearch className="absolute inset-y-0 my-auto h-8 w-12 stroke-neutral-400 px-3.5" />
       </form>
 
-      {data?.searchUsers.map((user) => (
-        <Link href={`/users/${user.id}`} key={user.id}>
-          <div className="flex max-w-lg items-center gap-4 rounded-lg p-4 hover:bg-neutral-700">
-            <ProfilePicture user={user} />
-            <div className="text-white">
-              <h3 key={user.id}>{user.name}</h3>
-              <span className="text-sm">{user.matches?.length} matches</span>
-            </div>
-          </div>
-        </Link>
-      ))}
+      {data?.searchUsers && (
+        <>
+          {data.searchUsers.length === 0 && (
+            <span className="mb-4 block dark:text-neutral-300">
+              Found no results for {router.query.q}
+            </span>
+          )}
+          <span className="mb-4 block dark:text-neutral-300">
+            Found {data.searchUsers.length} result
+            {data.searchUsers.length > 1 && "s"} for {router.query.q}
+          </span>
+          {data?.searchUsers.map((user) => (
+            <Link href={`/users/${user.id}`} key={user.id}>
+              <div className="flex max-w-lg items-center gap-4 rounded-lg p-4 hover:bg-neutral-700">
+                <ProfilePicture size="md" user={user} />
+                <div className="text-white">
+                  <h3 key={user.id}>{user.name}</h3>
+                  <span className="text-sm">
+                    {user.matches?.length} matches
+                  </span>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </>
+      )}
     </div>
   );
 };
