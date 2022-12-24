@@ -13,16 +13,26 @@ type Movie {
   inWatchlist: Boolean
 }
 
+type User {
+  id: ID!
+  name: String!
+  image: String
+  email: String!
+  matches: [Movie]
+}
+
 type Genre {
   id: ID!
   name: String!
 }
 
 type Query {
+  user(id: ID!): User
   movie(id: ID!): Movie
   watchlist: [Movie]
   moviesByGenre(genreId: ID!): [Movie]
   search(query: String!): [Movie]
+  searchUsers(nameQuery: String!): [User]
   genres: [Genre]
 }
 

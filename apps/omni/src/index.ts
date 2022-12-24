@@ -2,16 +2,16 @@ import { ApolloServer } from "@apollo/server";
 import { startStandaloneServer } from "@apollo/server/standalone";
 import { readFileSync } from "fs";
 import { verify } from "jsonwebtoken";
-import type { Movie, Resolvers } from "./__generated__/resolvers-types";
+import type { Movie, Resolvers, User } from "./__generated__/resolvers-types";
 import neo4j from "neo4j-driver";
-import { MovieRepo, NeoDataSource } from "./repositories/movieRepo";
 import { MovieDbService } from "./services/movieDbService";
 import { SyncService } from "./services/syncService";
 import { Migrator } from "./migrator";
-import { GenreRepo } from "./repositories/genreRepo";
 import DataLoader from "dataloader";
 import { requireUser } from "./utils";
 import { config } from './config'
+import { MovieRepo, NeoDataSource } from "./dataSources/neoDataSource";
+import { GenreRepo } from "./dataSources/genreRepo";
 
 
 const schema = readFileSync("./schema.graphql").toString();
@@ -20,6 +20,8 @@ export interface Context {
   movieRepo: MovieRepo;
   genreRepo: GenreRepo;
   movieLoader: DataLoader<string, Movie>;
+  userLoader: DataLoader<string, User>;
+  matchesLoader: DataLoader<string, Movie[]>;
   neoDataSource: NeoDataSource;
   user: User | null;
 }
@@ -31,6 +33,12 @@ const resolvers: Resolvers = {
     },
     search: async (_parent, { query }, { movieRepo }) => {
       return await movieRepo.search(query);
+    },
+    user: async (_parent, { id }, { userLoader }) => {
+      return await userLoader.load(id);
+    },
+    searchUsers: async (_parent, { nameQuery }, {neoDataSource}) => {
+      return await neoDataSource.searchUsers(nameQuery)
     },
     moviesByGenre: async (_parent, { genreId }, { movieRepo }) => {
       return await movieRepo.getMoviesByGenre(genreId);
@@ -71,6 +79,11 @@ const resolvers: Resolvers = {
       );
     },
   },
+  User: {
+    matches: async (parent, _, {matchesLoader})  => {
+      return await matchesLoader.load(parent.id)
+    }
+  }
 };
 
 const { host, user, pass } = config.neo4j
@@ -101,12 +114,15 @@ async function main() {
     listen: { port },
     context: async ({ req }) => {
       const neo = new NeoDataSource(driver);
+      const user = getUser(req.headers.authorization?.toString())
       const context: Context = {
         movieRepo: new MovieRepo(driver),
         genreRepo: new GenreRepo(driver),
         movieLoader: new DataLoader(neo.getMovies.bind(neo)),
+        userLoader: new DataLoader(neo.getUsers.bind(neo)),
+        matchesLoader: new DataLoader(neo.getMatchesWith(user).bind(neo)),
         neoDataSource: neo,
-        user: getUser(req.headers.authorization?.toString()),
+        user,
       };
       return context;
     },
@@ -115,17 +131,12 @@ async function main() {
   console.log(`🚀  Server ready at: ${url}`);
 }
 
-export interface User {
-  email: string;
-}
-
 function getUser(authHeader: string | undefined): User | null {
   if (authHeader == null) {
     return null;
   }
 
   const [, token] = authHeader.split(" ");
-  console.log(token);
 
   try {
     return verify(
