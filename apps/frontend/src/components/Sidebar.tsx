@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "next/link"
 import {
   FiCalendar,
   FiHeart,
@@ -7,18 +7,18 @@ import {
   FiTrendingUp,
   FiUser,
   FiX,
-} from "react-icons/fi";
-import type { FC, PropsWithChildren } from "react";
-import React, { useState } from "react";
-import OutsideClickHandler from "react-outside-click-handler";
-import { cn } from "utils/cn";
-import { useRouter } from "next/router";
-import { signIn, signOut } from "next-auth/react";
-import { ProfilePicture } from "./Avatar";
-import { useQuery, gql } from "@apollo/client";
-import type { Genre } from "__generated__/resolvers-types";
-import { useSession } from "next-auth/react";
-import _ from "lodash";
+} from "react-icons/fi"
+import type { FC, PropsWithChildren } from "react"
+import React, { useState } from "react"
+import OutsideClickHandler from "react-outside-click-handler"
+import { cn } from "utils/cn"
+import { useRouter } from "next/router"
+import { signIn, signOut } from "next-auth/react"
+import { ProfilePicture } from "./Avatar"
+import { useQuery, gql } from "@apollo/client"
+import type { Genre } from "__generated__/resolvers-types"
+import { useSession } from "next-auth/react"
+import _ from "lodash"
 
 interface NavItemProps {
   href: string;
@@ -44,8 +44,8 @@ const NavItem: FC<PropsWithChildren<NavItemProps>> = ({
         <span className="ml-3 text-sm">{children}</span>
       </Link>
     </li>
-  );
-};
+  )
+}
 
 const GET_GENRES = gql`
   query Genres {
@@ -54,15 +54,15 @@ const GET_GENRES = gql`
       name
     }
   }
-`;
+`
 
 export const Sidebar = () => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false)
   const { data } = useQuery<{ genres: Genre[] }>(GET_GENRES, {
     canonizeResults: true,
-  });
-  const { data: session } = useSession();
-  const router = useRouter();
+  })
+  const { data: session } = useSession()
+  const router = useRouter()
 
   return (
     <>
@@ -194,5 +194,5 @@ export const Sidebar = () => {
         }`}
       />
     </>
-  );
-};
+  )
+}

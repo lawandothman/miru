@@ -2,9 +2,9 @@ import type {
   GetServerSidePropsContext,
   InferGetServerSidePropsType,
   NextPage,
-} from "next";
-import { getProviders, getSession, signIn } from "next-auth/react";
-import { FiFacebook } from "react-icons/fi";
+} from "next"
+import { getProviders, getSession, signIn } from "next-auth/react"
+import { FiFacebook } from "react-icons/fi"
 
 const SignIn: NextPage<
   InferGetServerSidePropsType<typeof getServerSideProps>
@@ -24,14 +24,14 @@ const SignIn: NextPage<
           </button>
         ))}
     </div>
-  );
-};
+  )
+}
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
 ) => {
-  const { req } = context;
-  const session = await getSession({ req });
+  const { req } = context
+  const session = await getSession({ req })
 
   if (session) {
     return {
@@ -39,16 +39,16 @@ export const getServerSideProps = async (
         destination: "/",
         statusCode: 302,
       },
-    };
+    }
   }
 
-  const providers = await getProviders();
+  const providers = await getProviders()
 
   return {
     props: {
       providers,
     },
-  };
-};
+  }
+}
 
-export default SignIn;
+export default SignIn

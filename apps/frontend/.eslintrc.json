@@ -1,11 +1,6 @@
 {
   "parser": "@typescript-eslint/parser",
   "plugins": ["@typescript-eslint"],
-  "extends": ["next/core-web-vitals", "plugin:@typescript-eslint/recommended"],
-  "rules": {
-    "@typescript-eslint/consistent-type-imports": "warn"
-  },
-  "ignorePatterns": [
-    "src/__generated__/*.ts"
-  ]
+  "extends": ["../../.eslintrc", "next/core-web-vitals"],
+  "ignorePatterns": ["src/__generated__/*.ts"]
 }

@@ -1,9 +1,9 @@
-import { LoadingSkeleton, MoviesList } from "components/MoviesList";
-import { PageHeader } from "components/PageHeader";
-import type { NextPage } from "next";
-import { useRouter } from "next/router";
-import { gql, useQuery } from "@apollo/client";
-import type { Movie } from "__generated__/resolvers-types";
+import { LoadingSkeleton, MoviesList } from "components/MoviesList"
+import { PageHeader } from "components/PageHeader"
+import type { NextPage } from "next"
+import { useRouter } from "next/router"
+import { gql, useQuery } from "@apollo/client"
+import type { Movie } from "__generated__/resolvers-types"
 
 const SEARCH = gql`
   query Search($query: String!) {
@@ -14,24 +14,24 @@ const SEARCH = gql`
       inWatchlist
     }
   }
-`;
+`
 
 const Search: NextPage = () => {
-  const router = useRouter();
+  const router = useRouter()
 
   const searchQuery = Array.isArray(router.query.q)
     ? router.query.q[0]
-    : router.query.q;
+    : router.query.q
 
   const { data, loading } = useQuery<{ search: Movie[] }, { query?: string }>(
     SEARCH,
     {
       variables: { query: searchQuery },
     }
-  );
+  )
 
   if (!searchQuery) {
-    return <div>Ooops something went wrong</div>;
+    return <div>Ooops something went wrong</div>
   }
 
   return (
@@ -39,7 +39,7 @@ const Search: NextPage = () => {
       <PageHeader title={searchQuery} subtitle="Search results" />
       {loading ? <LoadingSkeleton /> : <MoviesList movies={data?.search} />}
     </div>
-  );
-};
+  )
+}
 
-export default Search;
+export default Search

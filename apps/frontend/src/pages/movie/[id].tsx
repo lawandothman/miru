@@ -1,15 +1,15 @@
-import type { NextPage } from "next";
-import Image from "next/image";
-import Link from "next/link";
-import { useRouter } from "next/router";
-import { getImage } from "utils/image";
-import { getYear } from "date-fns";
-import { Loader } from "components/Loader";
-import { gql, useMutation, useQuery } from "@apollo/client";
-import { Movie } from "__generated__/resolvers-types";
-import { FiMinus, FiPlus } from "react-icons/fi";
-import { useSession } from "next-auth/react";
-import { Spinner } from "components/Spinner";
+import type { NextPage } from "next"
+import Image from "next/image"
+import Link from "next/link"
+import { useRouter } from "next/router"
+import { getImage } from "utils/image"
+import { getYear } from "date-fns"
+import { Loader } from "components/Loader"
+import { gql, useMutation, useQuery } from "@apollo/client"
+import { Movie } from "__generated__/resolvers-types"
+import { FiMinus, FiPlus } from "react-icons/fi"
+import { useSession } from "next-auth/react"
+import { Spinner } from "components/Spinner"
 
 const GET_BY_ID = gql`
   query Movie($movieId: ID!) {
@@ -26,7 +26,7 @@ const GET_BY_ID = gql`
       inWatchlist
     }
   }
-`;
+`
 
 const ADD_TO_WATCHLIST = gql`
   mutation AddMovieToWatchlist($movieId: ID!) {
@@ -35,7 +35,7 @@ const ADD_TO_WATCHLIST = gql`
       inWatchlist
     }
   }
-`;
+`
 
 const REMOVE_FROM_WATCHLIST = gql`
   mutation RemoveMovieFromWatchlist($movieId: ID!) {
@@ -44,12 +44,12 @@ const REMOVE_FROM_WATCHLIST = gql`
       inWatchlist
     }
   }
-`;
+`
 
 const Movie: NextPage = () => {
-  const { query } = useRouter();
-  const movieId = Array.isArray(query.id) ? query.id[0] : query.id;
-  const { data: session } = useSession();
+  const { query } = useRouter()
+  const movieId = Array.isArray(query.id) ? query.id[0] : query.id
+  const { data: session } = useSession()
 
   const { data, loading } = useQuery<{ movie: Movie }, { movieId?: string }>(
     GET_BY_ID,
@@ -58,17 +58,17 @@ const Movie: NextPage = () => {
         movieId,
       },
     }
-  );
+  )
 
   const [addToWatchlist, { loading: addToWatchlistLoading }] = useMutation<
     Movie,
     { movieId?: string }
-  >(ADD_TO_WATCHLIST);
+  >(ADD_TO_WATCHLIST)
   const [removeFromWatchlist, { loading: removeFromWatchlistLoading }] =
-    useMutation<Movie, { movieId?: string }>(REMOVE_FROM_WATCHLIST);
+    useMutation<Movie, { movieId?: string }>(REMOVE_FROM_WATCHLIST)
 
   if (loading) {
-    return <Loader />;
+    return <Loader />
   }
   return (
     <div className="flex flex-col px-8 pt-10">
@@ -153,13 +153,13 @@ const Movie: NextPage = () => {
                     variables: {
                       movieId,
                     },
-                  });
+                  })
                 } else {
                   addToWatchlist({
                     variables: {
                       movieId,
                     },
-                  });
+                  })
                 }
               }}
               className="mt-8 mr-auto flex items-center justify-center gap-2 rounded border border-white px-4 py-1 dark:text-white"
@@ -180,7 +180,7 @@ const Movie: NextPage = () => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Movie;
+export default Movie

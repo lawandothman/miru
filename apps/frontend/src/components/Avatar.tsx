@@ -1,14 +1,14 @@
-import * as Avatar from "@radix-ui/react-avatar";
-import type { User } from "next-auth";
-import type { FC } from "react";
-import { cn } from "utils/cn";
+import * as Avatar from "@radix-ui/react-avatar"
+import type { User } from "next-auth"
+import type { FC } from "react"
+import { cn } from "utils/cn"
 
 const initials = (name: string) => {
-  const [firstName, lastName] = name.split(" ");
+  const [firstName, lastName] = name.split(" ")
   return firstName && lastName
     ? `${firstName.charAt(0)}${lastName.charAt(0)}`
-    : firstName?.charAt(0);
-};
+    : firstName?.charAt(0)
+}
 
 interface ProfilePictureProps {
   user: User;
@@ -43,5 +43,5 @@ export const ProfilePicture: FC<ProfilePictureProps> = ({
         {user.name && initials(user.name)}
       </Avatar.Fallback>
     </Avatar.Root>
-  );
-};
+  )
+}

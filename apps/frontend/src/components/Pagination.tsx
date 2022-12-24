@@ -1,13 +1,13 @@
-import Link from "next/link";
-import { useRouter } from "next/router";
-import type { FC } from "react";
+import Link from "next/link"
+import { useRouter } from "next/router"
+import type { FC } from "react"
 
 interface PaginationProps {
   page: number;
   totalPages?: number;
 }
 export const Pagination: FC<PaginationProps> = ({ page, totalPages }) => {
-  const { pathname, query } = useRouter();
+  const { pathname, query } = useRouter()
 
   return (
     <>
@@ -42,5 +42,5 @@ export const Pagination: FC<PaginationProps> = ({ page, totalPages }) => {
         )}
       </div>
     </>
-  );
-};
+  )
+}
