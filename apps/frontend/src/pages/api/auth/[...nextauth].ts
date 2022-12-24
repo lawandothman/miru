@@ -4,7 +4,7 @@ import FacebookProvider from "next-auth/providers/facebook";
 
 import neo4j from "neo4j-driver";
 import { Neo4jAdapter } from "@next-auth/neo4j-adapter";
-import { config } from "../config";
+import { config } from "../../../config";
 
 const { host, user, pass } = config.neo4j
 const driver = neo4j.driver(host, neo4j.auth.basic(user, pass));
