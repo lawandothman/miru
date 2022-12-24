@@ -1,5 +1,5 @@
 import axios from 'axios'
-import type { Genre, Movie } from '../__generated__/resolvers-types'
+import { Genre, Movie } from '../__generated__/resolvers-types'
 
 export class MovieDbService {
   constructor(private readonly http = axios.create()) {

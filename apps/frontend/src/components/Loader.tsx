@@ -8,5 +8,5 @@ export const Loader = () => {
         <div className="h-3 w-3 rounded-full bg-gray-300"></div>
       </div>
     </div>
-  )
-}
+  );
+};

@@ -1,19 +1,19 @@
-import { useRouter } from "next/router"
-import type { ChangeEvent, FormEvent } from "react"
-import { useRef, useState } from "react"
-import { FiSearch } from "react-icons/fi"
+import { useRouter } from "next/router";
+import type { ChangeEvent, FormEvent } from "react";
+import { useRef, useState } from "react";
+import { FiSearch } from "react-icons/fi";
 
 export const SearchInput = () => {
-  const [searchQuery, setSearchQuery] = useState("")
-  const router = useRouter()
+  const [searchQuery, setSearchQuery] = useState("");
+  const router = useRouter();
 
-  const formRef = useRef<HTMLFormElement>(null)
-  const inputRef = useRef<HTMLInputElement>(null)
+  const formRef = useRef<HTMLFormElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const onSubmit = (e: FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (searchQuery.length === 0) {
-      return
+      return;
     }
     router.push({
       pathname: "/search",
@@ -21,16 +21,16 @@ export const SearchInput = () => {
         q: searchQuery,
         page: 1,
       },
-    })
-  }
+    });
+  };
 
   const onClick = () => {
-    inputRef.current?.focus()
-  }
+    inputRef.current?.focus();
+  };
 
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value)
-  }
+    setSearchQuery(e.target.value);
+  };
 
   return (
     <div>
@@ -49,5 +49,5 @@ export const SearchInput = () => {
         <FiSearch className="absolute inset-y-0 my-auto h-8 w-12 stroke-neutral-400 px-3.5" />
       </form>
     </div>
-  )
-}
+  );
+};

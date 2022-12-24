@@ -1,7 +1,7 @@
-import { groupBy } from "lodash"
-import type { Driver } from "neo4j-driver"
-import type { Dict } from "neo4j-driver-core/types/record"
-import type { Genre, Movie, User } from "../__generated__/resolvers-types"
+import { groupBy } from "lodash";
+import type { Driver } from "neo4j-driver";
+import type { Dict } from "neo4j-driver-core/types/record";
+import type { Genre, Movie, User } from "../__generated__/resolvers-types";
 
 export interface Repository<T> {
   get(id: string): Promise<T | null>

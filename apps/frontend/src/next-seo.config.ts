@@ -1,4 +1,4 @@
-import type { DefaultSeoProps } from "next-seo"
+import type { DefaultSeoProps } from "next-seo";
 
 const config: DefaultSeoProps = {
   title: "ミル Miru",
@@ -11,6 +11,6 @@ const config: DefaultSeoProps = {
     locale: "en_IE",
     siteName: "ミル Miru",
   },
-}
+};
 
-export default config
+export default config;

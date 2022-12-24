@@ -1,14 +1,14 @@
-import { gql, useMutation } from "@apollo/client"
-import { useSession } from "next-auth/react"
-import Image from "next/image"
-import Link from "next/link"
-import type { FC } from "react"
-import { useState } from "react"
-import { FiMinus, FiPlus } from "react-icons/fi"
-import { cn } from "utils/cn"
-import { getImage } from "utils/image"
-import type { Movie } from "__generated__/resolvers-types"
-import { Spinner } from "./Spinner"
+import { gql, useMutation } from "@apollo/client";
+import { useSession } from "next-auth/react";
+import Image from "next/image";
+import Link from "next/link";
+import type { FC } from "react";
+import { useState } from "react";
+import { FiMinus, FiPlus } from "react-icons/fi";
+import { cn } from "utils/cn";
+import { getImage } from "utils/image";
+import type { Movie } from "__generated__/resolvers-types";
+import { Spinner } from "./Spinner";
 
 interface MoviesListProps {
   movies?: Array<Movie | null>;
@@ -21,7 +21,7 @@ const ADD_TO_WATCHLIST = gql`
       inWatchlist
     }
   }
-`
+`;
 
 const REMOVE_FROM_WATCHLIST = gql`
   mutation RemoveMovieFromWatchlist($movieId: ID!) {
@@ -30,7 +30,7 @@ const REMOVE_FROM_WATCHLIST = gql`
       inWatchlist
     }
   }
-`
+`;
 
 export const LoadingSkeleton = () => {
   return (
@@ -41,34 +41,34 @@ export const LoadingSkeleton = () => {
             <div key={idx} className="h-full w-full">
               <div className="h-[400px] min-h-full w-full min-w-full animate-pulse rounded-lg bg-neutral-700" />
             </div>
-          )
+          );
         })}
       </div>
     </div>
-  )
-}
+  );
+};
 
 export const MoviesList: FC<MoviesListProps> = ({ movies }) => {
   return (
     <div>
       <div className="grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
         {movies?.map((movie) => {
-          return <BlurImage key={movie?.id} movie={movie} />
+          return <BlurImage key={movie?.id} movie={movie} />;
         })}
       </div>
     </div>
-  )
-}
+  );
+};
 
 const BlurImage = ({ movie }: { movie: Movie | null }) => {
-  const [isLoading, setLoading] = useState(true)
-  const { data: session } = useSession()
+  const [isLoading, setLoading] = useState(true);
+  const { data: session } = useSession();
   const [addToWatchlist, { loading: addToWatchlistLoading }] = useMutation<
     Movie,
     { movieId?: string }
-  >(ADD_TO_WATCHLIST)
+  >(ADD_TO_WATCHLIST);
   const [removeFromWatchlist, { loading: removeFromWatchlistLoading }] =
-    useMutation<Movie, { movieId?: string }>(REMOVE_FROM_WATCHLIST)
+    useMutation<Movie, { movieId?: string }>(REMOVE_FROM_WATCHLIST);
 
   return (
     <div className="h-full w-full">
@@ -103,19 +103,19 @@ const BlurImage = ({ movie }: { movie: Movie | null }) => {
       {session && (
         <button
           onClick={() => {
-            const movieId = movie?.id
+            const movieId = movie?.id;
             if (movie?.inWatchlist) {
               removeFromWatchlist({
                 variables: {
                   movieId,
                 },
-              })
+              });
             } else {
               addToWatchlist({
                 variables: {
                   movieId,
                 },
-              })
+              });
             }
           }}
           className="mx-auto mb-8 mt-4 flex h-8 w-32 items-center justify-center gap-1 rounded-md border border-neutral-500 dark:text-neutral-300"
@@ -134,5 +134,5 @@ const BlurImage = ({ movie }: { movie: Movie | null }) => {
         </button>
       )}
     </div>
-  )
-}
+  );
+};

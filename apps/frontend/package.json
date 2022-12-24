@@ -6,7 +6,6 @@
     "build": "next build",
     "dev": "next dev",
     "lint": "next lint",
-    "lint:fix": "next lint --fix",
     "start": "next start",
     "generate": "graphql-codegen --config codegen.yaml"
   },

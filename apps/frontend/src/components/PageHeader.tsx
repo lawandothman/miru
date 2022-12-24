@@ -1,5 +1,5 @@
-import type { FC } from "react"
-import { SearchInput } from "./SearchInput"
+import type { FC } from "react";
+import { SearchInput } from "./SearchInput";
 
 interface PageHeaderProps {
   title: string;
@@ -19,5 +19,5 @@ export const PageHeader: FC<PageHeaderProps> = ({
       </div>
       <SearchInput />
     </div>
-  )
-}
+  );
+};

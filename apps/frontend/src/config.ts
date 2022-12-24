@@ -1,4 +1,4 @@
-import env from "env-var"
+import env from "env-var";
 
 export const config = {
   neo4j: {
@@ -9,4 +9,4 @@ export const config = {
   omni: {
     baseUrl: env.get("NEXT_PUBLIC_OMNI_URL").required().asString(),
   },
-}
+};

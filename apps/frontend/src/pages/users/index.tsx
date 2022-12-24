@@ -1,11 +1,11 @@
-import { gql, useLazyQuery } from "@apollo/client"
-import { ProfilePicture } from "components/Avatar"
-import Link from "next/link"
-import { useRouter } from "next/router"
-import type { ChangeEvent, FormEvent } from "react"
-import { useState } from "react"
-import { FiSearch } from "react-icons/fi"
-import type { User } from "__generated__/resolvers-types"
+import { gql, useLazyQuery } from "@apollo/client";
+import { ProfilePicture } from "components/Avatar";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import type { ChangeEvent, FormEvent } from "react";
+import { useState } from "react";
+import { FiSearch } from "react-icons/fi";
+import type { User } from "__generated__/resolvers-types";
 
 const SEARCH_USERS = gql`
   query SearchUsers($nameQuery: String!) {
@@ -19,34 +19,34 @@ const SEARCH_USERS = gql`
       }
     }
   }
-`
+`;
 
 const Users = () => {
-  const router = useRouter()
-  const [query, setQuery] = useState("")
+  const router = useRouter();
+  const [query, setQuery] = useState("");
   const [searchUsers, { data }] = useLazyQuery<
     { searchUsers: User[] },
     { nameQuery: string }
-  >(SEARCH_USERS)
+  >(SEARCH_USERS);
 
   const onSubmit = (e: FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     searchUsers({
       variables: {
         nameQuery: query,
       },
-    })
+    });
     router.push({
       pathname: "/users",
       query: {
         q: query,
       },
-    })
-  }
+    });
+  };
 
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setQuery(e.target.value)
-  }
+    setQuery(e.target.value);
+  };
 
   return (
     <div className="px-20 pt-20">
@@ -88,7 +88,7 @@ const Users = () => {
         </>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default Users
+export default Users;
