@@ -1,6 +1,6 @@
-import { Driver } from "neo4j-driver";
-import { Dict } from "neo4j-driver-core/types/record";
-import { Genre } from "../__generated__/resolvers-types";
+import type { Driver } from "neo4j-driver";
+import type { Dict } from "neo4j-driver-core/types/record";
+import type { Genre } from "../__generated__/resolvers-types";
 
 export interface Repository<T> {
   get(id: string): Promise<T | null>

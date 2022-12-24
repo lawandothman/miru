@@ -1,6 +1,6 @@
-import { GenreRepo } from "../dataSources/genreRepo"
-import { MovieRepo } from "../dataSources/neoDataSource"
-import { MovieDbService } from "./movieDbService"
+import type { GenreRepo } from "../dataSources/genreRepo"
+import type { MovieRepo } from "../dataSources/neoDataSource"
+import type { MovieDbService } from "./movieDbService"
 
 const PAGE_SIZE = 20
 

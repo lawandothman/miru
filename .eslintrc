@@ -4,5 +4,8 @@
   "extends": ["plugin:@typescript-eslint/recommended"],
   "rules": {
     "@typescript-eslint/consistent-type-imports": "warn"
-  }
+  },
+  "ignorePatterns": [
+    "src/__generated__/*.ts"
+  ]
 }
