@@ -39,10 +39,7 @@ export const LoadingSkeleton = () => {
         {new Array(24).fill(true)?.map((item, idx) => {
           return (
             <div key={idx} className="h-full w-full">
-              <div className="h-[500px] w-full rounded-lg lg:h-[500px]">
-                <div className="min-h-full min-w-full animate-pulse bg-neutral-700" />
-              </div>
-              <div className="mx-auto mt-4 h-2.5 w-48 animate-pulse rounded-full bg-gray-200 dark:bg-neutral-700"></div>
+              <div className="h-[400px] min-h-full w-full min-w-full animate-pulse rounded-lg bg-neutral-700" />
             </div>
           );
         })}
@@ -53,8 +50,8 @@ export const LoadingSkeleton = () => {
 
 export const MoviesList: FC<MoviesListProps> = ({ movies }) => {
   return (
-    <div className="my-8">
-      <div className="grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 xl:gap-x-8">
+    <div>
+      <div className="grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
         {movies?.map((movie) => {
           return <BlurImage key={movie?.id} movie={movie} />;
         })}
@@ -75,7 +72,7 @@ const BlurImage = ({ movie }: { movie: Movie | null }) => {
 
   return (
     <div className="h-full w-full">
-      <div className="aspect-w-1 aspect-h-1 xl:aspect-w-7 xl:aspect-h-8 relative h-[500px] w-full overflow-hidden rounded-lg lg:h-[500px]">
+      <div className="aspect-w-8 aspect-h-12 w-full overflow-hidden rounded-lg">
         {movie?.posterUrl && (
           <Link href={`/movie/${movie?.id}`}>
             <Image
