@@ -1,6 +1,6 @@
-import type { GenreRepo } from "../dataSources/genreRepo"
-import type { MovieRepo } from "../dataSources/neoDataSource"
-import type { MovieDbService } from "./movieDbService"
+import type { GenreRepo } from '../dataSources/genreRepo'
+import type { MovieRepo } from '../dataSources/neoDataSource'
+import type { MovieDbService } from './movieDbService'
 
 const PAGE_SIZE = 20
 
@@ -49,7 +49,7 @@ export class SyncService {
 
   private sleep(ms: number) {
     return new Promise((resolve) => {
-      setTimeout(resolve, ms);
+      setTimeout(resolve, ms)
     })
   }
 }

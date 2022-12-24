@@ -1,8 +1,8 @@
-import { LoadingSkeleton, MoviesList } from "components/MoviesList";
-import { PageHeader } from "components/PageHeader";
-import type { NextPage } from "next";
-import { gql, useQuery } from "@apollo/client";
-import type { Movie } from "__generated__/resolvers-types";
+import { LoadingSkeleton, MoviesList } from 'components/MoviesList'
+import { PageHeader } from 'components/PageHeader'
+import type { NextPage } from 'next'
+import { gql, useQuery } from '@apollo/client'
+import type { Movie } from '__generated__/resolvers-types'
 
 const GET_UPCOMING = gql`
   query Search {
@@ -13,17 +13,17 @@ const GET_UPCOMING = gql`
       inWatchlist
     }
   }
-`;
+`
 
 const Upcoming: NextPage = () => {
-  const { data, loading } = useQuery<{ search: Movie[] }>(GET_UPCOMING);
+  const { data, loading } = useQuery<{ search: Movie[] }>(GET_UPCOMING)
 
   return (
-    <div className="px-20 pt-20">
-      <PageHeader title="Popular" />
+    <div className='px-20 pt-20'>
+      <PageHeader title='Popular' />
       {loading ? <LoadingSkeleton /> : <MoviesList movies={data?.search} />}
     </div>
-  );
-};
+  )
+}
 
-export default Upcoming;
+export default Upcoming
