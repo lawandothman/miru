@@ -6,8 +6,8 @@
   "scripts": {
     "generate": "graphql-codegen --config codegen.yaml",
     "compile": "npm run generate && tsc",
-    "lint": "eslint src/*/**.ts",
-    "lint:fix": "eslint src/*/**.ts --fix",
+    "lint": "eslint src/**/*.ts",
+    "lint:fix": "eslint src/**/*.ts --fix",
     "dev": "nodemon -e ts --exec \"(tsc || exit 1) && node dist/index.js\"",
     "start": "npm run compile && node ./dist/index.js"
   },
