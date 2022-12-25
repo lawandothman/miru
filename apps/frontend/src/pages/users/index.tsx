@@ -63,15 +63,16 @@ const Users = () => {
 
       {data?.searchUsers && (
         <>
-          {data.searchUsers.length === 0 && (
+          {data.searchUsers.length === 0 ? (
             <span className='mb-4 block dark:text-neutral-300'>
               Found no results for {router.query.q}
             </span>
+          ) : (
+            <span className='mb-4 block dark:text-neutral-300'>
+              Found {data.searchUsers.length} result
+              {data.searchUsers.length > 1 && 's'} for {router.query.q}
+            </span>
           )}
-          <span className='mb-4 block dark:text-neutral-300'>
-            Found {data.searchUsers.length} result
-            {data.searchUsers.length > 1 && 's'} for {router.query.q}
-          </span>
           {data?.searchUsers.map((user) => (
             <Link href={`/users/${user.id}`} key={user.id}>
               <div className='flex max-w-lg items-center gap-4 rounded-lg p-4 hover:bg-neutral-700'>
