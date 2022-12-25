@@ -1,10 +1,11 @@
-import type { AppProps } from 'next/app'
+import type { AppContext, AppProps } from 'next/app'
 import { getSession, SessionProvider } from 'next-auth/react'
 import {
   ApolloProvider,
   ApolloClient,
   InMemoryCache,
   createHttpLink,
+  gql,
 } from '@apollo/client'
 import { setContext } from '@apollo/client/link/context'
 import { DefaultSeo } from 'next-seo'
@@ -14,6 +15,7 @@ import { Sidebar } from 'components/Sidebar'
 
 import 'styles/globals.css'
 import type { Genre } from '__generated__/resolvers-types'
+import App from 'next/app'
 
 const httpLinkt = createHttpLink({
   uri: `${process.env.NEXT_PUBLIC_OMNI_URL}/graphql`,
@@ -55,6 +57,23 @@ const MyApp = (props: AppProps & { genres: Genre[] }) => {
       </SessionProvider>
     </>
   )
+}
+MyApp.getInitialProps = async (appContext: AppContext) => {
+  // perhaps getSession(appContext.ctx) would also work
+  const session = await getSession({ req: appContext.ctx.req })
+  const appProps = await App.getInitialProps(appContext)
+  const res = await client.query<{ genres: Genre[] }>({
+    query: gql`
+      query Genres {
+        genres {
+          id
+          name
+        }
+      }
+    `,
+  })
+
+  return { ...appProps, session, genres: res.data.genres }
 }
 
 export default MyApp
