@@ -148,34 +148,40 @@ export class NeoDataSource {
     return mapTo<User>(res.records[0].toObject(), 'f') as User
   }
 
-  async getFollowers(me: User | null): Promise<User[]> {
-    const session = this.driver.session()
-    const res = await session.run(
-      `MATCH (f:User)-[r:FOLLOWS]->(u:User {email: $email})
-      RETURN f`,
-
-      { email: me?.email }
+  async getFollowers(userId: string): Promise<User[]> {
+    const followers = await runAndMapMany<User>(
+      this.driver,
+      `
+      MATCH (f:User)-[r:FOLLOWS]->(u:User {id: $id})
+      RETURN f
+      `,
+      { id: userId },
+      'f'
     )
-
-    return (
-      (res.records.map((rec) => mapTo<User>(rec.toObject(), 'f')) as User[]) ??
-      []
+    return followers
+  }
+  async getFollowing(userId: string): Promise<User[]> {
+    const following = await runAndMapMany<User>(
+      this.driver,
+      `
+      MATCH (f:User)<-[r:FOLLOWS]-(u:User {id: $id})
+      RETURN f
+      `,
+      { id: userId },
+      'f'
     )
+    return following
   }
 
-  async getFollowing(me: User | null): Promise<User[]> {
-    const session = this.driver.session()
-    const res = await session.run(
-      `MATCH (f:User)<-[r:FOLLOWS]-(u:User {email: $email})
-      RETURN f`,
-
-      { email: me?.email }
+  async isFollowed(friendId: string, me: User| null): Promise<boolean> {
+    const rel = await runAndMap<object>(
+      this.driver,
+      `MATCH (f:User {id: $friendId})<-[r:FOLLOWS]-(u:User {email: $email})
+      RETURN r`,
+      { friendId, email: me?.email },
+      'r'
     )
-
-    return (
-      (res.records.map((rec) => mapTo<User>(rec.toObject(), 'f')) as User[]) ??
-      []
-    )
+    return rel != null
   }
 }
 

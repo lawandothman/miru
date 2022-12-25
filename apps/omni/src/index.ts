@@ -90,12 +90,6 @@ const resolvers: Resolvers = {
     matches: async (parent, _, { matchesLoader }) => {
       return await matchesLoader.load(parent.id)
     },
-    followers: async (parent, _, { neoDataSource }) => {
-      return await neoDataSource.getFollowers(parent)
-    },
-    following: async (parent, _, { neoDataSource }) => {
-      return await neoDataSource.getFollowing(parent)
-    },
   },
 }
 
