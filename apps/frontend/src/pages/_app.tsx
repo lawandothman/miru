@@ -59,8 +59,7 @@ const MyApp = (props: AppProps & { genres: Genre[] }) => {
   )
 }
 MyApp.getInitialProps = async (appContext: AppContext) => {
-  // perhaps getSession(appContext.ctx) would also work
-  const session = await getSession({ req: appContext.ctx.req })
+  const session = await getSession(appContext.ctx)
   const appProps = await App.getInitialProps(appContext)
   const res = await client.query<{ genres: Genre[] }>({
     query: gql`
