@@ -1,17 +1,17 @@
-import Link from "next/link";
-import { useRouter } from "next/router";
-import type { FC } from "react";
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import type { FC } from 'react'
 
 interface PaginationProps {
   page: number;
   totalPages?: number;
 }
 export const Pagination: FC<PaginationProps> = ({ page, totalPages }) => {
-  const { pathname, query } = useRouter();
+  const { pathname, query } = useRouter()
 
   return (
     <>
-      <div className="mb-8 flex w-full items-center justify-center gap-5 lg:px-20">
+      <div className='mb-8 flex w-full items-center justify-center gap-5 lg:px-20'>
         {page && page > 1 && (
           <Link
             href={{
@@ -21,7 +21,7 @@ export const Pagination: FC<PaginationProps> = ({ page, totalPages }) => {
                 page: page - 1,
               },
             }}
-            className="flex  h-10 items-center rounded bg-neutral-800 px-10 text-white dark:bg-neutral-100 dark:text-black"
+            className='flex  h-10 items-center rounded bg-neutral-800 px-10 text-white dark:bg-neutral-100 dark:text-black'
           >
             Prev
           </Link>
@@ -35,12 +35,12 @@ export const Pagination: FC<PaginationProps> = ({ page, totalPages }) => {
                 page: page + 1,
               },
             }}
-            className="flex h-10 items-center rounded bg-neutral-800 px-10 text-white dark:bg-neutral-100 dark:text-black"
+            className='flex h-10 items-center rounded bg-neutral-800 px-10 text-white dark:bg-neutral-100 dark:text-black'
           >
             Next
           </Link>
         )}
       </div>
     </>
-  );
-};
+  )
+}

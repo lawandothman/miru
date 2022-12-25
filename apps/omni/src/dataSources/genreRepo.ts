@@ -1,6 +1,6 @@
-import { Driver } from "neo4j-driver";
-import { Dict } from "neo4j-driver-core/types/record";
-import { Genre } from "../__generated__/resolvers-types";
+import type { Driver } from 'neo4j-driver'
+import type { Dict } from 'neo4j-driver-core/types/record'
+import type { Genre } from '../__generated__/resolvers-types'
 
 export interface Repository<T> {
   get(id: string): Promise<T | null>
@@ -16,11 +16,11 @@ export class GenreRepo implements Repository<Genre> {
   async get(id: string): Promise<Genre| null> {
     const session = this.driver.session()
     const res = await session.run('MATCH (g:Genre) WHERE g.id = $id RETURN g', {
-      id, 
+      id,
     })
 
     session.close()
-      .then(() => { })
+      .then(() => void 0)
       .catch(console.error)
 
     return this.mapTo<Genre>(res.records[0].toObject(), 'g') ?? null
@@ -41,7 +41,7 @@ export class GenreRepo implements Repository<Genre> {
     return this.mapTo<Genre>(res.records[0].toObject(), 'g')
   }
 
-  
+
   private builtSetQuery(obj: any, entryKey: string): string {
     return Object.entries(obj)
       .filter(([_,value]) => value != null)
