@@ -117,6 +117,66 @@ export class NeoDataSource {
 
     return movies
   }
+
+  async follow(me: User, friendId: string): Promise<User> {
+    const session = this.driver.session()
+    const res = await session.run(
+      `
+      MATCH (u:User {email: $email}), (f:User {id: $id})
+      MERGE (u)-[r:FOLLOWS]->(f)
+      RETURN f
+      `,
+      { email: me.email, id: friendId }
+    )
+    session.close()
+
+    return mapTo<User>(res.records[0].toObject(), 'f') as User
+  }
+
+  async unfollow(me: User, friendId: string): Promise<User> {
+    const session = this.driver.session()
+    const res = await session.run(
+      `
+      MATCH (u:User {email: $email})-[r:FOLLOWS]->(f:User {id: $id})
+      DELETE r
+      RETURN f
+      `,
+      { email: me.email, id: friendId }
+    )
+    session.close()
+
+    return mapTo<User>(res.records[0].toObject(), 'f') as User
+  }
+
+  async getFollowers(me: User | null): Promise<User[]> {
+    const session = this.driver.session()
+    const res = await session.run(
+      `MATCH (f:User)-[r:FOLLOWS]->(u:User {email: $email})
+      RETURN f`,
+
+      { email: me?.email }
+    )
+
+    return (
+      (res.records.map((rec) => mapTo<User>(rec.toObject(), 'f')) as User[]) ??
+      []
+    )
+  }
+
+  async getFollowing(me: User | null): Promise<User[]> {
+    const session = this.driver.session()
+    const res = await session.run(
+      `MATCH (f:User)<-[r:FOLLOWS]-(u:User {email: $email})
+      RETURN f`,
+
+      { email: me?.email }
+    )
+
+    return (
+      (res.records.map((rec) => mapTo<User>(rec.toObject(), 'f')) as User[]) ??
+      []
+    )
+  }
 }
 
 async function runMany<T>(

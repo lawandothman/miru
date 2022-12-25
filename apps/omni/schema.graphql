@@ -19,6 +19,8 @@ type User {
   image: String
   email: String!
   matches: [Movie]
+  followers: [User]
+  following: [User]
 }
 
 type Genre {
@@ -39,4 +41,6 @@ type Query {
 type Mutation {
   addMovieToWatchlist(movieId: ID!): Movie
   removeMovieFromWatchlist(movieId: ID!): Movie
+  follow(friendId: ID!): User
+  unfollow(friendId: ID!): User
 }

@@ -62,6 +62,14 @@ const resolvers: Resolvers = {
       const u = requireUser(user)
       return await movieRepo.removeFromWatchlist(movieId, u)
     },
+    follow: async (_parent, { friendId }, { neoDataSource, user }) => {
+      const u = requireUser(user)
+      return await neoDataSource.follow(u, friendId)
+    },
+    unfollow: async (_parent, { friendId }, { neoDataSource, user }) => {
+      const u = requireUser(user)
+      return await neoDataSource.unfollow(u, friendId)
+    },
   },
   Movie: {
     genres: async (parent, _, { movieRepo }) => {
@@ -81,6 +89,12 @@ const resolvers: Resolvers = {
   User: {
     matches: async (parent, _, { matchesLoader }) => {
       return await matchesLoader.load(parent.id)
+    },
+    followers: async (parent, _, { neoDataSource }) => {
+      return await neoDataSource.getFollowers(parent)
+    },
+    following: async (parent, _, { neoDataSource }) => {
+      return await neoDataSource.getFollowing(parent)
     },
   },
 }
