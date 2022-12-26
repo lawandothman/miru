@@ -34,10 +34,12 @@ const resolvers: Resolvers = {
       return await movieRepo.search(query)
     },
     user: async (_parent, { id }, { userLoader }) => {
-      return await userLoader.load(id)
+      const val = await userLoader.load(id)
+      console.log(val)
+      return val
     },
-    searchUsers: async (_parent, { nameQuery }, { neoDataSource }) => {
-      return await neoDataSource.searchUsers(nameQuery)
+    searchUsers: async (_parent, { nameQuery }, { neoDataSource, user }) => {
+      return await neoDataSource.searchUsers(nameQuery, user)
     },
     moviesByGenre: async (_parent, { genreId }, { movieRepo }) => {
       return await movieRepo.getMoviesByGenre(genreId)
@@ -126,7 +128,7 @@ async function main() {
         movieRepo: new MovieRepo(driver),
         genreRepo: new GenreRepo(driver),
         movieLoader: new DataLoader(neo.getMovies.bind(neo)),
-        userLoader: new DataLoader(neo.getUsers.bind(neo)),
+        userLoader: new DataLoader(neo.getUsers(user).bind(neo)),
         matchesLoader: new DataLoader(neo.getMatchesWith(user).bind(neo)),
         neoDataSource: neo,
         user,

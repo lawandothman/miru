@@ -19,6 +19,8 @@ type User {
   image: String
   email: String!
   matches: [Movie]
+  isFollowing: Boolean
+  isFollower: Boolean
   followers: [User]
   following: [User]
 }

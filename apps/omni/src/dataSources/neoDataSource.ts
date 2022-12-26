@@ -1,7 +1,7 @@
 import { groupBy } from 'lodash'
 import type { Driver } from 'neo4j-driver'
-import type { Dict } from 'neo4j-driver-core/types/record'
 import type { Genre, Movie, User } from '../__generated__/resolvers-types'
+import { mapTo, runAndMap, runAndMapMany, runMany, runOnce } from './utils'
 
 export interface Repository<T> {
   get(id: string): Promise<T | null>;
@@ -29,11 +29,21 @@ export class NeoDataSource {
     )
   }
 
-  async getUsers(ids: readonly string[]): Promise<User[]> {
-    return await runAndMapMany<User>(
+  getUsers = (user: User | null) => async (ids: readonly string[]): Promise<User[]> => {
+    const email = user?.email ?? ''
+    return await runMany<User>(
       this.driver,
-      'MATCH (u:User) WHERE u.id in $ids RETURN u',
-      { ids },
+      `MATCH (u:User) WHERE u.id in $ids 
+      RETURN u{
+          .id,
+          .email,
+          .image,
+          .name,
+          isFollower: exists((u)-[:FOLLOWS]->(:User {email: $email})),
+          isFollowing: exists((u)<-[:FOLLOWS]-(:User {email: $email}))
+      }
+      `,
+      { ids, email },
       'u'
     )
   }
@@ -50,7 +60,7 @@ export class NeoDataSource {
 
       const res = await runMany<Movie & { friendId: string }>(
         this.driver,
-        `MATCH (f:User)<-[r1:IN_WATCHLIST]-(m:Movie)-[r2]->(me:User {email: $myEmail})
+        `MATCH (f:User)<-[r1:IN_WATCHLIST]-(m:Movie)-[r2:IN_WATCHLIST]->(me:User {email: $myEmail})
       WHERE f.id IN $ids
       RETURN m{
           .overview,
@@ -74,11 +84,21 @@ export class NeoDataSource {
       })
     }
 
-  async searchUsers(query: string): Promise<User[]> {
-    return await runAndMapMany<User>(
+  async searchUsers(query: string, user: User | null): Promise<User[]> {
+    const email = user?.email ?? ''
+    return await runMany<User>(
       this.driver,
-      'MATCH (u:User) WHERE toLower(u.name) CONTAINS toLower($query) RETURN u LIMIT 20',
-      { query },
+      `MATCH (u:User) WHERE toLower(u.name) CONTAINS toLower($query) 
+      RETURN u{
+          .id,
+          .email,
+          .image,
+          .name,
+          isFollower: exists((u)-[:FOLLOWS]->(:User {email: $email})),
+          isFollowing: exists((u)<-[:FOLLOWS]-(:User {email: $email}))
+      } LIMIT 20
+      `,
+      { query, email },
       'u'
     )
   }
@@ -118,19 +138,14 @@ export class NeoDataSource {
     return movies
   }
 
-  async follow(me: User, friendId: string): Promise<User> {
-    const session = this.driver.session()
-    const res = await session.run(
-      `
+  async follow(me: User, friendId: string): Promise<User | null> {
+    return await runOnce<User>(this.driver, `
       MATCH (u:User {email: $email}), (f:User {id: $id})
       MERGE (u)-[r:FOLLOWS]->(f)
-      RETURN f
-      `,
-      { email: me.email, id: friendId }
+      RETURN f`,
+      { email: me.email, id: friendId },
+      'f'
     )
-    session.close()
-
-    return mapTo<User>(res.records[0].toObject(), 'f') as User
   }
 
   async unfollow(me: User, friendId: string): Promise<User> {
@@ -185,56 +200,6 @@ export class NeoDataSource {
   }
 }
 
-async function runMany<T>(
-  driver: Driver,
-  query: string,
-  args: any,
-  key: string
-): Promise<T[]> {
-  const session = driver.session()
-  const res = await session.run(query, args)
-  session.close().catch(console.error)
-
-  return (res.records.map((rec) => rec.toObject()[key]) as T[]) ?? []
-}
-
-async function runAndMapMany<T>(
-  driver: Driver,
-  query: string,
-  args: any,
-  key: string
-): Promise<T[]> {
-  const session = driver.session()
-  const res = await session.run(query, args)
-  session.close().catch(console.error)
-
-  return (res.records.map((rec) => mapTo<T>(rec.toObject(), key)) as T[]) ?? []
-}
-
-async function runAndMap<T>(
-  driver: Driver,
-  query: string,
-  args: any,
-  key: string
-): Promise<T | null> {
-  const session = driver.session()
-  const res = await session.run(query, args)
-  session.close().catch(console.error)
-
-  return mapTo<T>(res.records[0]?.toObject() ?? null, key)
-}
-
-function mapTo<T>(
-  record: Dict<PropertyKey, any> | null,
-  key: string
-): T | null {
-  if (record == null) {
-    return null
-  }
-  return {
-    ...record[key].properties,
-  }
-}
 
 // We will slowly deprecate this for reading of data
 export class MovieRepo implements Repository<Movie> {
@@ -250,7 +215,6 @@ export class MovieRepo implements Repository<Movie> {
 
     return mapTo<Movie>(res.records[0].toObject(), 'm') ?? null
   }
-  // CREATE CONSTRAINT FOR (m:Movie) REQUIRE m.id IS UNIQUE;
 
   async upsert(movie: Movie): Promise<Movie | null> {
     const session = this.driver.session()
