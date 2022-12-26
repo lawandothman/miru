@@ -15,7 +15,6 @@ import { cn } from 'utils/cn'
 import { useRouter } from 'next/router'
 import { signIn, signOut } from 'next-auth/react'
 import { ProfilePicture } from './Avatar'
-import { useQuery, gql } from '@apollo/client'
 import type { Genre } from '__generated__/resolvers-types'
 import { useSession } from 'next-auth/react'
 import _ from 'lodash'
@@ -47,20 +46,8 @@ const NavItem: FC<PropsWithChildren<NavItemProps>> = ({
   )
 }
 
-const GET_GENRES = gql`
-  query Genres {
-    genres {
-      id
-      name
-    }
-  }
-`
-
-export const Sidebar = () => {
+export const Sidebar = ({ genres }: { genres: Genre[] }) => {
   const [isOpen, setIsOpen] = useState(false)
-  const { data } = useQuery<{ genres: Genre[] }>(GET_GENRES, {
-    canonizeResults: true,
-  })
   const { data: session } = useSession()
   const router = useRouter()
 
@@ -141,7 +128,7 @@ export const Sidebar = () => {
             <nav>
               <p className='pl-3 pb-2 pt-4 text-sm text-white'>Genres</p>
               <ul className='space-y-2'>
-                {_.sortBy(data?.genres, (genre) => genre.name).map((genre) => (
+                {_.sortBy(genres, (genre) => genre.name).map((genre) => (
                   <NavItem
                     href={`/genre/${genre.id}`}
                     isSelected={router.asPath === `/genre/${genre.id}`}
