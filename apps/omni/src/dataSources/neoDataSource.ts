@@ -163,29 +163,54 @@ export class NeoDataSource {
     return mapTo<User>(res.records[0].toObject(), 'f') as User
   }
 
-  async getFollowers(userId: string): Promise<User[]> {
-    const followers = await runAndMapMany<User>(
+  getFollowers = (user: User | null) => async (userIds: readonly string[]): Promise<User[][]> => {
+    const email = user?.email ?? ''
+    const followers = await runMany<User&{followerId: string}>(
       this.driver,
-      `
-      MATCH (f:User)-[r:FOLLOWS]->(u:User {id: $id})
-      RETURN f
-      `,
-      { id: userId },
+      `MATCH (f:User)-[r:FOLLOWS]->(u:User)
+      WHERE u.id IN $userIds
+      RETURN f{
+          .id,
+          .email,
+          .image,
+          .name,
+          isFollower: exists((f)-[:FOLLOWS]->(:User {email: $email})),
+          isFollowing: exists((f)<-[:FOLLOWS]-(:User {email: $email})),
+          followerId: u.id
+      }`,
+      { userIds, email },
       'f'
     )
-    return followers
+    const groupedByFollowerId = groupBy(followers, (a) => a.followerId)
+
+    return userIds.map((id) => {
+      return groupedByFollowerId[id] ?? []
+    })
   }
-  async getFollowing(userId: string): Promise<User[]> {
-    const following = await runAndMapMany<User>(
+
+  getFollowing = (user: User | null) => async (userIds: readonly string[]): Promise<User[][]> => {
+    const email = user?.email ?? ''
+    const followers = await runMany<User&{followingId: string}>(
       this.driver,
-      `
-      MATCH (f:User)<-[r:FOLLOWS]-(u:User {id: $id})
-      RETURN f
-      `,
-      { id: userId },
+      `MATCH (f:User)<-[r:FOLLOWS]-(u:User)
+      WHERE u.id IN $userIds
+      RETURN f{
+          .id,
+          .email,
+          .image,
+          .name,
+          isFollower: exists((f)-[:FOLLOWS]->(:User {email: $email})),
+          isFollowing: exists((f)<-[:FOLLOWS]-(:User {email: $email})),
+          followingId: u.id
+      }`,
+      { userIds, email },
       'f'
     )
-    return following
+    const groupedByFollowingId = groupBy(followers, (a) => a.followingId)
+
+    return userIds.map((id) => {
+      return groupedByFollowingId[id] ?? []
+    })
   }
 
   async isFollowed(friendId: string, me: User| null): Promise<boolean> {

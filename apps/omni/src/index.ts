@@ -16,13 +16,15 @@ import { GenreRepo } from './dataSources/genreRepo'
 const schema = readFileSync('./schema.graphql').toString()
 
 export interface Context {
-  movieRepo: MovieRepo;
-  genreRepo: GenreRepo;
-  movieLoader: DataLoader<string, Movie>;
-  userLoader: DataLoader<string, User>;
-  matchesLoader: DataLoader<string, Movie[]>;
-  neoDataSource: NeoDataSource;
-  user: User | null;
+  movieRepo: MovieRepo
+  genreRepo: GenreRepo
+  movieLoader: DataLoader<string, Movie>
+  userLoader: DataLoader<string, User>
+  matchesLoader: DataLoader<string, Movie[]>
+  followerLoader: DataLoader<string, User[]> 
+  followingLoader: DataLoader<string, User[]> 
+  neoDataSource: NeoDataSource
+  user: User | null
 }
 
 const resolvers: Resolvers = {
@@ -92,6 +94,12 @@ const resolvers: Resolvers = {
     matches: async (parent, _, { matchesLoader }) => {
       return await matchesLoader.load(parent.id)
     },
+    followers: async (parent, _, { followerLoader }) => {
+      return await followerLoader.load(parent.id)
+    },
+    following: async (parent, _, { followingLoader }) => {
+      return await followingLoader.load(parent.id)
+    },
   },
 }
 
@@ -130,6 +138,8 @@ async function main() {
         movieLoader: new DataLoader(neo.getMovies.bind(neo)),
         userLoader: new DataLoader(neo.getUsers(user).bind(neo)),
         matchesLoader: new DataLoader(neo.getMatchesWith(user).bind(neo)),
+        followerLoader: new DataLoader(neo.getFollowers(user).bind(neo)),
+        followingLoader: new DataLoader(neo.getFollowing(user).bind(neo)),
         neoDataSource: neo,
         user,
       }

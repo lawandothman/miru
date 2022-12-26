@@ -7,6 +7,7 @@ export async function runMany<T>(
   args: any,
   key: string
 ): Promise<T[]> {
+  console.log(query)
   const session = driver.session()
   const res = await session.run(query, args)
   session.close().catch(console.error)
@@ -20,6 +21,7 @@ export async function runOnce<T>(
   args: any,
   key: string
 ): Promise<T | null> {
+  console.log(query)
   const session = driver.session()
   const res = await session.run(query, args)
   session.close().catch(console.error)
