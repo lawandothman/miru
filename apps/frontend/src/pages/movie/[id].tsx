@@ -10,6 +10,7 @@ import { Movie } from '__generated__/resolvers-types'
 import { FiMinus, FiPlus } from 'react-icons/fi'
 import { useSession } from 'next-auth/react'
 import { Spinner } from 'components/Spinner'
+import { ProfilePicture } from 'components/Avatar'
 
 const GET_BY_ID = gql`
   query Movie($movieId: ID!) {
@@ -22,6 +23,12 @@ const GET_BY_ID = gql`
       genres {
         name
         id
+      }
+      matches {
+        id
+        name
+        image
+        isFollowing
       }
       inWatchlist
     }
@@ -144,6 +151,27 @@ const Movie: NextPage = () => {
                 </Link>
               )}
             </div> */}
+          </div>
+          <div className='mt-8'>
+            <h3 className='mb-4'>Added To Watchlist By</h3>
+            {data?.movie.matches
+              ?.filter((match) => match?.isFollowing)
+              .map((match) => {
+                if (match) {
+                  return (
+                    <Link
+                      className='inline-flex items-center gap-2'
+                      href={`/users/${match.id}`}
+                      key={match.id}
+                    >
+                      <ProfilePicture size='sm' user={match} />
+                      <span>{match?.name}</span>
+                    </Link>
+                  )
+                } else {
+                  return null
+                }
+              })}
           </div>
           {session && (
             <button
