@@ -22,16 +22,11 @@ async function seed() {
             id: faker.datatype.uuid(),
             email: faker.internet.email(),
             name: faker.name.fullName(),
-            image: 'https://picsum.photos/50'
+            image: `https://picsum.photos/${faker.datatype.number({min: 30, max: 1000})}`
         } 
         return user
     })
 
-
-    const moviesToLike = await runMany<{id: string, title: string}>(driver, `
-        MATCH (m:Movie) RETURN m{.id, .title} LIMIT $limit`, { limit: neo4j.int(scriptConfig.likes) }, 'm'
-    )
-    console.log('Found movies', moviesToLike)
 
     for(const user of users) {
         const uObj = await runOnce<{ id: string, email: string, name: string }>(driver, `
@@ -46,12 +41,15 @@ async function seed() {
         }
         console.log(`u:(${uObj.name}) created`)
 
+        const moviesToLike = await runMany<{id: string, title: string}>(driver, `
+            MATCH (m:Movie) RETURN m{.id, .title}, rand() as r ORDER BY r LIMIT $limit`, { limit: neo4j.int(scriptConfig.likes) }, 'm'
+        )
 
         const movieRepo = new MovieRepo(driver)
 
         for(const movie of moviesToLike) {
             await movieRepo.addToWatchlist(movie.id, uObj as User)
-            // console.log(`(u:${uObj.id})<-(m${mov.id}) created`)
+            console.log(`(u:${uObj.name})<-(m${movie.title}) created`)
         }
     }
 

@@ -142,7 +142,15 @@ export class NeoDataSource {
     return await runOnce<User>(this.driver, `
       MATCH (u:User {email: $email}), (f:User {id: $id})
       MERGE (u)-[r:FOLLOWS]->(f)
-      RETURN f`,
+      RETURN f{
+        .id,
+        .email,
+        .image,
+        .name,
+        isFollower: exists((f)-[:FOLLOWS]->(:User {email: $email})),
+        isFollowing: exists((f)<-[:FOLLOWS]-(:User {email: $email})),
+        followerId: u.id
+      }`,
       { email: me.email, id: friendId },
       'f'
     )
@@ -154,7 +162,15 @@ export class NeoDataSource {
       `
       MATCH (u:User {email: $email})-[r:FOLLOWS]->(f:User {id: $id})
       DELETE r
-      RETURN f
+      RETURN f{
+        .id,
+        .email,
+        .image,
+        .name,
+        isFollower: exists((f)-[:FOLLOWS]->(:User {email: $email})),
+        isFollowing: exists((f)<-[:FOLLOWS]-(:User {email: $email})),
+        followerId: u.id
+      }
       `,
       { email: me.email, id: friendId }
     )

@@ -36,9 +36,7 @@ const resolvers: Resolvers = {
       return await movieRepo.search(query)
     },
     user: async (_parent, { id }, { userLoader }) => {
-      const val = await userLoader.load(id)
-      console.log(val)
-      return val
+      return await userLoader.load(id)
     },
     searchUsers: async (_parent, { nameQuery }, { neoDataSource, user }) => {
       return await neoDataSource.searchUsers(nameQuery, user)

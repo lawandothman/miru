@@ -1,4 +1,4 @@
-import { gql, useQuery } from '@apollo/client'
+import { gql, useMutation, useQuery } from '@apollo/client'
 import { ProfilePicture } from 'components/Avatar'
 import { MoviesList } from 'components/MoviesList'
 import { useSession } from 'next-auth/react'
@@ -9,6 +9,7 @@ import { User } from '__generated__/resolvers-types'
 const SEARCH_USER = gql`
   query User($userId: ID!) {
     user(id: $userId) {
+      id
       name
       image
       matches {
@@ -21,9 +22,19 @@ const SEARCH_USER = gql`
   }
 `
 
+const FOLLOW = gql`
+  mutation($friendId: ID!) {
+    follow(friendId: $friendId) {
+      id
+      isFollowing
+    }
+  }
+`
+
 const User = () => {
   const { query } = useRouter()
   const userId = Array.isArray(query.id) ? query.id[0] : query.id
+  const [follow] = useMutation<User, { friendId: string }>(FOLLOW)
   const { data: session } = useSession()
   const { data } = useQuery<{ user: User }, { userId?: string }>(SEARCH_USER, {
     variables: {
@@ -43,7 +54,7 @@ const User = () => {
               </h1>
             </div>
             {session?.user?.id !== userId && (
-              <button className='flex h-10 w-28 items-center justify-center gap-2 rounded-lg font-semibold dark:bg-neutral-100'>
+              <button onClick={() => follow({ variables: { friendId: data?.user.id } })} className='flex h-10 w-28 items-center justify-center gap-2 rounded-lg font-semibold dark:bg-neutral-100'>
                 <FiUserPlus /> Follow
               </button>
             )}
