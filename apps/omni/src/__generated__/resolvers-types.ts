@@ -28,6 +28,7 @@ export type Movie = {
   genres?: Maybe<Array<Maybe<Genre>>>;
   id: Scalars['ID'];
   inWatchlist?: Maybe<Scalars['Boolean']>;
+  matches?: Maybe<Array<Maybe<User>>>;
   originalTitle?: Maybe<Scalars['String']>;
   overview?: Maybe<Scalars['String']>;
   popularity?: Maybe<Scalars['Float']>;
@@ -219,6 +220,7 @@ export type MovieResolvers<ContextType = Context, ParentType extends ResolversPa
   genres?: Resolver<Maybe<Array<Maybe<ResolversTypes['Genre']>>>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   inWatchlist?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
+  matches?: Resolver<Maybe<Array<Maybe<ResolversTypes['User']>>>, ParentType, ContextType>;
   originalTitle?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   overview?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   popularity?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;

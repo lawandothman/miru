@@ -8,7 +8,7 @@ type Movie {
   originalTitle: String
   backdropUrl: String
   popularity: Float
-  # genre_ids?: number[]
+  matches: [User] # Followers that have this movie watchlisted
   genres: [Genre]
   inWatchlist: Boolean
 }

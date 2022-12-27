@@ -21,6 +21,7 @@ export interface Context {
   movieLoader: DataLoader<string, Movie>
   userLoader: DataLoader<string, User>
   matchesLoader: DataLoader<string, Movie[]>
+  movieMatchesLoader: DataLoader<string, User[]>
   followerLoader: DataLoader<string, User[]> 
   followingLoader: DataLoader<string, User[]> 
   neoDataSource: NeoDataSource
@@ -87,6 +88,12 @@ const resolvers: Resolvers = {
         requireUser(user)
       )
     },
+    matches: async (parent, _, {user, movieMatchesLoader}) => {
+      if (user == null) {
+        return []
+      }
+      return movieMatchesLoader.load(parent.id)
+    }
   },
   User: {
     matches: async (parent, _, { matchesLoader }) => {
@@ -136,6 +143,7 @@ async function main() {
         movieLoader: new DataLoader(neo.getMovies.bind(neo)),
         userLoader: new DataLoader(neo.getUsers(user).bind(neo)),
         matchesLoader: new DataLoader(neo.getMatchesWith(user).bind(neo)),
+        movieMatchesLoader: new DataLoader(neo.getMovieMatches(user).bind(neo)),
         followerLoader: new DataLoader(neo.getFollowers(user).bind(neo)),
         followingLoader: new DataLoader(neo.getFollowing(user).bind(neo)),
         neoDataSource: neo,
