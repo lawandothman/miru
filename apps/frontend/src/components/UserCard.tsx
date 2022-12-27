@@ -41,13 +41,6 @@ export const UserCard = ({
                     )}
                   />
                 </div>
-                {/* <img
-                  width='100%'
-                  className='rounded-lg'
-                  height={'auto'}
-                  loading='lazy'
-                  src={getImage(match?.posterUrl)}
-                /> */}
                 <p className='truncate'>{match?.title}</p>
               </div>
             ))}
