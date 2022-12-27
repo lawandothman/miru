@@ -1,9 +1,7 @@
 import Link from 'next/link'
 import type { User } from '__generated__/resolvers-types'
 import { ProfilePicture } from './Avatar'
-import { getImage } from 'utils/image'
-import Image from 'next/image'
-import { cn } from 'utils/cn'
+import { MoviePoster } from './MoviePoster'
 
 export const UserCard = ({
   user,
@@ -26,22 +24,12 @@ export const UserCard = ({
           <div className='grid grid-flow-col gap-2 overflow-x-auto p-4'>
             {user.matches?.map((match) => (
               <div className='w-40 text-center' key={match?.id}>
-                {/* @law make this Next/image with a skeleton pls */}
-                <div className='aspect-w-8 aspect-h-12 overflow-hidden rounded-lg'>
-                  <Image
-                    alt={match?.title ?? ''}
-                    src={getImage(match?.posterUrl ?? '')}
-                    fill
-                    loading='lazy'
-                    sizes='(max-width: 768px) 100vw,
-              (max-width: 1200px) 50vw,
-              25vw'
-                    className={cn(
-                      'absolute top-0 left-0 bottom-0 right-0 min-h-full min-w-full object-cover'
-                    )}
-                  />
-                </div>
-                <p className='truncate'>{match?.title}</p>
+                {match && (
+                  <>
+                    <MoviePoster movie={match} />
+                    <p className='truncate'>{match?.title}</p>
+                  </>
+                )}
               </div>
             ))}
           </div>
