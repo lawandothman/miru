@@ -79,3 +79,7 @@ export function mapTo<T>(
     ...record[key].properties,
   }
 }
+
+export interface WriteRepository<T> {
+  upsert(obj: T): Promise<T | null>;
+}

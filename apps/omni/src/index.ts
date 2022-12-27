@@ -2,7 +2,7 @@ import { ApolloServer } from '@apollo/server'
 import { startStandaloneServer } from '@apollo/server/standalone'
 import { readFileSync } from 'fs'
 import { verify } from 'jsonwebtoken'
-import type { Movie, Resolvers, User } from './__generated__/resolvers-types'
+import type { Movie, Resolvers, User, WatchProvider } from './__generated__/resolvers-types'
 import neo4j from 'neo4j-driver'
 import { MovieDbService } from './services/movieDbService'
 import { SyncService } from './services/syncService'
@@ -10,8 +10,10 @@ import { Migrator } from './migrator'
 import DataLoader from 'dataloader'
 import { requireUser } from './utils'
 import { config } from './config'
-import { MovieRepo, NeoDataSource } from './dataSources/neoDataSource'
+import { NeoDataSource } from './dataSources/neoDataSource'
 import { GenreRepo } from './dataSources/genreRepo'
+import { WatchProviderRepo } from './dataSources/watchProviderRepo'
+import { MovieRepo } from './dataSources/movieRepo'
 
 const schema = readFileSync('./schema.graphql').toString()
 
@@ -24,6 +26,9 @@ export interface Context {
   movieMatchesLoader: DataLoader<string, User[]>
   followerLoader: DataLoader<string, User[]> 
   followingLoader: DataLoader<string, User[]> 
+  streamLoader: DataLoader<string, WatchProvider[]> 
+  buyLoader: DataLoader<string, WatchProvider[]> 
+  rentLoader: DataLoader<string, WatchProvider[]> 
   neoDataSource: NeoDataSource
   user: User | null
 }
@@ -93,7 +98,10 @@ const resolvers: Resolvers = {
         return []
       }
       return movieMatchesLoader.load(parent.id)
-    }
+    },
+    streamProviders: async (parent, _, { streamLoader }) => streamLoader.load(parent.id),
+    buyProviders: async (parent, _, { buyLoader }) => buyLoader.load(parent.id),
+    rentProviders: async (parent, _, { rentLoader }) => rentLoader.load(parent.id)
   },
   User: {
     matches: async (parent, _, { matchesLoader }) => {
@@ -121,6 +129,7 @@ const movieDbService = new MovieDbService()
 const syncService = new SyncService(
   new MovieRepo(driver),
   new GenreRepo(driver),
+  new WatchProviderRepo(driver),
   movieDbService
 )
 
@@ -146,6 +155,9 @@ async function main() {
         movieMatchesLoader: new DataLoader(neo.getMovieMatches(user).bind(neo)),
         followerLoader: new DataLoader(neo.getFollowers(user).bind(neo)),
         followingLoader: new DataLoader(neo.getFollowing(user).bind(neo)),
+        streamLoader: new DataLoader(neo.getStreamProviders.bind(neo)),
+        buyLoader: new DataLoader(neo.getBuyProviders.bind(neo)),
+        rentLoader: new DataLoader(neo.getRentProviders.bind(neo)),
         neoDataSource: neo,
         user,
       }

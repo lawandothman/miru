@@ -24,7 +24,6 @@ export class GenreRepo implements Repository<Genre> {
 
     return this.mapTo<Genre>(res.records[0].toObject(), 'g') ?? null
   }
-  // CREATE CONSTRAINT FOR (m:Movie) REQUIRE m.id IS UNIQUE;
 
   async upsert(genre: Genre): Promise<Genre | null> {
     const session = this.driver.session()

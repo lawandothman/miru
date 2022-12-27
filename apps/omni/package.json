@@ -15,6 +15,7 @@
   "dependencies": {
     "@apollo/server": "^4.3.0",
     "axios": "^1.2.1",
+    "axios-retry": "^3.3.1",
     "dataloader": "^2.1.0",
     "dotenv": "^16.0.3",
     "env-var": "^7.3.0",
