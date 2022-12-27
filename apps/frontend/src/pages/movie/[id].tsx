@@ -20,6 +20,8 @@ const GET_BY_ID = gql`
       title
       releaseDate
       overview
+      tagline
+      inWatchlist
       genres {
         name
         id
@@ -30,7 +32,10 @@ const GET_BY_ID = gql`
         image
         isFollowing
       }
-      inWatchlist
+      streamProviders {
+        name
+        logoPath
+      }
     }
   }
 `
@@ -92,7 +97,7 @@ const Movie: NextPage = () => {
           <h1 className='text-4xl font-thin uppercase tracking-widest '>
             {data?.movie.title}
           </h1>
-          {/* <p className="mt-2 text-xl font-thin">{movie?.tagline}</p> */}
+          <p className='mt-2 text-xl font-thin'>{data?.movie.tagline}</p>
           <div className='mt-6 text-sm text-neutral-400'>
             {/* {movie?.spoken_languages?.map((lang) => (
               <span key={lang.iso_639_1}>{lang.name} / </span>
@@ -175,6 +180,24 @@ const Movie: NextPage = () => {
                     return null
                   }
                 })}
+            </div>
+          )}
+
+          {data?.movie.streamProviders &&
+            data.movie.streamProviders.length > 0 && (
+            <div className='mt-8'>
+              <h3 className='mb-4 text-neutral-400'>Stream</h3>
+              <div className='flex gap-4'>
+                {data.movie.streamProviders.map((provider) => (
+                  <Image
+                    key={provider?.id}
+                    src={getImage(provider?.logoPath ?? '')}
+                    alt={provider?.name ?? ''}
+                    width={70}
+                    height={70}
+                  />
+                ))}
+              </div>
             </div>
           )}
           {session && (
