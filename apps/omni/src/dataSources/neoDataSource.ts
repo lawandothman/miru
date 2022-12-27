@@ -29,11 +29,13 @@ export class NeoDataSource {
     )
   }
 
-  getUsers = (user: User | null) => async (ids: readonly string[]): Promise<User[]> => {
-    const email = user?.email ?? ''
-    return await runMany<User>(
-      this.driver,
-      `MATCH (u:User) WHERE u.id in $ids 
+  getUsers =
+    (user: User | null) =>
+    async (ids: readonly string[]): Promise<User[]> => {
+      const email = user?.email ?? ''
+      return await runMany<User>(
+        this.driver,
+        `MATCH (u:User) WHERE u.id in $ids
       RETURN u{
           .id,
           .email,
@@ -43,10 +45,10 @@ export class NeoDataSource {
           isFollowing: exists((u)<-[:FOLLOWS]-(:User {email: $email}))
       }
       `,
-      { ids, email },
-      'u'
-    )
-  }
+        { ids, email },
+        'u'
+      )
+    }
 
   getMatchesWith =
     (me: User | null) =>
@@ -88,7 +90,7 @@ export class NeoDataSource {
     const email = user?.email ?? ''
     return await runMany<User>(
       this.driver,
-      `MATCH (u:User) WHERE toLower(u.name) CONTAINS toLower($query) 
+      `MATCH (u:User) WHERE toLower(u.name) CONTAINS toLower($query)
       RETURN u{
           .id,
           .email,
@@ -139,7 +141,9 @@ export class NeoDataSource {
   }
 
   async follow(me: User, friendId: string): Promise<User | null> {
-    return await runOnce<User>(this.driver, `
+    return await runOnce<User>(
+      this.driver,
+      `
       MATCH (u:User {email: $email}), (f:User {id: $id})
       MERGE (u)-[r:FOLLOWS]->(f)
       RETURN f{
@@ -156,9 +160,9 @@ export class NeoDataSource {
     )
   }
 
-  async unfollow(me: User, friendId: string): Promise<User> {
-    const session = this.driver.session()
-    const res = await session.run(
+  async unfollow(me: User, friendId: string): Promise<User | null> {
+    return await runOnce<User>(
+      this.driver,
       `
       MATCH (u:User {email: $email})-[r:FOLLOWS]->(f:User {id: $id})
       DELETE r
@@ -172,18 +176,18 @@ export class NeoDataSource {
         followerId: u.id
       }
       `,
-      { email: me.email, id: friendId }
+      { email: me.email, id: friendId },
+      'f'
     )
-    session.close()
-
-    return mapTo<User>(res.records[0].toObject(), 'f') as User
   }
 
-  getFollowers = (user: User | null) => async (userIds: readonly string[]): Promise<User[][]> => {
-    const email = user?.email ?? ''
-    const followers = await runMany<User&{followerId: string}>(
-      this.driver,
-      `MATCH (f:User)-[r:FOLLOWS]->(u:User)
+  getFollowers =
+    (user: User | null) =>
+    async (userIds: readonly string[]): Promise<User[][]> => {
+      const email = user?.email ?? ''
+      const followers = await runMany<User & { followerId: string }>(
+        this.driver,
+        `MATCH (f:User)-[r:FOLLOWS]->(u:User)
       WHERE u.id IN $userIds
       RETURN f{
           .id,
@@ -194,21 +198,23 @@ export class NeoDataSource {
           isFollowing: exists((f)<-[:FOLLOWS]-(:User {email: $email})),
           followerId: u.id
       }`,
-      { userIds, email },
-      'f'
-    )
-    const groupedByFollowerId = groupBy(followers, (a) => a.followerId)
+        { userIds, email },
+        'f'
+      )
+      const groupedByFollowerId = groupBy(followers, (a) => a.followerId)
 
-    return userIds.map((id) => {
-      return groupedByFollowerId[id] ?? []
-    })
-  }
+      return userIds.map((id) => {
+        return groupedByFollowerId[id] ?? []
+      })
+    }
 
-  getFollowing = (user: User | null) => async (userIds: readonly string[]): Promise<User[][]> => {
-    const email = user?.email ?? ''
-    const followers = await runMany<User&{followingId: string}>(
-      this.driver,
-      `MATCH (f:User)<-[r:FOLLOWS]-(u:User)
+  getFollowing =
+    (user: User | null) =>
+    async (userIds: readonly string[]): Promise<User[][]> => {
+      const email = user?.email ?? ''
+      const followers = await runMany<User & { followingId: string }>(
+        this.driver,
+        `MATCH (f:User)<-[r:FOLLOWS]-(u:User)
       WHERE u.id IN $userIds
       RETURN f{
           .id,
@@ -219,17 +225,17 @@ export class NeoDataSource {
           isFollowing: exists((f)<-[:FOLLOWS]-(:User {email: $email})),
           followingId: u.id
       }`,
-      { userIds, email },
-      'f'
-    )
-    const groupedByFollowingId = groupBy(followers, (a) => a.followingId)
+        { userIds, email },
+        'f'
+      )
+      const groupedByFollowingId = groupBy(followers, (a) => a.followingId)
 
-    return userIds.map((id) => {
-      return groupedByFollowingId[id] ?? []
-    })
-  }
+      return userIds.map((id) => {
+        return groupedByFollowingId[id] ?? []
+      })
+    }
 
-  async isFollowed(friendId: string, me: User| null): Promise<boolean> {
+  async isFollowed(friendId: string, me: User | null): Promise<boolean> {
     const rel = await runAndMap<object>(
       this.driver,
       `MATCH (f:User {id: $friendId})<-[r:FOLLOWS]-(u:User {email: $email})
@@ -240,7 +246,6 @@ export class NeoDataSource {
     return rel != null
   }
 }
-
 
 // We will slowly deprecate this for reading of data
 export class MovieRepo implements Repository<Movie> {
