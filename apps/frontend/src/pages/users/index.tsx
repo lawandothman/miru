@@ -1,6 +1,5 @@
 import { gql, useLazyQuery } from '@apollo/client'
-import { ProfilePicture } from 'components/Avatar'
-import Link from 'next/link'
+import { UserCard } from 'components/UserCard'
 import { useRouter } from 'next/router'
 import type { ChangeEvent, FormEvent } from 'react'
 import { useState } from 'react'
@@ -25,8 +24,8 @@ const Users = () => {
   const router = useRouter()
   const [query, setQuery] = useState('')
   const [searchUsers, { data }] = useLazyQuery<
-    { searchUsers: User[] },
-    { nameQuery: string }
+  { searchUsers: User[] },
+  { nameQuery: string }
   >(SEARCH_USERS)
 
   const onSubmit = (e: FormEvent) => {
@@ -74,17 +73,7 @@ const Users = () => {
             </span>
           )}
           {data?.searchUsers.map((user) => (
-            <Link href={`/users/${user.id}`} key={user.id}>
-              <div className='flex max-w-lg items-center gap-4 rounded-lg p-4 hover:bg-neutral-700'>
-                <ProfilePicture size='md' user={user} />
-                <div className='text-white'>
-                  <h3 key={user.id}>{user.name}</h3>
-                  <span className='text-sm'>
-                    {user.matches?.length} matches
-                  </span>
-                </div>
-              </div>
-            </Link>
+            <UserCard key={user.id} user={user} />
           ))}
         </>
       )}

@@ -1,4 +1,4 @@
-import dotenv from "dotenv";
+import dotenv from 'dotenv'
 import env from 'env-var'
 
 dotenv.config()
@@ -12,6 +12,6 @@ export const config = {
   jwtSecret: env.get('OMNI_SECRET').required().asString(),
   tmdb: {
     readToken: env.get('TMDB_API_READ_ACCESS_TOKEN').required().asString(),
-    baseUrl: env.get('TMDB_API_BASE_URL').required().asString()
-  }
+    baseUrl: env.get('TMDB_API_BASE_URL').required().asString(),
+  },
 }

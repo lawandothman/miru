@@ -6,8 +6,9 @@
   "scripts": {
     "generate": "graphql-codegen --config codegen.yaml",
     "compile": "npm run generate && tsc",
-    "lint": "eslint src/*/**.ts",
-    "lint:fix": "eslint src/*/**.ts --fix",
+    "lint": "eslint src --ext .ts",
+    "lint:fix": "eslint src --ext .ts --fix",
+    "script:seed": "ts-node src/scripts/seed.ts",
     "dev": "nodemon -e ts --exec \"(tsc || exit 1) && node dist/index.js\"",
     "start": "npm run compile && node ./dist/index.js"
   },
@@ -25,6 +26,7 @@
     "workspace": "^0.0.1-preview.1"
   },
   "devDependencies": {
+    "@faker-js/faker": "^7.6.0",
     "@graphql-codegen/cli": "^2.16.1",
     "@graphql-codegen/typescript": "^2.8.5",
     "@graphql-codegen/typescript-resolvers": "^2.7.10",

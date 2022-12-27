@@ -10,6 +10,9 @@
     "lint:fix": {
       "outputs": []
     },
+    "generate": {
+      "outputs": ["src/__generated__/**"]
+    },
     "dev": {
       "outputs": []
     },

@@ -23,8 +23,8 @@ const Genre: NextPage = () => {
   const { query } = useRouter()
   const genreId = Array.isArray(query.id) ? query.id[0] : query.id
   const { data, loading } = useQuery<
-    { moviesByGenre: Movie[] },
-    { genreId?: string }
+  { moviesByGenre: Movie[] },
+  { genreId?: string }
   >(GET_BY_GENRE, {
     variables: {
       genreId,

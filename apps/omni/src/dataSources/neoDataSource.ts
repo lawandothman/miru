@@ -1,11 +1,11 @@
 import { groupBy } from 'lodash'
 import type { Driver } from 'neo4j-driver'
-import type { Dict } from 'neo4j-driver-core/types/record'
 import type { Genre, Movie, User } from '../__generated__/resolvers-types'
+import { mapTo, runAndMap, runAndMapMany, runMany, runOnce } from './utils'
 
 export interface Repository<T> {
-  get(id: string): Promise<T | null>
-  upsert(obj: T): Promise<T | null>
+  get(id: string): Promise<T | null>;
+  upsert(obj: T): Promise<T | null>;
 }
 
 export class NeoDataSource {
@@ -13,36 +13,53 @@ export class NeoDataSource {
 
   async getMovies(ids: readonly string[]): Promise<Movie[]> {
     const session = this.driver.session()
-    const res = await session.run('MATCH (m:Movie) WHERE m.id in $ids RETURN m', {
-      ids,
-    })
+    const res = await session.run(
+      'MATCH (m:Movie) WHERE m.id in $ids RETURN m',
+      {
+        ids,
+      }
+    )
 
-    session.close()
-      .catch(console.error)
+    session.close().catch(console.error)
 
-    return res.records.map(rec => mapTo<Movie>(rec.toObject(), 'm')) as Movie[] ?? []
-  }
-
-  async getUsers(ids: readonly string[]): Promise<User[]> {
-    return await runAndMapMany<User>(
-      this.driver,
-      'MATCH (u:User) WHERE u.id in $ids RETURN u',
-      { ids },
-      'u'
+    return (
+      (res.records.map((rec) =>
+        mapTo<Movie>(rec.toObject(), 'm')
+      ) as Movie[]) ?? []
     )
   }
 
-  getMatchesWith = (me: User | null) => async (ids: readonly string[]): Promise<Movie[][]> => {
-    if(me == null) {
-      return []
-    }
+  getUsers =
+    (user: User | null) =>
+      async (ids: readonly string[]): Promise<User[]> => {
+        const email = user?.email ?? ''
+        return await runMany<User>(
+          this.driver,
+          `MATCH (u:User) WHERE u.id in $ids
+      RETURN u{
+          .id,
+          .email,
+          .image,
+          .name,
+          isFollower: exists((u)-[:FOLLOWS]->(:User {email: $email})),
+          isFollowing: exists((u)<-[:FOLLOWS]-(:User {email: $email}))
+      }
+      `,
+          { ids, email },
+          'u'
+        )
+      }
 
-    console.log(ids)
-    console.log(me.email)
+  getMatchesWith =
+    (me: User | null) =>
+      async (ids: readonly string[]): Promise<Movie[][]> => {
+        if (me == null) {
+          return []
+        }
 
-    const res = await runMany<Movie & { friendId: string }>(
-      this.driver,
-      `MATCH (f:User)<-[r1:IN_WATCHLIST]-(m:Movie)-[r2]->(me:User {email: $myEmail})
+        const res = await runMany<Movie & { friendId: string }>(
+          this.driver,
+          `MATCH (f:User)<-[r1:IN_WATCHLIST]-(m:Movie)-[r2:IN_WATCHLIST]->(me:User {email: $myEmail})
       WHERE f.id IN $ids
       RETURN m{
           .overview,
@@ -55,21 +72,54 @@ export class NeoDataSource {
           .title,
           .adult,
           friendId: f.id
-      }`, {ids, myEmail: me.email},
-      'm'
-    )
-    const groupedByUser = groupBy(res, (a) => a.friendId)
+      }`,
+          { ids, myEmail: me.email },
+          'm'
+        )
+        const groupedByUser = groupBy(res, (a) => a.friendId)
 
-    return ids.map((id) => {
-      return groupedByUser[id] ?? []
-    })
+        return ids.map((id) => {
+          return groupedByUser[id] ?? []
+        })
+      }
+
+  getMovieMatches = (user: User | null) => async (movieIds: readonly string[]) => {
+    const email = user?.email ?? ''
+    const matches = await runMany<User&{movieId:string}>(
+      this.driver, 
+      `MATCH (m:Movie)-[r1:IN_WATCHLIST]->(f:User)<-[r2:FOLLOWS]-(u:User {email: $email})
+      WHERE m.id IN $movieIds
+      RETURN f{
+        .id,
+        .email,
+        .image,
+        .name,
+        isFollower: exists((u)-[:FOLLOWS]->(:User {email: $email})),
+        isFollowing: exists((u)<-[:FOLLOWS]-(:User {email: $email})),
+        movieId: m.id
+      }`,
+      { movieIds, email},
+      'f'
+    )
+    const groupedByMovieId = groupBy(matches, (a) => a.movieId)
+    return movieIds.map(id => groupedByMovieId[id] ?? [])
   }
 
-  async searchUsers(query: string): Promise<User[]> {
-    return await runAndMapMany<User>(
+  async searchUsers(query: string, user: User | null): Promise<User[]> {
+    const email = user?.email ?? ''
+    return await runMany<User>(
       this.driver,
-      'MATCH (u:User) WHERE toLower(u.name) CONTAINS toLower($query) RETURN u LIMIT 20',
-      { query },
+      `MATCH (u:User) WHERE toLower(u.name) CONTAINS toLower($query)
+      RETURN u{
+          .id,
+          .email,
+          .image,
+          .name,
+          isFollower: exists((u)-[:FOLLOWS]->(:User {email: $email})),
+          isFollowing: exists((u)<-[:FOLLOWS]-(:User {email: $email}))
+      } LIMIT 20
+      `,
+      { query, email },
       'u'
     )
   }
@@ -77,10 +127,13 @@ export class NeoDataSource {
   async getGenres(): Promise<Genre[]> {
     const session = this.driver.session()
     const res = await session.run('MATCH (g:Genre) RETURN g')
-    session.close()
-      .catch(console.error)
+    session.close().catch(console.error)
 
-    return res.records.map(rec => mapTo<Genre>(rec.toObject(), 'g')) as Genre[] ?? []
+    return (
+      (res.records.map((rec) =>
+        mapTo<Genre>(rec.toObject(), 'g')
+      ) as Genre[]) ?? []
+    )
   }
 
   async isMovieInWatchlist(movieId: string, user: User): Promise<boolean> {
@@ -88,7 +141,9 @@ export class NeoDataSource {
       this.driver,
       `MATCH (m:Movie {id: $movieId})-[r:IN_WATCHLIST]->(u:User {email: $email})
       RETURN r`,
-      {movieId, email:user.email}, 'r')
+      { movieId, email: user.email },
+      'r'
+    )
     return rel != null
   }
 
@@ -97,50 +152,123 @@ export class NeoDataSource {
       this.driver,
       `MATCH (m:Movie)-[r:IN_WATCHLIST]->(u:User {email: $email})
       RETURN m`,
-      {email:user.email}, 'm')
+      { email: user.email },
+      'm'
+    )
 
     return movies
   }
-}
 
-async function runMany<T>(driver: Driver, query: string, args: any, key: string): Promise<T[]> {
-    const session = driver.session()
-    const res = await session.run(query, args)
-    session.close().catch(console.error)
-
-    return res.records.map(rec => rec.toObject()[key]) as T[] ?? []
-}
-
-async function runAndMapMany<T>(driver: Driver, query: string, args: any, key: string): Promise<T[]> {
-    const session = driver.session()
-    const res = await session.run(query, args)
-    session.close().catch(console.error)
-
-    return res.records.map(rec => mapTo<T>(rec.toObject(), key)) as T[] ?? []
-}
-
-async function runAndMap<T>(driver: Driver, query: string, args: any, key: string): Promise<T | null> {
-    const session = driver.session()
-    const res = await session.run(query, args)
-    session.close().catch(console.error)
-
-    return mapTo<T>(res.records[0]?.toObject() ?? null, key)
-}
-
-function mapTo<T>(record: Dict<PropertyKey, any> | null, key: string): T | null {
-  if (record == null) {
-    return null
+  async follow(me: User, friendId: string): Promise<User | null> {
+    return await runOnce<User>(
+      this.driver,
+      `
+      MATCH (u:User {email: $email}), (f:User {id: $id})
+      MERGE (u)-[r:FOLLOWS]->(f)
+      RETURN f{
+        .id,
+        .email,
+        .image,
+        .name,
+        isFollower: exists((f)-[:FOLLOWS]->(:User {email: $email})),
+        isFollowing: exists((f)<-[:FOLLOWS]-(:User {email: $email})),
+        followerId: u.id
+      }`,
+      { email: me.email, id: friendId },
+      'f'
+    )
   }
-  return {
-    ...record[key].properties
+
+  async unfollow(me: User, friendId: string): Promise<User | null> {
+    return await runOnce<User>(
+      this.driver,
+      `
+      MATCH (u:User {email: $email})-[r:FOLLOWS]->(f:User {id: $id})
+      DELETE r
+      RETURN f{
+        .id,
+        .email,
+        .image,
+        .name,
+        isFollower: exists((f)-[:FOLLOWS]->(:User {email: $email})),
+        isFollowing: exists((f)<-[:FOLLOWS]-(:User {email: $email})),
+        followerId: u.id
+      }
+      `,
+      { email: me.email, id: friendId },
+      'f'
+    )
+  }
+
+  getFollowers =
+    (user: User | null) =>
+      async (userIds: readonly string[]): Promise<User[][]> => {
+        const email = user?.email ?? ''
+        const followers = await runMany<User & { followerId: string }>(
+          this.driver,
+          `MATCH (f:User)-[r:FOLLOWS]->(u:User)
+      WHERE u.id IN $userIds
+      RETURN f{
+          .id,
+          .email,
+          .image,
+          .name,
+          isFollower: exists((f)-[:FOLLOWS]->(:User {email: $email})),
+          isFollowing: exists((f)<-[:FOLLOWS]-(:User {email: $email})),
+          followerId: u.id
+      }`,
+          { userIds, email },
+          'f'
+        )
+        const groupedByFollowerId = groupBy(followers, (a) => a.followerId)
+
+        return userIds.map((id) => {
+          return groupedByFollowerId[id] ?? []
+        })
+      }
+
+  getFollowing =
+    (user: User | null) =>
+      async (userIds: readonly string[]): Promise<User[][]> => {
+        const email = user?.email ?? ''
+        const followers = await runMany<User & { followingId: string }>(
+          this.driver,
+          `MATCH (f:User)<-[r:FOLLOWS]-(u:User)
+      WHERE u.id IN $userIds
+      RETURN f{
+          .id,
+          .email,
+          .image,
+          .name,
+          isFollower: exists((f)-[:FOLLOWS]->(:User {email: $email})),
+          isFollowing: exists((f)<-[:FOLLOWS]-(:User {email: $email})),
+          followingId: u.id
+      }`,
+          { userIds, email },
+          'f'
+        )
+        const groupedByFollowingId = groupBy(followers, (a) => a.followingId)
+
+        return userIds.map((id) => {
+          return groupedByFollowingId[id] ?? []
+        })
+      }
+
+  async isFollowed(friendId: string, me: User | null): Promise<boolean> {
+    const rel = await runAndMap<object>(
+      this.driver,
+      `MATCH (f:User {id: $friendId})<-[r:FOLLOWS]-(u:User {email: $email})
+      RETURN r`,
+      { friendId, email: me?.email },
+      'r'
+    )
+    return rel != null
   }
 }
 
-// We will slowly deprecate this for reading of data 
+// We will slowly deprecate this for reading of data
 export class MovieRepo implements Repository<Movie> {
-  constructor(
-    private readonly driver: Driver) {
-  }
+  constructor(private readonly driver: Driver) {}
 
   async get(id: string): Promise<Movie | null> {
     const session = this.driver.session()
@@ -148,30 +276,33 @@ export class MovieRepo implements Repository<Movie> {
       id,
     })
 
-    session.close()
-      .catch(console.error)
+    session.close().catch(console.error)
 
     return mapTo<Movie>(res.records[0].toObject(), 'm') ?? null
   }
-  // CREATE CONSTRAINT FOR (m:Movie) REQUIRE m.id IS UNIQUE;
 
   async upsert(movie: Movie): Promise<Movie | null> {
     const session = this.driver.session()
     const res = await session.executeWrite(async (tx) => {
-      const res = await tx.run(`merge (m:Movie {
+      const res = await tx.run(
+        `merge (m:Movie {
             id: $id
         })
         ${this.builtSetQuery(movie, 'm')}
         return m`,
         { ...movie }
       )
-      await Promise.all(movie.genres?.map((genre) => {
-        return tx.run(`
-          MATCH (m:Movie {id: $movieId}), (g:Genre {id: $genreId}) 
-          MERGE (m)-[r:IS_A]->(g) 
+      await Promise.all(
+        movie.genres?.map((genre) => {
+          return tx.run(
+            `
+          MATCH (m:Movie {id: $movieId}), (g:Genre {id: $genreId})
+          MERGE (m)-[r:IS_A]->(g)
           RETURN m,r,g`,
-          { movieId: movie.id, genreId: genre!.id })
-      }) ?? [])
+            { movieId: movie.id, genreId: genre!.id }
+          )
+        }) ?? []
+      )
 
       return res
     })
@@ -181,44 +312,61 @@ export class MovieRepo implements Repository<Movie> {
 
   async getMoviesByGenre(genreId: string): Promise<Movie[]> {
     const session = this.driver.session()
-    const res = await session.run(`
+    const res = await session.run(
+      `
       MATCH (m:Movie)-[r:IS_A]->(g:Genre {id: $id})
       RETURN m LIMIT 20
-    `, { id: genreId })
+    `,
+      { id: genreId }
+    )
 
-    return res.records.map(record => mapTo<Movie>(record.toObject(), 'm')) as Movie[]
+    return res.records.map((record) =>
+      mapTo<Movie>(record.toObject(), 'm')
+    ) as Movie[]
   }
 
   async getGenres(movie: Movie): Promise<Genre[]> {
     const session = this.driver.session()
-    const res = await session.run(`
+    const res = await session.run(
+      `
       MATCH (m:Movie {id: $id})-[r:IS_A]->(g:Genre)
       RETURN g
-    `, { id: movie.id })
+    `,
+      { id: movie.id }
+    )
 
-    return res.records.map(record => mapTo<Genre>(record.toObject(), 'g')) as Genre[]
+    return res.records.map((record) =>
+      mapTo<Genre>(record.toObject(), 'g')
+    ) as Genre[]
   }
 
   async search(query: string): Promise<Movie[]> {
     const session = this.driver.session()
-    const res = await session.run(`
-      MATCH (m:Movie) WHERE 
-      toLower(m.title) CONTAINS toLower($query) 
+    const res = await session.run(
+      `
+      MATCH (m:Movie) WHERE
+      toLower(m.title) CONTAINS toLower($query)
       RETURN m LIMIT 20
-    `, { query })
+    `,
+      { query }
+    )
 
     session.close()
-    return res.records.map((record) => mapTo<Movie>(record.toObject(), 'm')) as Movie[]
-
+    return res.records.map((record) =>
+      mapTo<Movie>(record.toObject(), 'm')
+    ) as Movie[]
   }
 
   async addToWatchlist(movieId: string, user: User): Promise<Movie> {
     const session = this.driver.session()
-    const res = await session.run(`
+    const res = await session.run(
+      `
       MATCH (u:User {email: $email}), (m:Movie {id: $id})
       MERGE (u)<-[r:IN_WATCHLIST]-(m)
       RETURN m
-    `, { email: user.email, id: movieId })
+    `,
+      { email: user.email, id: movieId }
+    )
     session.close()
 
     return mapTo<Movie>(res.records[0].toObject(), 'm') as Movie
@@ -226,11 +374,14 @@ export class MovieRepo implements Repository<Movie> {
 
   async removeFromWatchlist(movieId: string, user: User): Promise<Movie> {
     const session = this.driver.session()
-    const res = await session.run(`
+    const res = await session.run(
+      `
       MATCH (u:User {email: $email})<-[r:IN_WATCHLIST]-(m:Movie {id: $id})
       DELETE r
       RETURN m
-    `, { email: user.email, id: movieId })
+    `,
+      { email: user.email, id: movieId }
+    )
     session.close()
 
     return mapTo<Movie>(res.records[0].toObject(), 'm') as Movie
@@ -240,7 +391,7 @@ export class MovieRepo implements Repository<Movie> {
     return Object.entries(obj)
       .filter(([_, value]) => !Array.isArray(value))
       .filter(([_, value]) => value != null)
-      .map(([key, _]) => `SET ${entryKey}.${key} = $${key}`).join('\n')
+      .map(([key, _]) => `SET ${entryKey}.${key} = $${key}`)
+      .join('\n')
   }
-
 }

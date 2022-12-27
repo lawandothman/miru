@@ -28,6 +28,7 @@ export type Movie = {
   genres?: Maybe<Array<Maybe<Genre>>>;
   id: Scalars['ID'];
   inWatchlist?: Maybe<Scalars['Boolean']>;
+  matches?: Maybe<Array<Maybe<User>>>;
   originalTitle?: Maybe<Scalars['String']>;
   overview?: Maybe<Scalars['String']>;
   popularity?: Maybe<Scalars['Float']>;
@@ -39,7 +40,9 @@ export type Movie = {
 export type Mutation = {
   __typename?: 'Mutation';
   addMovieToWatchlist?: Maybe<Movie>;
+  follow?: Maybe<User>;
   removeMovieFromWatchlist?: Maybe<Movie>;
+  unfollow?: Maybe<User>;
 };
 
 
@@ -48,8 +51,18 @@ export type MutationAddMovieToWatchlistArgs = {
 };
 
 
+export type MutationFollowArgs = {
+  friendId: Scalars['ID'];
+};
+
+
 export type MutationRemoveMovieFromWatchlistArgs = {
   movieId: Scalars['ID'];
+};
+
+
+export type MutationUnfollowArgs = {
+  friendId: Scalars['ID'];
 };
 
 export type Query = {
@@ -91,8 +104,12 @@ export type QueryUserArgs = {
 export type User = {
   __typename?: 'User';
   email: Scalars['String'];
+  followers?: Maybe<Array<Maybe<User>>>;
+  following?: Maybe<Array<Maybe<User>>>;
   id: Scalars['ID'];
   image?: Maybe<Scalars['String']>;
+  isFollower?: Maybe<Scalars['Boolean']>;
+  isFollowing?: Maybe<Scalars['Boolean']>;
   matches?: Maybe<Array<Maybe<Movie>>>;
   name: Scalars['String'];
 };
@@ -203,6 +220,7 @@ export type MovieResolvers<ContextType = Context, ParentType extends ResolversPa
   genres?: Resolver<Maybe<Array<Maybe<ResolversTypes['Genre']>>>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   inWatchlist?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
+  matches?: Resolver<Maybe<Array<Maybe<ResolversTypes['User']>>>, ParentType, ContextType>;
   originalTitle?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   overview?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   popularity?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
@@ -214,7 +232,9 @@ export type MovieResolvers<ContextType = Context, ParentType extends ResolversPa
 
 export type MutationResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
   addMovieToWatchlist?: Resolver<Maybe<ResolversTypes['Movie']>, ParentType, ContextType, RequireFields<MutationAddMovieToWatchlistArgs, 'movieId'>>;
+  follow?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<MutationFollowArgs, 'friendId'>>;
   removeMovieFromWatchlist?: Resolver<Maybe<ResolversTypes['Movie']>, ParentType, ContextType, RequireFields<MutationRemoveMovieFromWatchlistArgs, 'movieId'>>;
+  unfollow?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<MutationUnfollowArgs, 'friendId'>>;
 }>;
 
 export type QueryResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
@@ -229,8 +249,12 @@ export type QueryResolvers<ContextType = Context, ParentType extends ResolversPa
 
 export type UserResolvers<ContextType = Context, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = ResolversObject<{
   email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  followers?: Resolver<Maybe<Array<Maybe<ResolversTypes['User']>>>, ParentType, ContextType>;
+  following?: Resolver<Maybe<Array<Maybe<ResolversTypes['User']>>>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   image?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  isFollower?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
+  isFollowing?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   matches?: Resolver<Maybe<Array<Maybe<ResolversTypes['Movie']>>>, ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;

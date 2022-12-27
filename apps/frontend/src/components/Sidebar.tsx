@@ -2,6 +2,7 @@ import Link from 'next/link'
 import {
   FiCalendar,
   FiHeart,
+  FiHome,
   FiMenu,
   FiPlay,
   FiTrendingUp,
@@ -77,7 +78,9 @@ export const Sidebar = ({ genres }: { genres: Genre[] }) => {
           aria-label='Sidenav'
         >
           <div className='mb-6 mt-4 flex items-center justify-between pl-4 dark:text-white'>
-            <h1 className='text-lg'>ミル Miru</h1>
+            <Link href='/' className='text-lg'>
+              ミル Miru
+            </Link>
             <button
               onClick={() => setIsOpen(false)}
               className='mr-2 rounded p-1 hover:bg-neutral-700 lg:hidden'
@@ -88,6 +91,13 @@ export const Sidebar = ({ genres }: { genres: Genre[] }) => {
           <main className='flex flex-col p-2'>
             <nav>
               <ul className='space-y-2'>
+                <NavItem
+                  isSelected={router.pathname === '/'}
+                  href='/'
+                  icon={<FiHome />}
+                >
+                  Home
+                </NavItem>
                 <NavItem
                   isSelected={router.pathname === '/watchlist'}
                   href='/watchlist'

@@ -8,7 +8,7 @@ type Movie {
   originalTitle: String
   backdropUrl: String
   popularity: Float
-  # genre_ids?: number[]
+  matches: [User] # Followers that have this movie watchlisted
   genres: [Genre]
   inWatchlist: Boolean
 }
@@ -19,6 +19,10 @@ type User {
   image: String
   email: String!
   matches: [Movie]
+  isFollowing: Boolean
+  isFollower: Boolean
+  followers: [User]
+  following: [User]
 }
 
 type Genre {
@@ -39,4 +43,6 @@ type Query {
 type Mutation {
   addMovieToWatchlist(movieId: ID!): Movie
   removeMovieFromWatchlist(movieId: ID!): Movie
+  follow(friendId: ID!): User
+  unfollow(friendId: ID!): User
 }
