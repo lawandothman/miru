@@ -74,7 +74,7 @@ const FollowingDialog = ({ user }: { user: User }) => {
     <Dialog>
       <DialogTrigger>
         <span className='dark:text-neutral-300'>
-          {user.following?.length} followers
+          {user.following?.length} following
         </span>
       </DialogTrigger>
       <DialogContent>
