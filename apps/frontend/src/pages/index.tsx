@@ -47,7 +47,7 @@ const Home: NextPage = () => {
 
   return (
     <div className='px-20 pt-20'>
-      <PageHeader title='Welcome back!'></PageHeader>
+      <PageHeader title='Welcome back!' subtitle='' />
       {data?.user.following?.map((follower) => {
         if (follower) {
           <UserCard key={follower.id} user={follower} extended />
