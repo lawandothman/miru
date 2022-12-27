@@ -38,7 +38,7 @@ const Home: NextPage = () => {
   const { data } = useQuery<{ user: User }>(GET_HOME, {
     variables: { userId: session?.user?.id },
   })
-  if (true) {
+  if (status === 'loading') {
     return <FullPageLoader />
   }
   if (!session) {
