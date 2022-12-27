@@ -5,8 +5,8 @@ import {
   FiHome,
   FiMenu,
   FiPlay,
+  FiSearch,
   FiTrendingUp,
-  FiUser,
   FiX,
 } from 'react-icons/fi'
 import type { FC, PropsWithChildren } from 'react'
@@ -99,18 +99,18 @@ export const Sidebar = ({ genres }: { genres: Genre[] }) => {
                   Home
                 </NavItem>
                 <NavItem
+                  isSelected={router.pathname === '/explore'}
+                  href='/explore'
+                  icon={<FiSearch />}
+                >
+                  Explore
+                </NavItem>
+                <NavItem
                   isSelected={router.pathname === '/watchlist'}
                   href='/watchlist'
                   icon={<FiPlay />}
                 >
                   Watchlist
-                </NavItem>
-                <NavItem
-                  isSelected={router.pathname === '/users'}
-                  href='/users'
-                  icon={<FiUser />}
-                >
-                  Users
                 </NavItem>
                 <NavItem
                   isSelected={router.pathname === '/popular'}
