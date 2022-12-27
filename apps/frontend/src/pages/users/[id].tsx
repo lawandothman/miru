@@ -1,6 +1,7 @@
 import { gql, useMutation, useQuery } from '@apollo/client'
 import { ProfilePicture } from 'components/Avatar'
 import { MoviesList } from 'components/MoviesList'
+import { Spinner } from 'components/Spinner'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import { FiUserMinus, FiUserPlus } from 'react-icons/fi'
@@ -53,11 +54,53 @@ const UNFOLLOW = gql`
   }
 `
 
+const FollowButton = ({ user, friendId }: { user: User; friendId: string }) => {
+  const [follow, { loading: followLoading }] = useMutation<
+  User,
+  { friendId: string }
+  >(FOLLOW, {
+    variables: {
+      friendId,
+    },
+  })
+  const [unfollow, { loading: unfollowLoading }] = useMutation<
+  User,
+  { friendId: string }
+  >(UNFOLLOW, {
+    variables: {
+      friendId,
+    },
+  })
+  return (
+    <button
+      className='flex h-10 w-28 max-w-xl items-center justify-center gap-2 rounded-lg font-semibold dark:bg-neutral-100'
+      onClick={() => {
+        if (user.isFollowing) {
+          unfollow()
+        } else {
+          follow()
+        }
+      }}
+    >
+      {followLoading || unfollowLoading ? (
+        <Spinner />
+      ) : user.isFollowing ? (
+        <>
+          <FiUserMinus />
+          Unfollow
+        </>
+      ) : (
+        <>
+          <FiUserPlus /> Follow
+        </>
+      )}
+    </button>
+  )
+}
+
 const User = () => {
   const { query } = useRouter()
   const userId = Array.isArray(query.id) ? query.id[0] : query.id
-  const [follow] = useMutation<User, { friendId: string }>(FOLLOW)
-  const [unfollow] = useMutation<User, { friendId: string }>(UNFOLLOW)
   const { data: session } = useSession()
   const { data } = useQuery<{ user: User }, { userId?: string }>(SEARCH_USER, {
     variables: {
@@ -76,7 +119,7 @@ const User = () => {
                 <h1 className='text-3xl  dark:text-neutral-300'>
                   {data?.user.name}
                 </h1>
-                <div className='flex gap-4 mt-1'>
+                <div className='mt-1 flex gap-4'>
                   <span className='dark:text-neutral-300'>
                     {data.user.matches?.length} matches
                   </span>
@@ -90,35 +133,7 @@ const User = () => {
               </div>
             </div>
             {userId && session?.user?.id !== userId && (
-              <button
-                className='flex h-10 w-28 max-w-xl items-center justify-center gap-2 rounded-lg font-semibold dark:bg-neutral-100'
-                onClick={() => {
-                  if (data.user.isFollowing) {
-                    unfollow({
-                      variables: {
-                        friendId: userId,
-                      },
-                    })
-                  } else {
-                    follow({
-                      variables: {
-                        friendId: userId,
-                      },
-                    })
-                  }
-                }}
-              >
-                {data.user.isFollowing ? (
-                  <>
-                    <FiUserMinus />
-                    Unfollow
-                  </>
-                ) : (
-                  <>
-                    <FiUserPlus /> Follow
-                  </>
-                )}
-              </button>
+              <FollowButton user={data.user} friendId={userId} />
             )}
           </div>
 
