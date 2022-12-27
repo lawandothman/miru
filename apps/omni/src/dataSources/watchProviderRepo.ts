@@ -25,21 +25,24 @@ export class WatchProviderRepo implements WriteRepository<WatchProvider> {
   async upsertStream(watchProviderId: string, movieId: string) {
     return runOnce<{id: string}>(this.driver, `
       MATCH (m:Movie {id: $movieId}), (w:WatchProvider {id: $watchProviderId})
-      MERGE (m)-[r:STREAMS_FROM {updatedAt: datetime()}]->(w)
+      MERGE (m)-[r:STREAMS_FROM]->(w)
+      SET r.updatedAt = dateTime()
       RETURN m{.id}`, {movieId, watchProviderId}, 'm')
   }
   
   async upsertBuy(watchProviderId: string, movieId: string) {
     return runOnce<{id: string}>(this.driver, `
       MATCH (m:Movie {id: $movieId}), (w:WatchProvider {id: $watchProviderId})
-      MERGE (m)-[r:BUYS_FROM {updatedAt: datetime()}]->(w)
+      MERGE (m)-[r:BUYS_FROM]->(w)
+      SET r.updatedAt = dateTime()
       RETURN m{.id}`, {movieId, watchProviderId}, 'm')
   }
 
   async upsertRent(watchProviderId: string, movieId: string) {
     return runOnce<{id: string}>(this.driver, `
       MATCH (m:Movie {id: $movieId}), (w:WatchProvider {id: $watchProviderId})
-      MERGE (m)-[r:RENTS_FROM {updatedAt: datetime()}]->(w)
+      MERGE (m)-[r:RENTS_FROM]->(w)
+      SET r.updatedAt = dateTime()
       RETURN m{.id}`, {movieId, watchProviderId}, 'm')
   }
 
