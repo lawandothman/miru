@@ -92,14 +92,16 @@ const Search: NextPage = () => {
       ) : (
         <>
           {data?.users && data.users.length > 0 && (
-            <div className='dark:text-white'>
-              <h1 className='mb-8  text-lg'>Users</h1>
-              {data.users.map((user) => (
-                <Link href={`/users/${user.id}`} key={user.id}>
-                  <ProfilePicture size='md' user={user} />
-                  <span className='ml-2'>{user.name}</span>
-                </Link>
-              ))}
+            <div className='dark:text-white mb-8'>
+              <h1 className='mb-8 text-lg'>Users</h1>
+              <div className='grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8'>
+                {data.users.map((user) => (
+                  <Link href={`/users/${user.id}`} key={user.id} className='hover:dark:bg-neutral-600 p-2 rounded-lg'>
+                    <ProfilePicture size='md' user={user} />
+                    <span className='ml-2'>{user.name}</span>
+                  </Link>
+                ))}
+              </div>
             </div>
           )}
           {data?.movies && data.movies.length > 0 && (
