@@ -152,27 +152,31 @@ const Movie: NextPage = () => {
               )}
             </div> */}
           </div>
-          <div className='mt-8'>
-            <h3 className='mb-4'>Added To Watchlist By</h3>
-            {data?.movie.matches
-              ?.filter((match) => match?.isFollowing)
-              .map((match) => {
-                if (match) {
-                  return (
-                    <Link
-                      className='inline-flex items-center gap-2'
-                      href={`/users/${match.id}`}
-                      key={match.id}
-                    >
-                      <ProfilePicture size='sm' user={match} />
-                      <span>{match?.name}</span>
-                    </Link>
-                  )
-                } else {
-                  return null
-                }
-              })}
-          </div>
+          {data?.movie.matches &&
+            data.movie.matches.filter((match) => match?.isFollowing).length >
+              0 && (
+            <div className='mt-8'>
+              <h3 className='mb-4'>Added To Watchlist By</h3>
+              {data?.movie.matches
+                ?.filter((match) => match?.isFollowing)
+                .map((match) => {
+                  if (match) {
+                    return (
+                      <Link
+                        className='inline-flex items-center gap-2'
+                        href={`/users/${match.id}`}
+                        key={match.id}
+                      >
+                        <ProfilePicture size='sm' user={match} />
+                        <span>{match?.name}</span>
+                      </Link>
+                    )
+                  } else {
+                    return null
+                  }
+                })}
+            </div>
+          )}
           {session && (
             <button
               onClick={() => {
