@@ -13,7 +13,8 @@
   "scripts": {
     "lint": "turbo lint",
     "lint:fix": "turbo lint:fix",
-    "dev": "turbo dev"
+    "dev": "turbo dev",
+    "generate": "turbo generate"
   },
   "devDependencies": {
     "@rushstack/eslint-patch": "^1.2.0",

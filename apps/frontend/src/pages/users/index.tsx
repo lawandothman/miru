@@ -1,7 +1,5 @@
 import { gql, useLazyQuery } from '@apollo/client'
-import { ProfilePicture } from 'components/Avatar'
-import UserCard from 'components/UserCard'
-import Link from 'next/link'
+import { UserCard } from 'components/UserCard'
 import { useRouter } from 'next/router'
 import type { ChangeEvent, FormEvent } from 'react'
 import { useState } from 'react'

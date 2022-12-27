@@ -9,7 +9,7 @@ import {
 } from '@apollo/client'
 import { setContext } from '@apollo/client/link/context'
 import { DefaultSeo } from 'next-seo'
-import SEO from 'next-seo.config'
+import SEO from 'config/next-seo.config'
 
 import { Sidebar } from 'components/Sidebar'
 

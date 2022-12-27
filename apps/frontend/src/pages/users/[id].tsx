@@ -18,12 +18,13 @@ const SEARCH_USER = gql`
         posterUrl
         inWatchlist
       }
+      isFollowed
     }
   }
 `
 
 const FOLLOW = gql`
-  mutation($friendId: ID!) {
+  mutation ($friendId: ID!) {
     follow(friendId: $friendId) {
       id
       isFollowing
@@ -54,7 +55,12 @@ const User = () => {
               </h1>
             </div>
             {session?.user?.id !== userId && (
-              <button onClick={() => follow({ variables: { friendId: data?.user.id } })} className='flex h-10 w-28 items-center justify-center gap-2 rounded-lg font-semibold dark:bg-neutral-100'>
+              <button
+                className='flex h-10 w-28 items-center justify-center gap-2 rounded-lg font-semibold dark:bg-neutral-100'
+                onClick={() => {
+                  follow()
+                }}
+              >
                 <FiUserPlus /> Follow
               </button>
             )}
