@@ -61,8 +61,8 @@ const Movie: NextPage = () => {
   )
 
   const [addToWatchlist, { loading: addToWatchlistLoading }] = useMutation<
-    Movie,
-    { movieId?: string }
+  Movie,
+  { movieId?: string }
   >(ADD_TO_WATCHLIST)
   const [removeFromWatchlist, { loading: removeFromWatchlistLoading }] =
     useMutation<Movie, { movieId?: string }>(REMOVE_FROM_WATCHLIST)

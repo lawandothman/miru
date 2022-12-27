@@ -7,7 +7,7 @@ import { getProviders, getSession, signIn } from 'next-auth/react'
 import { FiFacebook } from 'react-icons/fi'
 
 const SignIn: NextPage<
-  InferGetServerSidePropsType<typeof getServerSideProps>
+InferGetServerSidePropsType<typeof getServerSideProps>
 > = ({ providers }) => {
   return (
     <div className='mx-auto flex h-screen max-w-md flex-col items-center justify-center gap-8'>
