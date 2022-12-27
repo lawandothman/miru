@@ -1,5 +1,4 @@
 import type { FC } from 'react'
-import { SearchInput } from './SearchInput'
 
 interface PageHeaderProps {
   title: string;
@@ -17,7 +16,6 @@ export const PageHeader: FC<PageHeaderProps> = ({
         </h1>
         <p className='mt-1 font-thin dark:text-white'>{subtitle}</p>
       </div>
-      <SearchInput />
     </div>
   )
 }
