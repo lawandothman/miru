@@ -50,7 +50,7 @@ const Home: NextPage = () => {
       <PageHeader title='Welcome back!' subtitle='' />
       {data?.user.following?.map((follower) => {
         if (follower) {
-          <UserCard key={follower.id} user={follower} extended />
+          return <UserCard key={follower.id} user={follower} extended />
         } else {
           return null
         }
