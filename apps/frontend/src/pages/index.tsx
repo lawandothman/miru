@@ -35,11 +35,11 @@ const GET_HOME = gql`
 `
 
 const Home: NextPage = () => {
-  const { data: session, status } = useSession()
-  const { data } = useQuery<{ user: User }>(GET_HOME, {
+  const { data: session, status: sessionStatus } = useSession()
+  const { data, loading } = useQuery<{ user: User }>(GET_HOME, {
     variables: { userId: session?.user?.id },
   })
-  if (status === 'loading') {
+  if (sessionStatus === 'loading' || loading) {
     return <FullPageLoader />
   }
   if (!session) {
