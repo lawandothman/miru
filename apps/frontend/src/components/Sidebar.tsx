@@ -2,6 +2,7 @@ import Link from 'next/link'
 import {
   FiCalendar,
   FiHeart,
+  FiHome,
   FiMenu,
   FiPlay,
   FiTrendingUp,
@@ -90,6 +91,13 @@ export const Sidebar = ({ genres }: { genres: Genre[] }) => {
           <main className='flex flex-col p-2'>
             <nav>
               <ul className='space-y-2'>
+                <NavItem
+                  isSelected={router.pathname === '/'}
+                  href='/'
+                  icon={<FiHome />}
+                >
+                  Home
+                </NavItem>
                 <NavItem
                   isSelected={router.pathname === '/watchlist'}
                   href='/watchlist'
