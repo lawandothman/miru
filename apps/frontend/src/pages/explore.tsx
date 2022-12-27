@@ -1,7 +1,7 @@
 import { MoviesList } from 'components/MoviesList'
 import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
-import { gql, useLazyQuery } from '@apollo/client'
+import { gql, useQuery } from '@apollo/client'
 import type { Movie, User } from '__generated__/resolvers-types'
 import { FiSearch } from 'react-icons/fi'
 import type { ChangeEvent, FormEvent } from 'react'
@@ -38,20 +38,16 @@ const Search: NextPage = () => {
     ? router.query.q[0]
     : router.query.q
 
-  const [search, { data, loading }] = useLazyQuery<
+  const { data, loading } = useQuery<
   { movies: Movie[]; users: User[] },
   { query?: string }
   >(SEARCH, {
     variables: { query: searchQuery },
+    skip: !searchQuery,
   })
 
   const onSubmit = (e: FormEvent) => {
     e.preventDefault()
-    search({
-      variables: {
-        query,
-      },
-    })
     router.push({
       pathname: '/explore',
       query: {
@@ -74,6 +70,7 @@ const Search: NextPage = () => {
           required
           placeholder='Search movies or Miru members...'
           className='h-12 w-full cursor-auto rounded-xl border border-neutral-300 bg-transparent pl-12 text-neutral-300 outline-none'
+          defaultValue={searchQuery}
           onChange={onChange}
         />
         <FiSearch className='absolute inset-y-0 my-auto h-8 w-12 stroke-neutral-400 px-3.5' />
