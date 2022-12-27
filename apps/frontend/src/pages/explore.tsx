@@ -96,10 +96,10 @@ const Search: NextPage = () => {
                   <Link
                     href={`/users/${user.id}`}
                     key={user.id}
-                    className='rounded-lg p-2 hover:dark:bg-neutral-600'
+                    className='rounded-lg inline-flex items-center p-2 hover:dark:bg-neutral-600'
                   >
                     <ProfilePicture size='md' user={user} />
-                    <span className='ml-3'>{user.name}</span>
+                    <span className='ml-3 truncate'>{user.name}</span>
                   </Link>
                 ))}
               </div>
