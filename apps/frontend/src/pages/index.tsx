@@ -1,5 +1,5 @@
 import { gql, useQuery } from '@apollo/client'
-import { Loader } from 'components/Loader'
+import { FullPageLoader } from 'components/FullPageLoader'
 import { PageHeader } from 'components/PageHeader'
 import { UserCard } from 'components/UserCard'
 import type { NextPage } from 'next'
@@ -38,8 +38,8 @@ const Home: NextPage = () => {
   const { data } = useQuery<{ user: User }>(GET_HOME, {
     variables: { userId: session?.user?.id },
   })
-  if (status === 'loading') {
-    return <Loader />
+  if (true) {
+    return <FullPageLoader />
   }
   if (!session) {
     return loggedOutPage()

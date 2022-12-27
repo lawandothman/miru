@@ -27,3 +27,25 @@
 	border-radius: 10px;
 	background-color: white;
 }
+
+
+circle#popcrncirlce {
+	transform-origin: 0 0;
+	-webkit-transform-origin: 0 0;
+	-webkit-animation: rotate 1.5s cubic-bezier(.49, .05, .32, 1.04) infinite alternate;
+	animation: rotate 1.5s cubic-bezier(.49, .05, .32, 1.04) infinite alternate;
+}
+
+
+
+@-webkit-keyframes rotate {
+	50% {
+		-webkit-transform: translate(0px, 100px);
+	}
+}
+
+@keyframes rotate {
+	50% {
+		transform: translate(0px, 100px);
+	}
+}

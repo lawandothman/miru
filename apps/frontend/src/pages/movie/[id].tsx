@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { getImage } from 'utils/image'
 import { getYear } from 'date-fns'
-import { Loader } from 'components/Loader'
+import { FullPageLoader } from 'components/FullPageLoader'
 import { gql, useMutation, useQuery } from '@apollo/client'
 import { Movie } from '__generated__/resolvers-types'
 import { FiMinus, FiPlus } from 'react-icons/fi'
@@ -68,7 +68,7 @@ const Movie: NextPage = () => {
     useMutation<Movie, { movieId?: string }>(REMOVE_FROM_WATCHLIST)
 
   if (loading) {
-    return <Loader />
+    return <FullPageLoader />
   }
   return (
     <div className='flex flex-col px-8 pt-10'>
