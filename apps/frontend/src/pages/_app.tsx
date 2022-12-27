@@ -16,6 +16,7 @@ import { Sidebar } from 'components/Sidebar'
 import 'styles/globals.css'
 import type { Genre } from '__generated__/resolvers-types'
 import App from 'next/app'
+import NextNProgress from 'nextjs-progressbar'
 
 const httpLinkt = createHttpLink({
   uri: `${process.env.NEXT_PUBLIC_OMNI_URL}/graphql`,
@@ -46,6 +47,12 @@ const MyApp = (props: AppProps & { genres: Genre[] }) => {
 
   return (
     <>
+      <NextNProgress
+        color='#ef4444'
+        options={{
+          showSpinner: false,
+        }}
+      />
       <SessionProvider session={session}>
         <ApolloProvider client={client}>
           <DefaultSeo {...SEO} />
