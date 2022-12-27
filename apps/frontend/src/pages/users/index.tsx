@@ -24,8 +24,8 @@ const Users = () => {
   const router = useRouter()
   const [query, setQuery] = useState('')
   const [searchUsers, { data }] = useLazyQuery<
-    { searchUsers: User[] },
-    { nameQuery: string }
+  { searchUsers: User[] },
+  { nameQuery: string }
   >(SEARCH_USERS)
 
   const onSubmit = (e: FormEvent) => {

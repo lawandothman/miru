@@ -9,9 +9,9 @@ export const UserCard = ({
   user,
   extended,
 }: {
-   user: User;
-   extended?: boolean;
- }) => {
+  user: User;
+  extended?: boolean;
+}) => {
   return (
     <Link href={`/users/${user.id}`}>
       <div className='gap-4 rounded-lg p-4 text-white hover:bg-neutral-700'>

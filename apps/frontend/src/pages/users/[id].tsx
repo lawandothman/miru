@@ -1,10 +1,16 @@
-import { gql, useMutation, useQuery } from '@apollo/client'
+import { gql, useQuery } from '@apollo/client'
 import { ProfilePicture } from 'components/Avatar'
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogTitle,
+} from 'components/Dialog'
+import { FollowButton } from 'components/FollowButton'
 import { MoviesList } from 'components/MoviesList'
-import { Spinner } from 'components/Spinner'
+import { UserCard } from 'components/UserCard'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
-import { FiUserMinus, FiUserPlus } from 'react-icons/fi'
 import { User } from '__generated__/resolvers-types'
 
 const SEARCH_USER = gql`
@@ -23,78 +29,65 @@ const SEARCH_USER = gql`
       isFollowing
       followers {
         id
+        name
+        image
+        matches {
+          id
+        }
       }
       following {
         id
-      }
-    }
-  }
-`
-
-const FOLLOW = gql`
-  mutation ($friendId: ID!) {
-    follow(friendId: $friendId) {
-      id
-      isFollowing
-      followers {
-        id
-      }
-    }
-  }
-`
-const UNFOLLOW = gql`
-  mutation ($friendId: ID!) {
-    unfollow(friendId: $friendId) {
-      id
-      isFollowing
-      followers {
-        id
-      }
-    }
-  }
-`
-
-const FollowButton = ({ user, friendId }: { user: User; friendId: string }) => {
-  const [follow, { loading: followLoading }] = useMutation<
-  User,
-  { friendId: string }
-  >(FOLLOW, {
-    variables: {
-      friendId,
-    },
-  })
-  const [unfollow, { loading: unfollowLoading }] = useMutation<
-  User,
-  { friendId: string }
-  >(UNFOLLOW, {
-    variables: {
-      friendId,
-    },
-  })
-  return (
-    <button
-      className='flex h-10 w-28 max-w-xl items-center justify-center gap-2 rounded-lg font-semibold dark:bg-neutral-100'
-      onClick={() => {
-        if (user.isFollowing) {
-          unfollow()
-        } else {
-          follow()
+        name
+        image
+        matches {
+          id
         }
-      }}
-    >
-      {followLoading || unfollowLoading ? (
-        <Spinner />
-      ) : user.isFollowing ? (
-        <>
-          <FiUserMinus />
-          Unfollow
-        </>
-      ) : (
-        <>
-          <FiUserPlus /> Follow
-        </>
-      )}
-    </button>
+      }
+    }
+  }
+`
+
+const FollowersDialog = ({ user }: { user: User }) => {
+  return (
+    <Dialog>
+      <DialogTrigger>
+        <span className='dark:text-neutral-300'>
+          {user.followers?.length} followers
+        </span>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogTitle className='mb-8 text-center text-lg font-semibold dark:text-neutral-300'>
+          Followers
+        </DialogTitle>
+        {user.followers?.map((follower) => {
+          if (follower) {
+            return <UserCard user={follower} key={follower.id} />
+          }
+        })}
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+const FollowingDialog = ({ user }: { user: User }) => {
+  return (
+    <Dialog>
+      <DialogTrigger>
+        <span className='dark:text-neutral-300'>
+          {user.following?.length} followers
+        </span>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogTitle className='mb-8 text-center text-lg font-semibold dark:text-neutral-300'>
+          Following
+        </DialogTitle>
+        {user.following?.map((following) => {
+          if (following) {
+            return <UserCard user={following} key={following.id} />
+          }
+        })}
+      </DialogContent>
+    </Dialog>
   )
 }
 
@@ -123,12 +116,8 @@ const User = () => {
                   <span className='dark:text-neutral-300'>
                     {data.user.matches?.length} matches
                   </span>
-                  <span className='dark:text-neutral-300'>
-                    {data.user.followers?.length} followers
-                  </span>
-                  <span className='dark:text-neutral-300'>
-                    {data.user.following?.length} following
-                  </span>
+                  <FollowersDialog user={data.user} />
+                  <FollowingDialog user={data.user} />
                 </div>
               </div>
             </div>
