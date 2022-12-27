@@ -86,7 +86,7 @@ export class NeoDataSource {
   getMovieMatches = (user: User | null) => async (movieIds: readonly string[]) => {
     const email = user?.email ?? ''
     const matches = await runMany<User&{movieId:string}>(
-      this.driver, 
+      this.driver,
       `MATCH (m:Movie)-[r1:IN_WATCHLIST]->(f:User)<-[r2:FOLLOWS]-(u:User {email: $email})
       WHERE m.id IN $movieIds
       RETURN f{
@@ -94,8 +94,8 @@ export class NeoDataSource {
         .email,
         .image,
         .name,
-        isFollower: exists((u)-[:FOLLOWS]->(:User {email: $email})),
-        isFollowing: exists((u)<-[:FOLLOWS]-(:User {email: $email})),
+        isFollower: exists((f)-[:FOLLOWS]->(:User {email: $email})),
+        isFollowing: exists((f)<-[:FOLLOWS]-(:User {email: $email})),
         movieId: m.id
       }`,
       { movieIds, email},
