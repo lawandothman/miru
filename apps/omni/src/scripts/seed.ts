@@ -5,7 +5,7 @@ import { config } from '../config'
 import { runMany, runOnce } from '../dataSources/utils'
 import { faker } from '@faker-js/faker'
 import type { User } from '../__generated__/resolvers-types'
-import { MovieRepo } from '../dataSources/neoDataSource'
+import { MovieRepo } from '../dataSources/movieRepo'
 
 const scriptConfig = {
   userCount: env.get('USER_COUNT').default(10).asInt(),

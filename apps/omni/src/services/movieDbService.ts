@@ -1,8 +1,12 @@
 import axios from 'axios'
-import type { Genre, Movie } from '../__generated__/resolvers-types'
+import axiosRetry from 'axios-retry'
+import type { Genre, Movie, WatchProvider } from '../__generated__/resolvers-types'
 
 export class MovieDbService {
-  constructor(private readonly http = axios.create()) {}
+  constructor(private readonly http = axios.create()) { 
+    axiosRetry(this.http)
+  }
+
   async search(query: string): Promise<Movie[]> {
     const res = await this.http.get<{ results: ApiMovie[] }>(
       `${process.env.TMDB_API_BASE_URL}/3/search/movie`,
@@ -37,6 +41,20 @@ export class MovieDbService {
     return res.data.results.map(this.mapToDomain)
   }
 
+  async getMovieDetails(movieId: string): Promise<Movie> {
+    const res = await this.http.get<ApiMovie>(
+      `${process.env.TMDB_API_BASE_URL}/3/movie/${movieId}`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${process.env.TMDB_API_READ_ACCESS_TOKEN}`,
+        },
+      }
+    )
+
+    return this.mapToDomain(res.data)
+  }
+
   async getGenres(): Promise<Genre[]> {
     const res = await this.http.get<{ genres: Genre[] }>(
       `${process.env.TMDB_API_BASE_URL}/3/genre/movie/list`,
@@ -51,6 +69,64 @@ export class MovieDbService {
     return res.data.genres.map((g) => ({ ...g, id: g.id.toString() }))
   }
 
+  async getWatchProvidersForMovie(movieLike: {id: string}): Promise<{
+    stream: WatchProvider[]
+    buy: WatchProvider[]
+    rent: WatchProvider[]
+  }> {
+    const res = await this.http.get<{ 
+      results: {
+        GB?: {
+          flatrate?: ApiWatchProvider[] 
+          buy?: ApiWatchProvider[] 
+          rent?: ApiWatchProvider[] 
+        }
+      } 
+    }>(
+      `${process.env.TMDB_API_BASE_URL}/3/movie/${movieLike.id}/watch/providers`,
+      {
+        params: {
+          watch_region: 'GB',
+        },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${process.env.TMDB_API_READ_ACCESS_TOKEN}`,
+        },
+      }
+    )
+    return {
+      stream: res.data.results.GB?.flatrate?.map(this.mapWatchProvider) ?? [],
+      buy: res.data.results.GB?.buy?.map(this.mapWatchProvider) ?? [],
+      rent: res.data.results.GB?.rent?.map(this.mapWatchProvider) ?? []
+    }
+  }
+
+  async getWatchProviders(): Promise<WatchProvider[]> {
+    const res = await this.http.get<{ results: ApiWatchProvider[] }>(
+      `${process.env.TMDB_API_BASE_URL}/3/watch/providers/movie`,
+      {
+        params: {
+          watch_region: 'GB',
+        },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${process.env.TMDB_API_READ_ACCESS_TOKEN}`,
+        },
+      }
+    )
+
+    return res.data.results.map(this.mapWatchProvider)
+  }
+  
+  private mapWatchProvider(raw: ApiWatchProvider): WatchProvider {
+    return {
+      id: raw.provider_id.toString(),
+      displayPriority: raw.display_priority,
+      name: raw.provider_name,
+      logoPath: raw.logo_path,
+    }
+  }
+
   private mapToDomain(mov: ApiMovie): Movie {
     return {
       id: mov.id.toString(),
@@ -62,9 +138,20 @@ export class MovieDbService {
       posterUrl: mov.poster_path,
       releaseDate: mov.release_date,
       title: mov.title,
+      budget: mov.budget,
+      revenue: mov.revenue,
+      runtime: mov.runtime,
+      tagline: mov.tagline,
       genres: mov.genre_ids?.map((id) => ({ id: id.toString() } as Genre)),
     }
   }
+}
+
+export interface ApiWatchProvider {
+  display_priority: number
+  logo_path: string
+  provider_name: string
+  provider_id: number
 }
 
 export interface ApiMovie {
@@ -81,4 +168,8 @@ export interface ApiMovie {
   vote_count?: number;
   video?: boolean;
   vote_average?: number;
+  budget?: number;
+  revenue?: number
+  runtime?: number
+  tagline?: string
 }

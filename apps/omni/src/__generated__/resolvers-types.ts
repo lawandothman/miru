@@ -25,6 +25,8 @@ export type Movie = {
   __typename?: 'Movie';
   adult?: Maybe<Scalars['Boolean']>;
   backdropUrl?: Maybe<Scalars['String']>;
+  budget?: Maybe<Scalars['Int']>;
+  buyProviders?: Maybe<Array<Maybe<WatchProvider>>>;
   genres?: Maybe<Array<Maybe<Genre>>>;
   id: Scalars['ID'];
   inWatchlist?: Maybe<Scalars['Boolean']>;
@@ -34,6 +36,11 @@ export type Movie = {
   popularity?: Maybe<Scalars['Float']>;
   posterUrl?: Maybe<Scalars['String']>;
   releaseDate?: Maybe<Scalars['String']>;
+  rentProviders?: Maybe<Array<Maybe<WatchProvider>>>;
+  revenue?: Maybe<Scalars['Int']>;
+  runtime?: Maybe<Scalars['Int']>;
+  streamProviders?: Maybe<Array<Maybe<WatchProvider>>>;
+  tagline?: Maybe<Scalars['String']>;
   title: Scalars['String'];
 };
 
@@ -114,6 +121,14 @@ export type User = {
   name: Scalars['String'];
 };
 
+export type WatchProvider = {
+  __typename?: 'WatchProvider';
+  displayPriority?: Maybe<Scalars['Int']>;
+  id: Scalars['ID'];
+  logoPath?: Maybe<Scalars['String']>;
+  name?: Maybe<Scalars['String']>;
+};
+
 export type WithIndex<TObject> = TObject & Record<string, any>;
 export type ResolversObject<TObject> = WithIndex<TObject>;
 
@@ -188,11 +203,13 @@ export type ResolversTypes = ResolversObject<{
   Float: ResolverTypeWrapper<Scalars['Float']>;
   Genre: ResolverTypeWrapper<Genre>;
   ID: ResolverTypeWrapper<Scalars['ID']>;
+  Int: ResolverTypeWrapper<Scalars['Int']>;
   Movie: ResolverTypeWrapper<Movie>;
   Mutation: ResolverTypeWrapper<{}>;
   Query: ResolverTypeWrapper<{}>;
   String: ResolverTypeWrapper<Scalars['String']>;
   User: ResolverTypeWrapper<User>;
+  WatchProvider: ResolverTypeWrapper<WatchProvider>;
 }>;
 
 /** Mapping between all available schema types and the resolvers parents */
@@ -201,11 +218,13 @@ export type ResolversParentTypes = ResolversObject<{
   Float: Scalars['Float'];
   Genre: Genre;
   ID: Scalars['ID'];
+  Int: Scalars['Int'];
   Movie: Movie;
   Mutation: {};
   Query: {};
   String: Scalars['String'];
   User: User;
+  WatchProvider: WatchProvider;
 }>;
 
 export type GenreResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Genre'] = ResolversParentTypes['Genre']> = ResolversObject<{
@@ -217,6 +236,8 @@ export type GenreResolvers<ContextType = Context, ParentType extends ResolversPa
 export type MovieResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Movie'] = ResolversParentTypes['Movie']> = ResolversObject<{
   adult?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   backdropUrl?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  budget?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  buyProviders?: Resolver<Maybe<Array<Maybe<ResolversTypes['WatchProvider']>>>, ParentType, ContextType>;
   genres?: Resolver<Maybe<Array<Maybe<ResolversTypes['Genre']>>>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   inWatchlist?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
@@ -226,6 +247,11 @@ export type MovieResolvers<ContextType = Context, ParentType extends ResolversPa
   popularity?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   posterUrl?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   releaseDate?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  rentProviders?: Resolver<Maybe<Array<Maybe<ResolversTypes['WatchProvider']>>>, ParentType, ContextType>;
+  revenue?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  runtime?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  streamProviders?: Resolver<Maybe<Array<Maybe<ResolversTypes['WatchProvider']>>>, ParentType, ContextType>;
+  tagline?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
@@ -260,11 +286,20 @@ export type UserResolvers<ContextType = Context, ParentType extends ResolversPar
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
+export type WatchProviderResolvers<ContextType = Context, ParentType extends ResolversParentTypes['WatchProvider'] = ResolversParentTypes['WatchProvider']> = ResolversObject<{
+  displayPriority?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  logoPath?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
 export type Resolvers<ContextType = Context> = ResolversObject<{
   Genre?: GenreResolvers<ContextType>;
   Movie?: MovieResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   User?: UserResolvers<ContextType>;
+  WatchProvider?: WatchProviderResolvers<ContextType>;
 }>;
 

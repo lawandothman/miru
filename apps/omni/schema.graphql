@@ -11,6 +11,13 @@ type Movie {
   matches: [User] # Followers that have this movie watchlisted
   genres: [Genre]
   inWatchlist: Boolean
+  budget: Int
+  revenue: Int
+  runtime: Int
+  tagline: String
+  streamProviders: [WatchProvider]
+  buyProviders: [WatchProvider]
+  rentProviders: [WatchProvider]
 }
 
 type User {
@@ -23,6 +30,13 @@ type User {
   isFollower: Boolean
   followers: [User]
   following: [User]
+}
+
+type WatchProvider {
+  id: ID!
+  displayPriority: Int
+  name: String
+  logoPath: String
 }
 
 type Genre {
