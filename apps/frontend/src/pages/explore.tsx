@@ -99,7 +99,7 @@ const Search: NextPage = () => {
                     className='rounded-lg p-2 hover:dark:bg-neutral-600'
                   >
                     <ProfilePicture size='md' user={user} />
-                    <span className='ml-2'>{user.name}</span>
+                    <span className='ml-3'>{user.name}</span>
                   </Link>
                 ))}
               </div>

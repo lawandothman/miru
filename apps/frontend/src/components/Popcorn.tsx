@@ -9,35 +9,33 @@ export const Popcorn = () => {
         x='0px'
         y='0px'
         viewBox='0 0 354.461 354.461'
+        bbox='33000px'
       >
+        <circle
+          id='popcrncirlce'
+          className='firstcirle'
+          fill='#FFE477'
+          cx='260.426'
+          cy='22.695'
+          r='22.695'
+        />
+        <circle
+          id='popcrncirlce'
+          className='firstcirle'
+          fill='#FFE477'
+          cx='163.426'
+          cy='22.695'
+          r='22.695'
+        />
+        <circle
+          id='popcrncirlce'
+          className='firstcirle'
+          fill='#FFE477'
+          cx='65.426'
+          cy='22.695'
+          r='22.695'
+        />
         <g id='XMLID_484_'>
-          <circle
-            id='popcrncirlce'
-            className='firstcirle'
-            fill='#FFE477'
-            cx='260.426'
-            cy='22.695'
-            r='22.695'
-          />
-
-          <circle
-            id='popcrncirlce'
-            className='firstcirle'
-            fill='#FFE477'
-            cx='163.426'
-            cy='-16.695'
-            r='22.695'
-          />
-
-          <circle
-            id='popcrncirlce'
-            className='firstcirle'
-            fill='#FFE477'
-            cx='65.426'
-            cy='22.695'
-            r='22.695'
-          />
-
           <path
             id='XMLID_488_'
             fill='#FFEB99'
