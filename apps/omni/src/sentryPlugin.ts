@@ -5,6 +5,7 @@ import { ProfilingIntegration } from '@sentry/profiling-node'
 import type { Context } from '.'
 import { uuid4 } from '@sentry/utils'
 import { config } from './config'
+import { FragmentsOnCompositeTypesRule } from 'graphql'
 
 Sentry.init({
   dsn: config.sentryUrl,
@@ -29,6 +30,9 @@ export default class SentryPlugin implements ApolloServerPlugin {
         query: requestContext.request.query,
       },
       name: requestContext.request.operationName ?? 'no-name'
+    })
+    Sentry.setUser({
+      email: requestContext.contextValue.user?.email,
     })
     return {
       async didEncounterErrors(context) {
