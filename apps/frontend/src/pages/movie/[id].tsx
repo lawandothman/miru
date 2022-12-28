@@ -204,7 +204,7 @@ const Movie: NextPage = () => {
                   if (match) {
                     return (
                       <Link
-                        className='inline-flex items-center gap-2'
+                        className='inline-flex items-center gap-2 mr-2'
                         href={`/users/${match.id}`}
                         key={match.id}
                       >

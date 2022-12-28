@@ -1,5 +1,6 @@
 import { groupBy } from 'lodash'
-import type { Driver } from 'neo4j-driver'
+import type { Driver} from 'neo4j-driver'
+import { int } from 'neo4j-driver'
 import type { Genre, Movie, User, WatchProvider } from '../__generated__/resolvers-types'
 import { mapTo, runAndMap, runAndMapMany, runMany, runOnce } from './utils'
 
@@ -26,6 +27,29 @@ export class NeoDataSource {
       (res.records.map((rec) =>
         mapTo<Movie>(rec.toObject(), 'm')
       ) as Movie[]) ?? []
+    )
+  }
+
+  async getMoviesForYou(user: User, offset: number, limit: number): Promise<Movie[]> {
+    const email = user.email
+    return await runAndMapMany<Movie>(this.driver, `
+      MATCH (u:User {email: $email})-[:FOLLOWS]->(f:User)<-[:IN_WATCHLIST]-(m:Movie)
+      RETURN m, count(*) as friendWatchlistRank
+      ORDER BY friendWatchlistRank DESC
+      SKIP $offset
+      LIMIT $limit`,
+    {email, offset: int(offset), limit: int(limit)},
+    'm'
+    )
+  }
+
+  async getPopularMovies(offset:number, limit: number): Promise<Movie[]> {
+    return await runAndMapMany<Movie>(this.driver, `
+      MATCH (m:Movie)-[:IN_WATCHLIST]->(u:User)
+      RETURN m, count(u) as watchlists
+      ORDER BY watchlists DESC`,
+    {offset: int(offset), limit: int(limit)},
+    'm'
     )
   }
 

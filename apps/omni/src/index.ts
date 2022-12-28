@@ -61,6 +61,12 @@ const resolvers: Resolvers = {
     watchlist: async (_parent, _args, { neoDataSource, user }) => {
       return await neoDataSource.getWatchlist(requireUser(user))
     },
+    moviesForYou:async (_parent, {offset, limit}, {neoDataSource, user}) => {
+      return await neoDataSource.getMoviesForYou(requireUser(user), offset ?? 0, limit?? 20)
+    },
+    popularMovies: async (_parent, { offset, limit }, { neoDataSource }) => {
+      return await neoDataSource.getPopularMovies(offset ?? 0, limit ?? 20)
+    }
   },
   Mutation: {
     addMovieToWatchlist: async (_parent, { movieId }, { movieRepo, user }) => {

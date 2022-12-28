@@ -80,6 +80,8 @@ export type Query = {
   genres?: Maybe<Array<Maybe<Genre>>>;
   movie?: Maybe<Movie>;
   moviesByGenre?: Maybe<Array<Maybe<Movie>>>;
+  moviesForYou?: Maybe<Array<Maybe<Movie>>>;
+  popularMovies?: Maybe<Array<Maybe<Movie>>>;
   search?: Maybe<Array<Maybe<Movie>>>;
   searchUsers?: Maybe<Array<Maybe<User>>>;
   user?: Maybe<User>;
@@ -99,6 +101,18 @@ export type QueryMovieArgs = {
 
 export type QueryMoviesByGenreArgs = {
   genreId: Scalars['ID'];
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+};
+
+
+export type QueryMoviesForYouArgs = {
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+};
+
+
+export type QueryPopularMoviesArgs = {
   limit?: InputMaybe<Scalars['Int']>;
   offset?: InputMaybe<Scalars['Int']>;
 };
@@ -282,6 +296,8 @@ export type QueryResolvers<ContextType = Context, ParentType extends ResolversPa
   genres?: Resolver<Maybe<Array<Maybe<ResolversTypes['Genre']>>>, ParentType, ContextType>;
   movie?: Resolver<Maybe<ResolversTypes['Movie']>, ParentType, ContextType, RequireFields<QueryMovieArgs, 'id'>>;
   moviesByGenre?: Resolver<Maybe<Array<Maybe<ResolversTypes['Movie']>>>, ParentType, ContextType, RequireFields<QueryMoviesByGenreArgs, 'genreId'>>;
+  moviesForYou?: Resolver<Maybe<Array<Maybe<ResolversTypes['Movie']>>>, ParentType, ContextType, Partial<QueryMoviesForYouArgs>>;
+  popularMovies?: Resolver<Maybe<Array<Maybe<ResolversTypes['Movie']>>>, ParentType, ContextType, Partial<QueryPopularMoviesArgs>>;
   search?: Resolver<Maybe<Array<Maybe<ResolversTypes['Movie']>>>, ParentType, ContextType, RequireFields<QuerySearchArgs, 'query'>>;
   searchUsers?: Resolver<Maybe<Array<Maybe<ResolversTypes['User']>>>, ParentType, ContextType, RequireFields<QuerySearchUsersArgs, 'nameQuery'>>;
   user?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryUserArgs, 'id'>>;
