@@ -1,6 +1,5 @@
 import Link from 'next/link'
 import {
-  FiCalendar,
   FiHeart,
   FiHome,
   FiMenu,
@@ -55,9 +54,9 @@ export const Sidebar = ({ genres }: { genres: Genre[] }) => {
   return (
     <>
       <OutsideClickHandler onOutsideClick={() => setIsOpen(false)}>
-        <div className='m-4 flex items-center lg:hidden'>
+        <div className='flex items-center m-4 lg:hidden'>
           <FiMenu
-            className='h-5 w-5 cursor-pointer text-white '
+            className='w-5 h-5 text-white cursor-pointer '
             onClick={() => setIsOpen(true)}
           />
           <h1
@@ -77,13 +76,13 @@ export const Sidebar = ({ genres }: { genres: Genre[] }) => {
           )}
           aria-label='Sidenav'
         >
-          <div className='mb-6 mt-4 flex items-center justify-between pl-4 dark:text-white'>
+          <div className='flex items-center justify-between pl-4 mt-4 mb-6 dark:text-white'>
             <Link href='/' className='text-lg'>
               ミル Miru
             </Link>
             <button
               onClick={() => setIsOpen(false)}
-              className='mr-2 rounded p-1 hover:bg-neutral-700 lg:hidden'
+              className='p-1 mr-2 rounded hover:bg-neutral-700 lg:hidden'
             >
               <FiX />
             </button>
@@ -129,7 +128,7 @@ export const Sidebar = ({ genres }: { genres: Genre[] }) => {
               </ul>
             </nav>
             <nav>
-              <p className='pl-3 pb-2 pt-4 text-sm text-white'>Genres</p>
+              <p className='pt-4 pb-2 pl-3 text-sm text-white'>Genres</p>
               <ul className='space-y-2'>
                 {_.sortBy(genres, (genre) => genre.name).map((genre) => (
                   <NavItem
@@ -148,7 +147,7 @@ export const Sidebar = ({ genres }: { genres: Genre[] }) => {
             <div className='p-4 dark:bg-neutral-900'>
               {session?.user ? (
                 <>
-                  <div className='flex w-full items-center justify-between rounded-lg p-2 text-base font-normal text-gray-900  dark:text-white '>
+                  <div className='flex items-center justify-between w-full p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white '>
                     <div>
                       <ProfilePicture size='sm' user={session.user} />
                       <span className='ml-3 text-sm'>
@@ -157,7 +156,7 @@ export const Sidebar = ({ genres }: { genres: Genre[] }) => {
                     </div>
                   </div>
                   <button
-                    className='mx-auto mt-2 flex justify-center p-2 text-base font-normal text-red-500 dark:bg-neutral-900'
+                    className='flex justify-center p-2 mx-auto mt-2 text-base font-normal text-red-500 dark:bg-neutral-900'
                     onClick={() => signOut()}
                   >
                     Sign out
@@ -165,7 +164,7 @@ export const Sidebar = ({ genres }: { genres: Genre[] }) => {
                 </>
               ) : (
                 <button
-                  className='mx-auto mt-2 flex justify-center rounded py-1 px-8 text-base font-normal dark:bg-white dark:text-black'
+                  className='flex justify-center px-8 py-1 mx-auto mt-2 text-base font-normal rounded dark:bg-white dark:text-black'
                   onClick={() => signIn()}
                 >
                   Login
