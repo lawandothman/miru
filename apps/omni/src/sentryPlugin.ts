@@ -23,7 +23,6 @@ Sentry.init({
 export default class SentryPlugin implements ApolloServerPlugin {
 
   async requestDidStart?(requestContext: GraphQLRequestContext<Context>): Promise<GraphQLRequestListener<Context> | void> {
-    console.log('start', requestContext.request.operationName)
     const transaction = Sentry.startTransaction({
       op: uuid4(),
       data: {
@@ -31,7 +30,6 @@ export default class SentryPlugin implements ApolloServerPlugin {
       },
       name: requestContext.request.operationName ?? 'no-name'
     })
-    console.log(transaction.toJSON())
     return {
       async didEncounterErrors(context) {
         for(const err of context.errors) {
