@@ -57,14 +57,17 @@ const FollowersDialog = ({ user }: { user: User }) => {
         </span>
       </DialogTrigger>
       <DialogContent>
-        <DialogTitle className='mb-8 text-center text-lg font-semibold dark:text-neutral-300'>
+        <DialogTitle className='mb-8 text-lg font-semibold text-center dark:text-neutral-300'>
           Followers
         </DialogTitle>
-        {user.followers?.map((follower) => {
-          if (follower) {
-            return <UserCard user={follower} key={follower.id} />
-          }
-        })}
+
+        <div className='mt-1 max-h-[325px] overflow-y-auto'>
+          {user.followers?.map((follower) => {
+            if (follower) {
+              return <UserCard user={follower} key={follower.id} />
+            }
+          })}
+        </div>
       </DialogContent>
     </Dialog>
   )
@@ -79,14 +82,16 @@ const FollowingDialog = ({ user }: { user: User }) => {
         </span>
       </DialogTrigger>
       <DialogContent>
-        <DialogTitle className='mb-8 text-center text-lg font-semibold dark:text-neutral-300'>
+        <DialogTitle className='py-2 text-lg font-semibold text-center dark:text-neutral-300'>
           Following
         </DialogTitle>
-        {user.following?.map((following) => {
-          if (following) {
-            return <UserCard user={following} key={following.id} />
-          }
-        })}
+        <div className='mt-1 max-h-[325px] overflow-y-auto'>
+          {user.following?.map((following) => {
+            if (following) {
+              return <UserCard user={following} key={following.id} />
+            }
+          })}
+        </div>
       </DialogContent>
     </Dialog>
   )
@@ -96,13 +101,16 @@ const User = () => {
   const { query } = useRouter()
   const userId = Array.isArray(query.id) ? query.id[0] : query.id
   const { data: session } = useSession({
-    required: false
+    required: false,
   })
-  const { data, loading } = useQuery<{ user: User }, { userId?: string }>(SEARCH_USER, {
-    variables: {
-      userId,
-    },
-  })
+  const { data, loading } = useQuery<{ user: User }, { userId?: string }>(
+    SEARCH_USER,
+    {
+      variables: {
+        userId,
+      },
+    }
+  )
 
   if (loading) {
     return <FullPageLoader />
@@ -116,15 +124,27 @@ const User = () => {
             <div className='flex items-center gap-4'>
               <ProfilePicture size='lg' user={data.user} />
               <div>
-                <h1 className='text-3xl  dark:text-neutral-300'>
+                <h1 className='text-3xl dark:text-neutral-300'>
                   {data?.user.name}
                 </h1>
-                <div className='mt-1 flex gap-4'>
+                <div className='flex gap-4 mt-1'>
                   <span className='dark:text-neutral-300'>
                     {data.user.matches?.length} matches
                   </span>
-                  <FollowersDialog user={data.user} />
-                  <FollowingDialog user={data.user} />
+                  {data.user.followers && data.user.followers.length > 0 ? (
+                    <FollowersDialog user={data.user} />
+                  ) : (
+                    <span className='dark:text-neutral-300'>
+                      {data.user.followers?.length} followers
+                    </span>
+                  )}
+                  {data.user.following && data.user.following.length > 0 ? (
+                    <FollowingDialog user={data.user} />
+                  ) : (
+                    <span className='dark:text-neutral-300'>
+                      {data.user.followers?.length} following
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
