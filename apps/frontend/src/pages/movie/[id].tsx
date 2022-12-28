@@ -7,7 +7,8 @@ import { getYear } from 'date-fns'
 import { FullPageLoader } from 'components/FullPageLoader'
 import { gql, useMutation, useQuery } from '@apollo/client'
 import { Movie } from '__generated__/resolvers-types'
-import { FiMinus, FiPlus } from 'react-icons/fi'
+import { FiLink, FiMinus, FiPlus } from 'react-icons/fi'
+import { FaImdb } from 'react-icons/fa'
 import { useSession } from 'next-auth/react'
 import { Spinner } from 'components/Spinner'
 import { ProfilePicture } from 'components/Avatar'
@@ -16,10 +17,15 @@ const GET_BY_ID = gql`
   query Movie($movieId: ID!) {
     movie(id: $movieId) {
       id
+      imdbId
       posterUrl
       title
       releaseDate
       overview
+      tagline
+      runtime
+      inWatchlist
+      homepage
       genres {
         name
         id
@@ -30,7 +36,10 @@ const GET_BY_ID = gql`
         image
         isFollowing
       }
-      inWatchlist
+      streamProviders {
+        name
+        logoPath
+      }
     }
   }
 `
@@ -89,24 +98,56 @@ const Movie: NextPage = () => {
           />
         )}
         <div className='flex max-w-xl flex-col dark:text-white'>
-          <h1 className='text-4xl font-thin uppercase tracking-widest '>
+          <h1 className='text-4xl font-thin tracking-wider'>
             {data?.movie.title}
           </h1>
-          {/* <p className="mt-2 text-xl font-thin">{movie?.tagline}</p> */}
-          <div className='mt-6 text-sm text-neutral-400'>
-            {/* {movie?.spoken_languages?.map((lang) => (
-              <span key={lang.iso_639_1}>{lang.name} / </span>
-            ))} */}
-            <span>
-              {/* {movie?.runtime && movie.runtime + " MIN / "} */}
-              {data?.movie.releaseDate &&
-                getYear(new Date(data?.movie.releaseDate))}
-            </span>
+          <p className='mt-2 text-xl font-thin'>{data?.movie.tagline}</p>
+          <div className='mt-3 text-sm text-neutral-400'>
+            <div className='flex items-center justify-between'>
+              <span>
+                {data?.movie?.runtime && data.movie.runtime + '  MIN • '}
+                {data?.movie.releaseDate &&
+                  getYear(new Date(data?.movie.releaseDate))}
+              </span>
+
+              {session && (
+                <button
+                  onClick={() => {
+                    if (data?.movie.inWatchlist) {
+                      removeFromWatchlist({
+                        variables: {
+                          movieId,
+                        },
+                      })
+                    } else {
+                      addToWatchlist({
+                        variables: {
+                          movieId,
+                        },
+                      })
+                    }
+                  }}
+                  className='flex h-10 w-28 max-w-xl items-center justify-center gap-2 rounded-lg text-base font-semibold dark:bg-neutral-100 dark:text-black'
+                >
+                  {addToWatchlistLoading || removeFromWatchlistLoading ? (
+                    <>
+                      <Spinner />
+                      Watchlist
+                    </>
+                  ) : (
+                    <>
+                      {data?.movie?.inWatchlist ? <FiMinus /> : <FiPlus />}
+                      Watchlist
+                    </>
+                  )}
+                </button>
+              )}
+            </div>
             <div className='mt-8 flex gap-3'>
               {data?.movie.genres?.map((genre) => (
                 <Link
                   href={`/genre/${genre?.id}`}
-                  className='rounded border border-neutral-400 p-2 text-xs tracking-wide'
+                  className='rounded-full border border-neutral-400 p-2 text-xs tracking-wide'
                   key={genre?.id}
                 >
                   {genre?.name}
@@ -116,30 +157,30 @@ const Movie: NextPage = () => {
             <p className='mt-8 max-w-xl text-neutral-400'>
               {data?.movie.overview}
             </p>
-            {/* <div className=" mt-6 flex gap-3">
-              {movie?.homepage && (
+            <div className=' mt-6 flex gap-3'>
+              {data?.movie?.homepage && (
                 <Link
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  href={movie?.homepage}
-                  className="inline-flex items-center gap-2"
+                  target='_blank'
+                  rel='noreferrer noopener'
+                  href={data.movie.homepage}
+                  className='inline-flex items-center gap-2'
                 >
                   <FiLink size={20} />
                   Homepage
                 </Link>
               )}
-              {movie?.imdb_id && (
+              {data?.movie?.imdbId && (
                 <Link
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  href={`https://imdb.com/title/${movie.imdb_id}`}
-                  className="inline-flex items-center justify-center gap-2"
+                  target='_blank'
+                  rel='noreferrer noopener'
+                  href={`https://imdb.com/title/${data.movie.imdbId}`}
+                  className='inline-flex items-center justify-center gap-2'
                 >
                   <FaImdb size={20} />
                   IMDB
                 </Link>
               )}
-              {trailer && (
+              {/* {trailer && (
                 <Link
                   target="_blank"
                   rel="noreferrer noopener"
@@ -149,8 +190,8 @@ const Movie: NextPage = () => {
                   <FiYoutube size={20} />
                   Trailer
                 </Link>
-              )}
-            </div> */}
+              )} */}
+            </div>
           </div>
           {data?.movie.matches &&
             data.movie.matches.filter((match) => match?.isFollowing).length >
@@ -177,37 +218,24 @@ const Movie: NextPage = () => {
                 })}
             </div>
           )}
-          {session && (
-            <button
-              onClick={() => {
-                if (data?.movie.inWatchlist) {
-                  removeFromWatchlist({
-                    variables: {
-                      movieId,
-                    },
-                  })
-                } else {
-                  addToWatchlist({
-                    variables: {
-                      movieId,
-                    },
-                  })
-                }
-              }}
-              className='mt-8 mr-auto flex items-center justify-center gap-2 rounded border border-white px-4 py-1 dark:text-white'
-            >
-              {addToWatchlistLoading || removeFromWatchlistLoading ? (
-                <>
-                  <Spinner />
-                  Watchlist
-                </>
-              ) : (
-                <>
-                  {data?.movie?.inWatchlist ? <FiMinus /> : <FiPlus />}
-                  Watchlist
-                </>
-              )}
-            </button>
+
+          {data?.movie.streamProviders &&
+            data.movie.streamProviders.length > 0 && (
+            <div className='mt-8'>
+              <h3 className='mb-4 text-neutral-400'>Stream</h3>
+              <div className='flex gap-4'>
+                {data.movie.streamProviders.map((provider) => (
+                  <Image
+                    key={provider?.id}
+                    src={getImage(provider?.logoPath ?? '')}
+                    alt={provider?.name ?? ''}
+                    width={40}
+                    height={40}
+                    className='rounded-lg'
+                  />
+                ))}
+              </div>
+            </div>
           )}
         </div>
       </div>
