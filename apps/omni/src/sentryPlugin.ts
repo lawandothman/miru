@@ -4,19 +4,20 @@ import '@sentry/tracing'
 import { ProfilingIntegration } from '@sentry/profiling-node'
 import type { Context } from '.'
 import { uuid4 } from '@sentry/utils'
+import { config } from './config'
 
 Sentry.init({
-  dsn: 'https://2d1d3b9436444bacb0c13fb850f59492@o4504404409581568.ingest.sentry.io/4504407781474304',
+  dsn: config.sentryUrl,
   environment: process.env.NODE_ENV ?? 'development',
   // Set tracesSampleRate to 1.0 to capture 100%
   // of transactions for performance monitoring.
   // We recommend adjusting this value in production
-  tracesSampleRate: 1.0,
+  tracesSampleRate: process.env.NODE_ENV == 'production' ? 0.2 : 1.0,
   integrations: [
     // add profiling integration
     new ProfilingIntegration()
   ],
-  profilesSampleRate: 1.0,
+  profilesSampleRate: process.env.NODE_ENV == 'production' ? 0.2 : 1.0,
 })
 
 export default class SentryPlugin implements ApolloServerPlugin {
