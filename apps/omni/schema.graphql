@@ -55,6 +55,8 @@ type Query {
   searchUsers(nameQuery: String!): [User]
   genre(genreId: ID!): Genre
   genres: [Genre]
+  moviesForYou(offset: Int, limit:Int): [Movie]
+  popularMovies(offset: Int, limit:Int): [Movie]
 }
 
 type Mutation {

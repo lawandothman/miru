@@ -1,12 +1,12 @@
 import { LoadingSkeleton, MoviesList } from 'components/MoviesList'
 import { PageHeader } from 'components/PageHeader'
 import type { NextPage } from 'next'
-import { useQuery, gql } from '@apollo/client'
+import { gql, useQuery } from '@apollo/client'
 import type { Movie } from '__generated__/resolvers-types'
 
-const GET_POPULAR = gql`
-  query Search {
-    search(query: " ") {
+const GET_POPULAR_MOVIES = gql`
+  query PopularMovies {
+    popularMovies {
       id
       title
       posterUrl
@@ -15,15 +15,15 @@ const GET_POPULAR = gql`
   }
 `
 
-const Popular: NextPage = () => {
-  const { data, loading } = useQuery<{ search: Movie[] }>(GET_POPULAR)
+const PopularMovies: NextPage = () => {
+  const { data, loading } = useQuery<{ popularMovies: Movie[] }>(GET_POPULAR_MOVIES)
 
   return (
     <div className='px-20 pt-20'>
       <PageHeader title='Popular' />
-      {loading ? <LoadingSkeleton /> : <MoviesList movies={data?.search} />}
+      {loading ? <LoadingSkeleton /> : <MoviesList movies={data?.popularMovies} />}
     </div>
   )
 }
 
-export default Popular
+export default PopularMovies
