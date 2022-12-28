@@ -14,9 +14,8 @@ const neo4jSession = driver.session()
 export const authOptions: NextAuthOptions = {
   // Include user.id and jwt token on session
   callbacks: {
-    session({ session, user }) {
+    session({ session }) {
       if (session.user) {
-        session.user.id = user.id
         if (session.user.email) {
           const encodedToken = jsonwebtoken.sign(
             { email: session.user.email },
@@ -38,6 +37,9 @@ export const authOptions: NextAuthOptions = {
     }),
     // ...add more providers here
   ],
+  session:{
+    strategy: 'jwt'
+  },
   pages: {
     signIn: '/auth/signin',
   },
