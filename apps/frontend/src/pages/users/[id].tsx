@@ -7,6 +7,7 @@ import {
   DialogTitle,
 } from 'components/Dialog'
 import { FollowButton } from 'components/FollowButton'
+import { FullPageLoader } from 'components/FullPageLoader'
 import { MoviesList } from 'components/MoviesList'
 import { UserCard } from 'components/UserCard'
 import { useSession } from 'next-auth/react'
@@ -94,12 +95,18 @@ const FollowingDialog = ({ user }: { user: User }) => {
 const User = () => {
   const { query } = useRouter()
   const userId = Array.isArray(query.id) ? query.id[0] : query.id
-  const { data: session } = useSession()
-  const { data } = useQuery<{ user: User }, { userId?: string }>(SEARCH_USER, {
+  const { data: session } = useSession({
+    required: false
+  })
+  const { data, loading } = useQuery<{ user: User }, { userId?: string }>(SEARCH_USER, {
     variables: {
       userId,
     },
   })
+
+  if (loading) {
+    return <FullPageLoader />
+  }
 
   return (
     <div className='px-20 pt-20'>
