@@ -3,7 +3,7 @@ import axiosRetry from 'axios-retry'
 import type { Genre, Movie, WatchProvider } from '../__generated__/resolvers-types'
 
 export class MovieDbService {
-  constructor(private readonly http = axios.create()) { 
+  constructor(private readonly http = axios.create()) {
     axiosRetry(this.http)
   }
 
@@ -74,14 +74,14 @@ export class MovieDbService {
     buy: WatchProvider[]
     rent: WatchProvider[]
   }> {
-    const res = await this.http.get<{ 
+    const res = await this.http.get<{
       results: {
         GB?: {
-          flatrate?: ApiWatchProvider[] 
-          buy?: ApiWatchProvider[] 
-          rent?: ApiWatchProvider[] 
+          flatrate?: ApiWatchProvider[]
+          buy?: ApiWatchProvider[]
+          rent?: ApiWatchProvider[]
         }
-      } 
+      }
     }>(
       `${process.env.TMDB_API_BASE_URL}/3/movie/${movieLike.id}/watch/providers`,
       {
@@ -117,7 +117,7 @@ export class MovieDbService {
 
     return res.data.results.map(this.mapWatchProvider)
   }
-  
+
   private mapWatchProvider(raw: ApiWatchProvider): WatchProvider {
     return {
       id: raw.provider_id.toString(),
@@ -142,6 +142,8 @@ export class MovieDbService {
       revenue: mov.revenue,
       runtime: mov.runtime,
       tagline: mov.tagline,
+      homepage: mov.home_page,
+      imdbId: mov.imdb_id,
       genres: mov.genre_ids?.map((id) => ({ id: id.toString() } as Genre)),
     }
   }
@@ -168,8 +170,10 @@ export interface ApiMovie {
   vote_count?: number;
   video?: boolean;
   vote_average?: number;
-  budget?: number;
+  budget?: number
   revenue?: number
   runtime?: number
   tagline?: string
+  imdb_id?: string
+  home_page?: string
 }
