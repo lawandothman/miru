@@ -40,9 +40,5 @@ export default class SentryPlugin implements ApolloServerPlugin {
         transaction.finish()
       }
     }
-
-
   }
-
-
 }
