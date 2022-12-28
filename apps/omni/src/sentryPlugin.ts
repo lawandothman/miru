@@ -36,8 +36,12 @@ export default class SentryPlugin implements ApolloServerPlugin {
           Sentry.captureException(err)
         }
       },
-      async didResolveOperation(_context): Promise<void> {
-        transaction.finish()
+      async executionDidStart() {
+        return {
+          async executionDidEnd() {
+            transaction.finish()
+          }
+        }
       }
     }
   }
