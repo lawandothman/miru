@@ -14,6 +14,7 @@ import { NeoDataSource } from './dataSources/neoDataSource'
 import { GenreRepo } from './dataSources/genreRepo'
 import { WatchProviderRepo } from './dataSources/watchProviderRepo'
 import { MovieRepo } from './dataSources/movieRepo'
+import SentryPlugin from './sentryPlugin'
 
 const schema = readFileSync('./schema.graphql').toString()
 
@@ -122,6 +123,9 @@ const driver = neo4j.driver(host, neo4j.auth.basic(user, pass))
 const server = new ApolloServer({
   typeDefs: schema,
   resolvers,
+  plugins: [
+    new SentryPlugin()
+  ]
 })
 
 const movieDbService = new MovieDbService()

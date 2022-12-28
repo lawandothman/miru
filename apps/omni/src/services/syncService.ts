@@ -1,3 +1,4 @@
+import { captureException, startTransaction } from '@sentry/node'
 import type { GenreRepo } from '../dataSources/genreRepo'
 import type { MovieRepo } from '../dataSources/movieRepo'
 import type { WatchProviderRepo } from '../dataSources/watchProviderRepo'
@@ -19,6 +20,10 @@ export class SyncService {
     await this.syncGenres()
     await this.syncWatchProviders()
     while(true) {
+      const transaction = startTransaction({
+        op: `Page ${page}`,
+        name: 'sync'
+      })
       try {
         const movies = await this.getPopularMovieSummaries(page)
         movies.forEach(async (movieLike) => {
@@ -37,9 +42,11 @@ export class SyncService {
         page = this.getNextPage(page)
       } catch(e) {
         if(e instanceof Error) {
+          captureException(e)
           console.error('Failed to fetch page', e.message)
         }
       }
+      transaction.finish()
       await this.sleep(10000)
     }
     return
