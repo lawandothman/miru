@@ -27,7 +27,9 @@ export type Movie = {
   budget?: Maybe<Scalars['Int']>;
   buyProviders?: Maybe<Array<Maybe<WatchProvider>>>;
   genres?: Maybe<Array<Maybe<Genre>>>;
+  homepage?: Maybe<Scalars['String']>;
   id: Scalars['ID'];
+  imdbId?: Maybe<Scalars['String']>;
   inWatchlist?: Maybe<Scalars['Boolean']>;
   matches?: Maybe<Array<Maybe<User>>>;
   originalTitle?: Maybe<Scalars['String']>;
@@ -238,7 +240,9 @@ export type MovieResolvers<ContextType = any, ParentType extends ResolversParent
   budget?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   buyProviders?: Resolver<Maybe<Array<Maybe<ResolversTypes['WatchProvider']>>>, ParentType, ContextType>;
   genres?: Resolver<Maybe<Array<Maybe<ResolversTypes['Genre']>>>, ParentType, ContextType>;
+  homepage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  imdbId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   inWatchlist?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   matches?: Resolver<Maybe<Array<Maybe<ResolversTypes['User']>>>, ParentType, ContextType>;
   originalTitle?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
