@@ -142,7 +142,7 @@ export class MovieDbService {
       revenue: mov.revenue,
       runtime: mov.runtime,
       tagline: mov.tagline,
-      homepage: mov.home_page,
+      homepage: mov.homepage,
       imdbId: mov.imdb_id,
       genres: mov.genre_ids?.map((id) => ({ id: id.toString() } as Genre)),
     }
@@ -175,5 +175,5 @@ export interface ApiMovie {
   runtime?: number
   tagline?: string
   imdb_id?: string
-  home_page?: string
+  homepage?: string
 }
