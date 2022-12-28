@@ -38,6 +38,7 @@ const Home: NextPage = () => {
   const { data: session, status: sessionStatus } = useSession()
   const { data, loading } = useQuery<{ user: User }>(GET_HOME, {
     variables: { userId: session?.user?.id },
+    fetchPolicy: 'network-only'
   })
   if (sessionStatus === 'loading' || loading) {
     return <FullPageLoader />
@@ -62,7 +63,7 @@ const Home: NextPage = () => {
 
 const loggedOutPage = () => {
   return (
-    <div className='mx-auto flex h-screen max-w-xl flex-col items-center justify-center gap-8 text-center text-neutral-300'>
+    <div className='flex flex-col items-center justify-center h-screen max-w-xl gap-8 mx-auto text-center text-neutral-300'>
       <h1 className='text-5xl'>Welcome to Miru</h1>
       <p className='text-lg'>
         Remove the drama from movie night and find the movie that everyone wants
@@ -73,7 +74,7 @@ const loggedOutPage = () => {
       </p>
       <Link
         href='/auth/signin'
-        className='mt-8  flex h-14 w-full items-center  justify-center rounded-md bg-neutral-900 px-8 text-2xl text-white dark:bg-neutral-300 dark:text-neutral-900'
+        className='flex items-center justify-center w-full px-8 mt-8 text-2xl text-white rounded-md h-14 bg-neutral-900 dark:bg-neutral-300 dark:text-neutral-900'
       >
         Login
       </Link>
