@@ -1,4 +1,5 @@
 import type { Driver } from 'neo4j-driver-core'
+import neo4j from 'neo4j-driver'
 import type { Movie, Genre, User } from '../__generated__/resolvers-types'
 import type { WriteRepository } from './utils'
 import { mapTo } from './utils'
@@ -47,14 +48,14 @@ export class MovieRepo implements WriteRepository<Movie> {
     return mapTo<Movie>(res.records[0].toObject(), 'm')
   }
 
-  async getMoviesByGenre(genreId: string): Promise<Movie[]> {
+  async getMoviesByGenre(genreId: string, offset: number, limit: number): Promise<Movie[]> {
     const session = this.driver.session()
     const res = await session.run(
       `
       MATCH (m:Movie)-[r:IS_A]->(g:Genre {id: $id})
-      RETURN m LIMIT 20
+      RETURN m SKIP $offset LIMIT $limit
     `,
-      { id: genreId }
+      { id: genreId, offset: neo4j.int(offset), limit: neo4j.int(limit) }
     )
 
     return res.records.map((record) =>
@@ -77,15 +78,15 @@ export class MovieRepo implements WriteRepository<Movie> {
     ) as Genre[]
   }
 
-  async search(query: string): Promise<Movie[]> {
+  async search(query: string, offset:number, limit:number): Promise<Movie[]> {
     const session = this.driver.session()
     const res = await session.run(
       `
       MATCH (m:Movie) WHERE
       toLower(m.title) CONTAINS toLower($query)
-      RETURN m LIMIT 20
+      RETURN m SKIP $offset LIMIT $limit
     `,
-      { query }
+      { query, limit: neo4j.int(limit), offset: neo4j.int(offset) }
     )
 
     session.close()
