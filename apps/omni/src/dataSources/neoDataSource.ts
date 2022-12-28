@@ -29,6 +29,17 @@ export class NeoDataSource {
     )
   }
 
+  async getGenresByIds(ids: readonly string[]): Promise<Genre[]> {
+    return await runMany<Genre>(this.driver, `
+      MATCH (g:Genre)
+      WHERE g.id IN $ids
+      RETURN g{
+        .id,
+        .name
+      }
+    `, {ids}, 'g')
+  }
+
   async getStreamProviders(movieIds: readonly string[]): Promise<WatchProvider[][]> {
     const providers = await runMany<WatchProvider&{movieId:string}>(this.driver, `
       MATCH (w: WatchProvider)<-[r:STREAMS_FROM]-(m:Movie)

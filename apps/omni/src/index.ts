@@ -2,7 +2,7 @@ import { ApolloServer } from '@apollo/server'
 import { startStandaloneServer } from '@apollo/server/standalone'
 import { readFileSync } from 'fs'
 import { verify } from 'jsonwebtoken'
-import type { Movie, Resolvers, User, WatchProvider } from './__generated__/resolvers-types'
+import type { Genre, Movie, Resolvers, User, WatchProvider } from './__generated__/resolvers-types'
 import neo4j from 'neo4j-driver'
 import { MovieDbService } from './services/movieDbService'
 import { SyncService } from './services/syncService'
@@ -30,6 +30,7 @@ export interface Context {
   streamLoader: DataLoader<string, WatchProvider[]> 
   buyLoader: DataLoader<string, WatchProvider[]> 
   rentLoader: DataLoader<string, WatchProvider[]> 
+  genreLoader: DataLoader<string, Genre>
   neoDataSource: NeoDataSource
   user: User | null
 }
@@ -39,8 +40,8 @@ const resolvers: Resolvers = {
     movie: async (_parent, { id }, { movieLoader }) => {
       return await movieLoader.load(id)
     },
-    search: async (_parent, { query }, { movieRepo }) => {
-      return await movieRepo.search(query)
+    search: async (_parent, { query, offset, limit }, { movieRepo }) => {
+      return await movieRepo.search(query, offset ?? 0, limit ?? 20)
     },
     user: async (_parent, { id }, { userLoader }) => {
       return await userLoader.load(id)
@@ -48,11 +49,14 @@ const resolvers: Resolvers = {
     searchUsers: async (_parent, { nameQuery }, { neoDataSource, user }) => {
       return await neoDataSource.searchUsers(nameQuery, user)
     },
-    moviesByGenre: async (_parent, { genreId }, { movieRepo }) => {
-      return await movieRepo.getMoviesByGenre(genreId)
+    moviesByGenre: async (_parent, { genreId, offset, limit }, { movieRepo }) => {
+      return await movieRepo.getMoviesByGenre(genreId, offset ?? 0, limit ?? 20)
     },
     genres: async (_parent, _args, { neoDataSource }) => {
       return await neoDataSource.getGenres()
+    },
+    genre: async (_parent, { genreId }, { genreLoader }) => {
+      return await genreLoader.load(genreId)
     },
     watchlist: async (_parent, _args, { neoDataSource, user }) => {
       return await neoDataSource.getWatchlist(requireUser(user))
@@ -162,6 +166,7 @@ async function main() {
         streamLoader: new DataLoader(neo.getStreamProviders.bind(neo)),
         buyLoader: new DataLoader(neo.getBuyProviders.bind(neo)),
         rentLoader: new DataLoader(neo.getRentProviders.bind(neo)),
+        genreLoader: new DataLoader(neo.getGenresByIds.bind(neo)),
         neoDataSource: neo,
         user,
       }

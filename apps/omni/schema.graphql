@@ -50,9 +50,10 @@ type Query {
   user(id: ID!): User
   movie(id: ID!): Movie
   watchlist: [Movie]
-  moviesByGenre(genreId: ID!): [Movie]
-  search(query: String!): [Movie]
+  moviesByGenre(genreId: ID!, offset: Int, limit: Int): [Movie]
+  search(query: String!, offset: Int, limit: Int): [Movie]
   searchUsers(nameQuery: String!): [User]
+  genre(genreId: ID!): Genre
   genres: [Genre]
 }
 

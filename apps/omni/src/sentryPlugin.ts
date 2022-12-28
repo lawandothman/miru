@@ -5,7 +5,6 @@ import { ProfilingIntegration } from '@sentry/profiling-node'
 import type { Context } from '.'
 import { uuid4 } from '@sentry/utils'
 import { config } from './config'
-import { FragmentsOnCompositeTypesRule } from 'graphql'
 
 Sentry.init({
   dsn: config.sentryUrl,

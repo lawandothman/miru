@@ -75,6 +75,7 @@ export type MutationUnfollowArgs = {
 
 export type Query = {
   __typename?: 'Query';
+  genre?: Maybe<Genre>;
   genres?: Maybe<Array<Maybe<Genre>>>;
   movie?: Maybe<Movie>;
   moviesByGenre?: Maybe<Array<Maybe<Movie>>>;
@@ -85,6 +86,11 @@ export type Query = {
 };
 
 
+export type QueryGenreArgs = {
+  genreId: Scalars['ID'];
+};
+
+
 export type QueryMovieArgs = {
   id: Scalars['ID'];
 };
@@ -92,10 +98,14 @@ export type QueryMovieArgs = {
 
 export type QueryMoviesByGenreArgs = {
   genreId: Scalars['ID'];
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
 };
 
 
 export type QuerySearchArgs = {
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
   query: Scalars['String'];
 };
 
@@ -267,6 +277,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 }>;
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
+  genre?: Resolver<Maybe<ResolversTypes['Genre']>, ParentType, ContextType, RequireFields<QueryGenreArgs, 'genreId'>>;
   genres?: Resolver<Maybe<Array<Maybe<ResolversTypes['Genre']>>>, ParentType, ContextType>;
   movie?: Resolver<Maybe<ResolversTypes['Movie']>, ParentType, ContextType, RequireFields<QueryMovieArgs, 'id'>>;
   moviesByGenre?: Resolver<Maybe<Array<Maybe<ResolversTypes['Movie']>>>, ParentType, ContextType, RequireFields<QueryMoviesByGenreArgs, 'genreId'>>;
