@@ -103,9 +103,6 @@ const Movie: NextPage = () => {
           </h1>
           <p className='mt-2 text-xl font-thin'>{data?.movie.tagline}</p>
           <div className='mt-3 text-sm text-neutral-400'>
-            {/* {movie?.spoken_languages?.map((lang) => (
-              <span key={lang.iso_639_1}>{lang.name} / </span>
-            ))} */}
             <div className='flex items-center justify-between'>
               <span>
                 {data?.movie?.runtime && data.movie.runtime + '  MIN • '}
@@ -232,8 +229,8 @@ const Movie: NextPage = () => {
                     key={provider?.id}
                     src={getImage(provider?.logoPath ?? '')}
                     alt={provider?.name ?? ''}
-                    width={70}
-                    height={70}
+                    width={40}
+                    height={40}
                     className='rounded-lg'
                   />
                 ))}
