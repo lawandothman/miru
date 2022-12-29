@@ -6,9 +6,11 @@ import { FiMinus, FiPlus } from 'react-icons/fi'
 import { Movie } from '__generated__/resolvers-types'
 import { MoviePoster } from './MoviePoster'
 import { Spinner } from './Spinner'
+import InfiniteScroll from 'react-infinite-scroller'
 
 interface MoviesListProps {
   movies?: Array<Movie | null>;
+  loadMore?: () => Promise<void>;
 }
 
 const ADD_TO_WATCHLIST = gql`
@@ -45,14 +47,28 @@ export const LoadingSkeleton = () => {
   )
 }
 
-export const MoviesList: FC<MoviesListProps> = ({ movies }) => {
+export const MoviesList: FC<MoviesListProps> = ({ movies, loadMore }) => {
   return (
     <div>
-      <div className='grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8'>
-        {movies?.map((movie) => {
-          return <Movie key={movie?.id} movie={movie} />
-        })}
-      </div>
+      {loadMore && (
+        <InfiniteScroll
+          pageStart={0}
+          className='grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8'
+          loadMore={async () => {
+            await loadMore()
+          }}
+          hasMore={true}
+          loader={
+            <div className='loader' key={0}>
+              Loading ...
+            </div>
+          }
+        >
+          {movies?.map((movie) => {
+            return <Movie key={movie?.id} movie={movie} />
+          })}
+        </InfiniteScroll>
+      )}
     </div>
   )
 }

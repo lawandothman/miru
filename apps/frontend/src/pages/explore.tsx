@@ -12,8 +12,8 @@ import Link from 'next/link'
 import { PageHeader } from 'components/PageHeader'
 
 const SEARCH = gql`
-  query SearchMovies($query: String!) {
-    movies: search(query: $query) {
+  query SearchMovies($query: String!, $offset: Int, $limit: Int) {
+    movies: search(query: $query, offset: $offset, limit: $limit) {
       id
       title
       posterUrl
@@ -39,9 +39,9 @@ const Search: NextPage = () => {
     ? router.query.q[0]
     : router.query.q
 
-  const { data, loading } = useQuery<
+  const { data, loading, fetchMore } = useQuery<
   { movies: Movie[]; users: User[] },
-  { query?: string }
+  { query?: string; limit?: number; offset?: number }
   >(SEARCH, {
     variables: { query: searchQuery },
     skip: !searchQuery,
@@ -60,6 +60,16 @@ const Search: NextPage = () => {
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
     onSubmit(e)
     setQuery(e.target.value)
+  }
+
+  const loadMore = async () => {
+    const currentLength = data?.movies.length ?? 20
+    await fetchMore({
+      variables: {
+        limit: currentLength,
+        offset: currentLength * 2,
+      },
+    })
   }
 
   const noResults = data?.movies.length === 0 && data.users.length === 0
@@ -111,7 +121,7 @@ const Search: NextPage = () => {
           {data?.movies && data.movies.length > 0 && (
             <div>
               <h1 className='mb-8  text-lg dark:text-white'>Movies</h1>
-              <MoviesList movies={data?.movies} />
+              <MoviesList loadMore={loadMore} movies={data?.movies} />
             </div>
           )}
         </>

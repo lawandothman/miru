@@ -9,8 +9,8 @@ import Image from 'next/image'
 import PhotoImg from '../../public/illustration/dark/photo.png'
 
 const GET_FOR_YOU = gql`
-  query ForYou {
-    moviesForYou {
+  query ForYou($limit: Int, $offset: Int) {
+    moviesForYou(limit: $limit, offset: $offset) {
       id
       title
       posterUrl
@@ -21,7 +21,22 @@ const GET_FOR_YOU = gql`
 
 const ForYou: NextPage = () => {
   const { data: session } = useSession()
-  const { data, loading } = useQuery<{ moviesForYou: Movie[] }>(GET_FOR_YOU)
+  const { data, loading, fetchMore } = useQuery<
+  { moviesForYou: Movie[] },
+  { limit?: number; offset?: number }
+  >(GET_FOR_YOU)
+
+
+  const loadMore = async () => {
+    const currentLength = data?.moviesForYou.length ?? 20
+    await fetchMore({
+      variables: {
+        limit: currentLength,
+        offset: currentLength * 2,
+      },
+    })
+  }
+
 
   if (!session) {
     return (
@@ -33,7 +48,7 @@ const ForYou: NextPage = () => {
         <Image className='mx-auto' src={PhotoImg} alt={'Illustration'}></Image>
         <Link
           href='/auth/signin'
-          className='block text-center mt-12 p-2 text-white rounded-md bg-neutral-900 dark:bg-neutral-300 text-black'
+          className='block text-center mt-12 p-2 dark:text-white rounded-md bg-neutral-900 dark:bg-neutral-300 text-black'
         >
           Login
         </Link>
@@ -44,7 +59,11 @@ const ForYou: NextPage = () => {
   return (
     <div className='px-20 pt-20'>
       <PageHeader title='For you' subtitle='Movies to watch with the people you follow' />
-      {loading ? <LoadingSkeleton /> : <MoviesList movies={data?.moviesForYou} />}
+      {loading ? (
+        <LoadingSkeleton />
+      ) : (
+        <MoviesList loadMore={loadMore} movies={data?.moviesForYou} />
+      )}
     </div>
   )
 }
