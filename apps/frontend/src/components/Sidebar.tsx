@@ -56,17 +56,17 @@ export const Sidebar = ({ genres }: { genres: Genre[] }) => {
       <OutsideClickHandler onOutsideClick={() => setIsOpen(false)}>
         <div className='m-4 flex items-center lg:hidden'>
           <FiMenu
-            className='h-5 w-5 cursor-pointer text-white '
+            className='h-5 w-5 cursor-pointer'
             onClick={() => setIsOpen(true)}
           />
           <h1
-            className={`mx-auto text-lg text-white ${
+            className={`mx-auto text-lg  ${
               isOpen && 'opacity-0'
             } transition-opacity`}
           >
             ミル Miru
           </h1>
-          <span className='mr-1 rounded-lg px-2 py-1 text-xs uppercase text-white dark:bg-red-800'>
+          <span className='mr-1 rounded-lg bg-red-400 px-2 py-1 text-xs uppercase text-white dark:bg-red-800'>
             Alpha
           </span>
         </div>

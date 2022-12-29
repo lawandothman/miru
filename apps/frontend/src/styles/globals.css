@@ -4,6 +4,7 @@
 
 
 @layer base {
+
 	h1,
 	h2,
 	h3,
@@ -13,6 +14,7 @@
 		@apply text-black;
 		@apply dark:text-white;
 	}
+
 	p {
 		@apply text-neutral-700;
 		@apply dark:text-neutral-400;
@@ -33,17 +35,31 @@
 	border-radius: 10px;
 }
 
+@media (prefers-color-scheme: dark) {
+	::-webkit-scrollbar-thumb {
+		background-color: white;
+	}
+
+}
+
 ::-webkit-scrollbar-thumb {
 	border-radius: 10px;
-	background-color: white;
+	background-color: black;
 	animation-duration: 0.1s;
 	background-clip: padding-box;
 	border: 3px solid transparent;
 }
 
+@media (prefers-color-scheme: dark) {
+	::-webkit-scrollbar-thumb:hover {
+		background-color: white;
+	}
+
+}
+
 ::-webkit-scrollbar-thumb:hover {
 	border-radius: 10px;
-	background-color: white;
+	background-color: black;
 }
 
 
