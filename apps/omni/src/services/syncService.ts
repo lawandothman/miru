@@ -21,8 +21,11 @@ export class SyncService {
     await this.syncWatchProviders()
     while(true) {
       const transaction = startTransaction({
-        op: `Page ${page}`,
-        name: 'sync'
+        op: 'Sync',
+        name: 'sync',
+        data: {
+          page
+        }
       })
       try {
         const movies = await this.getPopularMovieSummaries(page)
