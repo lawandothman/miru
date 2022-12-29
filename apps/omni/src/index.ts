@@ -13,7 +13,7 @@ import { NeoDataSource } from './dataSources/neoDataSource'
 import { GenreRepo } from './dataSources/genreRepo'
 import { WatchProviderRepo } from './dataSources/watchProviderRepo'
 import { MovieRepo } from './dataSources/movieRepo'
-import SentryPlugin from './sentryPlugin'
+import TracingPlugin from './TracingPlugin'
 import UserResolver from './resolvers/userResolver'
 import MovieResolver from './resolvers/movieResolver'
 import MutationResolver from './resolvers/mutationResolver'
@@ -52,7 +52,7 @@ const server = new ApolloServer({
   typeDefs: schema,
   resolvers,
   plugins: [
-    new SentryPlugin()
+    new TracingPlugin()
   ]
 })
 

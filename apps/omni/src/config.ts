@@ -14,5 +14,6 @@ export const config = {
     readToken: env.get('TMDB_API_READ_ACCESS_TOKEN').required().asString(),
     baseUrl: env.get('TMDB_API_BASE_URL').required().asString(),
   },
-  sentryUrl: env.get('SENTRY_URL').default('https://test').asString()
+  sentryUrl: env.get('SENTRY_URL').default('https://test').asString(),
+  mixpanelKey: env.get('MIXPANEL_KEY').default('').asString()
 }
