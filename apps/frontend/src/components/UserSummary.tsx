@@ -9,7 +9,7 @@ export const UserSummary = ({
   user: User;
 }) => {
   return (
-    <div className='text-white bg-neutral-900 rounded-lg p-4 mb-4'>
+    <div className='mb-4 rounded-lg border bg-white p-4 text-black dark:text-white drop-shadow-sm dark:border-none dark:bg-neutral-900'>
       <Link href={`/users/${user.id}`}>
         <div className='gap-4 rounded-lg'>
           <div className='flex items-center gap-3'>
@@ -22,7 +22,7 @@ export const UserSummary = ({
         </div>
       </Link>
       {user.matches && user.matches.length > 0 && (
-        <div className='grid grid-flow-col max-w-full w-fit gap-8 overflow-x-auto p-4'>
+        <div className='grid w-fit max-w-full grid-flow-col gap-8 overflow-x-auto p-4'>
           {user.matches?.map((match) => (
             <div className='w-60 text-center' key={match?.id}>
               {match && (

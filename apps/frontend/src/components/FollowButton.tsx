@@ -50,7 +50,7 @@ export const FollowButton = ({
   })
   return (
     <button
-      className='flex h-10 w-28 max-w-xl items-center justify-center gap-2 rounded-lg font-semibold dark:bg-neutral-100'
+      className='flex h-10 w-28 max-w-xl items-center justify-center gap-2 rounded-lg font-semibold bg-black dark:text-black text-white dark:bg-neutral-100'
       onClick={() => {
         if (user.isFollowing) {
           unfollow()

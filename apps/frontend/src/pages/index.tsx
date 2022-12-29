@@ -7,11 +7,13 @@ import type { NextPage } from 'next'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import Image from 'next/image'
-import PhoneImg from '../../public/illustration/dark/phone.png'
+import PhoneImgDark from '../../public/illustration/dark/phone.png'
+import PhoneImgLight from '../../public/illustration/light/phone.png'
 import React from 'react'
 import { FiSearch, FiShuffle, FiUserPlus } from 'react-icons/fi'
 import type { IconType } from 'react-icons/lib'
 import type { User } from '__generated__/resolvers-types'
+import { useColorMode } from 'utils/useColorMode'
 
 const GET_HOME = gql`
   query ($userId: ID!) {
@@ -63,21 +65,25 @@ const Home: NextPage = () => {
 }
 
 const LoggedOutPage = () => {
+  const colorMode = useColorMode()
   return (
-    <div className='mx-auto max-w-4xl px-20 pt-20 text-white'>
+    <div className='mx-auto max-w-4xl px-20 pt-20'>
       <PageHeader
         title='Welcome to Miru'
         subtitle='The social movie watching platform'
       ></PageHeader>
-      <p className='text-neutral-300'>
+      <p >
         Remove the drama from movie night and find the movie that everyone wants
         to watch.
       </p>
-      <p className='text-neutral-300'>
+      <p >
         Get started by making an account and adding movies to your watchlist
       </p>
-
-      <Image className='mx-auto' src={PhoneImg} alt={'Illustration'}></Image>
+      {colorMode === 'dark' ? (
+        <Image className='mx-auto' src={PhoneImgDark} alt={'Illustration'}></Image>
+      ): (
+        <Image className='mx-auto' src={PhoneImgLight} alt={'Illustration'}></Image>
+      )}
 
       <h2 className='mt-4 text-xl'>How it works?</h2>
       <div className='grid grid-cols-1 gap-4 md:grid-cols-3'>
@@ -129,12 +135,12 @@ const Step = ({
       <div className='flex w-full justify-center '>
         {React.createElement(icon, {
           className:
-            'h-24 w-24 text-4xl bg-neutral-900 dark:bg-neutral-300 dark:text-black border-full rounded-full p-8 m-4',
+            'h-24 w-24 text-4xl bg-neutral-900 dark:bg-neutral-300 text-white dark:text-black border-full rounded-full p-8 m-4',
         })}
       </div>
       <div className='w-full'>
         <p className='text-l text-center font-bold'>{text}</p>
-        <p className='text-neutral-300'>{description}</p>
+        <p>{description}</p>
       </div>
     </div>
   )
@@ -142,12 +148,12 @@ const Step = ({
 
 const Footer = () => (
   <div className='mt-12 mb-2 flex w-full gap-2  text-sm text-neutral-500'>
-    <Link href='/about' className='hover:text-white'>
-          About
+    <Link href='/about' className='hover:text-black dark:hover:text-white'>
+      About
     </Link>
     <span>•</span>
-    <Link href='/privacy' className='hover:text-white'>
-          Privacy Policy
+    <Link href='/privacy' className='hover:text-black dark:hover:text-white'>
+      Privacy Policy
     </Link>
   </div>
 )

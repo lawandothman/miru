@@ -38,7 +38,7 @@ export const LoadingSkeleton = () => {
         {new Array(24).fill(true)?.map((item, idx) => {
           return (
             <div key={idx} className='h-full w-full'>
-              <div className='h-[400px] min-h-full w-full min-w-full animate-pulse rounded-lg bg-neutral-700' />
+              <div className='h-[400px] min-h-full w-full min-w-full animate-pulse rounded-lg bg-neutral-300 dark:bg-neutral-700' />
             </div>
           )
         })}
@@ -50,7 +50,7 @@ export const LoadingSkeleton = () => {
 export const MoviesList: FC<MoviesListProps> = ({ movies, loadMore }) => {
   return (
     <div>
-      {loadMore && (
+      {loadMore ? (
         <InfiniteScroll
           pageStart={0}
           className='grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8'
@@ -58,16 +58,17 @@ export const MoviesList: FC<MoviesListProps> = ({ movies, loadMore }) => {
             await loadMore()
           }}
           hasMore={true}
-          loader={
-            <div className='loader' key={0}>
-              Loading ...
-            </div>
-          }
         >
           {movies?.map((movie) => {
             return <Movie key={movie?.id} movie={movie} />
           })}
         </InfiniteScroll>
+      ) : (
+        <div className='grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8'>
+          {movies?.map((movie) => {
+            return <Movie key={movie?.id} movie={movie} />
+          })}
+        </div>
       )}
     </div>
   )

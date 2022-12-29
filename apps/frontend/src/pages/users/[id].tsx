@@ -57,7 +57,7 @@ const FollowersDialog = ({ user }: { user: User }) => {
         </span>
       </DialogTrigger>
       <DialogContent>
-        <DialogTitle className='mb-8 text-lg font-semibold text-center dark:text-neutral-300'>
+        <DialogTitle className='mb-8 text-lg font-semibold text-center dark:text-neutral-300 text-neutral-900'>
           Followers
         </DialogTitle>
 
@@ -155,7 +155,7 @@ const User = () => {
 
           {data?.user.matches && data.user.matches.length > 0 && (
             <>
-              <h3 className='my-8 text-xl font-thin text-neutral-300'>
+              <h3 className='my-8 text-xl font-thin'>
                 Your matches with {data?.user.name}
               </h3>
               <MoviesList movies={data?.user.matches} />

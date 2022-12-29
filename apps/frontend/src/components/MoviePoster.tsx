@@ -18,7 +18,7 @@ export const MoviePoster = ({ movie }: { movie: Movie }) => {
               25vw'
         className={cn(
           'absolute top-0 left-0 bottom-0 right-0 min-h-full min-w-full object-cover',
-          isLoading ? 'animate-pulse bg-neutral-700' : 'blur-0'
+          isLoading ? 'animate-pulse dark:bg-neutral-700 bg-neutral-300' : 'blur-0'
         )}
         onLoadingComplete={() => setLoading(false)}
       />

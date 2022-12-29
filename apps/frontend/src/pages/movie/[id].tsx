@@ -98,12 +98,12 @@ const Movie: NextPage = () => {
             height={1000}
           />
         )}
-        <div className='flex max-w-xl flex-col dark:text-white'>
+        <div className='flex max-w-xl flex-col'>
           <h1 className='text-4xl font-thin tracking-wider'>
             {data?.movie.title}
           </h1>
           <p className='mt-2 text-xl font-thin'>{data?.movie.tagline}</p>
-          <div className='mt-3 text-sm text-neutral-400'>
+          <div className='mt-3 text-sm dark:text-neutral-400 text-neutral-500'>
             <div className='flex items-center justify-between'>
               <span>
                 {data?.movie?.runtime && data.movie.runtime + '  MIN • '}
@@ -128,7 +128,7 @@ const Movie: NextPage = () => {
                       })
                     }
                   }}
-                  className='flex h-10 w-28 max-w-xl items-center justify-center gap-2 rounded-lg text-base font-semibold dark:bg-neutral-100 dark:text-black'
+                  className='flex h-10 w-28 max-w-xl items-center justify-center gap-2 rounded-lg text-base font-semibold bg-black text-white dark:bg-neutral-100 dark:text-black'
                 >
                   {addToWatchlistLoading || removeFromWatchlistLoading ? (
                     <>
@@ -155,7 +155,7 @@ const Movie: NextPage = () => {
                 </Link>
               ))}
             </div>
-            <p className='mt-8 max-w-xl text-neutral-400'>
+            <p className='mt-8 max-w-xl dark:text-neutral-400 text-neutral-600'>
               {data?.movie.overview}
             </p>
             <div className=' mt-6 flex gap-3'>
@@ -223,7 +223,7 @@ const Movie: NextPage = () => {
           {data?.movie.streamProviders &&
             data.movie.streamProviders.length > 0 && (
             <div className='mt-8'>
-              <h3 className='mb-4 text-neutral-400'>Stream</h3>
+              <h3 className='mb-4'>Stream</h3>
               <div className='flex gap-4'>
                 {data.movie.streamProviders.map((provider) => (
                   <Image

@@ -4,9 +4,9 @@ import Link from 'next/link'
 
 const About: NextPage = () => {
   return (
-    <div className='mx-auto max-w-4xl px-20 pt-20 text-white'>
+    <div className='mx-auto max-w-4xl px-20 pt-20'>
       <PageHeader title='Welcome to Miru!' subtitle='' />
-      <div className=' mx-auto flex flex-col gap-8 text-neutral-400'>
+      <div className=' mx-auto flex flex-col gap-8'>
         <p>
           Miru is a platform that helps you and your friends find movies to
           watch together. We know that one of the best parts of watching movies
@@ -30,13 +30,13 @@ const About: NextPage = () => {
           again!
         </p>
       </div>
-      <h1 className='mb-4 mt-8 text-2xl font-thin tracking-widest dark:text-white'>
+      <h1 className='mb-4 mt-8 text-2xl font-thin tracking-widest'>
         Acknowledgments
       </h1>
-      <div className=' mx-auto flex flex-col gap-8 dark:text-neutral-400'>
+      <div className=' mx-auto flex flex-col gap-8'>
         <p>
           This product uses the{' '}
-          <Link href='https://www.themoviedb.org/' className='text-white'>
+          <Link href='https://www.themoviedb.org/' className='dark:text-white underline dark:no-underline'>
             TMDB API
           </Link>{' '}
           (The Movie Database API) but is not endorsed or certified by TMDb.
@@ -50,7 +50,7 @@ const About: NextPage = () => {
           We offer a variety of options for finding films that fit your
           preferences and interests, including information on where you can
           stream, rent, or buy a movie. This data comes from{' '}
-          <Link href='https://www.justwatch.com/' className='text-white'>
+          <Link href='https://www.justwatch.com/' className='dark:text-white underline dark:no-underline'>
             JustWatch
           </Link>
           , a leading platform for finding the best way to watch movies and TV
