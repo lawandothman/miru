@@ -21,7 +21,7 @@ export const authOptions: NextAuthOptions = {
         }
         if (session.user.email) {
           const encodedToken = jsonwebtoken.sign(
-            { email: session.user.email },
+            { id: token.sub, name: session.user.name, image: session.user.image, email: session.user.email },
             process.env.NEXTAUTH_SECRET as string,
             { algorithm: 'HS256' }
           )
