@@ -57,6 +57,7 @@ const Search: NextPage = () => {
   }
 
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
+    onSubmit(e)
     setQuery(e.target.value)
   }
 
