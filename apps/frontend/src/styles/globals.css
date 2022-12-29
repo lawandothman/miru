@@ -3,6 +3,24 @@
 @tailwind utilities;
 
 
+@layer base {
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6 {
+		@apply text-black;
+		@apply dark:text-white;
+	}
+	p {
+		@apply text-neutral-700;
+		@apply dark:text-neutral-400;
+
+	}
+}
+
+
 ::-webkit-scrollbar {
 	width: 10px;
 	height: 10px;

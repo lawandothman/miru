@@ -82,7 +82,7 @@ const Search: NextPage = () => {
           type='text'
           required
           placeholder='Search movies or Miru members...'
-          className='h-12 w-full cursor-auto rounded-xl border border-neutral-300 bg-transparent pl-12 text-neutral-300 outline-none'
+          className='h-12 w-full cursor-auto rounded-xl border border-neutral-300 bg-transparent pl-12 text-neutral-600 outline-none dark:text-neutral-300'
           defaultValue={searchQuery}
           onChange={onChange}
         />
@@ -93,7 +93,7 @@ const Search: NextPage = () => {
           <Popcorn />
         </div>
       ) : noResults ? (
-        <div className='flex flex-col items-center dark:text-white'>
+        <div className='flex flex-col items-center '>
           <h1 className='text-3xl'>Nothing Found</h1>
           <span className='font-lg mt-8 font-thin text-neutral-300'>
             We couldn&apos;t find anything that matches your search :(
@@ -109,7 +109,7 @@ const Search: NextPage = () => {
                   <Link
                     href={`/users/${user.id}`}
                     key={user.id}
-                    className='rounded-lg inline-flex items-center p-2 hover:dark:bg-neutral-600'
+                    className='inline-flex items-center rounded-lg p-2 hover:bg-neutral-300 hover:dark:bg-neutral-600'
                   >
                     <ProfilePicture size='md' user={user} />
                     <span className='ml-3 truncate'>{user.name}</span>

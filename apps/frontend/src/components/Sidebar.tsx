@@ -66,7 +66,7 @@ export const Sidebar = ({ genres }: { genres: Genre[] }) => {
           >
             ミル Miru
           </h1>
-          <span className='mr-1 rounded-lg px-2 text-xs py-1 uppercase text-white dark:bg-red-800'>
+          <span className='mr-1 rounded-lg px-2 py-1 text-xs uppercase text-white dark:bg-red-800'>
             Alpha
           </span>
         </div>
@@ -83,7 +83,7 @@ export const Sidebar = ({ genres }: { genres: Genre[] }) => {
             <Link href='/' className='text-lg'>
               ミル Miru
             </Link>
-            <span className='mr-1 rounded-lg px-2 text-xs py-1 uppercase text-white dark:bg-red-800'>
+            <span className='mr-1 rounded-lg bg-red-400 px-2 py-1 text-xs uppercase text-white dark:bg-red-800'>
               Alpha
             </span>
             <button
@@ -134,7 +134,7 @@ export const Sidebar = ({ genres }: { genres: Genre[] }) => {
               </ul>
             </nav>
             <nav>
-              <p className='pt-4 pb-2 pl-3 text-sm text-white'>Genres</p>
+              <p className='pt-4 pb-2 pl-3 text-sm'>Genres</p>
               <ul className='space-y-2'>
                 {_.sortBy(genres, (genre) => genre.name).map((genre) => (
                   <NavItem
@@ -150,7 +150,7 @@ export const Sidebar = ({ genres }: { genres: Genre[] }) => {
           </main>
           <footer className='sticky bottom-0 left-0'>
             <div className='h-8 bg-gradient-to-t from-white dark:from-black'></div>
-            <div className='p-4 dark:bg-black'>
+            <div className='bg-white p-4 dark:bg-black'>
               {session?.user ? (
                 <>
                   <div className='flex w-full items-center justify-between rounded-lg p-2 text-base font-normal text-gray-900 dark:text-white '>
@@ -170,7 +170,7 @@ export const Sidebar = ({ genres }: { genres: Genre[] }) => {
                 </>
               ) : (
                 <button
-                  className='mx-auto mt-2 flex justify-center rounded px-8 py-1 text-base font-normal dark:bg-white dark:text-black'
+                  className='mx-auto mt-2 flex justify-center rounded bg-black px-8 py-1 text-base font-normal text-white dark:bg-white dark:text-black'
                   onClick={() => signIn()}
                 >
                   Login
@@ -181,7 +181,7 @@ export const Sidebar = ({ genres }: { genres: Genre[] }) => {
         </aside>
       </OutsideClickHandler>
       <div
-        className={`fixed inset-0 z-20 bg-black bg-opacity-10 transition duration-200 ease-in-out dark:bg-opacity-50 ${
+        className={`fixed inset-0 z-20 bg-white bg-opacity-10 transition duration-200 ease-in-out dark:bg-black dark:bg-opacity-50 ${
           isOpen
             ? 'pointer-events-auto opacity-100'
             : 'pointer-events-none opacity-0'

@@ -19,7 +19,7 @@ const Privacy: NextPage = () => {
           Privacy Policy, do not hesitate to contact us.
         </p>
 
-        <h2 className='text-xl tracking-wide text-neutral-300'>Log Files</h2>
+        <h2 className='text-xl tracking-wide '>Log Files</h2>
 
         <p>
           Miru follows a standard procedure of using log files. These files log
@@ -33,7 +33,7 @@ const Privacy: NextPage = () => {
           users&apos; movement on the website, and gathering demographic
           information. Our Privacy Policy was created with the help of the{' '}
           <Link
-            className='text-neutral-300 underline'
+            className='dark:text-neutral-300 text-neutral-700 underline'
             href='https://www.privacypolicygenerator.org'
             target='_blank'
           >
@@ -42,9 +42,7 @@ const Privacy: NextPage = () => {
           .
         </p>
 
-        <h2 className='text-xl tracking-wide text-neutral-300'>
-          Cookies and Web Beacons
-        </h2>
+        <h2 className='text-xl tracking-wide'>Cookies and Web Beacons</h2>
 
         <p>
           Like any other website, Miru uses &lsquo;cookies&rsquo;. These cookies
@@ -55,9 +53,7 @@ const Privacy: NextPage = () => {
           and/or other information.
         </p>
 
-        <h2 className='text-xl tracking-wide text-neutral-300'>
-          Privacy Policies
-        </h2>
+        <h2 className='text-xl tracking-wide '>Privacy Policies</h2>
 
         <p>
           You may consult this list to find the Privacy Policy for each of the
@@ -79,9 +75,7 @@ const Privacy: NextPage = () => {
           used by third-party advertisers.
         </p>
 
-        <h2 className='text-xl tracking-wide text-neutral-300'>
-          Third Party Privacy Policies
-        </h2>
+        <h2 className='text-xl tracking-wide '>Third Party Privacy Policies</h2>
 
         <p>
           Miru&apos;s Privacy Policy does not apply to other advertisers or
@@ -98,9 +92,7 @@ const Privacy: NextPage = () => {
           respective websites.
         </p>
 
-        <h2 className='text-xl tracking-wide text-neutral-300'>
-          Children&apos;s Information
-        </h2>
+        <h2 className='text-xl tracking-wide '>Children&apos;s Information</h2>
 
         <p>
           Another part of our priority is adding protection for children while
@@ -116,9 +108,7 @@ const Privacy: NextPage = () => {
           efforts to promptly remove such information from our records.
         </p>
 
-        <h2 className='text-xl tracking-wide text-neutral-300'>
-          Online Privacy Policy Only
-        </h2>
+        <h2 className='text-xl tracking-wide '>Online Privacy Policy Only</h2>
 
         <p>
           This Privacy Policy applies only to our online activities and is valid
@@ -127,7 +117,7 @@ const Privacy: NextPage = () => {
           information collected offline or via channels other than this website.
         </p>
 
-        <h2 className='text-xl tracking-wide text-neutral-300'>Consent</h2>
+        <h2 className='text-xl tracking-wide '>Consent</h2>
 
         <p>
           By using our website, you hereby consent to our Privacy Policy and

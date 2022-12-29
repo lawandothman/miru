@@ -11,9 +11,9 @@ HTMLDivElement,
 DialogContentProps
 >(({ children, ...props }, forwardedRef) => (
   <DialogPrimitive.Portal>
-    <DialogPrimitive.Overlay className='fixed inset-0 bg-black opacity-80' />
+    <DialogPrimitive.Overlay className='fixed inset-0 bg-black dark:opacity-80 opacity-70' />
     <DialogPrimitive.Content
-      className='fixed top-1/2 left-1/2 h-[400px] w-[400px] -translate-x-1/2 -translate-y-1/2 rounded-lg bg-neutral-800 p-2 shadow-lg'
+      className='fixed top-1/2 left-1/2 h-[400px] w-[400px] -translate-x-1/2 -translate-y-1/2 rounded-lg bg-white dark:bg-neutral-800 p-2 shadow-lg'
       {...props}
       ref={forwardedRef}
     >

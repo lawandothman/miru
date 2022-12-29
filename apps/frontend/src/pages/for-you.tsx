@@ -6,7 +6,9 @@ import type { Movie } from '__generated__/resolvers-types'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import Image from 'next/image'
-import PhotoImg from '../../public/illustration/dark/photo.png'
+import PhotoImgDark from '../../public/illustration/dark/photo.png'
+import PhotoImgLight from '../../public/illustration/light/photo.png'
+import { useColorMode } from 'utils/useColorMode'
 
 const GET_FOR_YOU = gql`
   query ForYou($limit: Int, $offset: Int) {
@@ -20,6 +22,7 @@ const GET_FOR_YOU = gql`
 `
 
 const ForYou: NextPage = () => {
+  const colorMode = useColorMode()
   const { data: session } = useSession()
   const { data, loading, fetchMore } = useQuery<
   { moviesForYou: Movie[] },
@@ -40,15 +43,25 @@ const ForYou: NextPage = () => {
 
   if (!session) {
     return (
-      <div className='px-20 pt-20 mx-auto max-w-4xl text-white'>
+      <div className='mx-auto max-w-4xl px-20 pt-20 text-white'>
         <PageHeader title='For you' />
-        <p>
-          Login so that we can recommend you movies
-        </p>
-        <Image className='mx-auto' src={PhotoImg} alt={'Illustration'}></Image>
+        <p>Login so that we can recommend you movies</p>
+        {colorMode === 'dark' ? (
+          <Image
+            className='mx-auto'
+            src={PhotoImgDark}
+            alt={'Illustration'}
+          ></Image>
+        ) : (
+          <Image
+            className='mx-auto'
+            src={PhotoImgLight}
+            alt={'Illustration'}
+          ></Image>
+        )}
         <Link
           href='/auth/signin'
-          className='block text-center mt-12 p-2 dark:text-white rounded-md bg-neutral-900 dark:bg-neutral-300 text-black'
+          className='mt-12 block rounded-md bg-neutral-900 p-2 text-center text-white dark:bg-neutral-300 dark:text-white'
         >
           Login
         </Link>

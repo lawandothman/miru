@@ -7,7 +7,9 @@ import { useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import Image from 'next/image'
-import TalkImg from '../../public/illustration/dark/talk.png'
+import TalkImgDark from '../../public/illustration/dark/talk.png'
+import TalkImgLight from '../../public/illustration/light/talk.png'
+import { useColorMode } from 'utils/useColorMode'
 
 export const GET_WATCHLIST = gql`
   query Watchlist($limit: Int, $offset: Int) {
@@ -21,6 +23,7 @@ export const GET_WATCHLIST = gql`
 `
 
 const Watchlist: NextPage = () => {
+  const colorMode = useColorMode()
   const { data: session } = useSession()
   const { data, loading, refetch, fetchMore } = useQuery<{
     watchlist: Movie[];
@@ -45,10 +48,14 @@ const Watchlist: NextPage = () => {
       <div className='mx-auto max-w-4xl px-20 pt-20 text-white'>
         <PageHeader title='Watchlist' />
         <p>Login to add movies to your watchlist and match with friends</p>
-        <Image className='mx-auto' src={TalkImg} alt={'Illustration'}></Image>
+        {colorMode === 'dark' ? (
+          <Image className='mx-auto' src={TalkImgDark} alt={'Illustration'}></Image>
+        ) : (
+          <Image className='mx-auto' src={TalkImgLight} alt={'Illustration'}></Image>
+        )}
         <Link
           href='/auth/signin'
-          className='mt-12 block rounded-md bg-neutral-900 p-2 text-center text-black dark:bg-neutral-300 dark:text-white'
+          className='mt-12 block rounded-md bg-neutral-900 p-2 text-center text-white  dark:bg-neutral-300 dark:text-white'
         >
           Login
         </Link>
