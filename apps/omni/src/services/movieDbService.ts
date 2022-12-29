@@ -144,7 +144,7 @@ export class MovieDbService {
       tagline: mov.tagline,
       homepage: mov.homepage,
       imdbId: mov.imdb_id,
-      genres: mov.genre_ids?.map((id) => ({ id: id.toString() } as Genre)),
+      genres: mov.genres,
     }
   }
 }
@@ -161,7 +161,7 @@ export interface ApiMovie {
   adult?: boolean;
   overview?: string;
   release_date?: string;
-  genre_ids?: number[];
+  genres?: Genre[];
   id: number;
   original_title?: string;
   title: string;
