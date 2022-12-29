@@ -47,7 +47,9 @@ export class NeoDataSource {
     return await runAndMapMany<Movie>(this.driver, `
       MATCH (m:Movie)-[:IN_WATCHLIST]->(u:User)
       RETURN m, count(u) as watchlists
-      ORDER BY watchlists DESC`,
+      ORDER BY watchlists DESC
+      SKIP $offset
+      LIMIT $limit`,
     {offset: int(offset), limit: int(limit)},
     'm'
     )
