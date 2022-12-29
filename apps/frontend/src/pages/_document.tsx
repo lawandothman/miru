@@ -24,7 +24,7 @@ export default function Document() {
         <link rel='icon' href='/favicon.ico' />
         <link rel='manifest' href='/site.webmanifest' />
       </Head>
-      <body className='dark:bg-neutral-900'>
+      <body className='dark:bg-black'>
         <Main />
         <NextScript />
       </body>

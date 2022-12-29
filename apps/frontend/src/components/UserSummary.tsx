@@ -2,7 +2,6 @@ import Link from 'next/link'
 import type { User } from '__generated__/resolvers-types'
 import { ProfilePicture } from './Avatar'
 import { MovieBackdrop } from './MovieBackdrop'
-import { MoviePoster } from './MoviePoster'
 
 export const UserSummary = ({
   user,
@@ -10,7 +9,7 @@ export const UserSummary = ({
   user: User;
 }) => {
   return (
-    <div className='text-white bg-neutral-800 rounded-lg p-4 mb-4'>
+    <div className='text-white bg-neutral-900 rounded-lg p-4 mb-4'>
       <Link href={`/users/${user.id}`}>
         <div className='gap-4 rounded-lg'>
           <div className='flex items-center gap-3'>

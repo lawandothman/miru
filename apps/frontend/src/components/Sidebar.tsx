@@ -69,7 +69,7 @@ export const Sidebar = ({ genres }: { genres: Genre[] }) => {
         </div>
         <aside
           className={cn(
-            'z-30 h-full w-60 transform overflow-y-auto border-r border-gray-200 bg-white transition duration-200 ease-in-out dark:border-neutral-700 dark:bg-neutral-900 lg:z-auto lg:translate-x-0',
+            'z-30 h-full w-60 transform overflow-y-auto border-r border-gray-200 bg-white transition duration-200 ease-in-out dark:border-neutral-700 dark:bg-black lg:z-auto lg:translate-x-0',
             isOpen
               ? 'fixed inset-y-0 left-0 translate-x-0'
               : 'fixed inset-y-0 -translate-x-full'
@@ -143,8 +143,8 @@ export const Sidebar = ({ genres }: { genres: Genre[] }) => {
             </nav>
           </main>
           <footer className='sticky bottom-0 left-0'>
-            <div className='h-8 bg-gradient-to-t from-white dark:from-neutral-900'></div>
-            <div className='p-4 dark:bg-neutral-900'>
+            <div className='h-8 bg-gradient-to-t from-white dark:from-black'></div>
+            <div className='p-4 dark:bg-black'>
               {session?.user ? (
                 <>
                   <div className='flex items-center justify-between w-full p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white '>
@@ -156,7 +156,7 @@ export const Sidebar = ({ genres }: { genres: Genre[] }) => {
                     </div>
                   </div>
                   <button
-                    className='flex justify-center p-2 mx-auto mt-2 text-base font-normal text-red-500 dark:bg-neutral-900'
+                    className='flex justify-center p-2 mx-auto mt-2 text-base font-normal text-red-500'
                     onClick={() => signOut()}
                   >
                     Sign out
@@ -171,7 +171,6 @@ export const Sidebar = ({ genres }: { genres: Genre[] }) => {
                 </button>
               )}
             </div>
-            <div className='p-4 dark:bg-neutral-900'></div>
           </footer>
         </aside>
       </OutsideClickHandler>
