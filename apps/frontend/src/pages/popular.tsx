@@ -23,10 +23,9 @@ const PopularMovies: NextPage = () => {
 
   const loadMore = async () => {
     const currentLength = data?.popularMovies.length ?? 20
-    console.log('calling next')
     await fetchMore({
       variables: {
-        limit: currentLength,
+        limit: 20,
         offset: currentLength * 2,
       },
     })

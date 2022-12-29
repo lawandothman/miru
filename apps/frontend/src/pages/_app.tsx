@@ -43,6 +43,7 @@ const client = new ApolloClient({
           search: offsetLimitPagination(),
           popularMovies: offsetLimitPagination(),
           moviesForYou: offsetLimitPagination(),
+          moviesByGenre: offsetLimitPagination(['genreId']),
         },
       },
     },

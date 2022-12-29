@@ -66,7 +66,7 @@ const Search: NextPage = () => {
     const currentLength = data?.movies.length ?? 20
     await fetchMore({
       variables: {
-        limit: currentLength,
+        limit: 20,
         offset: currentLength * 2,
       },
     })
