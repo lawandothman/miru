@@ -56,7 +56,7 @@ export const Sidebar = ({ genres }: { genres: Genre[] }) => {
       <OutsideClickHandler onOutsideClick={() => setIsOpen(false)}>
         <div className='m-4 flex items-center lg:hidden'>
           <FiMenu
-            className='h-5 w-5 cursor-pointer'
+            className='h-5 w-5 cursor-pointer dark:text-white'
             onClick={() => setIsOpen(true)}
           />
           <h1
@@ -88,7 +88,7 @@ export const Sidebar = ({ genres }: { genres: Genre[] }) => {
             </span>
             <button
               onClick={() => setIsOpen(false)}
-              className='mr-2 rounded p-1 hover:bg-neutral-700 lg:hidden'
+              className='mr-2 rounded p-1 dark:hover:bg-neutral-700 hover:bg-neutral-300 lg:hidden'
             >
               <FiX />
             </button>
