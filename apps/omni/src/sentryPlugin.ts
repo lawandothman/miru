@@ -12,12 +12,12 @@ Sentry.init({
   // Set tracesSampleRate to 1.0 to capture 100%
   // of transactions for performance monitoring.
   // We recommend adjusting this value in production
-  tracesSampleRate: process.env.NODE_ENV == 'production' ? 0.2 : 1.0,
+  tracesSampleRate: process.env.NODE_ENV == 'production' ? 1.0 : 1.0,
   integrations: [
     // add profiling integration
     new ProfilingIntegration()
   ],
-  profilesSampleRate: process.env.NODE_ENV == 'production' ? 0.2 : 1.0,
+  profilesSampleRate: process.env.NODE_ENV == 'production' ? 1.0 : 1.0,
 })
 
 export default class SentryPlugin implements ApolloServerPlugin {
