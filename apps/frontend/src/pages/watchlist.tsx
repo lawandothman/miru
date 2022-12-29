@@ -10,8 +10,8 @@ import Image from 'next/image'
 import TalkImg from '../../public/illustration/dark/talk.png'
 
 export const GET_WATCHLIST = gql`
-  query Watchlist {
-    watchlist {
+  query Watchlist($limit: Int, $offset: Int) {
+    watchlist(limit: $limit, offset: $offset) {
       id
       title
       posterUrl
@@ -22,25 +22,33 @@ export const GET_WATCHLIST = gql`
 
 const Watchlist: NextPage = () => {
   const { data: session } = useSession()
-  const { data, loading, refetch } = useQuery<{ watchlist: Movie[] }>(
-    GET_WATCHLIST
-  )
+  const { data, loading, refetch, fetchMore } = useQuery<{
+    watchlist: Movie[];
+  }>(GET_WATCHLIST)
 
   useEffect(() => {
     refetch()
   }, [refetch])
 
+  const loadMore = async () => {
+    const currentLength = data?.watchlist.length ?? 20
+    await fetchMore({
+      variables: {
+        limit: 20,
+        offset: currentLength * 2,
+      },
+    })
+  }
+
   if (!session) {
     return (
-      <div className='px-20 pt-20 mx-auto max-w-4xl text-white'>
+      <div className='mx-auto max-w-4xl px-20 pt-20 text-white'>
         <PageHeader title='Watchlist' />
-        <p>
-          Login to add movies to your watchlist and match with friends
-        </p>
+        <p>Login to add movies to your watchlist and match with friends</p>
         <Image className='mx-auto' src={TalkImg} alt={'Illustration'}></Image>
         <Link
           href='/auth/signin'
-          className='block text-center mt-12 p-2 text-white rounded-md bg-neutral-900 dark:bg-neutral-300 text-black'
+          className='mt-12 block rounded-md bg-neutral-900 p-2 text-center text-black dark:bg-neutral-300 dark:text-white'
         >
           Login
         </Link>
@@ -51,7 +59,11 @@ const Watchlist: NextPage = () => {
   return (
     <div className='px-20 pt-20'>
       <PageHeader title='Watchlist' />
-      {loading ? <LoadingSkeleton /> : <MoviesList movies={data?.watchlist} />}
+      {loading ? (
+        <LoadingSkeleton />
+      ) : (
+        <MoviesList loadMore={loadMore} movies={data?.watchlist} />
+      )}
     </div>
   )
 }
