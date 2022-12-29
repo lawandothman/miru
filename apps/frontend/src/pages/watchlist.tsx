@@ -6,6 +6,8 @@ import type { Movie } from '__generated__/resolvers-types'
 import { useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
+import Image from 'next/image'
+import TalkImg from '../../public/illustration/dark/talk.png'
 
 export const GET_WATCHLIST = gql`
   query Watchlist {
@@ -30,13 +32,15 @@ const Watchlist: NextPage = () => {
 
   if (!session) {
     return (
-      <div className='flex h-screen flex-col items-center justify-center gap-8 text-neutral-300'>
-        <h1 className='max-w-lg text-center text-3xl'>
+      <div className='px-20 pt-20 text-white'>
+        <PageHeader title='Watchlist' />
+        <p>
           Login to add movies to your watchlist and match with friends
-        </h1>
+        </p>
+        <Image className='mx-auto' src={TalkImg} alt={'Illustration'}></Image>
         <Link
           href='/auth/signin'
-          className='flex  h-10 items-center  rounded-md bg-neutral-900 px-8 text-white dark:bg-white dark:text-neutral-900'
+          className='block text-center mt-12 p-2 text-white rounded-md bg-neutral-900 dark:bg-neutral-300 text-black'
         >
           Login
         </Link>

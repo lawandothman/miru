@@ -6,7 +6,7 @@ interface PageHeaderProps {
 }
 export const PageHeader: FC<PageHeaderProps> = ({
   title,
-  subtitle = 'Movies',
+  subtitle = '',
 }) => {
   return (
     <div className='mb-4 flex justify-between'>
