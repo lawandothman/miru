@@ -17,6 +17,7 @@ import 'styles/globals.css'
 import type { Genre } from '__generated__/resolvers-types'
 import App from 'next/app'
 import NextNProgress from 'nextjs-progressbar'
+import { offsetLimitPagination } from '@apollo/client/utilities'
 
 const httpLinkt = createHttpLink({
   uri: `${process.env.NEXT_PUBLIC_OMNI_URL}/graphql`,
@@ -35,7 +36,18 @@ const authLink = setContext(async (_, { headers }) => {
 
 const client = new ApolloClient({
   link: authLink.concat(httpLinkt),
-  cache: new InMemoryCache(),
+  cache: new InMemoryCache({
+    typePolicies: {
+      Query: {
+        fields: {
+          search: offsetLimitPagination(),
+          popularMovies: offsetLimitPagination(),
+          moviesForYou: offsetLimitPagination(),
+          moviesByGenre: offsetLimitPagination(['genreId']),
+        },
+      },
+    },
+  }),
 })
 
 const MyApp = (props: AppProps & { genres: Genre[] }) => {

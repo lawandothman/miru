@@ -142,7 +142,7 @@ const User = () => {
                     <FollowingDialog user={data.user} />
                   ) : (
                     <span className='dark:text-neutral-300'>
-                      {data.user.followers?.length} following
+                      {data.user.following?.length} following
                     </span>
                   )}
                 </div>

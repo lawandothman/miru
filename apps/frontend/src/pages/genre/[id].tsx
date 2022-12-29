@@ -8,8 +8,8 @@ import type { Movie } from '__generated__/resolvers-types'
 import { FullPageLoader } from 'components/FullPageLoader'
 
 const GET_BY_GENRE = gql`
-  query MoviesByGenre($genreId: ID!) {
-    moviesByGenre(genreId: $genreId) {
+  query MoviesByGenre($genreId: ID!, $offset: Int, $limit: Int) {
+    moviesByGenre(genreId: $genreId, offset: $offset, limit: $limit) {
       id
       title
       posterUrl
@@ -24,14 +24,26 @@ const GET_BY_GENRE = gql`
 const Genre: NextPage = () => {
   const { query } = useRouter()
   const genreId = Array.isArray(query.id) ? query.id[0] : query.id
-  const { data, loading } = useQuery<
+  const { data, loading, fetchMore } = useQuery<
   { moviesByGenre: Movie[]; genre: Genre },
-  { genreId?: string }
+  { genreId?: string; offset?: number; limit?: number }
   >(GET_BY_GENRE, {
     variables: {
       genreId,
     },
   })
+
+
+  const loadMore = async () => {
+    const currentLength = data?.moviesByGenre.length ?? 20
+    console.log('next')
+    await fetchMore({
+      variables: {
+        limit: 20,
+        offset: currentLength * 2,
+      },
+    })
+  }
 
   if (loading) {
     return <FullPageLoader />
@@ -40,7 +52,7 @@ const Genre: NextPage = () => {
   return (
     <div className='px-20 pt-20'>
       <PageHeader title={data?.genre.name ?? ''} />
-      <MoviesList movies={data?.moviesByGenre} />
+      <MoviesList loadMore={loadMore} movies={data?.moviesByGenre} />
     </div>
   )
 }

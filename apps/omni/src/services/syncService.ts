@@ -16,7 +16,7 @@ export class SyncService {
     private readonly maxMovies: number = 10000) { }
 
   async start(): Promise<void> {
-    let page = 1 
+    let page = 1
     await this.syncGenres()
     await this.syncWatchProviders()
     while(true) {
@@ -85,7 +85,7 @@ export class SyncService {
   private getNextPage(currentPage: number) {
     const maxPages = Math.ceil(this.maxMovies / PAGE_SIZE)
 
-    return (currentPage % maxPages) + 1 
+    return (currentPage % maxPages) + 1
   }
 
   private sleep(ms: number) {

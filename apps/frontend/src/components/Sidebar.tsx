@@ -112,8 +112,8 @@ export const Sidebar = ({ genres }: { genres: Genre[] }) => {
                   Watchlist
                 </NavItem>
                 <NavItem
-                  isSelected={router.pathname === '/forYou'}
-                  href='/forYou'
+                  isSelected={router.pathname === '/for-you'}
+                  href='/for-you'
                   icon={<FiHeart />}
                 >
                   For you

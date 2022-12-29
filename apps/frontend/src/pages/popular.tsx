@@ -5,8 +5,8 @@ import { gql, useQuery } from '@apollo/client'
 import type { Movie } from '__generated__/resolvers-types'
 
 const GET_POPULAR_MOVIES = gql`
-  query PopularMovies {
-    popularMovies {
+  query PopularMovies($offset: Int, $limit: Int) {
+    popularMovies(offset: $offset, limit: $limit) {
       id
       title
       posterUrl
@@ -16,12 +16,29 @@ const GET_POPULAR_MOVIES = gql`
 `
 
 const PopularMovies: NextPage = () => {
-  const { data, loading } = useQuery<{ popularMovies: Movie[] }>(GET_POPULAR_MOVIES)
+  const { data, loading, fetchMore } = useQuery<
+  { popularMovies: Movie[] },
+  { limit?: number; offset?: number }
+  >(GET_POPULAR_MOVIES)
+
+  const loadMore = async () => {
+    const currentLength = data?.popularMovies.length ?? 20
+    await fetchMore({
+      variables: {
+        limit: 20,
+        offset: currentLength * 2,
+      },
+    })
+  }
 
   return (
     <div className='px-20 pt-20'>
       <PageHeader title='Popular' subtitle='The top of Miru' />
-      {loading ? <LoadingSkeleton /> : <MoviesList movies={data?.popularMovies} />}
+      {loading ? (
+        <LoadingSkeleton />
+      ) : (
+        <MoviesList loadMore={loadMore} movies={data?.popularMovies} />
+      )}
     </div>
   )
 }

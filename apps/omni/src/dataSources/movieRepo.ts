@@ -48,7 +48,11 @@ export class MovieRepo implements WriteRepository<Movie> {
     return mapTo<Movie>(res.records[0].toObject(), 'm')
   }
 
-  async getMoviesByGenre(genreId: string, offset: number, limit: number): Promise<Movie[]> {
+  async getMoviesByGenre(
+    genreId: string,
+    offset: number,
+    limit: number
+  ): Promise<Movie[]> {
     const session = this.driver.session()
     const res = await session.run(
       `
@@ -78,7 +82,7 @@ export class MovieRepo implements WriteRepository<Movie> {
     ) as Genre[]
   }
 
-  async search(query: string, offset:number, limit:number): Promise<Movie[]> {
+  async search(query: string, offset: number, limit: number): Promise<Movie[]> {
     const session = this.driver.session()
     const res = await session.run(
       `
