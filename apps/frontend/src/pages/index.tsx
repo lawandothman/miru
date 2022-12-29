@@ -1,7 +1,7 @@
 import { gql, useQuery } from '@apollo/client'
 import { FullPageLoader } from 'components/FullPageLoader'
 import { PageHeader } from 'components/PageHeader'
-import { UserCard } from 'components/UserCard'
+import { UserSummary } from 'components/UserSummary'
 import { sortBy } from 'lodash'
 import type { NextPage } from 'next'
 import { useSession } from 'next-auth/react'
@@ -26,6 +26,7 @@ const GET_HOME = gql`
         matches {
           id
           title
+          backdropUrl
           inWatchlist
           posterUrl
         }
@@ -52,7 +53,7 @@ const Home: NextPage = () => {
       <PageHeader title='Welcome back!' subtitle='' />
       {sortBy(data?.user.following, [(u => -(u?.matches?.length ?? 0) )]).map((following) => {
         if (following) {
-          return <UserCard key={following.id} user={following} extended />
+          return <UserSummary key={following.id} user={following} />
         } else {
           return null
         }
