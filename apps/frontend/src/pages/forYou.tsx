@@ -25,7 +25,7 @@ const ForYou: NextPage = () => {
 
   if (!session) {
     return (
-      <div className='px-20 pt-20 text-white'>
+      <div className='px-20 pt-20 mx-auto max-w-4xl text-white'>
         <PageHeader title='For you' />
         <p>
           Login so that we can recommend you movies
