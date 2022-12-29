@@ -1,5 +1,5 @@
-import { requireUser } from "../utils";
-import { QueryResolvers } from "../__generated__/resolvers-types";
+import { requireUser } from '../utils'
+import type { QueryResolvers } from '../__generated__/resolvers-types'
 
 const QueryResolver: QueryResolvers = {
   movie: async (_parent, { id }, { movieLoader }) => {
@@ -23,8 +23,8 @@ const QueryResolver: QueryResolvers = {
   genre: async (_parent, { genreId }, { genreLoader }) => {
     return await genreLoader.load(genreId)
   },
-  watchlist: async (_parent, _args, { neoDataSource, user }) => {
-    return await neoDataSource.getWatchlist(requireUser(user))
+  watchlist: async (_parent, { offset, limit }, { neoDataSource, user }) => {
+    return await neoDataSource.getWatchlist(requireUser(user), offset ?? 0, limit ?? 20)
   },
   moviesForYou: async (_parent, { offset, limit }, { neoDataSource, user }) => {
     return await neoDataSource.getMoviesForYou(requireUser(user), offset ?? 0, limit ?? 20)

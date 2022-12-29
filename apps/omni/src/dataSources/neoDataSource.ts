@@ -230,12 +230,14 @@ export class NeoDataSource {
     return rel != null
   }
 
-  async getWatchlist(user: User) {
+  async getWatchlist(user: User, offset: number, limit: number) {
     const movies = await runAndMapMany<Movie>(
       this.driver,
       `MATCH (m:Movie)-[r:IN_WATCHLIST]->(u:User {email: $email})
-      RETURN m`,
-      { email: user.email },
+      RETURN m
+      SKIP $offset
+      LIMIT $limit`,
+      { email: user.email, offset: int(offset), limit: int(limit) },
       'm'
     )
 
