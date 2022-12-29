@@ -93,6 +93,7 @@ const Movie: NextPage = () => {
           <Image
             src={getImage(data.movie.posterUrl)}
             alt={data.movie.title ?? 'movie'}
+            className='rounded-lg'
             width={450}
             height={1000}
           />
@@ -147,7 +148,7 @@ const Movie: NextPage = () => {
               {data?.movie.genres?.map((genre) => (
                 <Link
                   href={`/genre/${genre?.id}`}
-                  className='rounded-full border border-neutral-400 p-2 text-xs tracking-wide'
+                  className='rounded-lg font-bold h-fit uppercase text-neutral-900 bg-neutral-200 p-2 text-xs tracking-wide'
                   key={genre?.id}
                 >
                   {genre?.name}
