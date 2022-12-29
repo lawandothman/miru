@@ -9,6 +9,7 @@ import { useState } from 'react'
 import { Popcorn } from 'components/Popcorn'
 import { ProfilePicture } from 'components/Avatar'
 import Link from 'next/link'
+import { PageHeader } from 'components/PageHeader'
 
 const SEARCH = gql`
   query SearchMovies($query: String!) {
@@ -65,6 +66,7 @@ const Search: NextPage = () => {
 
   return (
     <div className='px-20 pt-20'>
+      <PageHeader title='Explore'></PageHeader>
       <form onSubmit={onSubmit} className='relative mx-auto mb-8 w-full'>
         <input
           type='text'

@@ -20,7 +20,7 @@ const PopularMovies: NextPage = () => {
 
   return (
     <div className='px-20 pt-20'>
-      <PageHeader title='Popular' />
+      <PageHeader title='Popular' subtitle='The top of Miru' />
       {loading ? <LoadingSkeleton /> : <MoviesList movies={data?.popularMovies} />}
     </div>
   )
