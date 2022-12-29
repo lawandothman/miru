@@ -8,13 +8,16 @@ import { MovieDbService } from './services/movieDbService'
 import { SyncService } from './services/syncService'
 import { Migrator } from './migrator'
 import DataLoader from 'dataloader'
-import { requireUser } from './utils'
 import { config } from './config'
 import { NeoDataSource } from './dataSources/neoDataSource'
 import { GenreRepo } from './dataSources/genreRepo'
 import { WatchProviderRepo } from './dataSources/watchProviderRepo'
 import { MovieRepo } from './dataSources/movieRepo'
 import SentryPlugin from './sentryPlugin'
+import UserResolver from './resolvers/userResolver'
+import MovieResolver from './resolvers/movieResolver'
+import MutationResolver from './resolvers/mutationResolver'
+import QueryResolver from './resolvers/queryResolver'
 
 const schema = readFileSync('./schema.graphql').toString()
 
@@ -36,95 +39,10 @@ export interface Context {
 }
 
 const resolvers: Resolvers = {
-  Query: {
-    movie: async (_parent, { id }, { movieLoader }) => {
-      return await movieLoader.load(id)
-    },
-    search: async (_parent, { query, offset, limit }, { movieRepo }) => {
-      return await movieRepo.search(query, offset ?? 0, limit ?? 20)
-    },
-    user: async (_parent, { id }, { userLoader }) => {
-      return await userLoader.load(id)
-    },
-    searchUsers: async (_parent, { nameQuery }, { neoDataSource, user }) => {
-      return await neoDataSource.searchUsers(nameQuery, user)
-    },
-    moviesByGenre: async (_parent, { genreId, offset, limit }, { movieRepo }) => {
-      return await movieRepo.getMoviesByGenre(genreId, offset ?? 0, limit ?? 20)
-    },
-    genres: async (_parent, _args, { neoDataSource }) => {
-      return await neoDataSource.getGenres()
-    },
-    genre: async (_parent, { genreId }, { genreLoader }) => {
-      return await genreLoader.load(genreId)
-    },
-    watchlist: async (_parent, _args, { neoDataSource, user }) => {
-      return await neoDataSource.getWatchlist(requireUser(user))
-    },
-    moviesForYou:async (_parent, {offset, limit}, {neoDataSource, user}) => {
-      return await neoDataSource.getMoviesForYou(requireUser(user), offset ?? 0, limit?? 20)
-    },
-    popularMovies: async (_parent, { offset, limit }, { neoDataSource }) => {
-      return await neoDataSource.getPopularMovies(offset ?? 0, limit ?? 20)
-    }
-  },
-  Mutation: {
-    addMovieToWatchlist: async (_parent, { movieId }, { movieRepo, user }) => {
-      const u = requireUser(user)
-      return await movieRepo.addToWatchlist(movieId, u)
-    },
-    removeMovieFromWatchlist: async (
-      _parent,
-      { movieId },
-      { movieRepo, user }
-    ) => {
-      const u = requireUser(user)
-      return await movieRepo.removeFromWatchlist(movieId, u)
-    },
-    follow: async (_parent, { friendId }, { neoDataSource, user }) => {
-      const u = requireUser(user)
-      return await neoDataSource.follow(u, friendId)
-    },
-    unfollow: async (_parent, { friendId }, { neoDataSource, user }) => {
-      const u = requireUser(user)
-      return await neoDataSource.unfollow(u, friendId)
-    },
-  },
-  Movie: {
-    genres: async (parent, _, { movieRepo }) => {
-      return await movieRepo.getGenres(parent)
-    },
-    inWatchlist: async (parent, _, { user, neoDataSource }) => {
-      if (user == null) {
-        return false
-      }
-      // ⚠️ No data loader code, this is subject to N+1
-      return await neoDataSource.isMovieInWatchlist(
-        parent.id,
-        requireUser(user)
-      )
-    },
-    matches: async (parent, _, {user, movieMatchesLoader}) => {
-      if (user == null) {
-        return []
-      }
-      return movieMatchesLoader.load(parent.id)
-    },
-    streamProviders: async (parent, _, { streamLoader }) => streamLoader.load(parent.id),
-    buyProviders: async (parent, _, { buyLoader }) => buyLoader.load(parent.id),
-    rentProviders: async (parent, _, { rentLoader }) => rentLoader.load(parent.id)
-  },
-  User: {
-    matches: async (parent, _, { matchesLoader }) => {
-      return await matchesLoader.load(parent.id)
-    },
-    followers: async (parent, _, { followerLoader }) => {
-      return await followerLoader.load(parent.id)
-    },
-    following: async (parent, _, { followingLoader }) => {
-      return await followingLoader.load(parent.id)
-    },
-  },
+  Query: QueryResolver,
+  Mutation: MutationResolver,
+  Movie: MovieResolver,
+  User: UserResolver,
 }
 
 const { host, user, pass } = config.neo4j
