@@ -66,7 +66,7 @@ export const Sidebar = ({ genres }: { genres: Genre[] }) => {
           >
             ミル Miru
           </h1>
-          <span className='mr-1 rounded-lg px-2 text-xs uppercase text-black dark:bg-red-800'>
+          <span className='mr-1 rounded-lg px-2 text-xs py-1 uppercase text-white dark:bg-red-800'>
             Alpha
           </span>
         </div>
@@ -83,7 +83,7 @@ export const Sidebar = ({ genres }: { genres: Genre[] }) => {
             <Link href='/' className='text-lg'>
               ミル Miru
             </Link>
-            <span className='mr-1 rounded-lg px-2 text-xs uppercase text-black dark:bg-red-800'>
+            <span className='mr-1 rounded-lg px-2 text-xs py-1 uppercase text-white dark:bg-red-800'>
               Alpha
             </span>
             <button
