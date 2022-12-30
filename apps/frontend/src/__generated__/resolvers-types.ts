@@ -43,6 +43,8 @@ export type Movie = {
   streamProviders?: Maybe<Array<Maybe<WatchProvider>>>;
   tagline?: Maybe<Scalars['String']>;
   title: Scalars['String'];
+  tmdbVoteAverage?: Maybe<Scalars['Float']>;
+  tmdbVoteCount?: Maybe<Scalars['Int']>;
 };
 
 export type Mutation = {
@@ -131,6 +133,12 @@ export type QuerySearchUsersArgs = {
 
 export type QueryUserArgs = {
   id: Scalars['ID'];
+};
+
+
+export type QueryWatchlistArgs = {
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
 };
 
 export type User = {
@@ -280,6 +288,8 @@ export type MovieResolvers<ContextType = any, ParentType extends ResolversParent
   streamProviders?: Resolver<Maybe<Array<Maybe<ResolversTypes['WatchProvider']>>>, ParentType, ContextType>;
   tagline?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  tmdbVoteAverage?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  tmdbVoteCount?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -300,7 +310,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   search?: Resolver<Maybe<Array<Maybe<ResolversTypes['Movie']>>>, ParentType, ContextType, RequireFields<QuerySearchArgs, 'query'>>;
   searchUsers?: Resolver<Maybe<Array<Maybe<ResolversTypes['User']>>>, ParentType, ContextType, RequireFields<QuerySearchUsersArgs, 'nameQuery'>>;
   user?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryUserArgs, 'id'>>;
-  watchlist?: Resolver<Maybe<Array<Maybe<ResolversTypes['Movie']>>>, ParentType, ContextType>;
+  watchlist?: Resolver<Maybe<Array<Maybe<ResolversTypes['Movie']>>>, ParentType, ContextType, Partial<QueryWatchlistArgs>>;
 }>;
 
 export type UserResolvers<ContextType = any, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = ResolversObject<{
