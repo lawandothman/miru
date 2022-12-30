@@ -3,13 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "next build",
+    "build": "NEXT_PUBLIC_SENTRY_RELEASE=$VERCEL_GITHUB_COMMIT_SHA SENTRY_DSN=$SENTRY_DSN next build && yarn run upload-sourcemaps",
     "postbuild": "next-sitemap",
     "dev": "next dev",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
     "start": "next start",
-    "generate": "graphql-codegen --config codegen.yaml"
+    "generate": "graphql-codegen --config codegen.yaml",
+    "upload-sourcemaps": "sentry-cli releases --org $SENTRY_ORG --project $SENTRY_PROJECT files $VERCEL_GITHUB_COMMIT_SHA upload-sourcemaps ./build/ &&  sentry-cli releases --org $SENTRY_ORG --project $SENTRY_PROJECT files $VERCEL_GITHUB_COMMIT_SHA upload-sourcemaps ./src/ --ext .js --ext .ts --ext .tsx  --url-prefix '~/static/js/'"
   },
   "dependencies": {
     "@apollo/client": "^3.7.3",

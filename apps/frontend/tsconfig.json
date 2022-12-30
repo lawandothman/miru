@@ -24,6 +24,6 @@
     "**/*.tsx",
     "**/*.cjs",
     "**/*.mjs"
-  ],
+, "next.config.js"  ],
   "exclude": ["node_modules", "src/__generated__/*.ts"]
 }
