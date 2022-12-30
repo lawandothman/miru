@@ -57,7 +57,7 @@ const FollowersDialog = ({ user }: { user: User }) => {
         </span>
       </DialogTrigger>
       <DialogContent>
-        <DialogTitle className='mb-8 text-lg font-semibold text-center dark:text-neutral-300 text-neutral-900'>
+        <DialogTitle className='mb-8 text-center text-lg font-semibold text-neutral-900 dark:text-neutral-300'>
           Followers
         </DialogTitle>
 
@@ -82,7 +82,7 @@ const FollowingDialog = ({ user }: { user: User }) => {
         </span>
       </DialogTrigger>
       <DialogContent>
-        <DialogTitle className='py-2 text-lg font-semibold text-center dark:text-neutral-300'>
+        <DialogTitle className='py-2 text-center text-lg font-semibold dark:text-neutral-300'>
           Following
         </DialogTitle>
         <div className='mt-1 max-h-[325px] overflow-y-auto'>
@@ -127,7 +127,7 @@ const User = () => {
                 <h1 className='text-3xl dark:text-neutral-300'>
                   {data?.user.name}
                 </h1>
-                <div className='flex gap-4 mt-1'>
+                <div className='mt-1 flex gap-4'>
                   <span className='dark:text-neutral-300'>
                     {data.user.matches?.length} matches
                   </span>

@@ -1,8 +1,10 @@
+import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import type { User } from '__generated__/resolvers-types'
 import { ProfilePicture } from './Avatar'
 
 export const UserCard = ({ user }: { user: User }) => {
+  const { data: session } = useSession()
   return (
     <Link href={`/users/${user.id}`}>
       <div className='gap-4 rounded-lg p-4 hover:bg-neutral-200  dark:hover:bg-neutral-700'>
@@ -10,7 +12,13 @@ export const UserCard = ({ user }: { user: User }) => {
           <ProfilePicture size='md' user={user} />
           <div>
             <h3 key={user.id}>{user.name}</h3>
-            <span className='text-sm'>{user.matches?.length} matches</span>
+            {session?.user?.id === user.id ? (
+              <span className='text-sm dark:text-white'>You</span>
+            ) : (
+              <span className='text-sm dark:text-white'>
+                {user.matches?.length} matches
+              </span>
+            )}
           </div>
         </div>
       </div>
