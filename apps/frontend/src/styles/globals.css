@@ -19,6 +19,11 @@
 		@apply dark:text-neutral-400;
 
 	}
+	ul>li {
+		@apply text-neutral-700;
+		@apply dark:text-neutral-400;
+
+	}
 }
 
 
