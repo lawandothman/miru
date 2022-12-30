@@ -5,6 +5,7 @@ import type {
 } from 'next'
 import { getProviders, getSession, signIn } from 'next-auth/react'
 import { FiFacebook } from 'react-icons/fi'
+import { FaGoogle } from 'react-icons/fa'
 
 const SignIn: NextPage<
 InferGetServerSidePropsType<typeof getServerSideProps>
@@ -19,7 +20,11 @@ InferGetServerSidePropsType<typeof getServerSideProps>
             key={provider.name}
             className='flex w-72 items-center justify-center gap-4 rounded bg-black p-4 text-white dark:bg-white dark:text-neutral-900 '
           >
-            <FiFacebook className='fill-white dark:fill-neutral-900' />
+            {provider.name === 'Facebook' ? (
+              <FiFacebook className='fill-white dark:fill-neutral-900' />
+            ) : (
+              <FaGoogle className='fill-white dark:fill-neutral-900' />
+            )}
             Login with {provider.name}
           </button>
         ))}

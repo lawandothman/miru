@@ -1,5 +1,7 @@
+/* eslint-disable react/jsx-no-undef */
 import * as Avatar from '@radix-ui/react-avatar'
 import type { User } from 'next-auth'
+import Image from 'next/image'
 import type { FC } from 'react'
 import { cn } from 'utils/cn'
 
@@ -19,6 +21,7 @@ export const ProfilePicture: FC<ProfilePictureProps> = ({
   user,
   size = 'sm',
 }) => {
+  console.log(user)
   return (
     <Avatar.Root
       className={cn(
@@ -26,22 +29,19 @@ export const ProfilePicture: FC<ProfilePictureProps> = ({
         size === 'md' ? 'h-10 w-10' : size == 'lg' ? 'h-14 w-14' : 'h-6 w-6'
       )}
     >
-      {user.image && (
-        <Avatar.Image
-          className='h-full w-full border-inherit object-cover'
-          src={user.image ?? ''}
-          alt={user.name ?? ''}
-        />
+      {user.image ? (
+        <Image width={50} height={50} className='object-contain' src={user.image} alt={user.name ?? ''} />
+      ) : (
+        <Avatar.Fallback
+          className={cn(
+            'flex h-full w-full items-center justify-center bg-white text-sm text-neutral-900',
+            size === 'md' ? 'text-lg' : size === 'lg' ? 'text-3xl' : 'text-base'
+          )}
+          delayMs={600}
+        >
+          {user.name && initials(user.name)}
+        </Avatar.Fallback>
       )}
-      <Avatar.Fallback
-        className={cn(
-          'flex h-full w-full items-center justify-center bg-white text-sm text-neutral-900',
-          size === 'md' ? 'text-lg' : size === 'lg' ? 'text-3xl' : 'text-base'
-        )}
-        delayMs={600}
-      >
-        {user.name && initials(user.name)}
-      </Avatar.Fallback>
     </Avatar.Root>
   )
 }
