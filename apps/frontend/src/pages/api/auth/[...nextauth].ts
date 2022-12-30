@@ -1,7 +1,6 @@
 import NextAuth, { type NextAuthOptions } from 'next-auth'
 import jsonwebtoken from 'jsonwebtoken'
 import FacebookProvider from 'next-auth/providers/facebook'
-import TwitterProvider from 'next-auth/providers/twitter'
 import GoogleProvider from 'next-auth/providers/google'
 
 import neo4j from 'neo4j-driver'
@@ -47,11 +46,6 @@ export const authOptions: NextAuthOptions = {
       clientSecret: process.env.FACEBOOK_CLIENT_SECRET as string,
       allowDangerousEmailAccountLinking: true,
     }),
-    // TwitterProvider({
-    //   clientId: process.env.TWITTER_CLIENT_ID as string,
-    //   clientSecret: process.env.TWITTER_CLIENT_SECRET as string,
-    //   allowDangerousEmailAccountLinking: true,
-    // }),
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID as string,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
