@@ -152,6 +152,13 @@ const Footer = () => (
       About
     </Link>
     <span>•</span>
+    <Link
+      href='/terms-and-conditions'
+      className='hover:text-black dark:hover:text-white'
+    >
+      Terms & Conditions
+    </Link>
+    <span>•</span>
     <Link href='/privacy' className='hover:text-black dark:hover:text-white'>
       Privacy Policy
     </Link>
