@@ -29,7 +29,7 @@ export const ProfilePicture: FC<ProfilePictureProps> = ({
       )}
     >
       {user.image ? (
-        <Image width={50} height={50} className='object-contain' src={user.image} alt={user.name ?? ''} />
+        <Image width={100} height={100} className='object-contain' src={user.image} alt={user.name ?? ''} />
       ) : (
         <Avatar.Fallback
           className={cn(

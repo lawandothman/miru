@@ -162,12 +162,12 @@ export const Sidebar = ({ genres }: { genres: Genre[] }) => {
               {session?.user ? (
                 <>
                   <div className='flex w-full items-center justify-between rounded-lg p-2 text-base font-normal text-gray-900 dark:text-white '>
-                    <div>
+                    <Link href={`/users/${session.user.id}`}>
                       <ProfilePicture size='sm' user={session.user} />
                       <span className='ml-3 text-sm'>
                         {session?.user?.name ?? 'Profile'}
                       </span>
-                    </div>
+                    </Link>
                   </div>
                   <button
                     className='mx-auto mt-2 flex justify-center p-2 text-base font-normal text-red-500'
