@@ -49,13 +49,21 @@ const Watchlist: NextPage = () => {
         <PageHeader title='Watchlist' />
         <p>Login to add movies to your watchlist and match with friends</p>
         {colorMode === 'dark' ? (
-          <Image className='mx-auto' src={TalkImgDark} alt={'Illustration'}></Image>
+          <Image
+            className='mx-auto'
+            src={TalkImgDark}
+            alt={'Illustration'}
+          ></Image>
         ) : (
-          <Image className='mx-auto' src={TalkImgLight} alt={'Illustration'}></Image>
+          <Image
+            className='mx-auto'
+            src={TalkImgLight}
+            alt={'Illustration'}
+          ></Image>
         )}
         <Link
           href='/auth/signin'
-          className='mt-12 block rounded-md bg-neutral-900 p-2 text-center text-white  dark:bg-neutral-300 dark:text-white'
+          className='mx-auto mt-12 block max-w-lg rounded-md bg-neutral-900 px-2 py-4 text-center text-lg font-semibold  text-white dark:bg-neutral-300 dark:text-black'
         >
           Login
         </Link>

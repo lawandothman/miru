@@ -61,9 +61,9 @@ const ForYou: NextPage = () => {
         )}
         <Link
           href='/auth/signin'
-          className='mt-12 block rounded-md bg-neutral-900 p-2 text-center text-white dark:bg-neutral-300 dark:text-white'
+          className='mx-auto mt-12 block max-w-lg rounded-md bg-neutral-900 px-2 py-4 text-center text-lg font-semibold  text-white dark:bg-neutral-300 dark:text-black'
         >
-          Login
+        Login
         </Link>
       </div>
     )
