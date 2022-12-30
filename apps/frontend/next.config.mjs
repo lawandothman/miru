@@ -13,6 +13,15 @@ const config = {
       {
         hostname: 'image.tmdb.org',
       },
+      {
+        hostname: 'picsum.photos',
+      },
+      {
+        hostname: 'lh3.googleusercontent.com',
+      },
+      {
+        hostname: 'platform-lookaside.fbsbx.com',
+      },
     ],
   },
   sentry: {
