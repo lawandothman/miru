@@ -1,5 +1,14 @@
 version: '3.9'
 services:
+  omni:
+    build: 
+      context: .
+      dockerfile: Dockerfile.omni
+    env_file: apps/omni/.env
+    ports:
+      - 4001:4000
+    depends_on: 
+      - neo4j
   neo4j:
     image: neo4j:5.3
     ports: 

@@ -5,12 +5,12 @@
   "license": "MIT",
   "scripts": {
     "generate": "graphql-codegen --config codegen.yaml",
-    "compile": "npm run generate && tsc",
+    "build": "npm run generate && tsc",
     "lint": "eslint src --ext .ts",
     "lint:fix": "eslint src --ext .ts --fix",
     "script:seed": "ts-node src/scripts/seed.ts",
     "dev": "nodemon -e ts --exec \"(tsc || exit 1) && node dist/index.js\"",
-    "start": "npm run compile && node ./dist/index.js"
+    "start": "node ./dist/index.js"
   },
   "dependencies": {
     "@apollo/server": "^4.3.0",

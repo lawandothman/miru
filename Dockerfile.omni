@@ -1,0 +1,15 @@
+FROM node:18
+
+# Create app directory
+WORKDIR .
+
+COPY apps/omni/package.json ./
+COPY yarn.lock ./
+
+RUN yarn install
+
+# Bundle app source
+COPY apps/omni/. .
+RUN yarn build
+
+CMD [ "yarn", "start" ]
