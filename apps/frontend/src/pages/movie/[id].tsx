@@ -103,7 +103,7 @@ const Movie: NextPage = () => {
             {data?.movie.title}
           </h1>
           <p className='mt-2 text-xl font-thin'>{data?.movie.tagline}</p>
-          <div className='mt-3 text-sm dark:text-neutral-400 text-neutral-500'>
+          <div className='mt-3 text-sm text-neutral-500 dark:text-neutral-400'>
             <div className='flex items-center justify-between'>
               <span>
                 {data?.movie?.runtime && data.movie.runtime + '  MIN • '}
@@ -128,7 +128,7 @@ const Movie: NextPage = () => {
                       })
                     }
                   }}
-                  className='flex h-10 w-28 max-w-xl items-center justify-center gap-2 rounded-lg text-base font-semibold bg-black text-white dark:bg-neutral-100 dark:text-black'
+                  className='flex h-10 w-28 max-w-xl items-center justify-center gap-2 rounded-lg bg-black text-base font-semibold text-white dark:bg-neutral-100 dark:text-black'
                 >
                   {addToWatchlistLoading || removeFromWatchlistLoading ? (
                     <>
@@ -148,14 +148,14 @@ const Movie: NextPage = () => {
               {data?.movie.genres?.map((genre) => (
                 <Link
                   href={`/genre/${genre?.id}`}
-                  className='rounded-lg font-bold h-fit uppercase text-neutral-900 bg-neutral-200 p-2 text-xs tracking-wide'
+                  className='h-fit rounded-lg bg-neutral-200 p-2 text-xs font-bold uppercase tracking-wide text-neutral-900'
                   key={genre?.id}
                 >
                   {genre?.name}
                 </Link>
               ))}
             </div>
-            <p className='mt-8 max-w-xl dark:text-neutral-400 text-neutral-600'>
+            <p className='mt-8 max-w-xl text-neutral-600 dark:text-neutral-400'>
               {data?.movie.overview}
             </p>
             <div className=' mt-6 flex gap-3'>
@@ -205,12 +205,11 @@ const Movie: NextPage = () => {
                   if (match) {
                     return (
                       <Link
-                        className='inline-flex items-center gap-2 mr-2'
+                        className='mr-2 inline-flex items-center gap-2'
                         href={`/users/${match.id}`}
                         key={match.id}
                       >
                         <ProfilePicture size='sm' user={match} />
-                        <span>{match?.name}</span>
                       </Link>
                     )
                   } else {

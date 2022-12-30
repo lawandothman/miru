@@ -23,15 +23,17 @@ interface NavItemProps {
   href: string;
   isSelected: boolean;
   icon?: React.ReactNode;
+  onClick: () => void;
 }
 const NavItem: FC<PropsWithChildren<NavItemProps>> = ({
   href,
   isSelected,
   icon,
   children,
+  onClick,
 }) => {
   return (
-    <li>
+    <li onClick={onClick}>
       <Link
         className={cn(
           'flex items-center rounded-lg p-2 text-base font-normal text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-neutral-700',
@@ -88,7 +90,7 @@ export const Sidebar = ({ genres }: { genres: Genre[] }) => {
             </span>
             <button
               onClick={() => setIsOpen(false)}
-              className='mr-2 rounded p-1 dark:hover:bg-neutral-700 hover:bg-neutral-300 lg:hidden'
+              className='mr-2 rounded p-1 hover:bg-neutral-300 dark:hover:bg-neutral-700 lg:hidden'
             >
               <FiX />
             </button>
@@ -97,6 +99,7 @@ export const Sidebar = ({ genres }: { genres: Genre[] }) => {
             <nav>
               <ul className='space-y-2'>
                 <NavItem
+                  onClick={() => setIsOpen(false)}
                   isSelected={router.pathname === '/'}
                   href='/'
                   icon={<FiHome />}
@@ -104,6 +107,7 @@ export const Sidebar = ({ genres }: { genres: Genre[] }) => {
                   Home
                 </NavItem>
                 <NavItem
+                  onClick={() => setIsOpen(false)}
                   isSelected={router.pathname === '/explore'}
                   href='/explore'
                   icon={<FiSearch />}
@@ -111,6 +115,7 @@ export const Sidebar = ({ genres }: { genres: Genre[] }) => {
                   Explore
                 </NavItem>
                 <NavItem
+                  onClick={() => setIsOpen(false)}
                   isSelected={router.pathname === '/watchlist'}
                   href='/watchlist'
                   icon={<FiPlay />}
@@ -118,6 +123,7 @@ export const Sidebar = ({ genres }: { genres: Genre[] }) => {
                   Watchlist
                 </NavItem>
                 <NavItem
+                  onClick={() => setIsOpen(false)}
                   isSelected={router.pathname === '/for-you'}
                   href='/for-you'
                   icon={<FiHeart />}
@@ -125,6 +131,7 @@ export const Sidebar = ({ genres }: { genres: Genre[] }) => {
                   For you
                 </NavItem>
                 <NavItem
+                  onClick={() => setIsOpen(false)}
                   isSelected={router.pathname === '/popular'}
                   href='/popular'
                   icon={<FiTrendingUp />}
@@ -138,6 +145,7 @@ export const Sidebar = ({ genres }: { genres: Genre[] }) => {
               <ul className='space-y-2'>
                 {_.sortBy(genres, (genre) => genre.name).map((genre) => (
                   <NavItem
+                    onClick={() => setIsOpen(false)}
                     href={`/genre/${genre.id}`}
                     isSelected={router.asPath === `/genre/${genre.id}`}
                     key={genre.id}
