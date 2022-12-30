@@ -43,7 +43,6 @@
 ::-webkit-scrollbar-thumb {
 	border-radius: 10px;
 	background-color: black;
-	animation-duration: 0.1s;
 	background-clip: padding-box;
 	border: 3px solid transparent;
 }

@@ -12,10 +12,11 @@ import { MoviesList } from 'components/MoviesList'
 import { UserCard } from 'components/UserCard'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
+import type { Movie } from '__generated__/resolvers-types'
 import { User } from '__generated__/resolvers-types'
 
 const SEARCH_USER = gql`
-  query User($userId: ID!) {
+  query User($userId: ID!, $limit: Int, $offset: Int) {
     user(id: $userId) {
       id
       name
@@ -44,6 +45,12 @@ const SEARCH_USER = gql`
           id
         }
       }
+    }
+    watchlist(limit: $limit, offset: $offset) {
+      id
+      title
+      posterUrl
+      inWatchlist
     }
   }
 `
@@ -100,19 +107,31 @@ const FollowingDialog = ({ user }: { user: User }) => {
 const User = () => {
   const { query } = useRouter()
   const userId = Array.isArray(query.id) ? query.id[0] : query.id
-  const { data: session } = useSession({
+  const { data: session, status } = useSession({
     required: false,
   })
-  const { data, loading } = useQuery<{ user: User }, { userId?: string }>(
-    SEARCH_USER,
-    {
-      variables: {
-        userId,
-      },
-    }
-  )
+  const { data, loading, fetchMore } = useQuery<
+  { user: User; watchlist?: Movie[] },
+  { userId?: string }
+  >(SEARCH_USER, {
+    variables: {
+      userId,
+    },
+  })
 
-  if (loading) {
+
+  const loadMore = async () => {
+    const currentLength = data?.watchlist?.length ?? 20
+    await fetchMore({
+      variables: {
+        limit: 20,
+        offset: currentLength * 2,
+      },
+    })
+  }
+
+
+  if (loading || status === 'loading') {
     return <FullPageLoader />
   }
 
@@ -128,9 +147,11 @@ const User = () => {
                   {data?.user.name}
                 </h1>
                 <div className='mt-1 flex gap-4'>
-                  <span className='dark:text-neutral-300'>
-                    {data.user.matches?.length} matches
-                  </span>
+                  {session?.user?.id !== userId && (
+                    <span className='dark:text-neutral-300'>
+                      {data.user.matches?.length} matches
+                    </span>
+                  )}
                   {data.user.followers && data.user.followers.length > 0 ? (
                     <FollowersDialog user={data.user} />
                   ) : (
@@ -152,6 +173,13 @@ const User = () => {
               <FollowButton user={data.user} friendId={userId} />
             )}
           </div>
+
+          {session?.user?.id === userId && (
+            <>
+              <h3 className='my-8 text-xl font-thin'>Your watchlist</h3>
+              <MoviesList loadMore={loadMore} movies={data?.watchlist} />
+            </>
+          )}
 
           {data?.user.matches && data.user.matches.length > 0 && (
             <>
