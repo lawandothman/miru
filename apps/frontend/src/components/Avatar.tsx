@@ -21,7 +21,6 @@ export const ProfilePicture: FC<ProfilePictureProps> = ({
   user,
   size = 'sm',
 }) => {
-  console.log(user)
   return (
     <Avatar.Root
       className={cn(

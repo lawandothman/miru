@@ -21,7 +21,6 @@ export const authOptions: NextAuthOptions = {
           session.user.id = token.sub
         }
         if (session.user.email) {
-          console.log(session.user)
           const encodedToken = jsonwebtoken.sign(
             {
               id: token.sub,
