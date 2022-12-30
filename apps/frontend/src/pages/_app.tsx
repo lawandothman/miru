@@ -40,7 +40,7 @@ const client = new ApolloClient({
     typePolicies: {
       Query: {
         fields: {
-          search: offsetLimitPagination(),
+          search: offsetLimitPagination(['query']),
           popularMovies: offsetLimitPagination(),
           moviesForYou: offsetLimitPagination(),
           moviesByGenre: offsetLimitPagination(['genreId']),
