@@ -44,6 +44,8 @@ export type Movie = {
   streamProviders?: Maybe<Array<Maybe<WatchProvider>>>;
   tagline?: Maybe<Scalars['String']>;
   title: Scalars['String'];
+  tmdbVoteAverage?: Maybe<Scalars['Float']>;
+  tmdbVoteCount?: Maybe<Scalars['Int']>;
 };
 
 export type Mutation = {
@@ -287,6 +289,8 @@ export type MovieResolvers<ContextType = Context, ParentType extends ResolversPa
   streamProviders?: Resolver<Maybe<Array<Maybe<ResolversTypes['WatchProvider']>>>, ParentType, ContextType>;
   tagline?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  tmdbVoteAverage?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  tmdbVoteCount?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 

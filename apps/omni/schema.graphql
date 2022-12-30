@@ -20,6 +20,8 @@ type Movie {
   streamProviders: [WatchProvider]
   buyProviders: [WatchProvider]
   rentProviders: [WatchProvider]
+  tmdbVoteAverage: Float
+  tmdbVoteCount: Int
 }
 
 type User {

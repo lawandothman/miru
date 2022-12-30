@@ -145,6 +145,8 @@ export class MovieDbService {
       homepage: mov.homepage,
       imdbId: mov.imdb_id,
       genres: mov.genres,
+      tmdbVoteAverage: mov.vote_average,
+      tmdbVoteCount: mov.vote_count
     }
   }
 }

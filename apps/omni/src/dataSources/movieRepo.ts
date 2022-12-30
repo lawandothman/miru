@@ -57,7 +57,11 @@ export class MovieRepo implements WriteRepository<Movie> {
     const res = await session.run(
       `
       MATCH (m:Movie)-[r:IS_A]->(g:Genre {id: $id})
-      RETURN m SKIP $offset LIMIT $limit
+      WHERE m.tmdbVoteCount > 0
+      RETURN m 
+      ORDER BY m.tmdbVoteCount DESC
+      SKIP $offset
+      LIMIT $limit
     `,
       { id: genreId, offset: neo4j.int(offset), limit: neo4j.int(limit) }
     )
