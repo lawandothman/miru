@@ -4,7 +4,6 @@
 
 
 @layer base {
-
 	h1,
 	h2,
 	h3,
@@ -35,12 +34,6 @@
 	border-radius: 10px;
 }
 
-@media (prefers-color-scheme: dark) {
-	::-webkit-scrollbar-thumb {
-		background-color: white;
-	}
-
-}
 
 ::-webkit-scrollbar-thumb {
 	border-radius: 10px;
@@ -51,17 +44,24 @@
 }
 
 @media (prefers-color-scheme: dark) {
-	::-webkit-scrollbar-thumb:hover {
+	::-webkit-scrollbar-thumb {
 		background-color: white;
 	}
 
 }
+
 
 ::-webkit-scrollbar-thumb:hover {
 	border-radius: 10px;
 	background-color: black;
 }
 
+@media (prefers-color-scheme: dark) {
+	::-webkit-scrollbar-thumb:hover {
+		background-color: white;
+	}
+
+}
 
 circle#popcrncirlce {
 	transform-origin: 0 0;
