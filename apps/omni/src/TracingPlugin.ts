@@ -55,7 +55,6 @@ export default class TracingPlugin implements ApolloServerPlugin {
           async executionDidEnd() {
             const user = requestContext.contextValue.user
             if(user) {
-              console.log(user)
               mixpanel.people.set(user.id, {
                 $email: user.email,
                 $name: user.name,

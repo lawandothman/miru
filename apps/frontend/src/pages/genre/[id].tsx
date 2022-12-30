@@ -36,7 +36,6 @@ const Genre: NextPage = () => {
 
   const loadMore = async () => {
     const currentLength = data?.moviesByGenre.length ?? 20
-    console.log('next')
     await fetchMore({
       variables: {
         limit: 20,
