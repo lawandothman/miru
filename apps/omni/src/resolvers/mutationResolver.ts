@@ -1,5 +1,5 @@
-import { requireUser } from "../utils";
-import { MutationResolvers } from "../__generated__/resolvers-types";
+import { requireUser } from '../utils'
+import type { MutationResolvers } from '../__generated__/resolvers-types'
 
 const MutationResolver: MutationResolvers = {
   addMovieToWatchlist: async (_parent, { movieId }, { movieRepo, user }) => {

@@ -1,5 +1,5 @@
-import { requireUser } from "../utils"
-import { MovieResolvers } from "../__generated__/resolvers-types"
+import { requireUser } from '../utils'
+import type { MovieResolvers } from '../__generated__/resolvers-types'
 
 const MovieResolver: MovieResolvers = {
   genres: async (parent, _, { movieRepo }) => {

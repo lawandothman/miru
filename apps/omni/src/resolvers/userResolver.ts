@@ -1,4 +1,4 @@
-import { UserResolvers } from "../__generated__/resolvers-types"
+import type { UserResolvers } from '../__generated__/resolvers-types'
 
 
 const UserResolver: UserResolvers = {
