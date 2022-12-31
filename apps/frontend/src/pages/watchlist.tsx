@@ -9,7 +9,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import TalkImgDark from '../../public/illustration/dark/talk.png'
 import TalkImgLight from '../../public/illustration/light/talk.png'
-import { useColorMode } from 'utils/useColorMode'
+import { useTheme } from 'next-themes'
 
 export const GET_WATCHLIST = gql`
   query Watchlist($limit: Int, $offset: Int) {
@@ -23,7 +23,7 @@ export const GET_WATCHLIST = gql`
 `
 
 const Watchlist: NextPage = () => {
-  const colorMode = useColorMode()
+  const { theme } = useTheme()
   const { data: session } = useSession()
   const { data, loading, refetch, fetchMore } = useQuery<{
     watchlist: Movie[];
@@ -48,7 +48,7 @@ const Watchlist: NextPage = () => {
       <div className='mx-auto max-w-4xl px-20 pt-20 text-white'>
         <PageHeader title='Watchlist' />
         <p>Login to add movies to your watchlist and match with friends</p>
-        {colorMode === 'dark' ? (
+        {theme === 'dark' ? (
           <Image
             className='mx-auto'
             src={TalkImgDark}

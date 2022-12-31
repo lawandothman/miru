@@ -8,7 +8,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import PhotoImgDark from '../../public/illustration/dark/photo.png'
 import PhotoImgLight from '../../public/illustration/light/photo.png'
-import { useColorMode } from 'utils/useColorMode'
+import { useTheme } from 'next-themes'
 
 const GET_FOR_YOU = gql`
   query ForYou($limit: Int, $offset: Int) {
@@ -22,7 +22,7 @@ const GET_FOR_YOU = gql`
 `
 
 const ForYou: NextPage = () => {
-  const colorMode = useColorMode()
+  const { theme } = useTheme()
   const { data: session } = useSession()
   const { data, loading, fetchMore } = useQuery<
   { moviesForYou: Movie[] },
@@ -46,7 +46,7 @@ const ForYou: NextPage = () => {
       <div className='mx-auto max-w-4xl px-20 pt-20 text-white'>
         <PageHeader title='For you' />
         <p>Login so that we can recommend you movies</p>
-        {colorMode === 'dark' ? (
+        {theme === 'dark' ? (
           <Image
             className='mx-auto'
             src={PhotoImgDark}

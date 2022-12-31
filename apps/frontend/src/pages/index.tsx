@@ -13,7 +13,7 @@ import React from 'react'
 import { FiSearch, FiShuffle, FiUserPlus } from 'react-icons/fi'
 import type { IconType } from 'react-icons/lib'
 import type { User } from '__generated__/resolvers-types'
-import { useColorMode } from 'utils/useColorMode'
+import { useTheme } from 'next-themes'
 import { getHours } from 'date-fns'
 
 const GET_HOME = gql`
@@ -66,24 +66,32 @@ const Home: NextPage = () => {
 }
 
 const LoggedOutPage = () => {
-  const colorMode = useColorMode()
+  const {theme} = useTheme()
   return (
     <div className='mx-auto max-w-4xl px-20 pt-20'>
       <PageHeader
         title='Welcome to Miru'
         subtitle='The social movie watching platform'
       ></PageHeader>
-      <p >
+      <p>
         Remove the drama from movie night and find the movie that everyone wants
         to watch.
       </p>
-      <p >
+      <p>
         Get started by making an account and adding movies to your watchlist
       </p>
-      {colorMode === 'dark' ? (
-        <Image className='mx-auto' src={PhoneImgDark} alt={'Illustration'}></Image>
-      ): (
-        <Image className='mx-auto' src={PhoneImgLight} alt={'Illustration'}></Image>
+      {theme === 'dark' ? (
+        <Image
+          className='mx-auto'
+          src={PhoneImgDark}
+          alt={'Illustration'}
+        ></Image>
+      ) : (
+        <Image
+          className='mx-auto'
+          src={PhoneImgLight}
+          alt={'Illustration'}
+        ></Image>
       )}
 
       <h2 className='mt-4 text-xl'>How it works?</h2>

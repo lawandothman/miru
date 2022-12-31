@@ -12,7 +12,7 @@ import { DefaultSeo } from 'next-seo'
 import SEO from 'config/next-seo.config'
 
 import { Sidebar } from 'components/Sidebar'
-
+import { ThemeProvider } from 'next-themes'
 import 'styles/globals.css'
 import type { Genre } from '__generated__/resolvers-types'
 import App from 'next/app'
@@ -71,10 +71,12 @@ const MyApp = (props: AppProps & { genres: Genre[] }) => {
       <SessionProvider session={session}>
         <ApolloProvider client={client}>
           <DefaultSeo {...SEO} />
-          <Sidebar genres={genres} />
-          <main className='lg:pl-60'>
-            <Component {...pageProps} />
-          </main>
+          <ThemeProvider attribute='class'>
+            <Sidebar genres={genres} />
+            <main className='lg:pl-60'>
+              <Component {...pageProps} />
+            </main>
+          </ThemeProvider>
         </ApolloProvider>
       </SessionProvider>
     </>
