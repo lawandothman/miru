@@ -7,7 +7,7 @@ import { getYear } from 'date-fns'
 import { FullPageLoader } from 'components/FullPageLoader'
 import { gql, useMutation, useQuery } from '@apollo/client'
 import { Movie } from '__generated__/resolvers-types'
-import { FiLink, FiMinus, FiPlus } from 'react-icons/fi'
+import { FiArrowLeft, FiLink, FiMinus, FiPlus } from 'react-icons/fi'
 import { FaImdb } from 'react-icons/fa'
 import { useSession } from 'next-auth/react'
 import { Spinner } from 'components/Spinner'
@@ -64,6 +64,7 @@ const REMOVE_FROM_WATCHLIST = gql`
 
 const Movie: NextPage = () => {
   const { query } = useRouter()
+  const router = useRouter()
   const movieId = Array.isArray(query.id) ? query.id[0] : query.id
   const { data: session } = useSession()
 
@@ -88,7 +89,13 @@ const Movie: NextPage = () => {
   }
   return (
     <div className='flex flex-col px-8 pt-10'>
-      <div className='mx-auto flex flex-col gap-24 pt-10 md:flex-row'>
+      <button
+        onClick={() => router.back()}
+        className='flex h-8 w-8  items-center justify-center  rounded-full border text-black hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-800'
+      >
+        <FiArrowLeft className='h-5 w-5' />
+      </button>
+      <div className='mx-auto flex flex-col gap-24 pt-4 md:flex-row'>
         {data?.movie?.posterUrl && (
           <Image
             src={getImage(data.movie.posterUrl)}
@@ -132,7 +139,7 @@ const Movie: NextPage = () => {
                 >
                   {addToWatchlistLoading || removeFromWatchlistLoading ? (
                     <>
-                      <Spinner  />
+                      <Spinner />
                       Watchlist
                     </>
                   ) : (
