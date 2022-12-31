@@ -18,6 +18,7 @@ import type { Genre } from '__generated__/resolvers-types'
 import App from 'next/app'
 import NextNProgress from 'nextjs-progressbar'
 import { offsetLimitPagination } from '@apollo/client/utilities'
+import { usePreserveScroll } from 'utils/usePreserveScroll'
 
 const httpLinkt = createHttpLink({
   uri: `${process.env.NEXT_PUBLIC_OMNI_URL}/graphql`,
@@ -56,6 +57,8 @@ const MyApp = (props: AppProps & { genres: Genre[] }) => {
     genres,
     pageProps: { session, ...pageProps },
   } = props
+
+  usePreserveScroll()
 
   return (
     <>
