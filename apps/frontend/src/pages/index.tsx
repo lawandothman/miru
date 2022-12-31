@@ -14,6 +14,7 @@ import { FiSearch, FiShuffle, FiUserPlus } from 'react-icons/fi'
 import type { IconType } from 'react-icons/lib'
 import type { User } from '__generated__/resolvers-types'
 import { useColorMode } from 'utils/useColorMode'
+import { getHours } from 'date-fns'
 
 const GET_HOME = gql`
   query ($userId: ID!) {
@@ -49,7 +50,7 @@ const Home: NextPage = () => {
 
   return (
     <div className='px-20 pt-20'>
-      <PageHeader title='Welcome back!' subtitle='' />
+      <PageHeader title={getGreeting()} subtitle='' />
       {sortBy(data?.user.following, [(u) => -(u?.matches?.length ?? 0)]).map(
         (following) => {
           if (following) {
@@ -120,6 +121,21 @@ const LoggedOutPage = () => {
     </div>
   )
 }
+
+
+const  getGreeting = () => {
+  const hours = getHours(new Date())
+  if (hours < 12 && hours >= 6) {
+    return 'Good morning!'
+  } else if (hours < 17 && hours > 12) {
+    return 'Good afternoon!'
+  } else if (hours <= 23 && hours > 17) {
+    return 'Good evening!'
+  } else {
+    return 'Welcome back!'
+  }
+}
+
 
 const Step = ({
   icon,

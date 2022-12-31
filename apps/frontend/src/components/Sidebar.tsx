@@ -161,17 +161,22 @@ export const Sidebar = ({ genres }: { genres: Genre[] }) => {
             <div className='bg-white p-4 dark:bg-black'>
               {session?.user ? (
                 <>
-                  <div className='flex w-full items-center justify-between rounded-lg p-2 text-base font-normal text-gray-900 dark:text-white '>
-                    <Link href={`/users/${session.user.id}`}>
-                      <ProfilePicture size='sm' user={session.user} />
-                      <span className='ml-3 text-sm'>
-                        {session?.user?.name ?? 'Profile'}
-                      </span>
-                    </Link>
-                  </div>
+                  <Link
+                    href={`/users/${session.user.id}`}
+                    onClick={() => setIsOpen(false)}
+                    className='flex w-full items-center rounded-lg p-2 text-base font-normal text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-neutral-700 '
+                  >
+                    <ProfilePicture size='sm' user={session.user} />
+                    <span className='ml-3 text-sm'>
+                      {session?.user?.name ?? 'Profile'}
+                    </span>
+                  </Link>
                   <button
                     className='mx-auto mt-2 flex justify-center p-2 text-base font-normal text-red-500'
-                    onClick={() => signOut()}
+                    onClick={() => {
+                      signOut()
+                      setIsOpen(false)
+                    }}
                   >
                     Sign out
                   </button>
@@ -179,7 +184,10 @@ export const Sidebar = ({ genres }: { genres: Genre[] }) => {
               ) : (
                 <button
                   className='mx-auto mt-2 flex justify-center rounded bg-black px-8 py-1 text-base font-normal text-white dark:bg-white dark:text-black'
-                  onClick={() => signIn()}
+                  onClick={() => {
+                    signIn()
+                    setIsOpen(false)
+                  }}
                 >
                   Login
                 </button>

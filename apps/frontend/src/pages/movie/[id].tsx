@@ -231,9 +231,9 @@ const Movie: NextPage = () => {
             <div className='mt-8'>
               <h3 className='mb-4'>Stream</h3>
               <div className='flex gap-4'>
-                {data.movie.streamProviders.map((provider) => (
+                {data.movie.streamProviders.map((provider, i) => (
                   <Image
-                    key={provider?.id}
+                    key={i}
                     src={getImage(provider?.logoPath ?? '')}
                     alt={provider?.name ?? ''}
                     width={40}

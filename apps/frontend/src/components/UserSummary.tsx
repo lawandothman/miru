@@ -10,7 +10,7 @@ export const UserSummary = ({
 }) => {
   return (
     <div className='mb-4 rounded-lg border bg-white p-4 text-black dark:text-white drop-shadow-sm dark:border-none dark:bg-neutral-900'>
-      <Link href={`/users/${user.id}`}>
+      <Link href={`/users/${user.id}`} className='inline-flex'>
         <div className='gap-4 rounded-lg'>
           <div className='flex items-center gap-3'>
             <ProfilePicture size='md' user={user} />
