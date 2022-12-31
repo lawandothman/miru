@@ -132,7 +132,7 @@ const Movie: NextPage = () => {
                 >
                   {addToWatchlistLoading || removeFromWatchlistLoading ? (
                     <>
-                      <Spinner />
+                      <Spinner  />
                       Watchlist
                     </>
                   ) : (

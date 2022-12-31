@@ -60,7 +60,7 @@ export const FollowButton = ({
       }}
     >
       {followLoading || unfollowLoading ? (
-        <Spinner />
+        <Spinner reverted />
       ) : user.isFollowing ? (
         <>
           <FiUserMinus />

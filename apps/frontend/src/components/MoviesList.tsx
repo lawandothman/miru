@@ -115,7 +115,7 @@ const Movie = ({ movie }: { movie: Movie | null }) => {
         >
           {addToWatchlistLoading || removeFromWatchlistLoading ? (
             <>
-              <Spinner />
+              <Spinner reverted />
               Watchlist
             </>
           ) : (
