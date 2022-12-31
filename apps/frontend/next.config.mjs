@@ -8,6 +8,9 @@ const config = {
     locales: ['en'],
     defaultLocale: 'en',
   },
+  experimental: {
+    scrollRestoration: true
+  },
   images: {
     remotePatterns: [
       {
