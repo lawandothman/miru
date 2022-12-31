@@ -47,19 +47,24 @@ const Search: NextPage = () => {
     skip: !searchQuery,
   })
 
+  const onChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setQuery(e.target.value)
+    router.push({
+      pathname: '/explore',
+      query: {
+        q: e.target.value
+      },
+    })
+  }
+
   const onSubmit = (e: FormEvent) => {
     e.preventDefault()
     router.push({
       pathname: '/explore',
       query: {
-        q: query,
+        q: query
       },
     })
-  }
-
-  const onChange = (e: ChangeEvent<HTMLInputElement>) => {
-    onSubmit(e)
-    setQuery(e.target.value)
   }
 
   const loadMore = async () => {
@@ -80,8 +85,9 @@ const Search: NextPage = () => {
       <form onSubmit={onSubmit} className='relative mx-auto mb-8 w-full'>
         <input
           type='text'
+          autoFocus
           required
-          placeholder='Search movies or Miru members...'
+          placeholder='Search for movies or Miru members...'
           className='h-12 w-full cursor-auto rounded-xl border border-neutral-300 bg-transparent pl-12 text-neutral-600 outline-none dark:text-neutral-300'
           defaultValue={searchQuery}
           onChange={onChange}
