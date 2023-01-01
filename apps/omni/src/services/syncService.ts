@@ -74,7 +74,11 @@ export class SyncService {
   }
 
   async getMovieDetails(movieLike: {id: string}) {
-    return this.movieDbService.getMovieDetails(movieLike.id)
+    const [movie, trailer] = await Promise.all([
+      this.movieDbService.getMovieDetails(movieLike.id),
+      this.movieDbService.getMovieTrailer(movieLike.id),
+    ])
+    return Object.assign({}, movie, trailer)
   }
 
   async getWatchProvidersForMovie(movieLike: {id: string}) {
