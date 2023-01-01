@@ -27,7 +27,6 @@ const MovieResolver: MovieResolvers = {
   rentProviders: async (parent, _, { rentLoader }) => rentLoader.load(parent.id),
   trailer: (parent, _, _ctx) => {
     const movie: Movie&TrailerKeys = parent
-    console.log(parent)
     if(movie.trailerProvider == undefined) {
       return null
     }
