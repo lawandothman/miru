@@ -13,21 +13,14 @@ export class NeoDataSource {
   constructor(private readonly driver: Driver) {}
 
   async getMovies(ids: readonly string[]): Promise<Movie[]> {
-    const session = this.driver.session()
-    const res = await session.run(
-      'MATCH (m:Movie) WHERE m.id in $ids RETURN m',
-      {
-        ids,
-      }
+    const movies = await runMany<Movie>(
+      this.driver,
+      'MATCH (m:Movie) WHERE m.id in $ids RETURN m{.*}',
+      { ids },
+      'm'
     )
 
-    session.close().catch(console.error)
-
-    return (
-      (res.records.map((rec) =>
-        mapTo<Movie>(rec.toObject(), 'm')
-      ) as Movie[]) ?? []
-    )
+    return ids.map((id) => movies.find(mov => mov.id == id)!)
   }
 
   async getMoviesForYou(user: User, offset: number, limit: number): Promise<Movie[]> {
@@ -56,7 +49,7 @@ export class NeoDataSource {
   }
 
   async getGenresByIds(ids: readonly string[]): Promise<Genre[]> {
-    return await runMany<Genre>(this.driver, `
+    const genres = await runMany<Genre>(this.driver, `
       MATCH (g:Genre)
       WHERE g.id IN $ids
       RETURN g{
@@ -64,6 +57,7 @@ export class NeoDataSource {
         .name
       }
     `, {ids}, 'g')
+    return ids.map((id) => genres.find(gen => gen.id == id)!)
   }
 
   async getStreamProviders(movieIds: readonly string[]): Promise<WatchProvider[][]> {
@@ -116,7 +110,7 @@ export class NeoDataSource {
     (user: User | null) =>
       async (ids: readonly string[]): Promise<User[]> => {
         const email = user?.email ?? ''
-        return await runMany<User>(
+        const users = await runMany<User>(
           this.driver,
           `MATCH (u:User) WHERE u.id in $ids
       RETURN u{
@@ -131,6 +125,7 @@ export class NeoDataSource {
           { ids, email },
           'u'
         )
+        return ids.map((id) => users.find(u => u.id == id)!)
       }
 
   getMatchesWith =
