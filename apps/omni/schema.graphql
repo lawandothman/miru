@@ -22,6 +22,16 @@ type Movie {
   rentProviders: [WatchProvider]
   tmdbVoteAverage: Float
   tmdbVoteCount: Int
+  trailer: Trailer
+}
+
+type Trailer {
+  key: String
+  provider: VideoProvider
+}
+
+enum VideoProvider {
+  YouTube
 }
 
 type User {

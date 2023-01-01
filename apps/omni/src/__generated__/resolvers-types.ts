@@ -46,6 +46,7 @@ export type Movie = {
   title: Scalars['String'];
   tmdbVoteAverage?: Maybe<Scalars['Float']>;
   tmdbVoteCount?: Maybe<Scalars['Int']>;
+  trailer?: Maybe<Trailer>;
 };
 
 export type Mutation = {
@@ -142,6 +143,12 @@ export type QueryWatchlistArgs = {
   offset?: InputMaybe<Scalars['Int']>;
 };
 
+export type Trailer = {
+  __typename?: 'Trailer';
+  key?: Maybe<Scalars['String']>;
+  provider?: Maybe<VideoProvider>;
+};
+
 export type User = {
   __typename?: 'User';
   email: Scalars['String'];
@@ -154,6 +161,10 @@ export type User = {
   matches?: Maybe<Array<Maybe<Movie>>>;
   name: Scalars['String'];
 };
+
+export enum VideoProvider {
+  YouTube = 'YouTube'
+}
 
 export type WatchProvider = {
   __typename?: 'WatchProvider';
@@ -242,7 +253,9 @@ export type ResolversTypes = ResolversObject<{
   Mutation: ResolverTypeWrapper<{}>;
   Query: ResolverTypeWrapper<{}>;
   String: ResolverTypeWrapper<Scalars['String']>;
+  Trailer: ResolverTypeWrapper<Trailer>;
   User: ResolverTypeWrapper<User>;
+  VideoProvider: VideoProvider;
   WatchProvider: ResolverTypeWrapper<WatchProvider>;
 }>;
 
@@ -257,6 +270,7 @@ export type ResolversParentTypes = ResolversObject<{
   Mutation: {};
   Query: {};
   String: Scalars['String'];
+  Trailer: Trailer;
   User: User;
   WatchProvider: WatchProvider;
 }>;
@@ -291,6 +305,7 @@ export type MovieResolvers<ContextType = Context, ParentType extends ResolversPa
   title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   tmdbVoteAverage?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   tmdbVoteCount?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  trailer?: Resolver<Maybe<ResolversTypes['Trailer']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -312,6 +327,12 @@ export type QueryResolvers<ContextType = Context, ParentType extends ResolversPa
   searchUsers?: Resolver<Maybe<Array<Maybe<ResolversTypes['User']>>>, ParentType, ContextType, RequireFields<QuerySearchUsersArgs, 'nameQuery'>>;
   user?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryUserArgs, 'id'>>;
   watchlist?: Resolver<Maybe<Array<Maybe<ResolversTypes['Movie']>>>, ParentType, ContextType, Partial<QueryWatchlistArgs>>;
+}>;
+
+export type TrailerResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Trailer'] = ResolversParentTypes['Trailer']> = ResolversObject<{
+  key?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  provider?: Resolver<Maybe<ResolversTypes['VideoProvider']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
 export type UserResolvers<ContextType = Context, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = ResolversObject<{
@@ -340,6 +361,7 @@ export type Resolvers<ContextType = Context> = ResolversObject<{
   Movie?: MovieResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
+  Trailer?: TrailerResolvers<ContextType>;
   User?: UserResolvers<ContextType>;
   WatchProvider?: WatchProviderResolvers<ContextType>;
 }>;

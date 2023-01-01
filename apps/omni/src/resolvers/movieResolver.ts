@@ -1,5 +1,6 @@
+import { TrailerKeys } from '../services/movieDbService'
 import { requireUser } from '../utils'
-import type { MovieResolvers } from '../__generated__/resolvers-types'
+import type { Movie, MovieResolvers, Trailer, VideoProvider } from '../__generated__/resolvers-types'
 
 const MovieResolver: MovieResolvers = {
   genres: async (parent, _, { movieRepo }) => {
@@ -23,8 +24,18 @@ const MovieResolver: MovieResolvers = {
   },
   streamProviders: async (parent, _, { streamLoader }) => streamLoader.load(parent.id),
   buyProviders: async (parent, _, { buyLoader }) => buyLoader.load(parent.id),
-  rentProviders: async (parent, _, { rentLoader }) => rentLoader.load(parent.id)
-
+  rentProviders: async (parent, _, { rentLoader }) => rentLoader.load(parent.id),
+  trailer: (parent, _, _ctx) => {
+    const movie: Movie&TrailerKeys = parent
+    console.log(parent)
+    if(movie.trailerProvider == undefined) {
+      return null
+    }
+    return {
+      key: movie.trailerKey,
+      provider: movie.trailerProvider
+    } as Trailer
+  }
 }
 
 export default MovieResolver

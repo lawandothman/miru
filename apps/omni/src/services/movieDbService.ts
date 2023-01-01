@@ -1,6 +1,6 @@
 import axios from 'axios'
 import axiosRetry from 'axios-retry'
-import type { Genre, Movie, WatchProvider } from '../__generated__/resolvers-types'
+import type { Genre, Movie, VideoProvider, WatchProvider } from '../__generated__/resolvers-types'
 
 export class MovieDbService {
   constructor(private readonly http = axios.create()) {
@@ -53,6 +53,27 @@ export class MovieDbService {
     )
 
     return this.mapToDomain(res.data)
+  }
+
+  async getMovieTrailer(movieId: string): Promise<TrailerKeys> {
+    const res = await this.http.get<{results: ApiTrailer[]}>(
+      `${process.env.TMDB_API_BASE_URL}/3/movie/${movieId}/videos`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${process.env.TMDB_API_READ_ACCESS_TOKEN}`,
+        },
+      }
+    )
+
+    const trailers = res.data.results
+      .filter(t => t.site === 'YouTube')
+      .filter(t => t.type === 'Trailer')
+
+    return {
+      trailerProvider: trailers[0]?.site ?? null,
+      trailerKey: trailers[0]?.key ?? null,
+    }
   }
 
   async getGenres(): Promise<Genre[]> {
@@ -178,4 +199,24 @@ export interface ApiMovie {
   tagline?: string
   imdb_id?: string
   homepage?: string
+}
+
+type VideoTypes = 'Trailer' | 'Featurette' | 'Teaser' | 'Behind the Scenes' | 'Clip'
+
+export interface TrailerKeys {
+  trailerKey?: string
+  trailerProvider?: VideoProvider
+}
+
+export interface ApiTrailer {
+  iso_639_1: 'en' | 'unsupported',
+  iso_3166_1: 'US' | 'unsupported',
+  name: string,
+  key: string,
+  site: VideoProvider
+  type: VideoTypes,
+  size: number
+  official: boolean
+  published_at: string
+  id: string
 }
