@@ -58,14 +58,15 @@ const SEARCH_USER = gql`
 `
 
 const FollowersDialog = ({ user }: { user: User }) => {
+  const [open, setIsOpen] = useState(false)
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setIsOpen}>
       <DialogTrigger>
         <span className='dark:text-neutral-300'>
           {user.followers?.length} followers
         </span>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent show={open}>
         <DialogTitle className='mb-8 text-center text-lg font-semibold text-neutral-900 dark:text-neutral-300'>
           Followers
         </DialogTitle>
@@ -83,14 +84,15 @@ const FollowersDialog = ({ user }: { user: User }) => {
 }
 
 const FollowingDialog = ({ user }: { user: User }) => {
+  const [open, setIsOpen] = useState(false)
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setIsOpen}>
       <DialogTrigger>
         <span className='dark:text-neutral-300'>
           {user.following?.length} following
         </span>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent show={open}>
         <DialogTitle className='py-2 text-center text-lg font-semibold dark:text-neutral-300'>
           Following
         </DialogTitle>
