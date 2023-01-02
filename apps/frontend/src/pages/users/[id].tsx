@@ -154,7 +154,7 @@ const User = () => {
     }
 
     return (
-      <div className='px-20 pt-20'>
+      <main>
         {data.user && (
           <>
             <div className='flex items-center justify-between'>
@@ -209,7 +209,7 @@ const User = () => {
             )}
           </>
         )}
-      </div>
+      </main>
     )
   }
 

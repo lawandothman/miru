@@ -71,9 +71,9 @@ const MyApp = (props: AppProps & { genres: Genre[] }) => {
           <DefaultSeo {...SEO} />
           <ThemeProvider attribute='class'>
             <Sidebar genres={genres} />
-            <main className='lg:pl-60'>
+            <div className='lg:pl-60'>
               <Component {...pageProps} />
-            </main>
+            </div>
           </ThemeProvider>
         </ApolloProvider>
       </SessionProvider>

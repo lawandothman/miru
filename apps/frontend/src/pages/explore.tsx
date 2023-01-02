@@ -39,7 +39,7 @@ const ExploreSkeleton: FC<PropsWithChildren> = ({ children }) => {
     })
   }
   return (
-    <div className='px-20 pt-20'>
+    <main>
       <PageHeader title='Explore'></PageHeader>
       <form onSubmit={onSubmit} className='relative mx-auto mb-8 w-full'>
         <input
@@ -54,7 +54,7 @@ const ExploreSkeleton: FC<PropsWithChildren> = ({ children }) => {
         <FiSearch className='absolute inset-y-0 my-auto h-8 w-12 stroke-neutral-400 px-3.5' />
       </form>
       {children}
-    </div>
+    </main>
   )
 }
 

@@ -92,7 +92,7 @@ const Movie: NextPage = () => {
     return <FullPageLoader />
   }
   return (
-    <div className='flex flex-col px-8 pt-10'>
+    <main className='flex flex-col'>
       <button
         onClick={() => router.back()}
         className='flex h-8 w-8  items-center justify-center  rounded-full border text-black hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-800'
@@ -264,7 +264,7 @@ const Movie: NextPage = () => {
           )}
         </div>
       </div>
-    </div>
+    </main>
   )
 }
 

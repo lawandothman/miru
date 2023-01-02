@@ -49,7 +49,7 @@ const Home: NextPage = () => {
   }
 
   return (
-    <div className='px-20 pt-20'>
+    <main>
       <PageHeader title={getGreeting()} subtitle='' />
       {sortBy(data?.user.following, [(u) => -(u?.matches?.length ?? 0)]).map(
         (following) => {
@@ -61,14 +61,14 @@ const Home: NextPage = () => {
         }
       )}
       <Footer />
-    </div>
+    </main>
   )
 }
 
 const LoggedOutPage = () => {
   const {theme} = useTheme()
   return (
-    <div className='mx-auto max-w-4xl px-20 pt-20'>
+    <main>
       <PageHeader
         title='Welcome to Miru'
         subtitle='The social movie watching platform'
@@ -126,12 +126,12 @@ const LoggedOutPage = () => {
         Login
       </Link>
       <Footer />
-    </div>
+    </main>
   )
 }
 
 
-const  getGreeting = () => {
+const getGreeting = () => {
   const hours = getHours(new Date())
   if (hours < 12 && hours >= 6) {
     return 'Good morning!'

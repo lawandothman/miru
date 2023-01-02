@@ -4,7 +4,7 @@ import Link from 'next/link'
 
 const TermsAndConditions: NextPage = () => {
   return (
-    <div className='mx-auto max-w-4xl px-20 pt-20'>
+    <main className='mx-auto max-w-4xl'>
       <PageHeader title='Terms & Conditions' subtitle='' />
       <div className=' mx-auto flex flex-col gap-8'>
         <h2 className='text-xl tracking-wide '>Terms</h2>
@@ -127,7 +127,7 @@ const TermsAndConditions: NextPage = () => {
           of gb without regards to its conflict of law provisions.
         </p>
       </div>
-    </div>
+    </main>
   )
 }
 

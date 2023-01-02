@@ -24,6 +24,15 @@
 		@apply dark:text-neutral-400;
 
 	}
+
+  main {
+    @apply px-4;
+    @apply py-4;
+    @apply lg:px-20;
+    @apply mx-auto
+  }
+
+
 }
 
 

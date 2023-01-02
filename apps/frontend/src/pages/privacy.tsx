@@ -4,7 +4,7 @@ import Link from 'next/link'
 
 const Privacy: NextPage = () => {
   return (
-    <div className='mx-auto mb-8 max-w-4xl px-20 pt-20 '>
+    <main className='mx-auto max-w-4xl'>
       <PageHeader title='Privacy Policy for Miru' subtitle='' />
       <div className='flex flex-col gap-2 text-neutral-400'>
         <p>
@@ -124,7 +124,7 @@ const Privacy: NextPage = () => {
           agree to its Terms and Conditions.
         </p>
       </div>
-    </div>
+    </main>
   )
 }
 
