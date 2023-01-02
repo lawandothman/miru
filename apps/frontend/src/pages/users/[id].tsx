@@ -67,8 +67,8 @@ const FollowersDialog = ({ user }: { user: User }) => {
         </span>
       </DialogTrigger>
       <DialogContent show={open}>
-        <DialogTitle className='mb-8 text-center text-lg font-semibold text-neutral-900 dark:text-neutral-300'>
-          Followers
+        <DialogTitle className='py-2 text-center text-lg font-semibold dark:text-neutral-300'>
+          Following
         </DialogTitle>
 
         <div className='mt-1 max-h-[325px] overflow-y-auto'>

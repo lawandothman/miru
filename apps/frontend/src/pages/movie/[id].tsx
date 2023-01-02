@@ -8,7 +8,7 @@ import { FullPageLoader } from 'components/FullPageLoader'
 import { gql, useMutation, useQuery } from '@apollo/client'
 import { Movie } from '__generated__/resolvers-types'
 import { FiArrowLeft, FiLink, FiMinus, FiPlus } from 'react-icons/fi'
-import { FaImdb, FaYoutube } from 'react-icons/fa'
+import { FaImdb } from 'react-icons/fa'
 import { useSession } from 'next-auth/react'
 import { Spinner } from 'components/Spinner'
 import { ProfilePicture } from 'components/Avatar'
@@ -99,16 +99,20 @@ const Movie: NextPage = () => {
       >
         <FiArrowLeft className='h-5 w-5' />
       </button>
-      <div className='mx-auto flex flex-col gap-24 pt-4 md:flex-row'>
-        {data?.movie?.posterUrl && (
-          <Image
-            src={getImage(data.movie.posterUrl)}
-            alt={data.movie.title ?? 'movie'}
-            className='rounded-lg'
-            width={450}
-            height={1000}
-          />
-        )}
+      <div className='mx-auto flex flex-col gap-24 pt-4 lg:flex-row'>
+        <div className='flex max-w-2xl'>
+          {data?.movie?.posterUrl && (
+            <div className='aspect-w-20 aspect-h-34 overflow-hidden rounded-lg'>
+              <Image
+                src={getImage(data.movie.posterUrl)}
+                alt={data.movie.title ?? 'movie'}
+                className='rounded-lg'
+                width={550}
+                height={1000}
+              />
+            </div>
+          )}
+        </div>
         <div className='flex max-w-xl flex-col'>
           <h1 className='text-4xl font-thin tracking-wider'>
             {data?.movie.title}
@@ -169,6 +173,17 @@ const Movie: NextPage = () => {
             <p className='mt-8 max-w-xl text-neutral-600 dark:text-neutral-400'>
               {data?.movie.overview}
             </p>
+            {data?.movie.trailer && (
+              <iframe
+                width='560'
+                height='315'
+                className='mt-8 w-full'
+                src={`https://www.youtube.com/embed/${data.movie.trailer.key}`}
+                title='YouTube video player'
+                allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
+                allowFullScreen
+              />
+            )}
             <div className=' mt-6 flex gap-3'>
               {data?.movie?.homepage && (
                 <Link
@@ -190,17 +205,6 @@ const Movie: NextPage = () => {
                 >
                   <FaImdb size={20} />
                   IMDB
-                </Link>
-              )}
-              {data?.movie.trailer && (
-                <Link
-                  target='_blank'
-                  rel='noreferrer noopener'
-                  href={`https://youtube.com/watch?v=${data.movie.trailer.key}`}
-                  className='inline-flex items-center justify-center gap-2'
-                >
-                  <FaYoutube size={20} />
-                  Trailer
                 </Link>
               )}
             </div>
