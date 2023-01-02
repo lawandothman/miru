@@ -1,8 +1,10 @@
 import { LoadingSkeleton, MoviesList } from 'components/MoviesList'
 import { PageHeader } from 'components/PageHeader'
 import type { NextPage } from 'next'
-import { gql, useQuery } from '@apollo/client'
+import { gql, NetworkStatus, useQuery } from '@apollo/client'
 import type { Movie } from '__generated__/resolvers-types'
+import { useState } from 'react'
+import { PAGE_LIMIT } from 'config/constants'
 
 const GET_POPULAR_MOVIES = gql`
   query PopularMovies($offset: Int, $limit: Int) {
@@ -16,31 +18,55 @@ const GET_POPULAR_MOVIES = gql`
 `
 
 const PopularMovies: NextPage = () => {
-  const { data, loading, fetchMore } = useQuery<
-  { popularMovies: Movie[] },
-  { limit?: number; offset?: number }
-  >(GET_POPULAR_MOVIES)
-
-  const loadMore = async () => {
-    const currentLength = data?.popularMovies.length ?? 20
-    await fetchMore({
+  const [fullyLoaded, setFullyLoaded] = useState(false)
+  const {
+    data,
+    networkStatus,
+    fetchMore,
+    variables = { offset: 0, limit: PAGE_LIMIT },
+  } = useQuery<{ popularMovies: Movie[] }, { limit: number; offset: number }>(
+    GET_POPULAR_MOVIES,
+    {
+      notifyOnNetworkStatusChange: true,
       variables: {
-        limit: 20,
-        offset: currentLength * 2,
+        offset: 0,
+        limit: PAGE_LIMIT,
       },
-    })
+    }
+  )
+
+  if (networkStatus === NetworkStatus.loading) {
+    return (
+      <div className='px-20 pt-20'>
+        <PageHeader title='Popular' />
+        <LoadingSkeleton />
+      </div>
+    )
   }
 
-  return (
-    <div className='px-20 pt-20'>
-      <PageHeader title='Popular' subtitle='The top of Miru' />
-      {loading ? (
-        <LoadingSkeleton />
-      ) : (
+  if (data) {
+    const isFetchingMore = networkStatus === NetworkStatus.fetchMore
+    const isFullPage = data.popularMovies.length % variables.limit === 0
+    const loadMore = async () => {
+      if (!isFetchingMore && isFullPage && !fullyLoaded) {
+        await fetchMore({
+          variables: {
+            limit: PAGE_LIMIT,
+            offset: data.popularMovies.length,
+          },
+        }).then((res) => setFullyLoaded(!res.data.popularMovies.length))
+      }
+    }
+
+    return (
+      <div className='px-20 pt-20'>
+        <PageHeader title='Popular' subtitle='The top of Miru' />
         <MoviesList loadMore={loadMore} movies={data?.popularMovies} />
-      )}
-    </div>
-  )
+      </div>
+    )
+  }
+
+  return null
 }
 
 export default PopularMovies

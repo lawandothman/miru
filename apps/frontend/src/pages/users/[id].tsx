@@ -1,4 +1,4 @@
-import { gql, useQuery } from '@apollo/client'
+import { gql, NetworkStatus, useQuery } from '@apollo/client'
 import { ProfilePicture } from 'components/Avatar'
 import {
   Dialog,
@@ -10,8 +10,10 @@ import { FollowButton } from 'components/FollowButton'
 import { FullPageLoader } from 'components/FullPageLoader'
 import { MoviesList } from 'components/MoviesList'
 import { UserCard } from 'components/UserCard'
+import { PAGE_LIMIT } from 'config/constants'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
+import { useState } from 'react'
 import type { Movie } from '__generated__/resolvers-types'
 import { User } from '__generated__/resolvers-types'
 
@@ -107,92 +109,108 @@ const FollowingDialog = ({ user }: { user: User }) => {
 const User = () => {
   const { query } = useRouter()
   const userId = Array.isArray(query.id) ? query.id[0] : query.id
+  const [fullyLoaded, setFullyLoaded] = useState(false)
   const { data: session, status } = useSession({
     required: false,
   })
-  const { data, loading, fetchMore } = useQuery<
+
+  const {
+    data,
+    networkStatus,
+    fetchMore,
+    variables = { offset: 0, limit: PAGE_LIMIT },
+  } = useQuery<
   { user: User; watchlist?: Movie[] },
-  { userId?: string }
+  { userId?: string; offset: number; limit: number }
   >(SEARCH_USER, {
     variables: {
       userId,
+      offset: 0,
+      limit: PAGE_LIMIT,
     },
+    notifyOnNetworkStatusChange: true,
   })
 
-
-  const loadMore = async () => {
-    const currentLength = data?.watchlist?.length ?? 20
-    await fetchMore({
-      variables: {
-        limit: 20,
-        offset: currentLength * 2,
-      },
-    })
-  }
-
-
-  if (loading || status === 'loading') {
+  if (networkStatus === NetworkStatus.loading || status === 'loading') {
     return <FullPageLoader />
   }
 
-  return (
-    <div className='px-20 pt-20'>
-      {data?.user && (
-        <>
-          <div className='flex items-center justify-between'>
-            <div className='flex items-center gap-4'>
-              <ProfilePicture size='lg' user={data.user} />
-              <div>
-                <h1 className='text-3xl dark:text-neutral-300'>
-                  {data?.user.name}
-                </h1>
-                <div className='mt-1 flex gap-4'>
-                  {session?.user?.id !== userId && (
-                    <span className='dark:text-neutral-300'>
-                      {data.user.matches?.length} matches
-                    </span>
-                  )}
-                  {data.user.followers && data.user.followers.length > 0 ? (
-                    <FollowersDialog user={data.user} />
-                  ) : (
-                    <span className='dark:text-neutral-300'>
-                      {data.user.followers?.length} followers
-                    </span>
-                  )}
-                  {data.user.following && data.user.following.length > 0 ? (
-                    <FollowingDialog user={data.user} />
-                  ) : (
-                    <span className='dark:text-neutral-300'>
-                      {data.user.following?.length} following
-                    </span>
-                  )}
+  if (data) {
+    const isFetchingMore = networkStatus === NetworkStatus.fetchMore
+    const isFullPage =
+      data.watchlist && data.watchlist.length % variables.limit === 0
+    const loadMore = async () => {
+      if (!isFetchingMore && isFullPage && !fullyLoaded) {
+        await fetchMore({
+          variables: {
+            limit: PAGE_LIMIT,
+            offset: data.watchlist?.length,
+          },
+        }).then((res) => setFullyLoaded(!res.data.watchlist?.length))
+      }
+    }
+
+    return (
+      <div className='px-20 pt-20'>
+        {data.user && (
+          <>
+            <div className='flex items-center justify-between'>
+              <div className='flex items-center gap-4'>
+                <ProfilePicture size='lg' user={data.user} />
+                <div>
+                  <h1 className='text-3xl dark:text-neutral-300'>
+                    {data.user.name}
+                  </h1>
+                  <div className='mt-1 flex gap-4'>
+                    {session?.user?.id !== userId && (
+                      <span className='dark:text-neutral-300'>
+                        {data.user.matches?.length} matches
+                      </span>
+                    )}
+                    {data.user.followers && data.user.followers.length > 0 ? (
+                      <FollowersDialog user={data.user} />
+                    ) : (
+                      <span className='dark:text-neutral-300'>
+                        {data.user.followers?.length} followers
+                      </span>
+                    )}
+                    {data.user.following && data.user.following.length > 0 ? (
+                      <FollowingDialog user={data.user} />
+                    ) : (
+                      <span className='dark:text-neutral-300'>
+                        {data.user.following?.length} following
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
+              {userId && session?.user?.id !== userId && (
+                <FollowButton user={data.user} friendId={userId} />
+              )}
             </div>
-            {userId && session?.user?.id !== userId && (
-              <FollowButton user={data.user} friendId={userId} />
+
+            {session?.user?.id === userId && (
+              <>
+                <h3 className='my-8 text-xl font-thin'>Your watchlist</h3>
+                <MoviesList loadMore={loadMore} movies={data.watchlist} />
+              </>
             )}
-          </div>
 
-          {session?.user?.id === userId && (
-            <>
-              <h3 className='my-8 text-xl font-thin'>Your watchlist</h3>
-              <MoviesList loadMore={loadMore} movies={data?.watchlist} />
-            </>
-          )}
+            {data.user.matches && data.user.matches.length > 0 && (
+              <>
+                <h3 className='my-8 text-xl font-thin'>
+                  Your matches with {data.user.name}
+                </h3>
+                <MoviesList movies={data.user.matches} />
+              </>
+            )}
+          </>
+        )}
+      </div>
+    )
+  }
 
-          {data?.user.matches && data.user.matches.length > 0 && (
-            <>
-              <h3 className='my-8 text-xl font-thin'>
-                Your matches with {data?.user.name}
-              </h3>
-              <MoviesList movies={data?.user.matches} />
-            </>
-          )}
-        </>
-      )}
-    </div>
-  )
+  return null
 }
 
 export default User

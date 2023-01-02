@@ -1,4 +1,4 @@
-import { gql, useQuery } from '@apollo/client'
+import { gql, NetworkStatus, useQuery } from '@apollo/client'
 import { MoviesList } from 'components/MoviesList'
 import { PageHeader } from 'components/PageHeader'
 import type { NextPage } from 'next'
@@ -6,6 +6,8 @@ import { useRouter } from 'next/router'
 import { Genre } from '__generated__/resolvers-types'
 import type { Movie } from '__generated__/resolvers-types'
 import { FullPageLoader } from 'components/FullPageLoader'
+import { useState } from 'react'
+import { PAGE_LIMIT } from 'config/constants'
 
 const GET_BY_GENRE = gql`
   query MoviesByGenre($genreId: ID!, $offset: Int, $limit: Int) {
@@ -23,37 +25,51 @@ const GET_BY_GENRE = gql`
 
 const Genre: NextPage = () => {
   const { query } = useRouter()
+  const [fullyLoaded, setFullyLoaded] = useState(false)
   const genreId = Array.isArray(query.id) ? query.id[0] : query.id
-  const { data, loading, fetchMore } = useQuery<
+  const {
+    data,
+    fetchMore,
+    networkStatus,
+    variables = { offset: 0, limit: PAGE_LIMIT },
+  } = useQuery<
   { moviesByGenre: Movie[]; genre: Genre },
-  { genreId?: string; offset?: number; limit?: number }
+  { genreId?: string; offset: number; limit: number }
   >(GET_BY_GENRE, {
     variables: {
       genreId,
+      offset: 0,
+      limit: PAGE_LIMIT,
     },
+    notifyOnNetworkStatusChange: true
   })
 
-
-  const loadMore = async () => {
-    const currentLength = data?.moviesByGenre.length ?? 20
-    await fetchMore({
-      variables: {
-        limit: 20,
-        offset: currentLength * 2,
-      },
-    })
-  }
-
-  if (loading) {
+  if (networkStatus === NetworkStatus.loading) {
     return <FullPageLoader />
   }
 
-  return (
-    <div className='px-20 pt-20'>
-      <PageHeader title={data?.genre.name ?? ''} />
-      <MoviesList loadMore={loadMore} movies={data?.moviesByGenre} />
-    </div>
-  )
+  if (data) {
+    const isFetchingMore = networkStatus === NetworkStatus.fetchMore
+    const isFullPage = data.moviesByGenre.length % variables.limit === 0
+    const loadMore = async () => {
+      if (!isFetchingMore && isFullPage && !fullyLoaded) {
+        await fetchMore({
+          variables: {
+            limit: PAGE_LIMIT,
+            offset: data.moviesByGenre.length,
+          },
+        }).then((res) => setFullyLoaded(!res.data.moviesByGenre.length))
+      }
+    }
+    return (
+      <div className='px-20 pt-20'>
+        <PageHeader title={data.genre.name ?? ''} />
+        <MoviesList loadMore={loadMore} movies={data.moviesByGenre} />
+      </div>
+    )
+  }
+
+  return null
 }
 
 export default Genre

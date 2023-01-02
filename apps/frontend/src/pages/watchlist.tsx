@@ -1,9 +1,9 @@
 import { LoadingSkeleton, MoviesList } from 'components/MoviesList'
 import { PageHeader } from 'components/PageHeader'
 import type { NextPage } from 'next'
-import { useQuery, gql } from '@apollo/client'
+import { useQuery, gql, NetworkStatus } from '@apollo/client'
 import type { Movie } from '__generated__/resolvers-types'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -11,6 +11,7 @@ import TalkImgDark from '../../public/illustration/dark/talk.png'
 import TalkImgLight from '../../public/illustration/light/talk.png'
 import { useTheme } from 'next-themes'
 import { FullPageLoader } from 'components/FullPageLoader'
+import { PAGE_LIMIT } from 'config/constants'
 
 export const GET_WATCHLIST = gql`
   query Watchlist($limit: Int, $offset: Int) {
@@ -26,26 +27,41 @@ export const GET_WATCHLIST = gql`
 const Watchlist: NextPage = () => {
   const { theme } = useTheme()
   const { data: session, status } = useSession()
-  const { data, loading, refetch, fetchMore } = useQuery<{
+  const [fullyLoaded, setFullyLoaded] = useState(false)
+  const {
+    data,
+    networkStatus,
+    refetch,
+    fetchMore,
+    variables = { offset: 0, limit: PAGE_LIMIT },
+  } = useQuery<
+  {
     watchlist: Movie[];
-  }>(GET_WATCHLIST)
+  },
+  { offset: number; limit: number }
+  >(GET_WATCHLIST, {
+    notifyOnNetworkStatusChange: true,
+    variables: {
+      offset: 0,
+      limit: PAGE_LIMIT,
+    },
+  })
 
   useEffect(() => {
     refetch()
   }, [refetch])
 
-  const loadMore = async () => {
-    const currentLength = data?.watchlist.length ?? 20
-    await fetchMore({
-      variables: {
-        limit: 20,
-        offset: currentLength * 2,
-      },
-    })
-  }
-
   if (status === 'loading') {
     return <FullPageLoader />
+  }
+
+  if (networkStatus === NetworkStatus.loading) {
+    return (
+      <div className='px-20 pt-20'>
+        <PageHeader title='Watchlist' />
+        <LoadingSkeleton />
+      </div>
+    )
   }
 
   if (!session) {
@@ -76,16 +92,29 @@ const Watchlist: NextPage = () => {
     )
   }
 
-  return (
-    <div className='px-20 pt-20'>
-      <PageHeader title='Watchlist' />
-      {loading ? (
-        <LoadingSkeleton />
-      ) : (
-        <MoviesList loadMore={loadMore} movies={data?.watchlist} />
-      )}
-    </div>
-  )
+  if (data) {
+    const isFetchingMore = networkStatus === NetworkStatus.fetchMore
+    const isFullPage = data.watchlist.length % variables.limit === 0
+    const loadMore = async () => {
+      if (!isFetchingMore && isFullPage && !fullyLoaded) {
+        await fetchMore({
+          variables: {
+            limit: PAGE_LIMIT,
+            offset: data.watchlist.length,
+          },
+        }).then((res) => setFullyLoaded(!res.data.watchlist.length))
+      }
+    }
+
+    return (
+      <div className='px-20 pt-20'>
+        <PageHeader title='Watchlist' />
+        <MoviesList loadMore={loadMore} movies={data.watchlist} />
+      </div>
+    )
+  }
+
+  return null
 }
 
 export default Watchlist
