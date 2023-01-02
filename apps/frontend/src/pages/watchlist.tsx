@@ -10,6 +10,7 @@ import Image from 'next/image'
 import TalkImgDark from '../../public/illustration/dark/talk.png'
 import TalkImgLight from '../../public/illustration/light/talk.png'
 import { useTheme } from 'next-themes'
+import { FullPageLoader } from 'components/FullPageLoader'
 
 export const GET_WATCHLIST = gql`
   query Watchlist($limit: Int, $offset: Int) {
@@ -24,7 +25,7 @@ export const GET_WATCHLIST = gql`
 
 const Watchlist: NextPage = () => {
   const { theme } = useTheme()
-  const { data: session } = useSession()
+  const { data: session, status } = useSession()
   const { data, loading, refetch, fetchMore } = useQuery<{
     watchlist: Movie[];
   }>(GET_WATCHLIST)
@@ -41,6 +42,10 @@ const Watchlist: NextPage = () => {
         offset: currentLength * 2,
       },
     })
+  }
+
+  if (status === 'loading') {
+    return <FullPageLoader />
   }
 
   if (!session) {
