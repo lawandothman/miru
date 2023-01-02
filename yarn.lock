@@ -6590,10 +6590,10 @@ synckit@^0.8.4:
     "@pkgr/utils" "^2.3.1"
     tslib "^2.4.0"
 
-tailwindcss-radix@^2.6.1:
-  version "2.6.1"
-  resolved "https://registry.yarnpkg.com/tailwindcss-radix/-/tailwindcss-radix-2.6.1.tgz#793d72e7185fc4f5c9e2b1d1cfc9470ade41b897"
-  integrity sha512-ejh4BHkn/3g349l+JiEW6I4//uclU4nllEqnOK3/8zpORscIk9WbjLyYR2UzqwVRjjzgd72I/hMDJZm3+XO48w==
+tailwindcss-radix@^2.6.2:
+  version "2.6.2"
+  resolved "https://registry.yarnpkg.com/tailwindcss-radix/-/tailwindcss-radix-2.6.2.tgz#f34db99cacd426622df46173bd89df722130d12f"
+  integrity sha512-+pqIyqY9mjMXtJHyDlkiJYMfpa8+Gkt2UE6VrmbYjbLAqva7Lg4q2Rffe9JFNv9dBFfoDTVML7gQd4BDJXOrCg==
 
 tailwindcss@^3.2.0:
   version "3.2.4"
