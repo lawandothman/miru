@@ -12,6 +12,8 @@ import { FaImdb, FaYoutube } from 'react-icons/fa'
 import { useSession } from 'next-auth/react'
 import { Spinner } from 'components/Spinner'
 import { ProfilePicture } from 'components/Avatar'
+import { Tooltip } from 'components/Tooltip'
+import { Fragment } from 'react'
 
 const GET_BY_ID = gql`
   query Movie($movieId: ID!) {
@@ -235,14 +237,20 @@ const Movie: NextPage = () => {
               <h3 className='mb-4'>Stream</h3>
               <div className='flex gap-4'>
                 {data.movie.streamProviders.map((provider, i) => (
-                  <Image
+                  <Tooltip
                     key={i}
-                    src={getImage(provider?.logoPath ?? '')}
-                    alt={provider?.name ?? ''}
-                    width={40}
-                    height={40}
-                    className='rounded-lg'
-                  />
+                    content={
+                      <div className='text-xs '>{provider?.name}</div>
+                    }
+                  >
+                    <Image
+                      src={getImage(provider?.logoPath ?? '')}
+                      alt={provider?.name ?? ''}
+                      width={40}
+                      height={40}
+                      className='rounded-lg'
+                    />
+                  </Tooltip>
                 ))}
               </div>
             </div>
