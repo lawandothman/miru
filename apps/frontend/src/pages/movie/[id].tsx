@@ -8,7 +8,7 @@ import { FullPageLoader } from 'components/FullPageLoader'
 import { gql, useMutation, useQuery } from '@apollo/client'
 import { Movie } from '__generated__/resolvers-types'
 import { FiArrowLeft, FiLink, FiMinus, FiPlus } from 'react-icons/fi'
-import { FaImdb } from 'react-icons/fa'
+import { FaImdb, FaYoutube } from 'react-icons/fa'
 import { useSession } from 'next-auth/react'
 import { Spinner } from 'components/Spinner'
 import { ProfilePicture } from 'components/Avatar'
@@ -39,6 +39,9 @@ const GET_BY_ID = gql`
       streamProviders {
         name
         logoPath
+      }
+      trailer {
+        key
       }
     }
   }
@@ -188,17 +191,17 @@ const Movie: NextPage = () => {
                   IMDB
                 </Link>
               )}
-              {/* {trailer && (
+              {data?.movie.trailer && (
                 <Link
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  href={`https://youtube.com/watch?v=${trailer.key}`}
-                  className="inline-flex items-center justify-center gap-2"
+                  target='_blank'
+                  rel='noreferrer noopener'
+                  href={`https://youtube.com/watch?v=${data.movie.trailer.key}`}
+                  className='inline-flex items-center justify-center gap-2'
                 >
-                  <FiYoutube size={20} />
+                  <FaYoutube size={20} />
                   Trailer
                 </Link>
-              )} */}
+              )}
             </div>
           </div>
           {data?.movie.matches &&
