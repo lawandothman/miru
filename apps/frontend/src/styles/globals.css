@@ -29,7 +29,20 @@
     @apply px-4;
     @apply py-4;
     @apply lg:px-20;
-    @apply mx-auto
+    @apply mx-auto;
+    @apply mb-20;
+  }
+
+  #bottomNav {
+    position: fixed;
+    bottom: 0px;
+    z-index: 1;
+    @apply flex;
+    @apply flex-row;
+    @apply w-full;
+    @apply p-2;
+    @apply bg-white;
+    @apply dark:bg-black;
   }
 
 
