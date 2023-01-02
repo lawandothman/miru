@@ -13,7 +13,6 @@ import { useSession } from 'next-auth/react'
 import { Spinner } from 'components/Spinner'
 import { ProfilePicture } from 'components/Avatar'
 import { Tooltip } from 'components/Tooltip'
-import { Fragment } from 'react'
 
 const GET_BY_ID = gql`
   query Movie($movieId: ID!) {
@@ -210,19 +209,25 @@ const Movie: NextPage = () => {
             data.movie.matches.filter((match) => match?.isFollowing).length >
               0 && (
             <div className='mt-8'>
-              <h3 className='mb-4'>Added To Watchlist By</h3>
+              <h3 className='mb-4'>Watch it with</h3>
               {data?.movie.matches
                 ?.filter((match) => match?.isFollowing)
                 .map((match) => {
                   if (match) {
                     return (
-                      <Link
-                        className='mr-2 inline-flex items-center gap-2'
-                        href={`/users/${match.id}`}
+                      <Tooltip
+                        content={
+                          <span className='text-xs'>{match.name}</span>
+                        }
                         key={match.id}
                       >
-                        <ProfilePicture size='sm' user={match} />
-                      </Link>
+                        <Link
+                          className='mr-2 inline-flex items-center gap-2'
+                          href={`/users/${match.id}`}
+                        >
+                          <ProfilePicture size='sm' user={match} />
+                        </Link>
+                      </Tooltip>
                     )
                   } else {
                     return null
@@ -239,9 +244,7 @@ const Movie: NextPage = () => {
                 {data.movie.streamProviders.map((provider, i) => (
                   <Tooltip
                     key={i}
-                    content={
-                      <div className='text-xs '>{provider?.name}</div>
-                    }
+                    content={<div className='text-xs '>{provider?.name}</div>}
                   >
                     <Image
                       src={getImage(provider?.logoPath ?? '')}

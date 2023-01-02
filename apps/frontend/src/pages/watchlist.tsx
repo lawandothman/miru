@@ -3,7 +3,7 @@ import { PageHeader } from 'components/PageHeader'
 import type { NextPage } from 'next'
 import { useQuery, gql, NetworkStatus } from '@apollo/client'
 import type { Movie } from '__generated__/resolvers-types'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -31,7 +31,6 @@ const Watchlist: NextPage = () => {
   const {
     data,
     networkStatus,
-    refetch,
     fetchMore,
     variables = { offset: 0, limit: PAGE_LIMIT },
   } = useQuery<
@@ -41,15 +40,12 @@ const Watchlist: NextPage = () => {
   { offset: number; limit: number }
   >(GET_WATCHLIST, {
     notifyOnNetworkStatusChange: true,
+    fetchPolicy: 'cache-and-network',
     variables: {
       offset: 0,
       limit: PAGE_LIMIT,
     },
   })
-
-  useEffect(() => {
-    refetch()
-  }, [refetch])
 
   if (status === 'loading') {
     return <FullPageLoader />

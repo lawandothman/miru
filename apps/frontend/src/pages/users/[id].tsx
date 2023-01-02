@@ -131,6 +131,7 @@ const User = () => {
       limit: PAGE_LIMIT,
     },
     notifyOnNetworkStatusChange: true,
+    fetchPolicy: 'cache-and-network',
   })
 
   if (networkStatus === NetworkStatus.loading || status === 'loading') {
