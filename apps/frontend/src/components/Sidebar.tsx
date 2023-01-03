@@ -153,61 +153,57 @@ export const Sidebar = ({ genres }: { genres: Genre[] }) => {
             <FiX />
           </button>
         </div>
-        <main className='flex flex-col p-2'>
-          <nav>
-            <ul className='space-y-2'>
-              <NavItem
-                isSelected={router.pathname === '/'}
-                href='/'
-                icon={<FiHome />}
-              >
+        <nav className='flex flex-col p-2'>
+          <ul className='space-y-2'>
+            <NavItem
+              isSelected={router.pathname === '/'}
+              href='/'
+              icon={<FiHome />}
+            >
                 Home
-              </NavItem>
-              <NavItem
-                isSelected={router.pathname === '/explore'}
-                href='/explore'
-                icon={<FiSearch />}
-              >
+            </NavItem>
+            <NavItem
+              isSelected={router.pathname === '/explore'}
+              href='/explore'
+              icon={<FiSearch />}
+            >
                 Explore
-              </NavItem>
-              <NavItem
-                isSelected={router.pathname === '/watchlist'}
-                href='/watchlist'
-                icon={<FiPlay />}
-              >
+            </NavItem>
+            <NavItem
+              isSelected={router.pathname === '/watchlist'}
+              href='/watchlist'
+              icon={<FiPlay />}
+            >
                 Watchlist
-              </NavItem>
-              <NavItem
-                isSelected={router.pathname === '/for-you'}
-                href='/for-you'
-                icon={<FiHeart />}
-              >
+            </NavItem>
+            <NavItem
+              isSelected={router.pathname === '/for-you'}
+              href='/for-you'
+              icon={<FiHeart />}
+            >
                 For you
-              </NavItem>
-              <NavItem
-                isSelected={router.pathname === '/popular'}
-                href='/popular'
-                icon={<FiTrendingUp />}
-              >
+            </NavItem>
+            <NavItem
+              isSelected={router.pathname === '/popular'}
+              href='/popular'
+              icon={<FiTrendingUp />}
+            >
                 Popular
+            </NavItem>
+          </ul>
+          <p className='pt-4 pb-2 pl-3 text-sm'>Genres</p>
+          <ul className='space-y-2'>
+            {_.sortBy(genres, (genre) => genre.name).map((genre) => (
+              <NavItem
+                href={`/genre/${genre.id}`}
+                isSelected={router.asPath === `/genre/${genre.id}`}
+                key={genre.id}
+              >
+                {genre.name}
               </NavItem>
-            </ul>
-          </nav>
-          <nav>
-            <p className='pt-4 pb-2 pl-3 text-sm'>Genres</p>
-            <ul className='space-y-2'>
-              {_.sortBy(genres, (genre) => genre.name).map((genre) => (
-                <NavItem
-                  href={`/genre/${genre.id}`}
-                  isSelected={router.asPath === `/genre/${genre.id}`}
-                  key={genre.id}
-                >
-                  {genre.name}
-                </NavItem>
-              ))}
-            </ul>
-          </nav>
-        </main>
+            ))}
+          </ul>
+        </nav>
         <footer className='sticky bottom-0 left-0'>
           <div className='h-8 bg-gradient-to-t from-white dark:from-black'></div>
           <div className='bg-white p-4 dark:bg-black'>
