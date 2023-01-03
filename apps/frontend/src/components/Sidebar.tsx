@@ -17,25 +17,22 @@ import type { Genre } from '__generated__/resolvers-types'
 import { useSession } from 'next-auth/react'
 import _ from 'lodash'
 import { useMobile } from 'hooks/useMobile'
-import Router from 'next/dist/server/router'
-import { NextRouter } from 'next/dist/client/router'
-import { IconType } from 'react-icons/lib'
+import type { NextRouter } from 'next/dist/client/router'
+import type { IconType } from 'react-icons/lib'
 
 interface NavItemProps {
   href: string;
   isSelected: boolean;
   icon?: React.ReactNode;
-  onClick: () => void;
 }
 const NavItem: FC<PropsWithChildren<NavItemProps>> = ({
   href,
   isSelected,
   icon,
   children,
-  onClick,
 }) => {
   return (
-    <li onClick={onClick}>
+    <li>
       <Link
         className={cn(
           'flex items-center rounded-lg p-2 text-base font-normal text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-neutral-700',
@@ -67,14 +64,16 @@ const BottomNavItem: FC<PropsWithChildren<BottomNavItemProps>> = ({
     <div className='w-1/4'>
       <Link
         className={cn(
-          'bg-neutral-400 hover:bg-gray-100 dark:text-white dark:hover:bg-neutral-700',
+          'bg-neutral-400 hover:bg-gray-100 dark:text-white dark:hover:bg-neutral-700'
         )}
         href={href}
       >
-        <div className={cn(
-          'text-center rounded-lg p-2', 
-          isSelected ? 'bg-gray-100 dark:bg-neutral-700' : 'bg-transparent'
-        )}>
+        <div
+          className={cn(
+            'rounded-lg p-2 text-center',
+            isSelected ? 'bg-gray-100 dark:bg-neutral-700' : 'bg-transparent'
+          )}
+        >
           {React.createElement(icon, { className: 'm-auto' })}
           <p className='text-xs'>{children}</p>
         </div>
@@ -139,7 +138,7 @@ export const Sidebar = ({ genres }: { genres: Genre[] }) => {
     <>
       <aside
         className={
-          'z-30 h-full w-60 transform overflow-y-auto border-r border-gray-200 bg-white transition duration-200 ease-in-out dark:border-neutral-700 dark:bg-black lg:z-auto lg:translate-x-0 fixed inset-y-0 -translate-x-full'
+          'fixed inset-y-0 z-30 h-full w-60 -translate-x-full transform overflow-y-auto border-r border-gray-200 bg-white transition duration-200 ease-in-out dark:border-neutral-700 dark:bg-black lg:z-auto lg:translate-x-0'
         }
         aria-label='Sidenav'
       >
@@ -150,9 +149,7 @@ export const Sidebar = ({ genres }: { genres: Genre[] }) => {
           <span className='mr-1 rounded-lg bg-red-400 px-2 py-1 text-xs uppercase text-white dark:bg-red-800'>
             Alpha
           </span>
-          <button
-            className='mr-2 rounded p-1 hover:bg-neutral-300 dark:hover:bg-neutral-700 lg:hidden'
-          >
+          <button className='mr-2 rounded p-1 hover:bg-neutral-300 dark:hover:bg-neutral-700 lg:hidden'>
             <FiX />
           </button>
         </div>
@@ -248,7 +245,10 @@ export const Sidebar = ({ genres }: { genres: Genre[] }) => {
         </footer>
       </aside>
       <div
-        className={'fixed inset-0 z-20 bg-white bg-opacity-10 transition duration-200 ease-in-out dark:bg-black dark:bg-opacity-50 pointer-events-none opacity-0'} />
+        className={
+          'pointer-events-none fixed inset-0 z-20 bg-white bg-opacity-10 opacity-0 transition duration-200 ease-in-out dark:bg-black dark:bg-opacity-50'
+        }
+      />
     </>
   )
 }
