@@ -11,7 +11,7 @@ import type { FC, PropsWithChildren } from 'react'
 import React from 'react'
 import { cn } from 'utils/cn'
 import { useRouter } from 'next/router'
-import { signIn, signOut } from 'next-auth/react'
+import { signIn } from 'next-auth/react'
 import { ProfilePicture } from './Avatar'
 import type { Genre } from '__generated__/resolvers-types'
 import { useSession } from 'next-auth/react'
@@ -160,35 +160,35 @@ export const Sidebar = ({ genres }: { genres: Genre[] }) => {
               href='/'
               icon={<FiHome />}
             >
-                Home
+              Home
             </NavItem>
             <NavItem
               isSelected={router.pathname === '/explore'}
               href='/explore'
               icon={<FiSearch />}
             >
-                Explore
+              Explore
             </NavItem>
             <NavItem
               isSelected={router.pathname === '/watchlist'}
               href='/watchlist'
               icon={<FiPlay />}
             >
-                Watchlist
+              Watchlist
             </NavItem>
             <NavItem
               isSelected={router.pathname === '/for-you'}
               href='/for-you'
               icon={<FiHeart />}
             >
-                For you
+              For you
             </NavItem>
             <NavItem
               isSelected={router.pathname === '/popular'}
               href='/popular'
               icon={<FiTrendingUp />}
             >
-                Popular
+              Popular
             </NavItem>
           </ul>
           <p className='pt-4 pb-2 pl-3 text-sm'>Genres</p>
@@ -208,25 +208,15 @@ export const Sidebar = ({ genres }: { genres: Genre[] }) => {
           <div className='h-8 bg-gradient-to-t from-white dark:from-black'></div>
           <div className='bg-white p-4 dark:bg-black'>
             {session?.user ? (
-              <>
-                <Link
-                  href={`/users/${session.user.id}`}
-                  className='flex w-full items-center rounded-lg p-2 text-base font-normal text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-neutral-700 '
-                >
-                  <ProfilePicture size='sm' user={session.user} />
-                  <span className='ml-3 text-sm'>
-                    {session?.user?.name ?? 'Profile'}
-                  </span>
-                </Link>
-                <button
-                  className='mx-auto mt-2 flex justify-center p-2 text-base font-normal text-red-500'
-                  onClick={() => {
-                    signOut()
-                  }}
-                >
-                  Sign out
-                </button>
-              </>
+              <Link
+                href={`/users/${session.user.id}`}
+                className='flex w-full items-center rounded-lg p-2 text-base font-normal text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-neutral-700 '
+              >
+                <ProfilePicture size='sm' user={session.user} />
+                <span className='ml-3 text-sm'>
+                  {session?.user?.name ?? 'Profile'}
+                </span>
+              </Link>
             ) : (
               <button
                 className='mx-auto mt-2 flex justify-center rounded bg-black px-8 py-1 text-base font-normal text-white dark:bg-white dark:text-black'

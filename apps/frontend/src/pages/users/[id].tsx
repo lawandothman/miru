@@ -11,9 +11,10 @@ import { FullPageLoader } from 'components/FullPageLoader'
 import { MoviesList } from 'components/MoviesList'
 import { UserCard } from 'components/UserCard'
 import { PAGE_LIMIT } from 'config/constants'
-import { useSession } from 'next-auth/react'
+import { signOut, useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
+import { FiLogOut } from 'react-icons/fi'
 import type { Movie } from '__generated__/resolvers-types'
 import { User } from '__generated__/resolvers-types'
 
@@ -187,8 +188,16 @@ const User = () => {
                   </div>
                 </div>
               </div>
-              {userId && session?.user?.id !== userId && (
+              {userId && session?.user?.id !== userId ? (
                 <FollowButton user={data.user} friendId={userId} />
+              ) : (
+                <button
+                  className='flex h-10 w-28 max-w-xl items-center justify-center gap-2 rounded-lg font-semibold text-red-500 '
+                  onClick={() => signOut()}
+                >
+                  <FiLogOut />
+                  Sign out
+                </button>
               )}
             </div>
 
