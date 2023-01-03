@@ -12,6 +12,7 @@ const config = {
     scrollRestoration: true
   },
   images: {
+    unoptimized: true,
     remotePatterns: [
       {
         hostname: 'image.tmdb.org',
