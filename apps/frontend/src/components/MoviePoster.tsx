@@ -12,6 +12,7 @@ export const MoviePoster = ({ movie }: { movie: Movie }) => {
         alt={movie?.title ?? ''}
         src={getImage(movie?.posterUrl ?? '')}
         fill
+        unoptimized
         loading='lazy'
         sizes='(max-width: 768px) 100vw,
               (max-width: 1200px) 50vw,
