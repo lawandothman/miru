@@ -91,6 +91,7 @@ const Movie: NextPage = () => {
   if (loading) {
     return <FullPageLoader />
   }
+
   return (
     <main className='flex flex-col'>
       <button
@@ -99,21 +100,21 @@ const Movie: NextPage = () => {
       >
         <FiArrowLeft className='h-5 w-5' />
       </button>
-      <div className='mx-auto flex flex-col gap-24 pt-4 lg:flex-row'>
-        <div className='flex max-w-2xl'>
+      <div className='mx-auto flex flex-col gap-10 pt-4 lg:flex-row'>
+        <div className='flex flex-1 justify-center'>
           {data?.movie?.posterUrl && (
             <div className='aspect-w-20 aspect-h-34 overflow-hidden rounded-lg'>
               <Image
                 src={getImage(data.movie.posterUrl)}
-                alt={data.movie.title ?? 'movie'}
+                alt={data.movie.title ?? ''}
                 className='rounded-lg'
-                width={550}
+                width={500}
                 height={1000}
               />
             </div>
           )}
         </div>
-        <div className='flex max-w-xl flex-col'>
+        <div className='flex flex-1 flex-col'>
           <h1 className='text-4xl font-thin tracking-wider'>
             {data?.movie.title}
           </h1>
@@ -121,7 +122,7 @@ const Movie: NextPage = () => {
           <div className='mt-3 text-sm text-neutral-500 dark:text-neutral-400'>
             <div className='flex items-center justify-between'>
               <span>
-                {data?.movie?.runtime && data.movie.runtime + '  MIN • '}
+                {data?.movie?.runtime ? data.movie.runtime + '  MIN • ' : null}
                 {data?.movie.releaseDate &&
                   getYear(new Date(data?.movie.releaseDate))}
               </span>
@@ -175,7 +176,6 @@ const Movie: NextPage = () => {
             </p>
             {data?.movie.trailer && (
               <iframe
-                width='560'
                 height='315'
                 className='mt-8 w-full'
                 src={`https://www.youtube.com/embed/${data.movie.trailer.key}`}

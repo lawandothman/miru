@@ -6,7 +6,7 @@ const TermsAndConditions: NextPage = () => {
   return (
     <main className='mx-auto max-w-4xl'>
       <PageHeader title='Terms & Conditions' subtitle='' />
-      <div className=' mx-auto flex flex-col gap-8'>
+      <div className=' mx-auto flex flex-col gap-2'>
         <h2 className='text-xl tracking-wide '>Terms</h2>
         <p>
           By accessing this Website, accessible from{' '}

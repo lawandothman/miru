@@ -47,17 +47,8 @@ const Watchlist: NextPage = () => {
     },
   })
 
-  if (status === 'loading') {
+  if (status === 'loading' || networkStatus === NetworkStatus.loading) {
     return <FullPageLoader />
-  }
-
-  if (networkStatus === NetworkStatus.loading) {
-    return (
-      <main>
-        <PageHeader title='Watchlist' />
-        <LoadingSkeleton />
-      </main>
-    )
   }
 
   if (!session) {

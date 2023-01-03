@@ -95,7 +95,7 @@ const LoggedOutPage = () => {
       )}
 
       <h2 className='mt-4 text-xl'>How it works?</h2>
-      <div className='grid grid-cols-1 gap-4 md:grid-cols-3'>
+      <div className='grid grid-cols-1 gap-8 md:grid-cols-3'>
         <Step
           icon={FiUserPlus}
           text={'Find your friends'}
@@ -156,15 +156,15 @@ const Step = ({
 }) => {
   return (
     <div>
-      <div className='flex w-full justify-center '>
+      <div className='flex w-full justify-center'>
         {React.createElement(icon, {
           className:
             'h-24 w-24 text-4xl bg-neutral-900 dark:bg-neutral-300 text-white dark:text-black border-full rounded-full p-8 m-4',
         })}
       </div>
       <div className='w-full'>
-        <p className='text-l text-center font-bold'>{text}</p>
-        <p>{description}</p>
+        <p className='text-l text-center font-bold mb-4'>{text}</p>
+        <p className='text-center'>{description}</p>
       </div>
     </div>
   )
