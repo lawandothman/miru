@@ -1,6 +1,6 @@
 ![ミル Miru](/apps/frontend/public/og-image.png)
 
-# Miru
+#  Miru
 
 This is a monorepo managed by [Turborepo](https://github.com/vercel/turbo)
 
