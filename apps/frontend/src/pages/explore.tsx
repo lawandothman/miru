@@ -2,7 +2,7 @@ import { MoviesList } from 'components/MoviesList'
 import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { gql, NetworkStatus, useQuery } from '@apollo/client'
-import type { Movie, User } from '__generated__/resolvers-types'
+import type { Genre, Movie, User } from '__generated__/resolvers-types'
 import { FiSearch } from 'react-icons/fi'
 import type { ChangeEvent, FC, FormEvent, PropsWithChildren } from 'react'
 import { useState } from 'react'
@@ -78,6 +78,21 @@ const SEARCH = gql`
   }
 `
 
+const EMPTY_STATE = gql`
+  query EmptyState {
+    genres: genres {
+      id
+      name
+    }
+    popularMovies: popularMovies {
+      id
+      title
+      posterUrl
+      inWatchlist
+    }
+  }
+`
+
 const Search: NextPage = () => {
   const router = useRouter()
 
@@ -100,12 +115,47 @@ const Search: NextPage = () => {
     skip: !searchQuery,
   })
 
-  if (networkStatus === NetworkStatus.loading) {
+  const { data: emptyStateData, networkStatus: emptyStateNetworkStatus } =
+    useQuery<{ genres: Genre[]; popularMovies: Movie[] }>(EMPTY_STATE, {
+      notifyOnNetworkStatusChange: true,
+    })
+
+  if (
+    networkStatus === NetworkStatus.loading ||
+    emptyStateNetworkStatus === NetworkStatus.loading
+  ) {
     return (
       <ExploreSkeleton>
         <div className='flex items-center justify-center'>
           <Popcorn />
         </div>
+      </ExploreSkeleton>
+    )
+  }
+
+  if (!searchQuery) {
+    return (
+      <ExploreSkeleton>
+        {emptyStateData?.genres && (
+          <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5'>
+            {emptyStateData?.genres.map((genre) => (
+              <Link
+                className='rounded-lg bg-neutral-800 p-8 text-center'
+                key={genre.id}
+                href={`/genre/${genre.id}`}
+              >
+                {genre.name}
+              </Link>
+            ))}
+          </div>
+        )}
+
+        {emptyStateData?.popularMovies && (
+          <div className='mt-4'>
+            <PageHeader title='Popular' />
+            <MoviesList movies={emptyStateData.popularMovies} />
+          </div>
+        )}
       </ExploreSkeleton>
     )
   }
