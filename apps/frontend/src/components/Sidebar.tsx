@@ -79,7 +79,13 @@ const BottomNavItem: FC<PropsWithChildren<BottomNavItemProps>> = ({
   )
 }
 
-export const BottomNavBar = ({ router, user }: { router: NextRouter, user: User | null }) => {
+export const BottomNavBar = ({
+  router,
+  user,
+}: {
+  router: NextRouter;
+  user: User | null;
+}) => {
   return (
     <aside id='bottomNav'>
       <BottomNavItem
@@ -110,35 +116,30 @@ export const BottomNavBar = ({ router, user }: { router: NextRouter, user: User 
       >
         Popular
       </BottomNavItem>
-      {user != null 
-        ? (
-          <BottomNavItem
-            isSelected={router.asPath === `/users/${user.id}`}
-            href={`/users/${user.id}`}
-            icon={ProfileIcon(user)}
-          >
-            Profile
-          </BottomNavItem>
-        )
-        : (
-          <BottomNavItem
-            isSelected={router.pathname === '/user'}
-            href={'/users/'}
-            icon={FiUser}
-          >
+      {user != null ? (
+        <BottomNavItem
+          isSelected={router.asPath === `/users/${user.id}`}
+          href={`/users/${user.id}`}
+          icon={ProfileIcon(user)}
+        >
+          Profile
+        </BottomNavItem>
+      ) : (
+        <BottomNavItem
+          isSelected={router.pathname === '/auth/signin'}
+          href={'/users/auth/signin'}
+          icon={FiUser}
+        >
           Login
-          </BottomNavItem>
-        )
-      }
+        </BottomNavItem>
+      )}
     </aside>
   )
 }
 
 // eslint-disable-next-line react/display-name
 const ProfileIcon = (user: User) => () => {
-  return (
-    <ProfilePicture user={user} size={'xs'}></ProfilePicture>
-  )
+  return <ProfilePicture user={user} size={'xs'}></ProfilePicture>
 }
 
 export const Sidebar = ({ genres }: { genres: Genre[] }) => {
