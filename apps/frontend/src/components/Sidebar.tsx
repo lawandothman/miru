@@ -127,7 +127,7 @@ export const BottomNavBar = ({
       ) : (
         <BottomNavItem
           isSelected={router.pathname === '/auth/signin'}
-          href={'/users/auth/signin'}
+          href={'/auth/signin'}
           icon={FiUser}
         >
           Login
