@@ -91,29 +91,30 @@ const Movie: NextPage = () => {
   if (loading) {
     return <FullPageLoader />
   }
+
   return (
-    <div className='flex flex-col px-8 pt-10'>
+    <main className='flex flex-col'>
       <button
         onClick={() => router.back()}
         className='flex h-8 w-8  items-center justify-center  rounded-full border text-black hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-800'
       >
         <FiArrowLeft className='h-5 w-5' />
       </button>
-      <div className='mx-auto flex flex-col gap-24 pt-4 lg:flex-row'>
-        <div className='flex max-w-2xl'>
+      <div className='mx-auto flex flex-col gap-10 pt-2 lg:flex-row flex-shrink'>
+        <div className='flex flex-1 items-center justify-center'>
           {data?.movie?.posterUrl && (
             <div className='aspect-w-20 aspect-h-34 overflow-hidden rounded-lg'>
               <Image
                 src={getImage(data.movie.posterUrl)}
-                alt={data.movie.title ?? 'movie'}
+                alt={data.movie.title ?? ''}
                 className='rounded-lg'
-                width={550}
+                width={530}
                 height={1000}
               />
             </div>
           )}
         </div>
-        <div className='flex max-w-xl flex-col'>
+        <div className='flex flex-1 flex-col'>
           <h1 className='text-4xl font-thin tracking-wider'>
             {data?.movie.title}
           </h1>
@@ -121,7 +122,7 @@ const Movie: NextPage = () => {
           <div className='mt-3 text-sm text-neutral-500 dark:text-neutral-400'>
             <div className='flex items-center justify-between'>
               <span>
-                {data?.movie?.runtime && data.movie.runtime + '  MIN • '}
+                {data?.movie?.runtime ? data.movie.runtime + '  MIN • ' : null}
                 {data?.movie.releaseDate &&
                   getYear(new Date(data?.movie.releaseDate))}
               </span>
@@ -159,7 +160,7 @@ const Movie: NextPage = () => {
                 </button>
               )}
             </div>
-            <div className='mt-8 flex gap-3'>
+            <div className='mt-8 flex flex-wrap gap-3'>
               {data?.movie.genres?.map((genre) => (
                 <Link
                   href={`/genre/${genre?.id}`}
@@ -175,7 +176,6 @@ const Movie: NextPage = () => {
             </p>
             {data?.movie.trailer && (
               <iframe
-                width='560'
                 height='315'
                 className='mt-8 w-full'
                 src={`https://www.youtube.com/embed/${data.movie.trailer.key}`}
@@ -264,7 +264,7 @@ const Movie: NextPage = () => {
           )}
         </div>
       </div>
-    </div>
+    </main>
   )
 }
 

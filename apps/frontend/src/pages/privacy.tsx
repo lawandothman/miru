@@ -4,8 +4,8 @@ import Link from 'next/link'
 
 const Privacy: NextPage = () => {
   return (
-    <div className='mx-auto mb-8 max-w-4xl px-20 pt-20 '>
-      <PageHeader title='Privacy Policy for Miru' subtitle='' />
+    <main className='mx-auto max-w-4xl'>
+      <PageHeader title='Privacy Policy' subtitle='' />
       <div className='flex flex-col gap-2 text-neutral-400'>
         <p>
           At Miru, accessible from miru.space, one of our main priorities is the
@@ -124,7 +124,7 @@ const Privacy: NextPage = () => {
           agree to its Terms and Conditions.
         </p>
       </div>
-    </div>
+    </main>
   )
 }
 

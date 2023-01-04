@@ -4,8 +4,8 @@ import type {
   NextPage,
 } from 'next'
 import { getProviders, getSession, signIn } from 'next-auth/react'
-import { FiFacebook } from 'react-icons/fi'
-import { FaGoogle } from 'react-icons/fa'
+import { FaFacebookF, FaGoogle } from 'react-icons/fa'
+import Link from 'next/link'
 
 const SignIn: NextPage<
 InferGetServerSidePropsType<typeof getServerSideProps>
@@ -18,16 +18,29 @@ InferGetServerSidePropsType<typeof getServerSideProps>
           <button
             onClick={() => signIn(provider.id)}
             key={provider.name}
-            className='flex w-72 items-center justify-center gap-4 rounded bg-black p-4 text-white dark:bg-white dark:text-neutral-900 '
+            className='flex w-72 items-center justify-center gap-4 rounded-lg bg-black p-4 text-white dark:bg-white dark:text-neutral-900 '
           >
             {provider.name === 'Facebook' ? (
-              <FiFacebook className='fill-white dark:fill-neutral-900' />
+              <FaFacebookF className='fill-white dark:fill-neutral-900' />
             ) : (
               <FaGoogle className='fill-white dark:fill-neutral-900' />
             )}
-            Login with {provider.name}
+            Continue with {provider.name}
           </button>
         ))}
+
+      <div className='w-md border-t-[0.1px] border-t-neutral-500 pt-8 text-center  text-sm text-neutral-500'>
+        By clicking “Continue with Facebook/Google” above, you acknowledge that
+        you have read and understood, and agree to Miru&apos;s{' '}
+        <Link className='underline' href='/terms-and-conditions'>
+          Terms & Conditions
+        </Link>{' '}
+        and{' '}
+        <Link className='underline' href='/privacy'>
+          Privacy Policy
+        </Link>
+        .
+      </div>
     </div>
   )
 }

@@ -50,7 +50,7 @@ const ForYou: NextPage = () => {
 
   if (!session) {
     return (
-      <div className='mx-auto max-w-4xl px-20 pt-20 text-white'>
+      <main>
         <PageHeader title='For you' />
         <p>Login so that we can recommend you movies</p>
         {theme === 'dark' ? (
@@ -72,16 +72,16 @@ const ForYou: NextPage = () => {
         >
           Login
         </Link>
-      </div>
+      </main>
     )
   }
 
   if (networkStatus === NetworkStatus.loading) {
     return (
-      <div className='px-20 pt-20'>
+      <main>
         <PageHeader title='For you' />
         <LoadingSkeleton />
-      </div>
+      </main>
     )
   }
 
@@ -99,13 +99,13 @@ const ForYou: NextPage = () => {
       }
     }
     return (
-      <div className='px-20 pt-20'>
+      <main>
         <PageHeader
           title='For you'
           subtitle='Movies to watch with the people you follow'
         />
         <MoviesList loadMore={loadMore} movies={data?.moviesForYou} />
-      </div>
+      </main>
     )
   }
 

@@ -37,10 +37,10 @@ const PopularMovies: NextPage = () => {
 
   if (networkStatus === NetworkStatus.loading) {
     return (
-      <div className='px-20 pt-20'>
+      <main>
         <PageHeader title='Popular' />
         <LoadingSkeleton />
-      </div>
+      </main>
     )
   }
 
@@ -59,10 +59,10 @@ const PopularMovies: NextPage = () => {
     }
 
     return (
-      <div className='px-20 pt-20'>
+      <main>
         <PageHeader title='Popular' subtitle='The top of Miru' />
         <MoviesList loadMore={loadMore} movies={data?.popularMovies} />
-      </div>
+      </main>
     )
   }
 

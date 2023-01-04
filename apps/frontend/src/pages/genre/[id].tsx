@@ -62,10 +62,10 @@ const Genre: NextPage = () => {
       }
     }
     return (
-      <div className='px-20 pt-20'>
+      <main>
         <PageHeader title={data.genre.name ?? ''} />
         <MoviesList loadMore={loadMore} movies={data.moviesByGenre} />
-      </div>
+      </main>
     )
   }
 

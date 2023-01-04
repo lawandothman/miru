@@ -4,7 +4,7 @@ import Link from 'next/link'
 
 const About: NextPage = () => {
   return (
-    <div className='mx-auto max-w-4xl px-20 pt-20'>
+    <main className='mx-auto max-w-4xl'>
       <PageHeader title='Welcome to Miru!' subtitle='' />
       <div className=' mx-auto flex flex-col gap-8'>
         <p>
@@ -59,7 +59,7 @@ const About: NextPage = () => {
           future.
         </p>
       </div>
-    </div>
+    </main>
   )
 }
 

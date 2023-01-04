@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-no-undef */
 import * as Avatar from '@radix-ui/react-avatar'
 import type { User } from 'next-auth'
 import Image from 'next/image'
@@ -12,29 +11,61 @@ const initials = (name: string) => {
     : firstName?.charAt(0)
 }
 
+type ProfilePictureSizes = 'xs' | 'sm' | 'md' | 'lg'
+
 interface ProfilePictureProps {
   user: User;
-  size: 'sm' | 'md' | 'lg';
+  size: ProfilePictureSizes
+}
+
+type SizeMap = {
+  [key in ProfilePictureSizes]: {
+    imgSize: number
+    fallbackSize: string
+    rootSize: string
+  }
+} 
+
+const sizeMap: SizeMap = {
+  xs: {
+    imgSize: 16,
+    fallbackSize: 'text-base',
+    rootSize: 'h-4 h-4'
+  },
+  sm: {
+    imgSize: 200,
+    fallbackSize: 'text-base',
+    rootSize: 'h-6 w-6'
+  },
+  md: {
+    imgSize: 200,
+    fallbackSize: 'text-lg',
+    rootSize: 'h-10 w-10'
+  },
+  lg: {
+    imgSize: 200,
+    fallbackSize: 'text-3x',
+    rootSize: 'h14 w-14'
+  }
 }
 
 export const ProfilePicture: FC<ProfilePictureProps> = ({
   user,
   size = 'sm',
 }) => {
+  const {rootSize, imgSize, fallbackSize} = sizeMap[size]
   return (
     <Avatar.Root
-      className={cn(
-        'inline-flex  select-none items-center justify-center overflow-hidden rounded-full align-middle',
-        size === 'md' ? 'h-10 w-10' : size == 'lg' ? 'h-14 w-14' : 'h-6 w-6'
-      )}
+      className={
+        `inline-flex select-none items-center justify-center overflow-hidden rounded-full align-middle ${rootSize}`
+      }
     >
       {user.image ? (
-        <Image width={200} height={200} className='object-contain' src={user.image} alt={user.name ?? ''} />
+        <Image width={imgSize} height={imgSize} className='object-contain' src={user.image} alt={user.name ?? ''} />
       ) : (
         <Avatar.Fallback
           className={cn(
-            'flex h-full w-full items-center justify-center bg-white text-sm text-neutral-900',
-            size === 'md' ? 'text-lg' : size === 'lg' ? 'text-3xl' : 'text-base'
+            `flex h-full w-full items-center justify-center bg-white text-sm text-neutral-900 ${fallbackSize}`
           )}
           delayMs={600}
         >

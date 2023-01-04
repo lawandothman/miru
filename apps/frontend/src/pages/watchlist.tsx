@@ -47,22 +47,13 @@ const Watchlist: NextPage = () => {
     },
   })
 
-  if (status === 'loading') {
+  if (status === 'loading' || networkStatus === NetworkStatus.loading) {
     return <FullPageLoader />
-  }
-
-  if (networkStatus === NetworkStatus.loading) {
-    return (
-      <div className='px-20 pt-20'>
-        <PageHeader title='Watchlist' />
-        <LoadingSkeleton />
-      </div>
-    )
   }
 
   if (!session) {
     return (
-      <div className='mx-auto max-w-4xl px-20 pt-20 text-white'>
+      <main>
         <PageHeader title='Watchlist' />
         <p>Login to add movies to your watchlist and match with friends</p>
         {theme === 'dark' ? (
@@ -84,7 +75,7 @@ const Watchlist: NextPage = () => {
         >
           Login
         </Link>
-      </div>
+      </main>
     )
   }
 
@@ -103,10 +94,10 @@ const Watchlist: NextPage = () => {
     }
 
     return (
-      <div className='px-20 pt-20'>
+      <main>
         <PageHeader title='Watchlist' />
         <MoviesList loadMore={loadMore} movies={data.watchlist} />
-      </div>
+      </main>
     )
   }
 

@@ -11,9 +11,10 @@ import { FullPageLoader } from 'components/FullPageLoader'
 import { MoviesList } from 'components/MoviesList'
 import { UserCard } from 'components/UserCard'
 import { PAGE_LIMIT } from 'config/constants'
-import { useSession } from 'next-auth/react'
+import { signOut, useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
+import { FiLogOut } from 'react-icons/fi'
 import type { Movie } from '__generated__/resolvers-types'
 import { User } from '__generated__/resolvers-types'
 
@@ -154,10 +155,10 @@ const User = () => {
     }
 
     return (
-      <div className='px-20 pt-20'>
+      <main>
         {data.user && (
           <>
-            <div className='flex items-center justify-between'>
+            <div className='grid md:grid-cols-[9fr,1fr] grid-cols-1'>
               <div className='flex items-center gap-4'>
                 <ProfilePicture size='lg' user={data.user} />
                 <div>
@@ -187,9 +188,23 @@ const User = () => {
                   </div>
                 </div>
               </div>
-              {userId && session?.user?.id !== userId && (
-                <FollowButton user={data.user} friendId={userId} />
-              )}
+              <div className='md:ml-auto mx-auto py-2'>
+                {userId && session?.user?.id !== userId ? (
+                  <FollowButton user={data.user} friendId={userId} />
+                ) : (
+                  <button
+                    className='flex h-10 w-28 max-w-xl items-center justify-center gap-2 rounded-lg font-semibold text-red-500 '
+                    onClick={() =>
+                      signOut({
+                        callbackUrl: '/',
+                      })
+                    }
+                  >
+                    <FiLogOut />
+                    Sign out
+                  </button>
+                )}
+              </div>
             </div>
 
             {session?.user?.id === userId && (
@@ -209,7 +224,7 @@ const User = () => {
             )}
           </>
         )}
-      </div>
+      </main>
     )
   }
 
