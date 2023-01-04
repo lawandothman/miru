@@ -24,7 +24,7 @@ export const UserSummary = ({ user }: { user: User }) => {
               {match && (
                 <Link href={`/movie/${match.id}`}>
                   <MovieBackdrop movie={match} />
-                  <p className='truncate'>{match?.title}</p>
+                  <p className='mt-2 truncate'>{match?.title}</p>
                 </Link>
               )}
             </div>
