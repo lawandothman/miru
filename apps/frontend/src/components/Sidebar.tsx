@@ -5,6 +5,7 @@ import {
   FiPlay,
   FiSearch,
   FiTrendingUp,
+  FiUser,
   FiX,
 } from 'react-icons/fi'
 import type { FC, PropsWithChildren } from 'react'
@@ -19,6 +20,7 @@ import _ from 'lodash'
 import { useMobile } from 'hooks/useMobile'
 import type { NextRouter } from 'next/dist/client/router'
 import type { IconType } from 'react-icons/lib'
+import type { User } from 'next-auth'
 
 interface NavItemProps {
   href: string;
@@ -69,7 +71,7 @@ const BottomNavItem: FC<PropsWithChildren<BottomNavItemProps>> = ({
             isSelected ? 'bg-gray-100 dark:bg-neutral-700' : 'bg-transparent'
           )}
         >
-          {React.createElement(icon, { className: 'm-auto' })}
+          {React.createElement(icon, { className: 'm-auto inline-flex' })}
           <p className='text-xs'>{children}</p>
         </div>
       </Link>
@@ -77,7 +79,7 @@ const BottomNavItem: FC<PropsWithChildren<BottomNavItemProps>> = ({
   )
 }
 
-export const BottomNavBar = ({ router }: { router: NextRouter }) => {
+export const BottomNavBar = ({ router, user }: { router: NextRouter, user: User | null }) => {
   return (
     <aside id='bottomNav'>
       <BottomNavItem
@@ -95,13 +97,6 @@ export const BottomNavBar = ({ router }: { router: NextRouter }) => {
         Explore
       </BottomNavItem>
       <BottomNavItem
-        isSelected={router.pathname === '/watchlist'}
-        href='/watchlist'
-        icon={FiPlay}
-      >
-        Watchlist
-      </BottomNavItem>
-      <BottomNavItem
         isSelected={router.pathname === '/for-you'}
         href='/for-you'
         icon={FiHeart}
@@ -115,7 +110,34 @@ export const BottomNavBar = ({ router }: { router: NextRouter }) => {
       >
         Popular
       </BottomNavItem>
+      {user != null 
+        ? (
+          <BottomNavItem
+            isSelected={router.asPath === `/users/${user.id}`}
+            href={`/users/${user.id}`}
+            icon={ProfileIcon(user)}
+          >
+            Profile
+          </BottomNavItem>
+        )
+        : (
+          <BottomNavItem
+            isSelected={router.pathname === '/user'}
+            href={'/users/'}
+            icon={FiUser}
+          >
+          Login
+          </BottomNavItem>
+        )
+      }
     </aside>
+  )
+}
+
+// eslint-disable-next-line react/display-name
+const ProfileIcon = (user: User) => () => {
+  return (
+    <ProfilePicture user={user} size={'xs'}></ProfilePicture>
   )
 }
 
@@ -126,7 +148,7 @@ export const Sidebar = ({ genres }: { genres: Genre[] }) => {
   const mobile = useMobile()
 
   if (mobile) {
-    return <BottomNavBar router={router} />
+    return <BottomNavBar router={router} user={session?.user as User} />
   }
 
   return (

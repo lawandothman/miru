@@ -158,7 +158,7 @@ const User = () => {
       <main>
         {data.user && (
           <>
-            <div className='flex items-center justify-between'>
+            <div className='grid md:grid-cols-[9fr,1fr] grid-cols-1'>
               <div className='flex items-center gap-4'>
                 <ProfilePicture size='lg' user={data.user} />
                 <div>
@@ -188,21 +188,23 @@ const User = () => {
                   </div>
                 </div>
               </div>
-              {userId && session?.user?.id !== userId ? (
-                <FollowButton user={data.user} friendId={userId} />
-              ) : (
-                <button
-                  className='flex h-10 w-28 max-w-xl items-center justify-center gap-2 rounded-lg font-semibold text-red-500 '
-                  onClick={() =>
-                    signOut({
-                      callbackUrl: '/',
-                    })
-                  }
-                >
-                  <FiLogOut />
-                  Sign out
-                </button>
-              )}
+              <div className='md:ml-auto mx-auto py-2'>
+                {userId && session?.user?.id !== userId ? (
+                  <FollowButton user={data.user} friendId={userId} />
+                ) : (
+                  <button
+                    className='flex h-10 w-28 max-w-xl items-center justify-center gap-2 rounded-lg font-semibold text-red-500 '
+                    onClick={() =>
+                      signOut({
+                        callbackUrl: '/',
+                      })
+                    }
+                  >
+                    <FiLogOut />
+                    Sign out
+                  </button>
+                )}
+              </div>
             </div>
 
             {session?.user?.id === userId && (
