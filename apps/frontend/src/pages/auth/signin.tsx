@@ -32,7 +32,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>
       <div className='w-md border-t-[0.1px] border-t-neutral-500 pt-8 text-center  text-sm text-neutral-500'>
         By clicking “Continue with Facebook/Google” above, you acknowledge that
         you have read and understood, and agree to Miru&apos;s{' '}
-        <Link className='underline' href='/terms-and-conditons'>
+        <Link className='underline' href='/terms-and-conditions'>
           Terms & Conditions
         </Link>{' '}
         and{' '}

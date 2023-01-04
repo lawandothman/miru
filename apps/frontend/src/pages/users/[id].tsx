@@ -193,9 +193,11 @@ const User = () => {
               ) : (
                 <button
                   className='flex h-10 w-28 max-w-xl items-center justify-center gap-2 rounded-lg font-semibold text-red-500 '
-                  onClick={() => signOut({
-                    callbackUrl: '/'
-                  })}
+                  onClick={() =>
+                    signOut({
+                      callbackUrl: '/',
+                    })
+                  }
                 >
                   <FiLogOut />
                   Sign out

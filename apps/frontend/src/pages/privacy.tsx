@@ -5,7 +5,7 @@ import Link from 'next/link'
 const Privacy: NextPage = () => {
   return (
     <main className='mx-auto max-w-4xl'>
-      <PageHeader title='Privacy Policy for Miru' subtitle='' />
+      <PageHeader title='Privacy Policy' subtitle='' />
       <div className='flex flex-col gap-2 text-neutral-400'>
         <p>
           At Miru, accessible from miru.space, one of our main priorities is the

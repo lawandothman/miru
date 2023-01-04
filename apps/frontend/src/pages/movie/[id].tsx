@@ -100,15 +100,15 @@ const Movie: NextPage = () => {
       >
         <FiArrowLeft className='h-5 w-5' />
       </button>
-      <div className='mx-auto flex flex-col gap-10 pt-4 lg:flex-row'>
-        <div className='flex flex-1 justify-center'>
+      <div className='mx-auto flex flex-col gap-10 pt-2 lg:flex-row flex-shrink'>
+        <div className='flex flex-1 items-center justify-center'>
           {data?.movie?.posterUrl && (
             <div className='aspect-w-20 aspect-h-34 overflow-hidden rounded-lg'>
               <Image
                 src={getImage(data.movie.posterUrl)}
                 alt={data.movie.title ?? ''}
                 className='rounded-lg'
-                width={500}
+                width={530}
                 height={1000}
               />
             </div>
@@ -160,7 +160,7 @@ const Movie: NextPage = () => {
                 </button>
               )}
             </div>
-            <div className='mt-8 flex gap-3'>
+            <div className='mt-8 flex flex-wrap gap-3'>
               {data?.movie.genres?.map((genre) => (
                 <Link
                   href={`/genre/${genre?.id}`}

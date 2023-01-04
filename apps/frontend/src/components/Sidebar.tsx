@@ -62,15 +62,10 @@ const BottomNavItem: FC<PropsWithChildren<BottomNavItemProps>> = ({
 }) => {
   return (
     <div className='w-1/4'>
-      <Link
-        className={cn(
-          'bg-neutral-400 hover:bg-gray-100 dark:text-white dark:hover:bg-neutral-700'
-        )}
-        href={href}
-      >
+      <Link className='bg-neutral-400 dark:text-white' href={href}>
         <div
           className={cn(
-            'rounded-lg p-2 text-center',
+            'mx-1 rounded-lg p-2 text-center hover:bg-gray-100 dark:hover:bg-neutral-700',
             isSelected ? 'bg-gray-100 dark:bg-neutral-700' : 'bg-transparent'
           )}
         >
