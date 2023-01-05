@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-export function useMobile(fallBackTheme = true) {
+export function useMobile(fallBackTheme = false) {
   const [mobile, setMobile] = useState(fallBackTheme)
   if (typeof window !== 'undefined') {
     const matcher = window.matchMedia('(min-width: 1024px)')

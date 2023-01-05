@@ -28,7 +28,7 @@
 		@apply flex;
 		@apply flex-row;
 		@apply w-full;
-		@apply p-2;
+		@apply p-1;
 		@apply bg-white;
 		@apply dark:bg-black;
 	}

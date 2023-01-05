@@ -60,20 +60,16 @@ const BottomNavItem: FC<PropsWithChildren<BottomNavItemProps>> = ({
   href,
   isSelected,
   icon,
-  children,
 }) => {
   return (
     <div className='w-1/4'>
       <Link className='bg-neutral-400 dark:text-white' href={href}>
-        <div
-          className={cn(
-            'mx-1 rounded-lg p-2 text-center hover:bg-gray-100 dark:hover:bg-neutral-700',
-            isSelected ? 'bg-gray-100 dark:bg-neutral-700' : 'bg-transparent'
-          )}
-        >
-          {React.createElement(icon, { className: 'm-auto inline-flex' })}
-          <p className='text-xs'>{children}</p>
+        <div className='mx-1 rounded-lg p-2 text-center'>
+          {React.createElement(icon, {
+            className: 'm-auto inline-flex',
+          })}
         </div>
+        {isSelected && <div className='text-center'>•</div>}
       </Link>
     </div>
   )
@@ -92,46 +88,34 @@ export const BottomNavBar = ({
         isSelected={router.pathname === '/'}
         href='/'
         icon={FiHome}
-      >
-        Home
-      </BottomNavItem>
+      />
       <BottomNavItem
         isSelected={router.pathname === '/explore'}
         href='/explore'
         icon={FiSearch}
-      >
-        Explore
-      </BottomNavItem>
+      />
       <BottomNavItem
         isSelected={router.pathname === '/for-you'}
         href='/for-you'
         icon={FiHeart}
-      >
-        For you
-      </BottomNavItem>
+      />
       <BottomNavItem
         isSelected={router.pathname === '/popular'}
         href='/popular'
         icon={FiTrendingUp}
-      >
-        Popular
-      </BottomNavItem>
+      />
       {user != null ? (
         <BottomNavItem
           isSelected={router.asPath === `/users/${user.id}`}
           href={`/users/${user.id}`}
           icon={ProfileIcon(user)}
-        >
-          Profile
-        </BottomNavItem>
+        />
       ) : (
         <BottomNavItem
           isSelected={router.pathname === '/auth/signin'}
           href={'/auth/signin'}
           icon={FiUser}
-        >
-          Login
-        </BottomNavItem>
+        />
       )}
     </aside>
   )
@@ -139,7 +123,7 @@ export const BottomNavBar = ({
 
 // eslint-disable-next-line react/display-name
 const ProfileIcon = (user: User) => () => {
-  return <ProfilePicture user={user} size={'xs'}></ProfilePicture>
+  return <ProfilePicture user={user} size={'sm'}></ProfilePicture>
 }
 
 export const Sidebar = ({ genres }: { genres: Genre[] }) => {
