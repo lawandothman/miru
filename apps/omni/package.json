@@ -16,7 +16,7 @@
     "@apollo/server": "^4.3.0",
     "@sentry/node": "^7.28.1",
     "@sentry/profiling-node": "^0.0.12",
-    "@sentry/tracing": "^7.28.1",
+    "@sentry/tracing": "^7.29.0",
     "axios": "^1.2.2",
     "axios-retry": "^3.3.1",
     "dataloader": "^2.1.0",
