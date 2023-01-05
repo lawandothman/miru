@@ -69,7 +69,7 @@ const BottomNavItem: FC<PropsWithChildren<BottomNavItemProps>> = ({
             className: 'm-auto inline-flex',
           })}
         </div>
-        {isSelected && <div className='text-center'>•</div>}
+        <div className='h-5 text-center'> {isSelected ? '•' : ' '}</div>
       </Link>
     </div>
   )
