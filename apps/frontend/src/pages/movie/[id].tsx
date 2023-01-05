@@ -70,7 +70,7 @@ const Movie: NextPage = () => {
 
   if (data) {
     return (
-      <main className='flex flex-col'>
+      <main>
         <button
           onClick={() => router.back()}
           className='flex h-8 w-8  items-center justify-center  rounded-full border text-black hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-800'
@@ -85,7 +85,7 @@ const Movie: NextPage = () => {
                   src={getImage(data.movie.posterUrl)}
                   alt={data.movie.title ?? ''}
                   className='rounded-lg'
-                  width={530}
+                  width={520}
                   height={1000}
                 />
               </div>
