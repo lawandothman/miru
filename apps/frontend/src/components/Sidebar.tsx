@@ -64,17 +64,13 @@ const BottomNavItem: FC<PropsWithChildren<BottomNavItemProps>> = ({
   return (
     <div className='w-1/4'>
       <Link className='bg-neutral-400 dark:text-white' href={href}>
-        <div
-          className={cn(
-            'mx-1 rounded-lg p-2 text-center hover:bg-gray-100 dark:hover:bg-neutral-700'
-          )}
-        >
+        <div className='mx-1 rounded-lg p-2 text-center'>
           {React.createElement(icon, {
             className: 'm-auto inline-flex',
           })}
         </div>
+        {isSelected && <div className='text-center'>•</div>}
       </Link>
-      {isSelected && <div className='m-0 mx-auto p-0 text-center'>•</div>}
     </div>
   )
 }
