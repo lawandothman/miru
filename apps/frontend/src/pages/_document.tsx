@@ -1,9 +1,6 @@
-import { useTheme } from 'next-themes'
 import { Html, Head, Main, NextScript } from 'next/document'
 
 export default function Document() {
-  const { theme } = useTheme()
-  console.log(theme)
   return (
     <Html lang='en'>
       <Head>
@@ -16,8 +13,16 @@ export default function Document() {
         <meta name='apple-mobile-web-app-title' content='Miru' />
         <meta name='format-detection' content='telephone=no' />
         <meta name='mobile-web-app-capable' content='yes' />
-        <meta name='theme-color' media='(prefers-color-scheme: light)' content='#FFFFFF'/>
-        <meta name='theme-color' media='(prefers-color-scheme: dark)'  content='#000000'/>
+        <meta
+          name='theme-color'
+          media='(prefers-color-scheme: light)'
+          content='#FFFFFF'
+        />
+        <meta
+          name='theme-color'
+          media='(prefers-color-scheme: dark)'
+          content='#000000'
+        />
         <meta name='viewport' content='width=device-width, initial-scale=1' />
         <link rel='apple-touch-icon' href='/touch-icon-iphone.png' />
         <link
