@@ -1,35 +1,15 @@
-import { gql, useMutation } from '@apollo/client'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import type { FC } from 'react'
-import { FiMinus, FiPlus } from 'react-icons/fi'
 import { Movie } from '__generated__/resolvers-types'
 import { MoviePoster } from './MoviePoster'
-import { Spinner } from './Spinner'
 import InfiniteScroll from 'react-infinite-scroller'
+import { WatchlistButton } from './WatchlistButton'
 
 interface MoviesListProps {
   movies?: Array<Movie | null>;
   loadMore?: () => Promise<void>;
 }
-
-const ADD_TO_WATCHLIST = gql`
-  mutation AddMovieToWatchlist($movieId: ID!) {
-    addMovieToWatchlist(movieId: $movieId) {
-      id
-      inWatchlist
-    }
-  }
-`
-
-const REMOVE_FROM_WATCHLIST = gql`
-  mutation RemoveMovieFromWatchlist($movieId: ID!) {
-    removeMovieFromWatchlist(movieId: $movieId) {
-      id
-      inWatchlist
-    }
-  }
-`
 
 export const LoadingSkeleton = () => {
   return (
@@ -76,56 +56,24 @@ export const MoviesList: FC<MoviesListProps> = ({ movies, loadMore }) => {
 
 const Movie = ({ movie }: { movie: Movie | null }) => {
   const { data: session } = useSession()
-  const [addToWatchlist, { loading: addToWatchlistLoading }] = useMutation<
-  Movie,
-  { movieId?: string }
-  >(ADD_TO_WATCHLIST)
-  const [removeFromWatchlist, { loading: removeFromWatchlistLoading }] =
-    useMutation<Movie, { movieId?: string }>(REMOVE_FROM_WATCHLIST)
+
+  if (!movie) {
+    return null
+  }
 
   return (
-    <div className='h-full w-full'>
+    <div className='flex h-full w-full flex-col'>
       {movie && (
         <Link href={`/movie/${movie?.id}`}>
           <MoviePoster movie={movie} />
         </Link>
       )}
-      <h3 className='mt-4 text-center text-sm dark:text-neutral-300'>
+      <h3 className='my-4 text-center text-sm dark:text-neutral-300'>
         {movie?.title}
       </h3>
-      {session && (
-        <button
-          onClick={() => {
-            const movieId = movie?.id
-            if (movie?.inWatchlist) {
-              removeFromWatchlist({
-                variables: {
-                  movieId,
-                },
-              })
-            } else {
-              addToWatchlist({
-                variables: {
-                  movieId,
-                },
-              })
-            }
-          }}
-          className='mx-auto mb-8 mt-4 flex h-8 w-32 items-center justify-center gap-1 rounded-md border border-neutral-500 dark:text-neutral-300'
-        >
-          {addToWatchlistLoading || removeFromWatchlistLoading ? (
-            <>
-              <Spinner reverted />
-              Watchlist
-            </>
-          ) : (
-            <>
-              {movie?.inWatchlist ? <FiMinus /> : <FiPlus />}
-              Watchlist
-            </>
-          )}
-        </button>
-      )}
+      <div className='mt-auto flex items-center justify-center'>
+        <WatchlistButton movie={movie} session={session} size='sm' />
+      </div>
     </div>
   )
 }
