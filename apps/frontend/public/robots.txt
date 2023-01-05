@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://miru.space
+
+# Sitemaps
+Sitemap: https://miru.space/sitemap.xml
