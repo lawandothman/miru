@@ -1,6 +1,7 @@
 import { gql, useMutation } from '@apollo/client'
 import { FiUserMinus, FiUserPlus } from 'react-icons/fi'
 import type { User } from '__generated__/resolvers-types'
+import { Button } from './Button'
 import { Spinner } from './Spinner'
 
 const FOLLOW = gql`
@@ -49,8 +50,7 @@ export const FollowButton = ({
     },
   })
   return (
-    <button
-      className='flex h-10 w-28 max-w-xl items-center justify-center gap-2 rounded-lg font-semibold bg-black dark:text-black text-white dark:bg-neutral-100'
+    <Button
       onClick={() => {
         if (user.isFollowing) {
           unfollow()
@@ -71,6 +71,6 @@ export const FollowButton = ({
           <FiUserPlus /> Follow
         </>
       )}
-    </button>
+    </Button>
   )
 }

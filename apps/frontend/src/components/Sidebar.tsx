@@ -21,6 +21,7 @@ import { useMobile } from 'hooks/useMobile'
 import type { NextRouter } from 'next/dist/client/router'
 import type { IconType } from 'react-icons/lib'
 import type { User } from 'next-auth'
+import { Button } from './Button'
 
 interface NavItemProps {
   href: string;
@@ -123,7 +124,7 @@ export const BottomNavBar = ({
 
 // eslint-disable-next-line react/display-name
 const ProfileIcon = (user: User) => () => {
-  return <ProfilePicture user={user} size={'sm'}></ProfilePicture>
+  return <ProfilePicture user={user} size={'sm'} />
 }
 
 export const Sidebar = ({ genres }: { genres: Genre[] }) => {
@@ -140,7 +141,7 @@ export const Sidebar = ({ genres }: { genres: Genre[] }) => {
     <>
       <aside
         className={
-          'fixed inset-y-0 z-30 h-full w-60 -translate-x-full transform overflow-y-auto border-r border-gray-200 bg-white transition duration-200 ease-in-out dark:border-neutral-700 dark:bg-black lg:z-auto lg:translate-x-0'
+          'fixed inset-y-0 z-30 h-full w-60 -translate-x-full transform overflow-y-auto border-r border-gray-200 bg-white   dark:border-neutral-700 dark:bg-black lg:z-auto lg:translate-x-0'
         }
         aria-label='Sidenav'
       >
@@ -151,9 +152,6 @@ export const Sidebar = ({ genres }: { genres: Genre[] }) => {
           <span className='mr-1 rounded-lg bg-red-400 px-2 py-1 text-xs uppercase text-white dark:bg-red-800'>
             Alpha
           </span>
-          <button className='mr-2 rounded p-1 hover:bg-neutral-300 dark:hover:bg-neutral-700 lg:hidden'>
-            <FiX />
-          </button>
         </div>
         <nav className='flex flex-col p-2'>
           <ul className='space-y-2'>
@@ -208,7 +206,7 @@ export const Sidebar = ({ genres }: { genres: Genre[] }) => {
         </nav>
         <footer className='sticky bottom-0 left-0'>
           <div className='h-8 bg-gradient-to-t from-white dark:from-black'></div>
-          <div className='bg-white p-4 dark:bg-black'>
+          <div className='flex justify-center bg-white p-4 dark:bg-black'>
             {session?.user ? (
               <Link
                 href={`/users/${session.user.id}`}
@@ -220,14 +218,7 @@ export const Sidebar = ({ genres }: { genres: Genre[] }) => {
                 </span>
               </Link>
             ) : (
-              <button
-                className='mx-auto mt-2 flex justify-center rounded bg-black px-8 py-1 text-base font-normal text-white dark:bg-white dark:text-black'
-                onClick={() => {
-                  signIn()
-                }}
-              >
-                Login
-              </button>
+              <Button onClick={() => signIn()}>Login</Button>
             )}
           </div>
         </footer>

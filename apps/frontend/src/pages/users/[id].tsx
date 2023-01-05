@@ -1,5 +1,6 @@
 import { gql, NetworkStatus, useQuery } from '@apollo/client'
 import { ProfilePicture } from 'components/Avatar'
+import { Button } from 'components/Button'
 import {
   Dialog,
   DialogTrigger,
@@ -158,7 +159,7 @@ const User = () => {
       <main>
         {data.user && (
           <>
-            <div className='grid md:grid-cols-[9fr,1fr] grid-cols-1'>
+            <div className='grid grid-cols-1 md:grid-cols-[9fr,1fr]'>
               <div className='flex items-center gap-4'>
                 <ProfilePicture size='lg' user={data.user} />
                 <div>
@@ -188,12 +189,13 @@ const User = () => {
                   </div>
                 </div>
               </div>
-              <div className='md:ml-auto mx-auto py-2'>
+              <div className='mx-auto py-2 md:ml-auto'>
                 {userId && session?.user?.id !== userId ? (
                   <FollowButton user={data.user} friendId={userId} />
                 ) : (
-                  <button
-                    className='flex h-10 w-28 max-w-xl items-center justify-center gap-2 rounded-lg font-semibold text-red-500 '
+                  <Button
+                    intent='danger'
+                    display='ghost'
                     onClick={() =>
                       signOut({
                         callbackUrl: '/',
@@ -202,7 +204,7 @@ const User = () => {
                   >
                     <FiLogOut />
                     Sign out
-                  </button>
+                  </Button>
                 )}
               </div>
             </div>
