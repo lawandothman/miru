@@ -8,7 +8,7 @@ import {
   DialogTitle,
 } from 'components/Dialog'
 import { FollowButton } from 'components/FollowButton'
-import { FullPageLoader } from 'components/FullPageLoader'
+import { FullPageLoader } from 'components/AsyncState'
 import { MoviesList } from 'components/MoviesList'
 import { UserCard } from 'components/UserCard'
 import { PAGE_LIMIT } from 'config/constants'

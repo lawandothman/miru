@@ -1,4 +1,4 @@
-import { LoadingSkeleton, MoviesList } from 'components/MoviesList'
+import { MoviesList } from 'components/MoviesList'
 import { PageHeader } from 'components/PageHeader'
 import type { NextPage } from 'next'
 import { useQuery, gql, NetworkStatus } from '@apollo/client'
@@ -10,8 +10,8 @@ import Image from 'next/image'
 import TalkImgDark from '../../public/illustration/dark/talk.png'
 import TalkImgLight from '../../public/illustration/light/talk.png'
 import { useTheme } from 'next-themes'
-import { FullPageLoader } from 'components/FullPageLoader'
-import { PAGE_LIMIT } from 'config/constants'
+import { FullPageLoader } from 'components/AsyncState'
+import { PAGE_LIMIT, SIGN_IN_INDEX } from 'config/constants'
 
 export const GET_WATCHLIST = gql`
   query Watchlist($limit: Int, $offset: Int) {
@@ -70,7 +70,7 @@ const Watchlist: NextPage = () => {
           ></Image>
         )}
         <Link
-          href='/auth/signin'
+          href={SIGN_IN_INDEX}
           className='mx-auto mt-12 block max-w-lg rounded-md bg-neutral-900 px-2 py-4 text-center text-lg font-semibold  text-white dark:bg-neutral-300 dark:text-black'
         >
           Login

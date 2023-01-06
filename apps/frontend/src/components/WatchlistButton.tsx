@@ -3,7 +3,7 @@ import type { Session } from 'next-auth'
 import { FiMinus, FiPlus } from 'react-icons/fi'
 import type { Movie } from '__generated__/resolvers-types'
 import { Button } from './Button'
-import { Spinner } from './Spinner'
+import { Spinner } from './AsyncState/Spinner'
 
 const ADD_TO_WATCHLIST = gql`
   mutation AddMovieToWatchlist($movieId: ID!) {

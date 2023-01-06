@@ -2,7 +2,7 @@ import { gql, useMutation } from '@apollo/client'
 import { FiUserMinus, FiUserPlus } from 'react-icons/fi'
 import type { User } from '__generated__/resolvers-types'
 import { Button } from './Button'
-import { Spinner } from './Spinner'
+import { Spinner } from './AsyncState/Spinner'
 
 const FOLLOW = gql`
   mutation ($friendId: ID!) {

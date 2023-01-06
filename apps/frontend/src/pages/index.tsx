@@ -1,5 +1,5 @@
 import { gql, useQuery } from '@apollo/client'
-import { FullPageLoader } from 'components/FullPageLoader'
+import { FullPageLoader } from 'components/AsyncState'
 import { PageHeader } from 'components/PageHeader'
 import { UserSummary } from 'components/UserSummary'
 import { sortBy } from 'lodash'
@@ -15,6 +15,7 @@ import type { IconType } from 'react-icons/lib'
 import type { User } from '__generated__/resolvers-types'
 import { useTheme } from 'next-themes'
 import { getHours } from 'date-fns'
+import { SIGN_IN_INDEX } from 'config/constants'
 
 const GET_HOME = gql`
   query ($userId: ID!) {
@@ -66,7 +67,7 @@ const Home: NextPage = () => {
 }
 
 const LoggedOutPage = () => {
-  const {theme} = useTheme()
+  const { theme } = useTheme()
   return (
     <main>
       <PageHeader
@@ -81,17 +82,9 @@ const LoggedOutPage = () => {
         Get started by making an account and adding movies to your watchlist
       </p>
       {theme === 'dark' ? (
-        <Image
-          className='mx-auto'
-          src={PhoneImgDark}
-          alt={'Illustration'}
-        ></Image>
+        <Image className='mx-auto' src={PhoneImgDark} alt={'Illustration'} />
       ) : (
-        <Image
-          className='mx-auto'
-          src={PhoneImgLight}
-          alt={'Illustration'}
-        ></Image>
+        <Image className='mx-auto' src={PhoneImgLight} alt={'Illustration'} />
       )}
 
       <h2 className='mt-4 text-xl'>How it works?</h2>
@@ -120,7 +113,7 @@ const LoggedOutPage = () => {
       </div>
 
       <Link
-        href='/auth/signin'
+        href={SIGN_IN_INDEX}
         className='mx-auto mt-12 block max-w-lg rounded-md bg-neutral-900 px-2 py-4 text-center text-lg font-semibold  text-white dark:bg-neutral-300 dark:text-black'
       >
         Login
@@ -129,7 +122,6 @@ const LoggedOutPage = () => {
     </main>
   )
 }
-
 
 const getGreeting = () => {
   const hours = getHours(new Date())
@@ -143,7 +135,6 @@ const getGreeting = () => {
     return 'Welcome back!'
   }
 }
-
 
 const Step = ({
   icon,
@@ -163,7 +154,7 @@ const Step = ({
         })}
       </div>
       <div className='w-full'>
-        <p className='text-l text-center font-bold mb-4'>{text}</p>
+        <p className='text-l mb-4 text-center font-bold'>{text}</p>
         <p className='text-center'>{description}</p>
       </div>
     </div>
@@ -188,6 +179,5 @@ const Footer = () => (
     </Link>
   </div>
 )
-
 
 export default Home

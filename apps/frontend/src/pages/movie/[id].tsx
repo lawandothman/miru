@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { getImage } from 'utils/image'
 import { getYear } from 'date-fns'
-import { FullPageLoader } from 'components/FullPageLoader'
+import { FullPageLoader } from 'components/AsyncState'
 import { gql, useQuery } from '@apollo/client'
 import { Movie } from '__generated__/resolvers-types'
 import { FiArrowLeft, FiLink } from 'react-icons/fi'
@@ -13,6 +13,12 @@ import { useSession } from 'next-auth/react'
 import { ProfilePicture } from 'components/Avatar'
 import { Tooltip } from 'components/Tooltip'
 import { WatchlistButton } from 'components/WatchlistButton'
+import {
+  GENRE_INDEX,
+  IMDB_TITLE,
+  USER_INDEX,
+  YOUTUBE_EMBED,
+} from 'config/constants'
 
 const GET_BY_ID = gql`
   query Movie($movieId: ID!) {
@@ -108,7 +114,7 @@ const Movie: NextPage = () => {
               <div className='mt-8 flex flex-wrap gap-3'>
                 {data?.movie.genres?.map((genre) => (
                   <Link
-                    href={`/genre/${genre?.id}`}
+                    href={`${GENRE_INDEX}/${genre?.id}`}
                     className='h-fit rounded-lg bg-neutral-200 p-2 text-xs font-bold uppercase tracking-wide text-neutral-900'
                     key={genre?.id}
                   >
@@ -123,7 +129,7 @@ const Movie: NextPage = () => {
                 <iframe
                   height='315'
                   className='mt-8 w-full'
-                  src={`https://www.youtube.com/embed/${data.movie.trailer.key}`}
+                  src={`${YOUTUBE_EMBED}/${data.movie.trailer.key}`}
                   title='YouTube video player'
                   allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
                   allowFullScreen
@@ -145,7 +151,7 @@ const Movie: NextPage = () => {
                   <Link
                     target='_blank'
                     rel='noreferrer noopener'
-                    href={`https://imdb.com/title/${data.movie.imdbId}`}
+                    href={`${IMDB_TITLE}/${data.movie.imdbId}`}
                     className='inline-flex items-center justify-center gap-2'
                   >
                     <FaImdb size={20} />
@@ -172,7 +178,7 @@ const Movie: NextPage = () => {
                         >
                           <Link
                             className='mr-2 inline-flex items-center gap-2'
-                            href={`/users/${match.id}`}
+                            href={`${USER_INDEX}/${match.id}`}
                           >
                             <ProfilePicture size='sm' user={match} />
                           </Link>

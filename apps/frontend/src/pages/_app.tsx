@@ -11,13 +11,13 @@ import { setContext } from '@apollo/client/link/context'
 import { DefaultSeo } from 'next-seo'
 import SEO from 'config/next-seo.config'
 
-import { Sidebar } from 'components/Sidebar'
 import { ThemeProvider } from 'next-themes'
 import 'styles/globals.css'
 import type { Genre } from '__generated__/resolvers-types'
 import App from 'next/app'
 import NextNProgress from 'nextjs-progressbar'
 import { offsetLimitPagination } from '@apollo/client/utilities'
+import { Navigation } from 'components/Navigation'
 
 const httpLinkt = createHttpLink({
   uri: `${process.env.NEXT_PUBLIC_OMNI_URL}/graphql`,
@@ -70,7 +70,7 @@ const MyApp = (props: AppProps & { genres: Genre[] }) => {
         <ApolloProvider client={client}>
           <DefaultSeo {...SEO} />
           <ThemeProvider attribute='class'>
-            <Sidebar genres={genres} />
+            <Navigation genres={genres} />
             <div className='lg:pl-60'>
               <Component {...pageProps} />
             </div>

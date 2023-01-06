@@ -1,3 +1,4 @@
+import { MOVIE_INDEX, USER_INDEX } from 'config/constants'
 import Link from 'next/link'
 import type { User } from '__generated__/resolvers-types'
 import { ProfilePicture } from './Avatar'
@@ -6,7 +7,7 @@ import { MovieBackdrop } from './MovieBackdrop'
 export const UserSummary = ({ user }: { user: User }) => {
   return (
     <div className='mb-4 rounded-lg border bg-white p-4 text-black drop-shadow-sm dark:border-none dark:bg-neutral-900 dark:text-white'>
-      <Link href={`/users/${user.id}`} className='inline-flex'>
+      <Link href={`${USER_INDEX}/${user.id}`} className='inline-flex'>
         <div className='gap-4 rounded-lg'>
           <div className='flex items-center gap-3'>
             <ProfilePicture size='md' user={user} />
@@ -22,7 +23,7 @@ export const UserSummary = ({ user }: { user: User }) => {
           {user.matches?.map((match) => (
             <div className='w-full text-center md:w-60' key={match?.id}>
               {match && (
-                <Link href={`/movie/${match.id}`}>
+                <Link href={`${MOVIE_INDEX}/${match.id}`}>
                   <MovieBackdrop movie={match} />
                   <p className='mt-2 truncate'>{match?.title}</p>
                 </Link>

@@ -1,3 +1,4 @@
+import { USER_INDEX } from 'config/constants'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import type { User } from '__generated__/resolvers-types'
@@ -6,7 +7,7 @@ import { ProfilePicture } from './Avatar'
 export const UserCard = ({ user }: { user: User }) => {
   const { data: session } = useSession()
   return (
-    <Link href={`/users/${user.id}`}>
+    <Link href={`${USER_INDEX}/${user.id}`}>
       <div className='gap-4 rounded-lg p-4 hover:bg-neutral-200  dark:hover:bg-neutral-700'>
         <div className='flex items-center gap-3'>
           <ProfilePicture size='md' user={user} />

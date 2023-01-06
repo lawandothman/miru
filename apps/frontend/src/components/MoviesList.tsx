@@ -5,6 +5,7 @@ import { Movie } from '__generated__/resolvers-types'
 import { MoviePoster } from './MoviePoster'
 import InfiniteScroll from 'react-infinite-scroller'
 import { WatchlistButton } from './WatchlistButton'
+import { MOVIE_INDEX } from 'config/constants'
 
 interface MoviesListProps {
   movies?: Array<Movie | null>;
@@ -64,7 +65,7 @@ const Movie = ({ movie }: { movie: Movie | null }) => {
   return (
     <div className='flex h-full w-full flex-col'>
       {movie && (
-        <Link href={`/movie/${movie?.id}`}>
+        <Link href={`${MOVIE_INDEX}/${movie?.id}`}>
           <MoviePoster movie={movie} />
         </Link>
       )}

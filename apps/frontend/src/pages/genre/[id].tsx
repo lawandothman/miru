@@ -5,7 +5,7 @@ import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { Genre } from '__generated__/resolvers-types'
 import type { Movie } from '__generated__/resolvers-types'
-import { FullPageLoader } from 'components/FullPageLoader'
+import { FullPageLoader } from 'components/AsyncState'
 import { useState } from 'react'
 import { PAGE_LIMIT } from 'config/constants'
 

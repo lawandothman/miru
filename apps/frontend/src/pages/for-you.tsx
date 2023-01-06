@@ -10,8 +10,8 @@ import PhotoImgDark from '../../public/illustration/dark/photo.png'
 import PhotoImgLight from '../../public/illustration/light/photo.png'
 import { useTheme } from 'next-themes'
 import { useState } from 'react'
-import { FullPageLoader } from 'components/FullPageLoader'
-import { PAGE_LIMIT } from 'config/constants'
+import { FullPageLoader } from 'components/AsyncState'
+import { PAGE_LIMIT, SIGN_IN_INDEX } from 'config/constants'
 
 const GET_FOR_YOU = gql`
   query ForYou($limit: Int, $offset: Int) {
@@ -54,20 +54,12 @@ const ForYou: NextPage = () => {
         <PageHeader title='For you' />
         <p>Login so that we can recommend you movies</p>
         {theme === 'dark' ? (
-          <Image
-            className='mx-auto'
-            src={PhotoImgDark}
-            alt={'Illustration'}
-          ></Image>
+          <Image className='mx-auto' src={PhotoImgDark} alt={'Illustration'} />
         ) : (
-          <Image
-            className='mx-auto'
-            src={PhotoImgLight}
-            alt={'Illustration'}
-          ></Image>
+          <Image className='mx-auto' src={PhotoImgLight} alt={'Illustration'} />
         )}
         <Link
-          href='/auth/signin'
+          href={SIGN_IN_INDEX}
           className='mx-auto mt-12 block max-w-lg rounded-md bg-neutral-900 px-2 py-4 text-center text-lg font-semibold  text-white dark:bg-neutral-300 dark:text-black'
         >
           Login

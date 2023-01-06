@@ -6,11 +6,11 @@ import type { Genre, Movie, User } from '__generated__/resolvers-types'
 import { FiSearch } from 'react-icons/fi'
 import type { ChangeEvent, FC, FormEvent, PropsWithChildren } from 'react'
 import { useState } from 'react'
-import { Popcorn } from 'components/Popcorn'
+import { Popcorn } from 'components/AsyncState'
 import { ProfilePicture } from 'components/Avatar'
 import Link from 'next/link'
 import { PageHeader } from 'components/PageHeader'
-import { PAGE_LIMIT } from 'config/constants'
+import { PAGE_LIMIT, USER_INDEX } from 'config/constants'
 import { useMobile } from 'hooks/useMobile'
 import { Tabs } from 'components/Tabs'
 
@@ -221,7 +221,7 @@ const Search: NextPage = () => {
                   <>
                     {data.users.map((user) => (
                       <Link
-                        href={`/users/${user.id}`}
+                        href={`${USER_INDEX}/${user.id}`}
                         key={user.id}
                         className='inline-flex items-center rounded-lg p-2 hover:bg-neutral-300 hover:dark:bg-neutral-600'
                       >
@@ -258,7 +258,7 @@ const Search: NextPage = () => {
               <div className='grid grid-cols-1 gap-y-5 gap-x-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8'>
                 {data.users.map((user) => (
                   <Link
-                    href={`/users/${user.id}`}
+                    href={`${USER_INDEX}/${user.id}`}
                     key={user.id}
                     className='inline-flex items-center rounded-lg p-2 hover:bg-neutral-300 hover:dark:bg-neutral-600'
                   >

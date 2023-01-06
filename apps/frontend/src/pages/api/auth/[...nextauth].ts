@@ -6,6 +6,7 @@ import GoogleProvider from 'next-auth/providers/google'
 import neo4j from 'neo4j-driver'
 import { Neo4jAdapter } from '@next-auth/neo4j-adapter'
 import { config } from '../../../config/env'
+import { SIGN_IN_INDEX } from 'config/constants'
 
 const { host, user, pass } = config.neo4j
 const driver = neo4j.driver(host, neo4j.auth.basic(user, pass))
@@ -56,7 +57,7 @@ export const authOptions: NextAuthOptions = {
     strategy: 'jwt',
   },
   pages: {
-    signIn: '/auth/signin',
+    signIn: SIGN_IN_INDEX,
   },
 }
 
