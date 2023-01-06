@@ -6,7 +6,6 @@ import {
   FiSearch,
   FiTrendingUp,
   FiUser,
-  FiX,
 } from 'react-icons/fi'
 import type { FC, PropsWithChildren } from 'react'
 import React from 'react'
@@ -70,7 +69,7 @@ const BottomNavItem: FC<PropsWithChildren<BottomNavItemProps>> = ({
             className: 'm-auto inline-flex',
           })}
         </div>
-        <div className='h-5 text-center'> {isSelected ? '•' : ' '}</div>
+        <div className='h-5 -mt-3 text-center'> {isSelected ? '•' : ''}</div>
       </Link>
     </div>
   )
