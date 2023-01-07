@@ -114,9 +114,9 @@ const Search: NextPage = () => {
   { movies: Movie[]; users: User[] },
   { query?: string; limit: number; offset: number }
   >(SEARCH, {
-    variables: { query: searchQuery, limit: PAGE_LIMIT, offset: 0 },
+    variables: { query: searchQuery?.trim(), limit: PAGE_LIMIT, offset: 0 },
     notifyOnNetworkStatusChange: true,
-    skip: !searchQuery,
+    skip: !searchQuery?.trim()
   })
 
   const { data: emptyStateData, networkStatus: emptyStateNetworkStatus } =
