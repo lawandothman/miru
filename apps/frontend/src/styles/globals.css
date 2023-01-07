@@ -3,88 +3,78 @@
 @tailwind utilities;
 
 @layer base {
-	h1,
-	h2,
-	h3,
-	h4,
-	h5,
-	h6 {
-		@apply text-black dark:text-white;
-	}
+  body {
+    @apply overflow-y-scroll;
+  }
 
-	p,
-	ul>li {
-		@apply text-neutral-700 dark:text-neutral-400;
-	}
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply text-black dark:text-white;
+  }
 
-	main {
-		@apply mx-auto mb-20 px-4 py-4 lg:mb-0 lg:px-20;
-	}
+  p,
+  ul > li {
+    @apply text-neutral-700 dark:text-neutral-400;
+  }
 
-	#bottomNav {
-		position: fixed;
-		bottom: 0px;
-		z-index: 1;
-		@apply flex;
-		@apply flex-row;
-		@apply w-full;
-		@apply p-1;
-		@apply bg-white;
-		@apply dark:bg-black;
-	}
+  main {
+    @apply mx-auto mb-20 px-4 py-4 lg:mb-0 lg:px-20;
+  }
 }
 
 ::-webkit-scrollbar {
-	width: 10px;
-	height: 10px;
-	float: right;
-	position: fixed;
-	display: contents;
+  width: 10px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-track {
-	border-radius: 10px;
+  border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb {
-	border-radius: 10px;
-	background-color: black;
-	background-clip: padding-box;
-	border: 3px solid transparent;
+  border-radius: 10px;
+  background-color: black;
+  background-clip: padding-box;
+  border: 3px solid transparent;
 }
 
 @media (prefers-color-scheme: dark) {
-	::-webkit-scrollbar-thumb {
-		background-color: white;
-	}
+  ::-webkit-scrollbar-thumb {
+    background-color: white;
+  }
 }
 
 ::-webkit-scrollbar-thumb:hover {
-	border-radius: 10px;
-	background-color: black;
+  border-radius: 10px;
+  background-color: black;
 }
 
 @media (prefers-color-scheme: dark) {
-	::-webkit-scrollbar-thumb:hover {
-		background-color: white;
-	}
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: white;
+  }
 }
 
 circle#popcrncirlce {
-	transform-origin: 0 0;
-	-webkit-transform-origin: 0 0;
-	-webkit-animation: rotate 1.5s cubic-bezier(0.49, 0.05, 0.32, 1.04) infinite alternate;
-	animation: rotate 1.5s cubic-bezier(0.49, 0.05, 0.32, 1.04) infinite alternate;
+  transform-origin: 0 0;
+  -webkit-transform-origin: 0 0;
+  -webkit-animation: rotate 1.5s cubic-bezier(0.49, 0.05, 0.32, 1.04) infinite
+    alternate;
+  animation: rotate 1.5s cubic-bezier(0.49, 0.05, 0.32, 1.04) infinite alternate;
 }
 
 @-webkit-keyframes rotate {
-	50% {
-		-webkit-transform: translate(0px, 100px);
-	}
+  50% {
+    -webkit-transform: translate(0px, 100px);
+  }
 }
 
 @keyframes rotate {
-	50% {
-		transform: translate(0px, 100px);
-	}
+  50% {
+    transform: translate(0px, 100px);
+  }
 }
