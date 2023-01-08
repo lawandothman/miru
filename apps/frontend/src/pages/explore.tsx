@@ -141,7 +141,7 @@ const Search: NextPage = () => {
           <div className='grid grid-cols-2 gap-4 lg:grid-cols-4'>
             {emptyStateData?.genres.map((genre) => (
               <Link
-                className='rounded-lg bg-neutral-800 p-8 text-center'
+                className='rounded-lg bg-neutral-100 dark:bg-neutral-800 p-8 text-center'
                 key={genre.id}
                 href={`/genre/${genre.id}`}
               >
