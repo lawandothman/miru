@@ -14,8 +14,8 @@ const config: DefaultSeoProps = {
       {
         url: 'https://miru.space/api/og',
         alt: 'Miru',
-        width: 1260,
-        height: 640,
+        width: 1200,
+        height: 600,
       },
     ],
   },
