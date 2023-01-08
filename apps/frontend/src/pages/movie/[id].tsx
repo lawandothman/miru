@@ -3,7 +3,6 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { getImage } from 'utils/image'
-import { getYear } from 'date-fns'
 import { FullPageLoader } from 'components/AsyncState'
 import { gql, useQuery } from '@apollo/client'
 import { Movie } from '__generated__/resolvers-types'
@@ -19,6 +18,7 @@ import {
   USER_INDEX,
   YOUTUBE_EMBED,
 } from 'config/constants'
+import { DateTime, Duration } from 'luxon'
 
 const GET_BY_ID = gql`
   query Movie($movieId: ID!) {
@@ -104,9 +104,11 @@ const Movie: NextPage = () => {
             <p className='mt-2 text-xl font-thin'>{data.movie.tagline}</p>
             <div className='mt-3 flex items-center justify-between'>
               <span>
-                {data?.movie?.runtime ? data.movie.runtime + '  MIN • ' : null}
+                {data?.movie?.runtime
+                  ? getRuntime(data.movie.runtime) + ' • '
+                  : null}
                 {data?.movie.releaseDate &&
-                  getYear(new Date(data?.movie.releaseDate))}
+                  DateTime.fromISO(data.movie.releaseDate).year}
               </span>
               <WatchlistButton session={session} movie={data.movie} />
             </div>
@@ -222,6 +224,17 @@ const Movie: NextPage = () => {
   }
 
   return null
+}
+
+const getRuntime = (minutes: number) => {
+  const duration = Duration.fromObject({ minutes })
+  if (duration.as('hour') < 1) {
+    return duration.toFormat('m\'m\'')
+  } else if (duration.minutes %60 === 0) {
+    return duration.toFormat('h\'h\'')
+  } else {
+    return duration.toFormat('h\'h\' m\'m\'')
+  }
 }
 
 export default Movie

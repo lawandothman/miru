@@ -14,7 +14,7 @@ import { FiSearch, FiShuffle, FiUserPlus } from 'react-icons/fi'
 import type { IconType } from 'react-icons/lib'
 import type { User } from '__generated__/resolvers-types'
 import { useTheme } from 'next-themes'
-import { getHours } from 'date-fns'
+import { DateTime } from 'luxon'
 import { SIGN_IN_INDEX } from 'config/constants'
 
 const GET_HOME = gql`
@@ -124,12 +124,13 @@ const LoggedOutPage = () => {
 }
 
 const getGreeting = () => {
-  const hours = getHours(new Date())
-  if (hours < 12 && hours >= 6) {
+  const now = DateTime.local()
+  const hour = now.hour
+  if (hour < 12 && hour >= 6) {
     return 'Good morning!'
-  } else if (hours < 17 && hours > 12) {
+  } else if (hour < 17 && hour > 12) {
     return 'Good afternoon!'
-  } else if (hours <= 23 && hours > 17) {
+  } else if (hour <= 23 && hour > 17) {
     return 'Good evening!'
   } else {
     return 'Welcome back!'
