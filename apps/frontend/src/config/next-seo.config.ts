@@ -12,7 +12,7 @@ const config: DefaultSeoProps = {
     siteName: 'Miru',
     images: [
       {
-        url: 'https://miru.space/og-image.png',
+        url: 'https://miru.space/api/og',
         alt: 'Miru',
         width: 1260,
         height: 640,

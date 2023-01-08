@@ -163,10 +163,10 @@ const User = () => {
               <div className='flex items-center gap-4'>
                 <ProfilePicture size='lg' user={data.user} />
                 <div>
-                  <h1 className='text-3xl dark:text-neutral-300'>
+                  <h1 className='text-lg lg:text-3xl dark:text-neutral-300'>
                     {data.user.name}
                   </h1>
-                  <div className='mt-1 flex gap-4'>
+                  <div className='mt-1 flex gap-2 lg:gap-4 text-sm lg:text-base'>
                     {session?.user?.id !== userId && (
                       <span className='dark:text-neutral-300'>
                         {data.user.matches?.length} matches
@@ -189,7 +189,7 @@ const User = () => {
                   </div>
                 </div>
               </div>
-              <div className='mx-auto py-2 md:ml-auto'>
+              <div className='ml-auto py-2 md:ml-auto'>
                 {userId && session?.user?.id !== userId ? (
                   <FollowButton user={data.user} friendId={userId} />
                 ) : (
@@ -203,7 +203,7 @@ const User = () => {
                     }
                   >
                     <FiLogOut />
-                    Sign out
+                    Log out
                   </Button>
                 )}
               </div>

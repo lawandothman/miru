@@ -1,4 +1,4 @@
-![ミル Miru](/apps/frontend/public/og-image.png)
+![ミル Miru](https://miru.space/api/og)
 
 #  Miru
 
