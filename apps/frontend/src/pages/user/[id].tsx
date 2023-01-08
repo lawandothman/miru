@@ -11,13 +11,14 @@ import { FollowButton } from 'components/FollowButton'
 import { FullPageLoader } from 'components/AsyncState'
 import { MoviesList } from 'components/MoviesList'
 import { UserCard } from 'components/UserCard'
-import { PAGE_LIMIT } from 'config/constants'
+import { PAGE_LIMIT, USER_INDEX } from 'config/constants'
 import { signOut, useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { FiLogOut } from 'react-icons/fi'
 import type { Movie } from '__generated__/resolvers-types'
 import { User } from '__generated__/resolvers-types'
+import { Page } from 'components/Page'
 
 const SEARCH_USER = gql`
   query User($userId: ID!, $limit: Int, $offset: Int) {
@@ -156,77 +157,84 @@ const User = () => {
     }
 
     return (
-      <main>
-        {data.user && (
-          <>
-            <div className='grid grid-cols-1 md:grid-cols-[9fr,1fr]'>
-              <div className='flex items-center gap-4'>
-                <ProfilePicture size='lg' user={data.user} />
-                <div>
-                  <h1 className='text-lg lg:text-3xl dark:text-neutral-300'>
-                    {data.user.name}
-                  </h1>
-                  <div className='mt-1 flex gap-2 lg:gap-4 text-sm lg:text-base'>
-                    {session?.user?.id !== userId && (
-                      <span className='dark:text-neutral-300'>
-                        {data.user.matches?.length} matches
-                      </span>
-                    )}
-                    {data.user.followers && data.user.followers.length > 0 ? (
-                      <FollowersDialog user={data.user} />
-                    ) : (
-                      <span className='dark:text-neutral-300'>
-                        {data.user.followers?.length} followers
-                      </span>
-                    )}
-                    {data.user.following && data.user.following.length > 0 ? (
-                      <FollowingDialog user={data.user} />
-                    ) : (
-                      <span className='dark:text-neutral-300'>
-                        {data.user.following?.length} following
-                      </span>
-                    )}
+      <Page
+        name={data.user.name}
+        index={`${USER_INDEX}/${data.user.id}`}
+        nofollow
+        noindex
+      >
+        <main>
+          {data.user && (
+            <>
+              <div className='grid grid-cols-1 md:grid-cols-[9fr,1fr]'>
+                <div className='flex items-center gap-4'>
+                  <ProfilePicture size='lg' user={data.user} />
+                  <div>
+                    <h1 className='text-lg dark:text-neutral-300 lg:text-3xl'>
+                      {data.user.name}
+                    </h1>
+                    <div className='mt-1 flex gap-2 text-sm lg:gap-4 lg:text-base'>
+                      {session?.user?.id !== userId && (
+                        <span className='dark:text-neutral-300'>
+                          {data.user.matches?.length} matches
+                        </span>
+                      )}
+                      {data.user.followers && data.user.followers.length > 0 ? (
+                        <FollowersDialog user={data.user} />
+                      ) : (
+                        <span className='dark:text-neutral-300'>
+                          {data.user.followers?.length} followers
+                        </span>
+                      )}
+                      {data.user.following && data.user.following.length > 0 ? (
+                        <FollowingDialog user={data.user} />
+                      ) : (
+                        <span className='dark:text-neutral-300'>
+                          {data.user.following?.length} following
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
+                <div className='ml-auto py-2 md:ml-auto'>
+                  {userId && session?.user?.id !== userId ? (
+                    <FollowButton user={data.user} friendId={userId} />
+                  ) : (
+                    <Button
+                      intent='danger'
+                      display='ghost'
+                      onClick={() =>
+                        signOut({
+                          callbackUrl: '/',
+                        })
+                      }
+                    >
+                      <FiLogOut />
+                      Log out
+                    </Button>
+                  )}
+                </div>
               </div>
-              <div className='ml-auto py-2 md:ml-auto'>
-                {userId && session?.user?.id !== userId ? (
-                  <FollowButton user={data.user} friendId={userId} />
-                ) : (
-                  <Button
-                    intent='danger'
-                    display='ghost'
-                    onClick={() =>
-                      signOut({
-                        callbackUrl: '/',
-                      })
-                    }
-                  >
-                    <FiLogOut />
-                    Log out
-                  </Button>
-                )}
-              </div>
-            </div>
 
-            {session?.user?.id === userId && (
-              <>
-                <h3 className='my-8 text-xl font-thin'>Your watchlist</h3>
-                <MoviesList loadMore={loadMore} movies={data.watchlist} />
-              </>
-            )}
+              {session?.user?.id === userId && (
+                <>
+                  <h3 className='my-8 text-xl font-thin'>Your watchlist</h3>
+                  <MoviesList loadMore={loadMore} movies={data.watchlist} />
+                </>
+              )}
 
-            {data.user.matches && data.user.matches.length > 0 && (
-              <>
-                <h3 className='my-8 text-xl font-thin'>
-                  Your matches with {data.user.name}
-                </h3>
-                <MoviesList movies={data.user.matches} />
-              </>
-            )}
-          </>
-        )}
-      </main>
+              {data.user.matches && data.user.matches.length > 0 && (
+                <>
+                  <h3 className='my-8 text-xl font-thin'>
+                    Your matches with {data.user.name}
+                  </h3>
+                  <MoviesList movies={data.user.matches} />
+                </>
+              )}
+            </>
+          )}
+        </main>
+      </Page>
     )
   }
 

@@ -11,7 +11,8 @@ import PhotoImgLight from '../../public/illustration/light/photo.png'
 import { useTheme } from 'next-themes'
 import { useState } from 'react'
 import { FullPageLoader } from 'components/AsyncState'
-import { PAGE_LIMIT, SIGN_IN_INDEX } from 'config/constants'
+import { FOR_YOU_INDEX, PAGE_LIMIT, SIGN_IN_INDEX } from 'config/constants'
+import { Page } from 'components/Page'
 
 const GET_FOR_YOU = gql`
   query ForYou($limit: Int, $offset: Int) {
@@ -40,7 +41,7 @@ const ForYou: NextPage = () => {
         limit: PAGE_LIMIT,
         offset: 0,
       },
-      notifyOnNetworkStatusChange: true
+      notifyOnNetworkStatusChange: true,
     }
   )
 
@@ -70,10 +71,12 @@ const ForYou: NextPage = () => {
 
   if (networkStatus === NetworkStatus.loading) {
     return (
-      <main>
-        <PageHeader title='For you' />
-        <LoadingSkeleton />
-      </main>
+      <Page name='For You' index={FOR_YOU_INDEX}>
+        <main>
+          <PageHeader title='For you' />
+          <LoadingSkeleton />
+        </main>
+      </Page>
     )
   }
 
@@ -91,13 +94,15 @@ const ForYou: NextPage = () => {
       }
     }
     return (
-      <main>
-        <PageHeader
-          title='For you'
-          subtitle='Movies to watch with the people you follow'
-        />
-        <MoviesList loadMore={loadMore} movies={data?.moviesForYou} />
-      </main>
+      <Page name='For You' index={FOR_YOU_INDEX}>
+        <main>
+          <PageHeader
+            title='For you'
+            subtitle='Movies to watch with the people you follow'
+          />
+          <MoviesList loadMore={loadMore} movies={data?.moviesForYou} />
+        </main>
+      </Page>
     )
   }
 

@@ -11,7 +11,8 @@ import TalkImgDark from '../../public/illustration/dark/talk.png'
 import TalkImgLight from '../../public/illustration/light/talk.png'
 import { useTheme } from 'next-themes'
 import { FullPageLoader } from 'components/AsyncState'
-import { PAGE_LIMIT, SIGN_IN_INDEX } from 'config/constants'
+import { PAGE_LIMIT, SIGN_IN_INDEX, WATCHLIST_INDEX } from 'config/constants'
+import { Page } from 'components/Page'
 
 export const GET_WATCHLIST = gql`
   query Watchlist($limit: Int, $offset: Int) {
@@ -94,10 +95,12 @@ const Watchlist: NextPage = () => {
     }
 
     return (
-      <main>
-        <PageHeader title='Watchlist' />
-        <MoviesList loadMore={loadMore} movies={data.watchlist} />
-      </main>
+      <Page name='Watchlist' index={WATCHLIST_INDEX}>
+        <main>
+          <PageHeader title='Watchlist' />
+          <MoviesList loadMore={loadMore} movies={data.watchlist} />
+        </main>
+      </Page>
     )
   }
 

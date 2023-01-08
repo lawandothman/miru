@@ -7,7 +7,8 @@ import { Genre } from '__generated__/resolvers-types'
 import type { Movie } from '__generated__/resolvers-types'
 import { FullPageLoader } from 'components/AsyncState'
 import { useState } from 'react'
-import { PAGE_LIMIT } from 'config/constants'
+import { GENRE_INDEX, PAGE_LIMIT } from 'config/constants'
+import { Page } from 'components/Page'
 
 const GET_BY_GENRE = gql`
   query MoviesByGenre($genreId: ID!, $offset: Int, $limit: Int) {
@@ -41,7 +42,7 @@ const Genre: NextPage = () => {
       offset: 0,
       limit: PAGE_LIMIT,
     },
-    notifyOnNetworkStatusChange: true
+    notifyOnNetworkStatusChange: true,
   })
 
   if (networkStatus === NetworkStatus.loading) {
@@ -62,10 +63,12 @@ const Genre: NextPage = () => {
       }
     }
     return (
-      <main>
-        <PageHeader title={data.genre.name ?? ''} />
-        <MoviesList loadMore={loadMore} movies={data.moviesByGenre} />
-      </main>
+      <Page name={data.genre.name} index={`${GENRE_INDEX}/${data.genre.id}`}>
+        <main>
+          <PageHeader title={data.genre.name ?? ''} />
+          <MoviesList loadMore={loadMore} movies={data.moviesByGenre} />
+        </main>
+      </Page>
     )
   }
 

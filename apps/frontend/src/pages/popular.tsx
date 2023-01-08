@@ -4,7 +4,8 @@ import type { NextPage } from 'next'
 import { gql, NetworkStatus, useQuery } from '@apollo/client'
 import type { Movie } from '__generated__/resolvers-types'
 import { useState } from 'react'
-import { PAGE_LIMIT } from 'config/constants'
+import { PAGE_LIMIT, POPULAR_INDEX } from 'config/constants'
+import { Page } from 'components/Page'
 
 const GET_POPULAR_MOVIES = gql`
   query PopularMovies($offset: Int, $limit: Int) {
@@ -37,10 +38,12 @@ const PopularMovies: NextPage = () => {
 
   if (networkStatus === NetworkStatus.loading) {
     return (
-      <main>
-        <PageHeader title='Popular' />
-        <LoadingSkeleton />
-      </main>
+      <Page name='Popular' index={POPULAR_INDEX}>
+        <main>
+          <PageHeader title='Popular' />
+          <LoadingSkeleton />
+        </main>
+      </Page>
     )
   }
 
@@ -59,10 +62,12 @@ const PopularMovies: NextPage = () => {
     }
 
     return (
-      <main>
-        <PageHeader title='Popular' subtitle='The top of Miru' />
-        <MoviesList loadMore={loadMore} movies={data?.popularMovies} />
-      </main>
+      <Page name='Popular' index={POPULAR_INDEX}>
+        <main>
+          <PageHeader title='Popular' subtitle='The top of Miru' />
+          <MoviesList loadMore={loadMore} movies={data?.popularMovies} />
+        </main>
+      </Page>
     )
   }
 
