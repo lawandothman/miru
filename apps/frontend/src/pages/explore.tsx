@@ -116,18 +116,15 @@ const Search: NextPage = () => {
   >(SEARCH, {
     variables: { query: searchQuery?.trim(), limit: PAGE_LIMIT, offset: 0 },
     notifyOnNetworkStatusChange: true,
-    skip: !searchQuery?.trim()
+    skip: !searchQuery?.trim(),
   })
 
-  const { data: emptyStateData, networkStatus: emptyStateNetworkStatus } =
-    useQuery<{ genres: Genre[]; popularMovies: Movie[] }>(EMPTY_STATE, {
-      notifyOnNetworkStatusChange: true,
-    })
+  const { data: emptyStateData } = useQuery<{
+    genres: Genre[];
+    popularMovies: Movie[];
+  }>(EMPTY_STATE)
 
-  if (
-    networkStatus === NetworkStatus.loading ||
-    emptyStateNetworkStatus === NetworkStatus.loading
-  ) {
+  if (networkStatus === NetworkStatus.loading) {
     return (
       <ExploreSkeleton>
         <div className='flex items-center justify-center'>
