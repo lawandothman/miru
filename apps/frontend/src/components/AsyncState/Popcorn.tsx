@@ -1,8 +1,8 @@
 export const Popcorn = () => {
   return (
-    <div className='w-20'>
+    <div className='w-20 '>
       <svg
-        className='animate-pulse p-3'
+        className=' p-3 animate-tilt-n-move-shaking'
         version='1.1'
         id='Capa_1'
         xmlns='http://www.w3.org/2000/svg'
