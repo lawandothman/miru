@@ -115,7 +115,7 @@ const User = () => {
   const userId = Array.isArray(query.id) ? query.id[0] : query.id
   const [fullyLoaded, setFullyLoaded] = useState(false)
   const { data: session, status } = useSession({
-    required: false,
+    required: true,
   })
 
   const {
