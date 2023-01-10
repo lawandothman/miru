@@ -67,7 +67,7 @@ const Home: NextPage = () => {
 }
 
 const LoggedOutPage = () => {
-  const { theme } = useTheme()
+  const { systemTheme } = useTheme()
   return (
     <main>
       <PageHeader
@@ -81,7 +81,7 @@ const LoggedOutPage = () => {
       <p>
         Get started by making an account and adding movies to your watchlist
       </p>
-      {theme === 'dark' ? (
+      {systemTheme === 'dark' ? (
         <Image className='mx-auto' src={PhoneImgDark} alt={'Illustration'} />
       ) : (
         <Image className='mx-auto' src={PhoneImgLight} alt={'Illustration'} />
@@ -114,7 +114,7 @@ const LoggedOutPage = () => {
 
       <Link
         href={SIGN_IN_INDEX}
-        className='mx-auto mt-12 block max-w-lg rounded-md bg-neutral-900 px-2 py-4 text-center text-lg font-semibold  text-white dark:bg-neutral-300 dark:text-black'
+        className='mx-auto mt-12 block max-w-lg rounded-md bg-black px-2 py-4 text-center text-lg font-semibold  text-white dark:bg-white dark:text-black'
       >
         Login
       </Link>
@@ -151,7 +151,7 @@ const Step = ({
       <div className='flex w-full justify-center'>
         {React.createElement(icon, {
           className:
-            'h-24 w-24 text-4xl bg-neutral-900 dark:bg-neutral-300 text-white dark:text-black border-full rounded-full p-8 m-4',
+            'h-24 w-24 text-4xl bg-black dark:bg-white text-white dark:text-black border-full rounded-full p-8 m-4',
         })}
       </div>
       <div className='w-full'>

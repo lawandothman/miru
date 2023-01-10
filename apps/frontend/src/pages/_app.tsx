@@ -69,7 +69,7 @@ const MyApp = (props: AppProps & { genres: Genre[] }) => {
       <SessionProvider session={session}>
         <ApolloProvider client={client}>
           <DefaultSeo {...SEO} />
-          <ThemeProvider attribute='class'>
+          <ThemeProvider attribute='class' enableSystem>
             <Navigation genres={genres} />
             <div className='lg:pl-60'>
               <Component {...pageProps} />

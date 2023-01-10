@@ -26,7 +26,7 @@ const GET_FOR_YOU = gql`
 `
 
 const ForYou: NextPage = () => {
-  const { theme } = useTheme()
+  const { systemTheme } = useTheme()
   const [fullyLoaded, setFullyLoaded] = useState(false)
   const { data: session, status } = useSession()
   const {
@@ -54,14 +54,14 @@ const ForYou: NextPage = () => {
       <main>
         <PageHeader title='For you' />
         <p>Login so that we can recommend you movies</p>
-        {theme === 'dark' ? (
+        {systemTheme === 'dark' ? (
           <Image className='mx-auto' src={PhotoImgDark} alt={'Illustration'} />
         ) : (
           <Image className='mx-auto' src={PhotoImgLight} alt={'Illustration'} />
         )}
         <Link
           href={SIGN_IN_INDEX}
-          className='mx-auto mt-12 block max-w-lg rounded-md bg-neutral-900 px-2 py-4 text-center text-lg font-semibold  text-white dark:bg-neutral-300 dark:text-black'
+          className='mx-auto mt-12 block max-w-lg rounded-md bg-black px-2 py-4 text-center text-lg font-semibold  text-white dark:bg-white dark:text-black'
         >
           Login
         </Link>

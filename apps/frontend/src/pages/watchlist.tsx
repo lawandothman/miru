@@ -26,7 +26,7 @@ export const GET_WATCHLIST = gql`
 `
 
 const Watchlist: NextPage = () => {
-  const { theme } = useTheme()
+  const { systemTheme } = useTheme()
   const { data: session, status } = useSession()
   const [fullyLoaded, setFullyLoaded] = useState(false)
   const {
@@ -57,7 +57,7 @@ const Watchlist: NextPage = () => {
       <main>
         <PageHeader title='Watchlist' />
         <p>Login to add movies to your watchlist and match with friends</p>
-        {theme === 'dark' ? (
+        {systemTheme === 'dark' ? (
           <Image
             className='mx-auto'
             src={TalkImgDark}
@@ -72,7 +72,7 @@ const Watchlist: NextPage = () => {
         )}
         <Link
           href={SIGN_IN_INDEX}
-          className='mx-auto mt-12 block max-w-lg rounded-md bg-neutral-900 px-2 py-4 text-center text-lg font-semibold  text-white dark:bg-neutral-300 dark:text-black'
+          className='mx-auto mt-12 block max-w-lg rounded-md bg-black px-2 py-4 text-center text-lg font-semibold  text-white dark:bg-white dark:text-black'
         >
           Login
         </Link>
