@@ -5,6 +5,7 @@ import { useRouter } from 'next/router'
 import { getImage } from 'utils/image'
 import { FullPageLoader } from 'components/AsyncState'
 import { gql, useQuery } from '@apollo/client'
+import type { Genre } from '__generated__/resolvers-types'
 import { Movie } from '__generated__/resolvers-types'
 import { FiArrowLeft, FiLink } from 'react-icons/fi'
 import { FaImdb } from 'react-icons/fa'
@@ -57,6 +58,58 @@ const GET_BY_ID = gql`
     }
   }
 `
+
+const StreamProviders = ({ movie }: { movie: Movie }) => {
+  if (!movie) {
+    return null
+  }
+  return (
+    <div className='mt-8'>
+      <h3 className='mb-4'>Stream</h3>
+      <div className='flex gap-4'>
+        {movie.streamProviders?.map((provider, i) => (
+          <Tooltip
+            key={i}
+            content={<div className='text-xs '>{provider?.name}</div>}
+          >
+            <Image
+              src={getImage(provider?.logoPath ?? '')}
+              alt={provider?.name ?? ''}
+              width={40}
+              height={40}
+              className='rounded-lg'
+            />
+          </Tooltip>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+const GenrePill = ({ genre }: { genre?: Genre | null }) => {
+  return (
+    <Link
+      href={`${GENRE_INDEX}/${genre?.id}`}
+      className='h-fit rounded-lg bg-neutral-200 p-2 text-xs font-bold uppercase tracking-wide text-neutral-900'
+      key={genre?.id}
+    >
+      {genre?.name}
+    </Link>
+  )
+}
+
+const Trailer = ({ movie }: { movie: Movie }) => {
+  return (
+    <iframe
+      height='315'
+      className='mt-8 w-full'
+      src={`${YOUTUBE_EMBED}/${movie.trailer?.key}`}
+      title='YouTube video player'
+      allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
+      allowFullScreen
+    />
+  )
+}
 
 const Movie: NextPage = () => {
   const router = useRouter()
@@ -122,28 +175,13 @@ const Movie: NextPage = () => {
                 <div className='text-sm text-neutral-500 dark:text-neutral-400'>
                   <div className='mt-8 flex flex-wrap gap-3'>
                     {data?.movie.genres?.map((genre) => (
-                      <Link
-                        href={`${GENRE_INDEX}/${genre?.id}`}
-                        className='h-fit rounded-lg bg-neutral-200 p-2 text-xs font-bold uppercase tracking-wide text-neutral-900'
-                        key={genre?.id}
-                      >
-                        {genre?.name}
-                      </Link>
+                      <GenrePill genre={genre} key={genre?.id} />
                     ))}
                   </div>
                   <p className='mt-8 max-w-xl text-neutral-600 dark:text-neutral-400'>
                     {data?.movie.overview}
                   </p>
-                  {data?.movie.trailer && (
-                    <iframe
-                      height='315'
-                      className='mt-8 w-full'
-                      src={`${YOUTUBE_EMBED}/${data.movie.trailer.key}`}
-                      title='YouTube video player'
-                      allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
-                      allowFullScreen
-                    />
-                  )}
+                  {data?.movie.trailer && <Trailer movie={data.movie} />}
                   <div className=' mt-6 flex gap-3'>
                     {data?.movie?.homepage && (
                       <Link
@@ -202,27 +240,7 @@ const Movie: NextPage = () => {
 
                 {data?.movie.streamProviders &&
                   data.movie.streamProviders.length > 0 && (
-                  <div className='mt-8'>
-                    <h3 className='mb-4'>Stream</h3>
-                    <div className='flex gap-4'>
-                      {data.movie.streamProviders.map((provider, i) => (
-                        <Tooltip
-                          key={i}
-                          content={
-                            <div className='text-xs '>{provider?.name}</div>
-                          }
-                        >
-                          <Image
-                            src={getImage(provider?.logoPath ?? '')}
-                            alt={provider?.name ?? ''}
-                            width={40}
-                            height={40}
-                            className='rounded-lg'
-                          />
-                        </Tooltip>
-                      ))}
-                    </div>
-                  </div>
+                  <StreamProviders movie={data.movie} />
                 )}
               </div>
             </div>
@@ -272,13 +290,7 @@ const Movie: NextPage = () => {
         </div>
         <div className='mt-8 flex flex-wrap gap-3 px-8'>
           {data?.movie.genres?.map((genre) => (
-            <Link
-              href={`${GENRE_INDEX}/${genre?.id}`}
-              className='h-fit rounded-lg bg-neutral-200 p-2 text-xs font-bold uppercase tracking-wide text-neutral-900'
-              key={genre?.id}
-            >
-              {genre?.name}
-            </Link>
+            <GenrePill key={genre?.id} genre={genre} />
           ))}
         </div>
         <div className='mt-16 mb-8 flex gap-16 px-8'>
@@ -288,40 +300,10 @@ const Movie: NextPage = () => {
             </p>
             {data?.movie.streamProviders &&
               data.movie.streamProviders.length > 0 && (
-              <div className='mt-8'>
-                <h3 className='mb-4'>Stream</h3>
-                <div className='flex gap-4'>
-                  {data.movie.streamProviders.map((provider, i) => (
-                    <Tooltip
-                      key={i}
-                      content={
-                        <div className='text-xs '>{provider?.name}</div>
-                      }
-                    >
-                      <Image
-                        src={getImage(provider?.logoPath ?? '')}
-                        alt={provider?.name ?? ''}
-                        width={40}
-                        height={40}
-                        className='rounded-lg'
-                      />
-                    </Tooltip>
-                  ))}
-                </div>
-              </div>
+              <StreamProviders movie={data.movie} />
             )}
           </div>
-          {data?.movie.trailer && (
-            <iframe
-              height='415'
-              width='100%'
-              className='mt-8 w-full rounded-lg'
-              src={`${YOUTUBE_EMBED}/${data.movie.trailer.key}`}
-              title='YouTube video player'
-              allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
-              allowFullScreen
-            />
-          )}
+          {data?.movie.trailer && <Trailer movie={data.movie} />}
         </div>
       </>
     )
