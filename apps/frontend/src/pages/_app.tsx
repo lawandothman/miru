@@ -8,6 +8,7 @@ import {
   gql,
 } from '@apollo/client'
 import { setContext } from '@apollo/client/link/context'
+import { Analytics } from '@vercel/analytics/react'
 import { DefaultSeo } from 'next-seo'
 import SEO from 'config/next-seo.config'
 
@@ -44,7 +45,7 @@ const client = new ApolloClient({
           popularMovies: offsetLimitPagination(),
           moviesForYou: offsetLimitPagination(),
           moviesByGenre: offsetLimitPagination(['genreId']),
-          watchlist: offsetLimitPagination()
+          watchlist: offsetLimitPagination(),
         },
       },
     },
@@ -69,6 +70,7 @@ const MyApp = (props: AppProps & { genres: Genre[] }) => {
       <SessionProvider session={session}>
         <ApolloProvider client={client}>
           <DefaultSeo {...SEO} />
+          <Analytics />
           <ThemeProvider attribute='class' enableSystem>
             <Navigation genres={genres} />
             <div className='lg:pl-60'>
