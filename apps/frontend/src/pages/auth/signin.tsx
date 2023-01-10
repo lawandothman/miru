@@ -6,17 +6,19 @@ import type {
 import { getProviders, getSession, signIn } from 'next-auth/react'
 import { FaFacebookF, FaGoogle } from 'react-icons/fa'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 
 const SignIn: NextPage<
 InferGetServerSidePropsType<typeof getServerSideProps>
 > = ({ providers }) => {
+  const router = useRouter()
   return (
     <div className='mx-auto flex h-screen max-w-md flex-col items-center justify-center gap-8'>
       <h1 className='text-4xl'>Log in</h1>
       {providers &&
         Object.values(providers).map((provider) => (
           <button
-            onClick={() => signIn(provider.id)}
+            onClick={() => signIn(provider.id ,{ callbackUrl: router.query.callbackUrl as string })}
             key={provider.name}
             className='flex w-72 items-center justify-center gap-4 rounded-lg bg-black p-4 text-white dark:bg-white dark:text-neutral-900 '
           >
