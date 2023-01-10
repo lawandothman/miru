@@ -12,6 +12,7 @@ export const MovieBackdrop = ({ movie }: { movie: Movie }) => {
         alt={movie?.title ?? ''}
         src={getImage(movie?.backdropUrl ?? '')}
         fill
+        unoptimized
         loading='lazy'
         sizes='(max-width: 160px) 50vw,
               (max-width: 240px) 100vw,
