@@ -233,7 +233,7 @@ const Movie: NextPage = () => {
 
     return (
       <>
-        <div className='relative flex h-[500px] w-full items-end overflow-hidden'>
+        <div className='relative flex h-[580px] w-full items-end overflow-hidden'>
           <Image
             src={getImage(data.movie.backdropUrl ?? '', 'original')}
             alt={data.movie.title}
