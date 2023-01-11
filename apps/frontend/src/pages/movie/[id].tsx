@@ -111,6 +111,35 @@ const Trailer = ({ movie }: { movie: Movie }) => {
   )
 }
 
+const Matches = ({ movie }: { movie: Movie }) => {
+  return (
+    <div className='mt-8 px-8'>
+      <h3 className='mb-4'>Watch it with</h3>
+      {movie.matches
+        ?.filter((match) => match?.isFollowing)
+        .map((match) => {
+          if (match) {
+            return (
+              <Tooltip
+                content={<span className='text-xs'>{match.name}</span>}
+                key={match.id}
+              >
+                <Link
+                  className='mr-2 inline-flex items-center gap-2'
+                  href={`${USER_INDEX}/${match.id}`}
+                >
+                  <ProfilePicture size='sm' user={match} />
+                </Link>
+              </Tooltip>
+            )
+          } else {
+            return null
+          }
+        })}
+    </div>
+  )
+}
+
 const Movie: NextPage = () => {
   const router = useRouter()
   const movieId = Array.isArray(router.query.id)
@@ -209,34 +238,7 @@ const Movie: NextPage = () => {
                 </div>
                 {data?.movie.matches &&
                   data.movie.matches.filter((match) => match?.isFollowing)
-                    .length > 0 && (
-                  <div className='mt-8'>
-                    <h3 className='mb-4'>Watch it with</h3>
-                    {data?.movie.matches
-                      ?.filter((match) => match?.isFollowing)
-                      .map((match) => {
-                        if (match) {
-                          return (
-                            <Tooltip
-                              content={
-                                <span className='text-xs'>{match.name}</span>
-                              }
-                              key={match.id}
-                            >
-                              <Link
-                                className='mr-2 inline-flex items-center gap-2'
-                                href={`${USER_INDEX}/${match.id}`}
-                              >
-                                <ProfilePicture size='sm' user={match} />
-                              </Link>
-                            </Tooltip>
-                          )
-                        } else {
-                          return null
-                        }
-                      })}
-                  </div>
-                )}
+                    .length > 0 && <Matches movie={data.movie} />}
 
                 {data?.movie.streamProviders &&
                   data.movie.streamProviders.length > 0 && (
@@ -253,9 +255,10 @@ const Movie: NextPage = () => {
       <>
         <div className='relative flex h-[750px] w-full items-end overflow-hidden'>
           <Image
-            src={getImage(data.movie.backdropUrl ?? '', 'original')}
+            src={getImage(data.movie.backdropUrl ?? '', 'w1280')}
             alt=''
             fill
+            loading='eager'
             className='absolute object-cover object-center'
           />
           <div className='absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-[200]' />
@@ -288,6 +291,9 @@ const Movie: NextPage = () => {
             <WatchlistButton session={session} movie={data.movie} />
           </div>
         </div>
+        {data?.movie.matches &&
+          data.movie.matches.filter((match) => match?.isFollowing).length >
+            0 && <Matches movie={data.movie} />}
         <div className='mt-8 flex flex-wrap gap-3 px-8'>
           {data?.movie.genres?.map((genre) => (
             <GenrePill key={genre?.id} genre={genre} />
