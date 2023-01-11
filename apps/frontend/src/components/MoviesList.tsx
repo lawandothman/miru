@@ -6,9 +6,10 @@ import { MoviePoster } from './MoviePoster'
 import InfiniteScroll from 'react-infinite-scroller'
 import { WatchlistButton } from './WatchlistButton'
 import { MOVIE_INDEX } from 'config/constants'
+import type { Maybe } from 'graphql/jsutils/Maybe'
 
 interface MoviesListProps {
-  movies?: Array<Movie | null>;
+  movies?: Maybe<Movie>[];
   loadMore?: () => Promise<void>;
 }
 
@@ -55,7 +56,7 @@ export const MoviesList: FC<MoviesListProps> = ({ movies, loadMore }) => {
   )
 }
 
-const Movie = ({ movie }: { movie: Movie | null }) => {
+const Movie = ({ movie }: { movie: Maybe<Movie> }) => {
   const { data: session } = useSession()
 
   if (!movie) {
