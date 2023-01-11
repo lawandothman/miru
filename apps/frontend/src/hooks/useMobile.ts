@@ -7,6 +7,7 @@ export function useMobile(fallBackTheme = false) {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     useEffect(() => {
       setMobile(!matcher.matches)
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
     matcher.addEventListener('change', (e) => {
       setMobile(!e.matches)
