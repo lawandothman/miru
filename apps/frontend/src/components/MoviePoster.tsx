@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import { useState } from 'react'
 import { cn } from 'utils/cn'
-import { getImage } from 'utils/image'
+import { getPoster } from 'utils/image'
 import type { Movie } from '__generated__/resolvers-types'
 
 export const MoviePoster = ({ movie }: { movie: Movie }) => {
@@ -10,7 +10,7 @@ export const MoviePoster = ({ movie }: { movie: Movie }) => {
     <div className='aspect-w-8 aspect-h-12 w-full overflow-hidden rounded-lg'>
       <Image
         alt={movie?.title ?? ''}
-        src={getImage(movie?.posterUrl ?? '')}
+        src={getPoster(movie?.posterUrl ?? '')}
         fill
         unoptimized
         loading='lazy'

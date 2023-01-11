@@ -4,10 +4,11 @@ import { FiMinus, FiPlus } from 'react-icons/fi'
 import type { Movie } from '__generated__/resolvers-types'
 import { Button } from './Button'
 import { Spinner } from './AsyncState/Spinner'
+import { signIn } from 'next-auth/react'
 
 const ADD_TO_WATCHLIST = gql`
   mutation AddMovieToWatchlist($movieId: ID!) {
-    addMovieToWatchlist(movieId: $movieId) {
+    movie: addMovieToWatchlist(movieId: $movieId) {
       id
       inWatchlist
     }
@@ -16,7 +17,7 @@ const ADD_TO_WATCHLIST = gql`
 
 const REMOVE_FROM_WATCHLIST = gql`
   mutation RemoveMovieFromWatchlist($movieId: ID!) {
-    removeMovieFromWatchlist(movieId: $movieId) {
+    movie: removeMovieFromWatchlist(movieId: $movieId) {
       id
       inWatchlist
     }
@@ -25,53 +26,51 @@ const REMOVE_FROM_WATCHLIST = gql`
 export const WatchlistButton = ({
   session,
   movie,
-  size = 'md'
+  size = 'md',
 }: {
   session: Session | null;
   movie: Movie;
-  size?: 'sm' | 'md'
+  size?: 'sm' | 'md';
 }) => {
-  const [addToWatchlist, { loading: addToWatchlistLoading }] = useMutation<
-  Movie,
+  const [addToWatchlist, { loading: addLoading }] = useMutation<
+  { movie: Movie },
   { movieId?: string }
-  >(ADD_TO_WATCHLIST)
-  const [removeFromWatchlist, { loading: removeFromWatchlistLoading }] =
-    useMutation<Movie, { movieId?: string }>(REMOVE_FROM_WATCHLIST)
+  >(ADD_TO_WATCHLIST, {
+    variables: {
+      movieId: movie.id,
+    },
+  })
 
-  if (!session) {
-    return null
+  const [removeFromWatchlist, { loading: removeLoading }] = useMutation<
+  { movie: Movie },
+  { movieId?: string }
+  >(REMOVE_FROM_WATCHLIST, {
+    variables: {
+      movieId: movie.id,
+    },
+  })
+
+  const onClick = async () => {
+    if (!session) {
+      return await signIn()
+    }
+    if (movie.inWatchlist) {
+      await removeFromWatchlist()
+    } else {
+      await addToWatchlist()
+    }
   }
 
+  const isLoading = addLoading || removeLoading
+
   return (
-    <Button
-      size={size}
-      onClick={() => {
-        if (movie.inWatchlist) {
-          removeFromWatchlist({
-            variables: {
-              movieId: movie.id,
-            },
-          })
-        } else {
-          addToWatchlist({
-            variables: {
-              movieId: movie.id,
-            },
-          })
-        }
-      }}
-    >
-      {addToWatchlistLoading || removeFromWatchlistLoading ? (
-        <>
-          <Spinner reverted />
-          Watchlist
-        </>
+    <Button size={size} onClick={onClick}>
+      {isLoading ? (
+        <Spinner reverted />
       ) : (
-        <>
-          {movie?.inWatchlist ? <FiMinus /> : <FiPlus />}
-          Watchlist
-        </>
+        <>{movie?.inWatchlist ? <FiMinus /> : <FiPlus />}</>
       )}
+      Watchlist
     </Button>
   )
 }

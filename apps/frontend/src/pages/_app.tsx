@@ -19,6 +19,7 @@ import App from 'next/app'
 import NextNProgress from 'nextjs-progressbar'
 import { offsetLimitPagination } from '@apollo/client/utilities'
 import { Navigation } from 'components/Navigation'
+import Head from 'next/head'
 
 const httpLinkt = createHttpLink({
   uri: `${process.env.NEXT_PUBLIC_OMNI_URL}/graphql`,
@@ -61,6 +62,10 @@ const MyApp = (props: AppProps & { genres: Genre[] }) => {
 
   return (
     <>
+      <Head>
+        <meta name='viewport' content='width=device-width, initial-scale=1' />
+      </Head>
+
       <NextNProgress
         color='#ef4444'
         options={{
