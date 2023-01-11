@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import { useState } from 'react'
 import { cn } from 'utils/cn'
-import { getImage } from 'utils/image'
+import { getBackdrop } from 'utils/image'
 import type { Movie } from '__generated__/resolvers-types'
 
 export const MovieBackdrop = ({ movie }: { movie: Movie }) => {
@@ -10,7 +10,7 @@ export const MovieBackdrop = ({ movie }: { movie: Movie }) => {
     <div className='aspect-w-12 aspect-h-8 w-full overflow-hidden rounded-lg'>
       <Image
         alt={movie?.title ?? ''}
-        src={getImage(movie?.backdropUrl ?? '')}
+        src={getBackdrop(movie?.backdropUrl ?? '')}
         fill
         unoptimized
         loading='lazy'

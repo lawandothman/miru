@@ -2,7 +2,7 @@ import type { NextPage } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { getImage } from 'utils/image'
+import { getBackdrop, getLogo, getPoster } from 'utils/image'
 import { FullPageLoader } from 'components/AsyncState'
 import { gql, useQuery } from '@apollo/client'
 import type { Genre, User, WatchProvider } from '__generated__/resolvers-types'
@@ -75,7 +75,7 @@ const StreamProviders = ({
             content={<div className='text-xs '>{provider?.name}</div>}
           >
             <Image
-              src={getImage(provider?.logoPath ?? '')}
+              src={getLogo(provider?.logoPath ?? '')}
               alt={provider?.name ?? ''}
               width={40}
               height={40}
@@ -179,7 +179,7 @@ const Movie: NextPage = () => {
                 {data.movie?.posterUrl && (
                   <div className='aspect-w-20 aspect-h-34 overflow-hidden rounded-lg'>
                     <Image
-                      src={getImage(data.movie.posterUrl)}
+                      src={getPoster(data.movie.posterUrl)}
                       alt={data.movie.title ?? ''}
                       className='rounded-lg'
                       width={520}
@@ -259,7 +259,7 @@ const Movie: NextPage = () => {
       <>
         <div className='relative flex h-[750px] w-full items-end overflow-hidden'>
           <Image
-            src={getImage(data.movie.backdropUrl ?? '', 'w1280')}
+            src={getBackdrop(data.movie.backdropUrl ?? '', 'w1280')}
             alt=''
             fill
             loading='eager'
@@ -269,7 +269,7 @@ const Movie: NextPage = () => {
           <div className='absolute inset-0 bg-gradient-to-r from-white to-transparent opacity-100 dark:from-black' />
           <div className='aspect-w-20 aspect-h-34 relative w-1/5 overflow-hidden rounded-lg pl-8'>
             <Image
-              src={getImage(data.movie.posterUrl ?? '')}
+              src={getPoster(data.movie.posterUrl ?? '', 'w342')}
               alt={data.movie.title ?? ''}
               className='rounded-lg'
               width={400}
