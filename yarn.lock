@@ -2858,10 +2858,10 @@
   resolved "https://registry.yarnpkg.com/@vercel/analytics/-/analytics-0.1.6.tgz#a1ce184168d8f5ec02e35ec954d84ee68ea01f4b"
   integrity sha512-zNd5pj3iDvq8IMBQHa1YRcIteiw6ZiPB8AsONHd8ieFXlNpLqhXfIYnf4WvTfZ7S1NSJ++mIM14aJnNac/VMXQ==
 
-"@vercel/og@^0.0.25":
-  version "0.0.25"
-  resolved "https://registry.yarnpkg.com/@vercel/og/-/og-0.0.25.tgz#6f7951351e5321a8f097a10dbc6a1d4ccdf2cf23"
-  integrity sha512-Zirui1w0CjiOqHrMTOIDptghiEyxhiyVEdgUnJAeQYaXYrtQPUWLDWBIh5J+xHxIstWhT0C6DIw0iMGfHSXTNQ==
+"@vercel/og@^0.0.26":
+  version "0.0.26"
+  resolved "https://registry.yarnpkg.com/@vercel/og/-/og-0.0.26.tgz#df5936063d7f9be7a45caab7da9fe91f2b35ad3b"
+  integrity sha512-YCVcVa0UMI4gfmldpBx9l1H28m6rVuwGakNVhbTtjShldxMYJC7eggtTrWxPUydYZomaVElzFl2uumyUwv0MnQ==
   dependencies:
     "@resvg/resvg-wasm" "2.0.0-alpha.4"
     satori "0.0.46"
