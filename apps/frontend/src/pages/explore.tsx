@@ -46,7 +46,6 @@ const ExploreSkeleton: FC<PropsWithChildren> = ({ children }) => {
       <form onSubmit={onSubmit} className='relative mx-auto mb-8 w-full'>
         <input
           type='text'
-          autoFocus
           required
           placeholder='Search for movies or Miru members...'
           className='h-12 w-full cursor-auto rounded-xl border border-neutral-300 bg-transparent pl-12 text-neutral-600 outline-none dark:text-neutral-300'
