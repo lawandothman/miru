@@ -115,7 +115,7 @@ const Trailer = ({ trailer, height }: { trailer: Trailer; height: string }) => {
 
 const Matches = ({ matches }: { matches: Maybe<User>[] }) => {
   return (
-    <div className='mt-8 px-8'>
+    <div className='mt-8'>
       <h3 className='mb-4'>Watch it with</h3>
       {matches
         .filter((match) => match?.isFollowing)
@@ -130,7 +130,7 @@ const Matches = ({ matches }: { matches: Maybe<User>[] }) => {
                   className='mr-2 inline-flex items-center gap-2'
                   href={`${USER_INDEX}/${match.id}`}
                 >
-                  <ProfilePicture size='sm' user={match} />
+                  <ProfilePicture size='md' user={match} />
                 </Link>
               </Tooltip>
             )
@@ -210,13 +210,13 @@ const Movie: NextPage = () => {
                     ))}
                   </div>
                   <p className='mt-8 max-w-xl text-neutral-600 dark:text-neutral-400'>
-                    {data?.movie.overview}
+                    {data.movie.overview}
                   </p>
                   {data.movie.trailer && (
                     <Trailer height='315' trailer={data.movie.trailer} />
                   )}
                   <div className=' mt-6 flex gap-3'>
-                    {data?.movie?.homepage && (
+                    {data.movie?.homepage && (
                       <Link
                         target='_blank'
                         rel='noreferrer noopener'
@@ -227,7 +227,7 @@ const Movie: NextPage = () => {
                         Homepage
                       </Link>
                     )}
-                    {data?.movie?.imdbId && (
+                    {data.movie?.imdbId && (
                       <Link
                         target='_blank'
                         rel='noreferrer noopener'
@@ -240,11 +240,11 @@ const Movie: NextPage = () => {
                     )}
                   </div>
                 </div>
-                {data?.movie.matches &&
+                {data.movie.matches &&
                   data.movie.matches.filter((match) => match?.isFollowing)
                     .length > 0 && <Matches matches={data.movie.matches} />}
 
-                {data?.movie.streamProviders &&
+                {data.movie.streamProviders &&
                   data.movie.streamProviders.length > 0 && (
                   <StreamProviders providers={data.movie.streamProviders} />
                 )}
@@ -256,7 +256,7 @@ const Movie: NextPage = () => {
     }
 
     return (
-      <>
+      <Page name={data.movie.title} index={`${MOVIE_INDEX}/${data.movie.id}`}>
         <div className='relative flex h-[500px] w-full items-end overflow-hidden'>
           <Image
             src={getBackdrop(data.movie.backdropUrl ?? '', 'w1280')}
@@ -295,55 +295,57 @@ const Movie: NextPage = () => {
             <WatchlistButton session={session} movie={data.movie} />
           </div>
         </div>
-        {data.movie.matches &&
-          data.movie.matches.filter((match) => match?.isFollowing).length >
-            0 && <Matches matches={data.movie.matches} />}
-        <div className='mt-8 flex flex-wrap gap-3 px-8'>
-          {data.movie.genres?.map((genre) => (
-            <GenrePill key={genre?.id} genre={genre} />
-          ))}
-        </div>
-        <div className='mt-16 mb-8 flex gap-16 px-8'>
-          <div className='max-w-xl flex-1'>
-            <p className='mt-8 text-neutral-600 dark:text-neutral-400'>
-              {data?.movie.overview}
-            </p>
-            <div className=' mt-6 flex gap-3 text-sm text-neutral-500 dark:text-neutral-400'>
-              {data?.movie?.homepage && (
-                <Link
-                  target='_blank'
-                  rel='noreferrer noopener'
-                  href={data.movie.homepage}
-                  className='inline-flex items-center gap-2'
-                >
-                  <FiLink size={20} />
-                  Homepage
-                </Link>
-              )}
-              {data?.movie?.imdbId && (
-                <Link
-                  target='_blank'
-                  rel='noreferrer noopener'
-                  href={`${IMDB_TITLE}/${data.movie.imdbId}`}
-                  className='inline-flex items-center justify-center gap-2'
-                >
-                  <FaImdb size={20} />
-                  IMDB
-                </Link>
+        <main className='px-8'>
+          {data.movie.matches &&
+            data.movie.matches.filter((match) => match?.isFollowing).length >
+              0 && <Matches matches={data.movie.matches} />}
+          <div className='mt-8 flex flex-wrap gap-3'>
+            {data.movie.genres?.map((genre) => (
+              <GenrePill key={genre?.id} genre={genre} />
+            ))}
+          </div>
+          <div className='mt-16 mb-8 flex gap-16'>
+            <div className='max-w-xl flex-1'>
+              <p className='mt-8 text-neutral-600 dark:text-neutral-400'>
+                {data?.movie.overview}
+              </p>
+              <div className=' mt-6 flex gap-3 text-sm text-neutral-500 dark:text-neutral-400'>
+                {data.movie?.homepage && (
+                  <Link
+                    target='_blank'
+                    rel='noreferrer noopener'
+                    href={data.movie.homepage}
+                    className='inline-flex items-center gap-2'
+                  >
+                    <FiLink size={20} />
+                    Homepage
+                  </Link>
+                )}
+                {data.movie?.imdbId && (
+                  <Link
+                    target='_blank'
+                    rel='noreferrer noopener'
+                    href={`${IMDB_TITLE}/${data.movie.imdbId}`}
+                    className='inline-flex items-center justify-center gap-2'
+                  >
+                    <FaImdb size={20} />
+                    IMDB
+                  </Link>
+                )}
+              </div>
+              {data.movie.streamProviders &&
+                data.movie.streamProviders.length > 0 && (
+                <StreamProviders providers={data.movie.streamProviders} />
               )}
             </div>
-            {data.movie.streamProviders &&
-              data.movie.streamProviders.length > 0 && (
-              <StreamProviders providers={data.movie.streamProviders} />
+            {data.movie.trailer && (
+              <div className='flex-1'>
+                <Trailer height='413' trailer={data.movie.trailer} />
+              </div>
             )}
           </div>
-          {data.movie.trailer && (
-            <div className='flex-1'>
-              <Trailer height='413' trailer={data.movie.trailer} />
-            </div>
-          )}
-        </div>
-      </>
+        </main>
+      </Page>
     )
   }
 
