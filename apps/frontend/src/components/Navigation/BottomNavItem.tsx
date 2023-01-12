@@ -16,7 +16,7 @@ export const BottomNavItem: FC<PropsWithChildren<BottomNavItemProps>> = ({
   icon,
 }) => {
   return (
-    <div className='w-1/4'>
+    <div className='w-1/4 active:bg-transparent'>
       <Link className='bg-neutral-400 dark:text-white' href={href}>
         <div className='mx-1 rounded-lg p-2 text-center'>
           {createElement(icon, {
