@@ -41,6 +41,7 @@ const SEARCH_USER = gql`
         matches {
           id
         }
+        isFollowing
       }
       following {
         id
