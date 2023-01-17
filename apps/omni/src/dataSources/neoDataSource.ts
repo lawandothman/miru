@@ -152,10 +152,7 @@ export class NeoDataSource {
           this.driver,
           `MATCH (u:User) WHERE u.id in $ids
       RETURN u{
-          .id,
-          .email,
-          .image,
-          .name,
+          .*,
           isFollower: exists((u)-[:FOLLOWS]->(:User {email: $email})),
           isFollowing: exists((u)<-[:FOLLOWS]-(:User {email: $email}))
       }
@@ -228,10 +225,7 @@ export class NeoDataSource {
       this.driver,
       `MATCH (u:User) WHERE toLower(u.name) CONTAINS toLower($query)
       RETURN u{
-          .id,
-          .email,
-          .image,
-          .name,
+          .*,
           isFollower: exists((u)-[:FOLLOWS]->(:User {email: $email})),
           isFollowing: exists((u)<-[:FOLLOWS]-(:User {email: $email}))
       } LIMIT 20
@@ -299,10 +293,7 @@ export class NeoDataSource {
       MATCH (u:User {email: $email}), (f:User {id: $id})
       MERGE (u)-[r:FOLLOWS]->(f)
       RETURN f{
-        .id,
-        .email,
-        .image,
-        .name,
+        .*,
         isFollower: exists((f)-[:FOLLOWS]->(:User {email: $email})),
         isFollowing: exists((f)<-[:FOLLOWS]-(:User {email: $email})),
         followerId: u.id
@@ -319,10 +310,7 @@ export class NeoDataSource {
       MATCH (u:User {email: $email})-[r:FOLLOWS]->(f:User {id: $id})
       DELETE r
       RETURN f{
-        .id,
-        .email,
-        .image,
-        .name,
+        .*,
         isFollower: exists((f)-[:FOLLOWS]->(:User {email: $email})),
         isFollowing: exists((f)<-[:FOLLOWS]-(:User {email: $email})),
         followerId: u.id
