@@ -51,7 +51,7 @@ const Home: NextPage = () => {
 
   return (
     <main>
-      <PageHeader title={getGreeting()} subtitle='' />
+      <PageHeader title={getGreeting()} />
       {sortBy(data?.user.following, [(u) => -(u?.matches?.length ?? 0)]).map(
         (following) => {
           if (following) {
@@ -81,11 +81,11 @@ const LoggedOutPage = () => {
       <p>
         Get started by making an account and adding movies to your watchlist
       </p>
-      {systemTheme === 'dark' ? (
-        <Image className='mx-auto' src={PhoneImgDark} alt={'Illustration'} />
-      ) : (
-        <Image className='mx-auto' src={PhoneImgLight} alt={'Illustration'} />
-      )}
+      <Image
+        className='mx-auto'
+        src={systemTheme === 'dark' ? PhoneImgDark : PhoneImgLight}
+        alt='Illustration'
+      />
 
       <h2 className='mt-4 text-xl'>How it works?</h2>
       <div className='grid grid-cols-1 gap-8 md:grid-cols-3'>

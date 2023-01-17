@@ -8,7 +8,7 @@ const Privacy: NextPage = () => {
   return (
     <Page name='Privacy Policy' index={PRIVACY_POLICY_INDEX}>
       <main className='mx-auto max-w-4xl'>
-        <PageHeader title='Privacy Policy' subtitle='' />
+        <PageHeader title='Privacy Policy' />
         <div className='flex flex-col gap-2 text-neutral-400'>
           <p>
             At Miru, accessible from miru.space, one of our main priorities is

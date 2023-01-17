@@ -8,7 +8,7 @@ const TermsAndConditions: NextPage = () => {
   return (
     <Page name='Terms and Conditions' index={TERMS_AND_CONDITIONS_INDEX}>
       <main className='mx-auto max-w-4xl'>
-        <PageHeader title='Terms & Conditions' subtitle='' />
+        <PageHeader title='Terms & Conditions' />
         <div className=' mx-auto flex flex-col gap-2'>
           <h2 className='text-xl tracking-wide '>Terms</h2>
           <p>
