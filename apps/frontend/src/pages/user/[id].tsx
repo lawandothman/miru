@@ -244,14 +244,8 @@ const User = () => {
                   )}
                 </div>
               </div>
-
-              {session?.user?.id === userId && (
-                <>
-                  <h3 className='my-8 text-xl font-thin'>Your watchlist</h3>
-                  <MoviesList loadMore={loadMore} movies={data.watchlist} />
-                </>
-              )}
-
+              <h3 className='my-8 text-xl font-thin'>Watchlist</h3>
+              <MoviesList loadMore={loadMore} movies={data.watchlist} />
               {data.user.matches && data.user.matches.length > 0 && (
                 <>
                   <h3 className='my-8 text-xl font-thin'>
