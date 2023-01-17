@@ -1,4 +1,5 @@
 import * as Avatar from '@radix-ui/react-avatar'
+import type { Maybe } from 'graphql/jsutils/Maybe'
 import type { User } from 'next-auth'
 import Image from 'next/image'
 import type { FC } from 'react'
@@ -13,7 +14,7 @@ const initials = (name: string) => {
 type ProfilePictureSizes = 'xs' | 'sm' | 'md' | 'lg'
 
 interface ProfilePictureProps {
-  user: User;
+  user: Maybe<User>;
   size: ProfilePictureSizes;
 }
 
@@ -57,20 +58,20 @@ export const ProfilePicture: FC<ProfilePictureProps> = ({
     <Avatar.Root
       className={`inline-flex select-none items-center justify-center overflow-hidden rounded-full align-middle ${rootSize}`}
     >
-      {user.image ? (
+      {user?.image ? (
         <Image
           width={imgSize}
           height={imgSize}
           className='object-contain'
-          src={user.image}
-          alt={user.name ?? ''}
+          src={user?.image}
+          alt={user?.name ?? ''}
         />
       ) : (
         <Avatar.Fallback
           className={`flex h-full w-full items-center justify-center bg-white text-sm text-neutral-900 ${fallbackSize}`}
           delayMs={600}
         >
-          {user.name && initials(user.name)}
+          {user?.name && initials(user.name)}
         </Avatar.Fallback>
       )}
     </Avatar.Root>

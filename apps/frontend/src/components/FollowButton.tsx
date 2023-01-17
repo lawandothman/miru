@@ -3,6 +3,7 @@ import { FiUserMinus, FiUserPlus } from 'react-icons/fi'
 import type { User } from '__generated__/resolvers-types'
 import { Button } from './Button'
 import { Spinner } from './AsyncState/Spinner'
+import type { Maybe } from 'graphql/jsutils/Maybe'
 
 const FOLLOW = gql`
   mutation ($friendId: ID!) {
@@ -28,31 +29,33 @@ const UNFOLLOW = gql`
 `
 export const FollowButton = ({
   user,
-  friendId,
+  size = 'md',
 }: {
-  user: User;
-  friendId: string;
+  user: Maybe<User>;
+  size?: 'sm' | 'md';
 }) => {
   const [follow, { loading: followLoading }] = useMutation<
   User,
-  { friendId: string }
+  { friendId?: string }
   >(FOLLOW, {
     variables: {
-      friendId,
+      friendId: user?.id,
     },
   })
   const [unfollow, { loading: unfollowLoading }] = useMutation<
   User,
-  { friendId: string }
+  { friendId?: string }
   >(UNFOLLOW, {
     variables: {
-      friendId,
+      friendId: user?.id,
     },
   })
+
   return (
     <Button
+      size={size}
       onClick={() => {
-        if (user.isFollowing) {
+        if (user?.isFollowing) {
           unfollow()
         } else {
           follow()
@@ -61,7 +64,7 @@ export const FollowButton = ({
     >
       {followLoading || unfollowLoading ? (
         <Spinner reverted />
-      ) : user.isFollowing ? (
+      ) : user?.isFollowing ? (
         <>
           <FiUserMinus />
           Unfollow

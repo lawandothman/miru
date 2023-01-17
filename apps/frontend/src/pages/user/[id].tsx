@@ -49,6 +49,7 @@ const SEARCH_USER = gql`
         matches {
           id
         }
+        isFollowing
       }
     }
     watchlist(limit: $limit, offset: $offset) {
@@ -60,10 +61,22 @@ const SEARCH_USER = gql`
   }
 `
 
-const FollowersDialog = ({ user }: { user: User }) => {
+const FollowersDialog = ({
+  user,
+  onOpenChange,
+}: {
+  user: User;
+  onOpenChange: () => void;
+}) => {
   const [open, setIsOpen] = useState(false)
   return (
-    <Dialog open={open} onOpenChange={setIsOpen}>
+    <Dialog
+      open={open}
+      onOpenChange={() => {
+        setIsOpen(!open)
+        onOpenChange()
+      }}
+    >
       <DialogTrigger>
         <span className='dark:text-neutral-300'>
           {user.followers?.length} followers
@@ -75,21 +88,31 @@ const FollowersDialog = ({ user }: { user: User }) => {
         </DialogTitle>
 
         <div className='mt-1 max-h-[325px] overflow-y-auto'>
-          {user.followers?.map((follower) => {
-            if (follower) {
-              return <UserCard user={follower} key={follower.id} />
-            }
-          })}
+          {user.followers?.map((follower) => (
+            <UserCard user={follower} key={follower?.id} />
+          ))}
         </div>
       </DialogContent>
     </Dialog>
   )
 }
 
-const FollowingDialog = ({ user }: { user: User }) => {
+const FollowingDialog = ({
+  user,
+  onOpenChange,
+}: {
+  user: User;
+  onOpenChange: () => void;
+}) => {
   const [open, setIsOpen] = useState(false)
   return (
-    <Dialog open={open} onOpenChange={setIsOpen}>
+    <Dialog
+      open={open}
+      onOpenChange={() => {
+        setIsOpen(!open)
+        onOpenChange()
+      }}
+    >
       <DialogTrigger>
         <span className='dark:text-neutral-300'>
           {user.following?.length} following
@@ -100,11 +123,9 @@ const FollowingDialog = ({ user }: { user: User }) => {
           Following
         </DialogTitle>
         <div className='mt-1 max-h-[325px] overflow-y-auto'>
-          {user.following?.map((following) => {
-            if (following) {
-              return <UserCard user={following} key={following.id} />
-            }
-          })}
+          {user.following?.map((following) => (
+            <UserCard user={following} key={following?.id} />
+          ))}
         </div>
       </DialogContent>
     </Dialog>
@@ -124,6 +145,7 @@ const User = () => {
     networkStatus,
     fetchMore,
     variables = { offset: 0, limit: PAGE_LIMIT },
+    refetch,
   } = useQuery<
   { user: User; watchlist?: Movie[] },
   { userId?: string; offset: number; limit: number }
@@ -180,14 +202,20 @@ const User = () => {
                         </span>
                       )}
                       {data.user.followers && data.user.followers.length > 0 ? (
-                        <FollowersDialog user={data.user} />
+                        <FollowersDialog
+                          user={data.user}
+                          onOpenChange={refetch}
+                        />
                       ) : (
                         <span className='dark:text-neutral-300'>
                           {data.user.followers?.length} followers
                         </span>
                       )}
                       {data.user.following && data.user.following.length > 0 ? (
-                        <FollowingDialog user={data.user} />
+                        <FollowingDialog
+                          user={data.user}
+                          onOpenChange={refetch}
+                        />
                       ) : (
                         <span className='dark:text-neutral-300'>
                           {data.user.following?.length} following
@@ -197,8 +225,8 @@ const User = () => {
                   </div>
                 </div>
                 <div className='ml-auto py-2 md:ml-auto'>
-                  {userId && session?.user?.id !== userId ? (
-                    <FollowButton user={data.user} friendId={userId} />
+                  {session?.user?.id !== userId ? (
+                    <FollowButton user={data.user} />
                   ) : (
                     <Button
                       intent='danger'
