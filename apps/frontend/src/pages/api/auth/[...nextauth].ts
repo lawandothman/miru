@@ -5,13 +5,15 @@ import GoogleProvider from 'next-auth/providers/google'
 
 import neo4j from 'neo4j-driver'
 import { Neo4jAdapter } from '@next-auth/neo4j-adapter'
-import { config } from '../../../config/env'
+import { config } from 'config/env'
 import { SIGN_IN_INDEX } from 'config/constants'
 
 const { host, user, pass } = config.neo4j
 const driver = neo4j.driver(host, neo4j.auth.basic(user, pass))
 
 const neo4jSession = driver.session()
+
+const { secret, facebook, google } = config.nextAuth
 
 export const authOptions: NextAuthOptions = {
   // Include user.id and jwt token on session
@@ -29,7 +31,7 @@ export const authOptions: NextAuthOptions = {
               image: session.user.image,
               email: session.user.email,
             },
-            process.env.NEXTAUTH_SECRET as string,
+            secret,
             { algorithm: 'HS256' }
           )
           session.token = encodedToken
@@ -42,13 +44,13 @@ export const authOptions: NextAuthOptions = {
   adapter: Neo4jAdapter(neo4jSession),
   providers: [
     FacebookProvider({
-      clientId: process.env.FACEBOOK_CLIENT_ID as string,
-      clientSecret: process.env.FACEBOOK_CLIENT_SECRET as string,
+      clientId: facebook.clientId,
+      clientSecret: facebook.clientSecret,
       allowDangerousEmailAccountLinking: true,
     }),
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID as string,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+      clientId: google.clientId,
+      clientSecret: google.clientSecret,
       allowDangerousEmailAccountLinking: true,
     }),
     // ...add more providers here
