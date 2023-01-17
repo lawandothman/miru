@@ -54,11 +54,11 @@ const ForYou: NextPage = () => {
       <main>
         <PageHeader title='For you' />
         <p>Login so that we can recommend you movies</p>
-        {systemTheme === 'dark' ? (
-          <Image className='mx-auto' src={PhotoImgDark} alt={'Illustration'} />
-        ) : (
-          <Image className='mx-auto' src={PhotoImgLight} alt={'Illustration'} />
-        )}
+        <Image
+          className='mx-auto'
+          src={systemTheme === 'dark' ? PhotoImgDark : PhotoImgLight}
+          alt='Illustration'
+        />
         <Link
           href={SIGN_IN_INDEX}
           className='mx-auto mt-12 block max-w-lg rounded-md bg-black px-2 py-4 text-center text-lg font-semibold  text-white dark:bg-white dark:text-black'

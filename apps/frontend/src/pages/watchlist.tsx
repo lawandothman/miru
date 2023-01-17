@@ -26,7 +26,6 @@ export const GET_WATCHLIST = gql`
 `
 
 const Watchlist: NextPage = () => {
-  const { systemTheme } = useTheme()
   const { data: session, status } = useSession()
   const [fullyLoaded, setFullyLoaded] = useState(false)
   const {
@@ -55,21 +54,11 @@ const Watchlist: NextPage = () => {
   if (!session) {
     return (
       <main>
-        <PageHeader title='Watchlist' />
-        <p>Login to add movies to your watchlist and match with friends</p>
-        {systemTheme === 'dark' ? (
-          <Image
-            className='mx-auto'
-            src={TalkImgDark}
-            alt={'Illustration'}
-          ></Image>
-        ) : (
-          <Image
-            className='mx-auto'
-            src={TalkImgLight}
-            alt={'Illustration'}
-          ></Image>
-        )}
+        <PageHeader
+          title='Watchlist'
+          subtitle='Login to add movies to your watchlist and match with friends'
+        />
+        <Illustration />
         <Link
           href={SIGN_IN_INDEX}
           className='mx-auto mt-12 block max-w-lg rounded-md bg-black px-2 py-4 text-center text-lg font-semibold  text-white dark:bg-white dark:text-black'
@@ -81,6 +70,18 @@ const Watchlist: NextPage = () => {
   }
 
   if (data) {
+    if (data.watchlist.length === 0) {
+      return (
+        <main>
+          <PageHeader
+            title='Watchlist'
+            subtitle="You don't have any movies in your watchlist"
+          />
+          <Illustration />
+        </main>
+      )
+    }
+
     const isFetchingMore = networkStatus === NetworkStatus.fetchMore
     const isFullPage = data.watchlist.length % variables.limit === 0
     const loadMore = async () => {
@@ -105,6 +106,17 @@ const Watchlist: NextPage = () => {
   }
 
   return null
+}
+
+const Illustration = () => {
+  const { systemTheme } = useTheme()
+  return (
+    <Image
+      className='mx-auto'
+      src={systemTheme === 'dark' ? TalkImgDark : TalkImgLight}
+      alt='Illustration'
+    />
+  )
 }
 
 export default Watchlist

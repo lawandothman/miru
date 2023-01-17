@@ -8,7 +8,7 @@ const About: NextPage = () => {
   return (
     <Page name='About' index={ABOUT_INDEX}>
       <main className='mx-auto max-w-4xl'>
-        <PageHeader title='Welcome to Miru!' subtitle='' />
+        <PageHeader title='Welcome to Miru!' />
         <div className=' mx-auto flex flex-col gap-8'>
           <p>
             Miru is a platform that helps you and your friends find movies to
