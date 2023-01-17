@@ -51,6 +51,8 @@ export const FollowButton = ({
     },
   })
 
+  const loading = followLoading || unfollowLoading
+
   return (
     <Button
       size={size}
@@ -62,16 +64,17 @@ export const FollowButton = ({
         }
       }}
     >
-      {followLoading || unfollowLoading ? (
+      {loading ? (
         <Spinner reverted />
       ) : user?.isFollowing ? (
         <>
           <FiUserMinus />
-          Unfollow
+          {size != 'sm' && 'Unfollow'}
         </>
       ) : (
         <>
-          <FiUserPlus /> Follow
+          <FiUserPlus />
+          {size != 'sm' && 'Follow'}
         </>
       )}
     </Button>

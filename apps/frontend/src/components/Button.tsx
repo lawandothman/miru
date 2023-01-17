@@ -13,6 +13,7 @@ export const button = cva(
     'font-semibold',
     'gap-2',
     'max-w-xl',
+    'p-4'
   ],
   {
     variants: {
@@ -22,7 +23,7 @@ export const button = cva(
       },
       size: {
         md: 'h-10 w-28',
-        sm: 'h-8 w-32',
+        sm: 'max-h-8 max-w-32',
       },
       display: {
         solid: 'bg-black dark:bg-white',
