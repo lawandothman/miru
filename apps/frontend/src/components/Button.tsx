@@ -2,6 +2,8 @@ import type { VariantProps } from 'class-variance-authority'
 import { cva } from 'class-variance-authority'
 import type { ButtonHTMLAttributes, FC, PropsWithChildren } from 'react'
 
+// mx-auto mb-8 mt-4 flex
+
 export const button = cva(
   [
     'flex',
