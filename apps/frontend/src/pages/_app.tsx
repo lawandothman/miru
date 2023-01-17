@@ -90,18 +90,22 @@ const MyApp = (props: AppProps & { genres: Genre[] }) => {
 MyApp.getInitialProps = async (appContext: AppContext) => {
   const session = await getSession(appContext.ctx)
   const appProps = await App.getInitialProps(appContext)
-  const res = await client.query<{ genres: Genre[] }>({
-    query: gql`
-      query Genres {
-        genres {
-          id
-          name
+  try {
+    const res = await client.query<{ genres: Genre[] }>({
+      query: gql`
+        query Genres {
+          genres {
+            id
+            name
+          }
         }
-      }
-    `,
-  })
-
-  return { ...appProps, session, genres: res.data.genres }
+      `,
+    })
+    return { ...appProps, session, genres: res.data.genres }
+  } catch (error) {
+    console.error(error)
+    return { ...appProps, session, genres: [] }
+  }
 }
 
 export default MyApp
