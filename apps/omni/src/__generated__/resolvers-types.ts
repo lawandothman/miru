@@ -156,6 +156,7 @@ export type User = {
   following?: Maybe<Array<Maybe<User>>>;
   id: Scalars['ID'];
   image?: Maybe<Scalars['String']>;
+  isBot?: Maybe<Scalars['Boolean']>;
   isFollower?: Maybe<Scalars['Boolean']>;
   isFollowing?: Maybe<Scalars['Boolean']>;
   matches?: Maybe<Array<Maybe<Movie>>>;
@@ -342,6 +343,7 @@ export type UserResolvers<ContextType = Context, ParentType extends ResolversPar
   following?: Resolver<Maybe<Array<Maybe<ResolversTypes['User']>>>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   image?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  isBot?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   isFollower?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   isFollowing?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   matches?: Resolver<Maybe<Array<Maybe<ResolversTypes['Movie']>>>, ParentType, ContextType>;

@@ -45,6 +45,7 @@ type User {
   followers: [User]
   following: [User]
   watchlist: [Movie]
+  isBot: Boolean
 }
 
 type WatchProvider {

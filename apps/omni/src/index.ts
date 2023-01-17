@@ -18,6 +18,7 @@ import UserResolver from './resolvers/userResolver'
 import MovieResolver from './resolvers/movieResolver'
 import MutationResolver from './resolvers/mutationResolver'
 import QueryResolver from './resolvers/queryResolver'
+import { BotManager } from './bots/botManager'
 
 const schema = readFileSync('./schema.graphql').toString()
 
@@ -67,9 +68,17 @@ const syncService = new SyncService(
 )
 
 const migrator = new Migrator(driver)
+const botManager = new BotManager(driver)
 
 async function main() {
-  await migrator.up()
+  try {
+    await migrator.up()
+    await botManager.up()
+  } catch(e) {
+    console.error(e)
+    console.error('Failed to start DB tasks. Exiting')
+    process.exit(1)
+  }
 
   syncService.start().catch(console.error)
 
