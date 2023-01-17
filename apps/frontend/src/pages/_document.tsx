@@ -86,6 +86,7 @@ export default function Document() {
           media='(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2)'
           rel='apple-touch-startup-image'
         />
+        <meta name='apple-mobile-web-app-capable' content='yes' />
         <link rel='manifest' href='/manifest.json' />
       </Head>
       <body className='dark:bg-black'>
