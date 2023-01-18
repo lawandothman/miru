@@ -38,7 +38,7 @@ const GET_HOME = gql`
   }
 `
 const FOLLOW = gql`
-  mutation ($friendId: ID!) {
+  mutation Follow ($friendId: ID!) {
     follow(friendId: $friendId) {
       id
       isFollowing
