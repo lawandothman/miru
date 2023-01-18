@@ -29,7 +29,6 @@ InferGetServerSidePropsType<typeof getServerSideProps>
   const router = useRouter()
   const [invitedBy, setInvitedBy] = useState(router.query.invitedBy as string)
 
-  // const invitedBy = router.query.invitedBy as string
   const { data } = useQuery<{ user: User }, { userId?: string }>(GET_INVITEE, {
     variables: {
       userId: invitedBy,
