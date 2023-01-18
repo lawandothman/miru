@@ -28,8 +28,7 @@
     "lodash": "^4.17.21",
     "mixpanel": "^0.17.0",
     "neo4j-driver": "^5.4.0",
-    "uuid": "^9.0.0",
-    "workspace": "^0.0.1-preview.1"
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "@faker-js/faker": "^7.6.0",
