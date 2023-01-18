@@ -20,6 +20,7 @@ import NextNProgress from 'nextjs-progressbar'
 import { offsetLimitPagination } from '@apollo/client/utilities'
 import { Navigation } from 'components/Navigation'
 import Head from 'next/head'
+import { CookieConsent } from 'components/CookiesConsent'
 
 const httpLinkt = createHttpLink({
   uri: `${process.env.NEXT_PUBLIC_OMNI_URL}/graphql`,
@@ -81,6 +82,7 @@ const MyApp = (props: AppProps & { genres: Genre[] }) => {
             <div className='lg:pl-60'>
               <Component {...pageProps} />
             </div>
+            <CookieConsent />
           </ThemeProvider>
         </ApolloProvider>
       </SessionProvider>
