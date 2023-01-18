@@ -7,11 +7,17 @@ import { getProviders, getSession, signIn } from 'next-auth/react'
 import { FaFacebookF, FaGoogle } from 'react-icons/fa'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { useEffect } from 'react'
 
 const SignIn: NextPage<
 InferGetServerSidePropsType<typeof getServerSideProps>
 > = ({ providers }) => {
   const router = useRouter()
+  useEffect(() => {
+    const invitedBy = router.query.invitedBy as string
+    localStorage.setItem('invitedBy', invitedBy)
+  }, [router])
+
   return (
     <div className='mx-auto flex h-screen max-w-md flex-col items-center justify-center gap-8'>
       <h1 className='text-4xl'>Log in</h1>
