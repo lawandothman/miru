@@ -7,10 +7,11 @@ import { getProviders, getSession, signIn } from 'next-auth/react'
 import { FaFacebookF, FaGoogle } from 'react-icons/fa'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { gql, useQuery } from '@apollo/client'
 import type { User } from '__generated__/resolvers-types'
 import { ProfilePicture } from 'components/Avatar'
+import { setCookie, getCookie } from 'cookies-next'
 
 const GET_INVITEE = gql`
   query User($userId: ID!) {
@@ -26,7 +27,9 @@ const SignIn: NextPage<
 InferGetServerSidePropsType<typeof getServerSideProps>
 > = ({ providers }) => {
   const router = useRouter()
-  const invitedBy = router.query.invitedBy as string
+  const [invitedBy, setInvitedBy] = useState(router.query.invitedBy as string)
+
+  // const invitedBy = router.query.invitedBy as string
   const { data } = useQuery<{ user: User }, { userId?: string }>(GET_INVITEE, {
     variables: {
       userId: invitedBy,
@@ -35,7 +38,17 @@ InferGetServerSidePropsType<typeof getServerSideProps>
   })
 
   useEffect(() => {
-    localStorage.setItem('invitedBy', invitedBy)
+    if (invitedBy) {
+      setCookie('invitedBy', invitedBy)
+    }
+    //eslint-disable-next-line
+  },[])
+
+  useEffect(() => {
+    const storedInvite = getCookie('invitedBy') as string
+    if(storedInvite) {
+      setInvitedBy(storedInvite)
+    }
   }, [invitedBy])
 
   return (

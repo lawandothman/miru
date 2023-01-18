@@ -17,6 +17,7 @@ import { useTheme } from 'next-themes'
 import { DateTime } from 'luxon'
 import { EXPLORE_INDEX, SIGN_IN_INDEX } from 'config/constants'
 import { Button } from 'components/Button'
+import { getCookie, removeCookies } from 'cookies-next'
 
 const GET_HOME = gql`
   query GetHome($userId: ID!) {
@@ -36,7 +37,6 @@ const GET_HOME = gql`
     }
   }
 `
-
 const FOLLOW = gql`
   mutation ($friendId: ID!) {
     follow(friendId: $friendId) {
@@ -60,20 +60,24 @@ const Home: NextPage = () => {
   User,
   { friendId: string | null }
   >(FOLLOW, {
-    variables: {
-      friendId: invitedBy,
-    },
     refetchQueries: [{ query: GET_HOME }, 'GetHome'],
   })
 
   useEffect(() => {
-    const invitedBy = localStorage.getItem('invitedBy')
-    setInvitedBy(invitedBy)
-    if (session && invitedBy && invitedBy !== session?.user?.id) {
-      follow()
-      localStorage.removeItem('invitedBy')
-      setInvitedBy(null)
-    }
+    (async () => {
+      const invitedBy = getCookie('invitedBy') as string
+      setInvitedBy(invitedBy)
+      if (session && invitedBy && invitedBy !== session?.user?.id) {
+        await follow({
+          variables: {
+            friendId: invitedBy,
+          },
+        }).then(() => {
+          removeCookies('invitedBy')
+          setInvitedBy(null)
+        })
+      }
+    })()
   }, [session, invitedBy, follow])
 
   if (sessionStatus === 'loading' || loading || followLoading) {
@@ -97,7 +101,7 @@ const Home: NextPage = () => {
     }
   }
 
-  if (data?.user.following?.length === 0 && !invitedBy) {
+  if (data && data.user.following?.length === 0 && !invitedBy) {
     return (
       <main>
         <PageHeader title={getGreeting()} />
