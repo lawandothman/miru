@@ -19,7 +19,7 @@ import { EXPLORE_INDEX, SIGN_IN_INDEX } from 'config/constants'
 import { Button } from 'components/Button'
 
 const GET_HOME = gql`
-  query GetHome ($userId: ID!) {
+  query GetHome($userId: ID!) {
     user(id: $userId) {
       following {
         id
@@ -63,10 +63,7 @@ const Home: NextPage = () => {
     variables: {
       friendId: invitedBy,
     },
-    refetchQueries: [
-      { query: GET_HOME },
-      'GetHome',
-    ],
+    refetchQueries: [{ query: GET_HOME }, 'GetHome'],
   })
 
   useEffect(() => {
@@ -86,12 +83,15 @@ const Home: NextPage = () => {
     return <LoggedOutPage />
   }
 
-  const generateInvite = async () => {
+  const copyInviteLink = async () => {
     try {
       await navigator.clipboard.writeText(
-        `http://localhost:3000/auth/signin?invitedBy=${session?.user?.id}`
+        `${window.location.origin}/${SIGN_IN_INDEX}?invitedBy=${session?.user?.id}`
       )
       setCopied(true)
+      setTimeout(() => {
+        setCopied(false)
+      }, 1000)
     } catch (err) {
       console.error('Failed to copy: ', err)
     }
@@ -112,8 +112,8 @@ const Home: NextPage = () => {
           <Link href={EXPLORE_INDEX}>
             <Button size='md'>Search for your friends</Button>
           </Link>
-          <Button onClick={() => generateInvite()}>
-            {copied ? 'Copied' : 'Copy Invite Link'}
+          <Button onClick={() => copyInviteLink()}>
+            {copied ? 'Copied!' : 'Copy Invite Link'}
           </Button>
         </div>
       </main>
