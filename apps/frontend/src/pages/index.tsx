@@ -50,7 +50,7 @@ const FOLLOW = gql`
 `
 const Home: NextPage = () => {
   const { data: session, status: sessionStatus } = useSession()
-  const { data, loading } = useQuery<{ user: User }>(GET_HOME, {
+  const { data, loading, refetch } = useQuery<{ user: User }>(GET_HOME, {
     variables: { userId: session?.user?.id },
     fetchPolicy: 'network-only',
   })
@@ -72,13 +72,14 @@ const Home: NextPage = () => {
           variables: {
             friendId: invitedBy,
           },
-        }).then(() => {
+        }).then(async () => {
+          await refetch()
           removeCookies('invitedBy')
           setInvitedBy(null)
         })
       }
     })()
-  }, [session, invitedBy, follow])
+  }, [session, invitedBy, follow, refetch])
 
   if (sessionStatus === 'loading' || loading || followLoading) {
     return <FullPageLoader />
