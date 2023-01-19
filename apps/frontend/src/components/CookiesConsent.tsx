@@ -29,9 +29,9 @@ export const CookieConsent = () => {
   }
 
   return (
-    <section className='fixed bottom-12 left-2 right-0 flex max-w-4xl mx-auto rounded-lg flex-col bg-neutral-100 px-5 py-8 dark:bg-neutral-900 md:flex-row md:items-stretch md:py-4 lg:bottom-0'>
-      <div className='flex flex-grow items-center text-gray-900'>
-        <p className='text-sm font-medium'>
+    <section className='fixed bottom-12 left-60 right-0 mx-auto flex max-w-4xl flex-col gap-3 rounded-lg bg-neutral-100 px-5 py-8 dark:bg-neutral-900 md:items-stretch md:py-4 lg:bottom-0'>
+      <div className='flex flex-grow items-center justify-center text-gray-900'>
+        <p className='text-center text-sm font-medium'>
           We use cookies to deliver a better experience. You can learn more
           about the services we use at our{' '}
           <Link
@@ -43,8 +43,10 @@ export const CookieConsent = () => {
           .
         </p>
       </div>
-      <div className='mt-2 ml-auto flex items-center'>
-        <Button onClick={onClick}>Got it</Button>
+      <div className='flex w-full justify-center'>
+        <Button className='w-full py-4' onClick={onClick}>
+          Got it
+        </Button>
       </div>
     </section>
   )

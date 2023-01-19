@@ -1,5 +1,5 @@
 import type { VariantProps } from 'class-variance-authority'
-import { cva } from 'class-variance-authority'
+import { cva, cx } from 'class-variance-authority'
 import type { ButtonHTMLAttributes, FC, PropsWithChildren } from 'react'
 
 export const button = cva(
@@ -49,7 +49,10 @@ export const Button: FC<PropsWithChildren<ButtonProps>> = ({
   ...props
 }) => {
   return (
-    <button className={button({ intent, size, display })} {...props}>
+    <button
+      {...props}
+      className={cx(button({ intent, size, display }), props.className)}
+    >
       {children}
     </button>
   )

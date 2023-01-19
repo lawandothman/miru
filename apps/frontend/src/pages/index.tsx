@@ -115,9 +115,9 @@ const Home: NextPage = () => {
         </div>
         <div className='mx-auto mt-8 flex max-w-xl flex-col items-center justify-center gap-4'>
           <Link className='block w-full' href={EXPLORE_INDEX}>
-            <Button size='full-width'>Search for your friends</Button>
+            <Button className='py-4' size='full-width'>Search for your friends</Button>
           </Link>
-          <Button size='full-width' onClick={() => copyInviteLink()}>
+          <Button className='py-4' size='full-width' onClick={() => copyInviteLink()}>
             {copied ? 'Copied!' : 'Copy Invite Link'}
           </Button>
         </div>
