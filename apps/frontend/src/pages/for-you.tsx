@@ -84,7 +84,6 @@ const ForYou: NextPage = () => {
   }
 
   if (data) {
-    console.log(data)
     if (data.moviesForYou.length === 0) {
       return (
         <Page name='For You' index={FOR_YOU_INDEX}>
