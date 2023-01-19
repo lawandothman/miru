@@ -11,8 +11,15 @@ import PhotoImgLight from '../../public/illustration/light/photo.png'
 import { useTheme } from 'next-themes'
 import { useState } from 'react'
 import { FullPageLoader } from 'components/AsyncState'
-import { FOR_YOU_INDEX, PAGE_LIMIT, SIGN_IN_INDEX } from 'config/constants'
+import {
+  EXPLORE_INDEX,
+  FOR_YOU_INDEX,
+  PAGE_LIMIT,
+  SIGN_IN_INDEX,
+} from 'config/constants'
 import { Page } from 'components/Page'
+import { Button } from 'components/Button'
+import { useInviteLink } from 'hooks/useInviteLink'
 
 const GET_FOR_YOU = gql`
   query ForYou($limit: Int, $offset: Int) {
@@ -26,9 +33,9 @@ const GET_FOR_YOU = gql`
 `
 
 const ForYou: NextPage = () => {
-  const { systemTheme } = useTheme()
   const [fullyLoaded, setFullyLoaded] = useState(false)
   const { data: session, status } = useSession()
+  const { copy, isCopied } = useInviteLink(session?.user)
   const {
     data,
     networkStatus,
@@ -54,11 +61,7 @@ const ForYou: NextPage = () => {
       <main>
         <PageHeader title='For you' />
         <p>Login so that we can recommend you movies</p>
-        <Image
-          className='mx-auto'
-          src={systemTheme === 'dark' ? PhotoImgDark : PhotoImgLight}
-          alt='Illustration'
-        />
+        <Illustration />
         <Link
           href={SIGN_IN_INDEX}
           className='mx-auto mt-12 block max-w-lg rounded-md bg-black px-2 py-4 text-center text-lg font-semibold  text-white dark:bg-white dark:text-black'
@@ -81,6 +84,34 @@ const ForYou: NextPage = () => {
   }
 
   if (data) {
+    console.log(data)
+    if (data.moviesForYou.length === 0) {
+      return (
+        <Page name='For You' index={FOR_YOU_INDEX}>
+          <main>
+            <PageHeader title='For You' />
+            <Illustration />
+            <div className='mx-auto max-w-2xl text-center'>
+              <p className='text-xl'>
+                It&apos;s quiet here, find more friends to follow and we&apos;ll
+                suggest you some movies for you to watch with them
+              </p>
+            </div>
+            <div className='mx-auto mt-8 flex max-w-xl flex-col items-center justify-center gap-4'>
+              <Link className='block w-full' href={EXPLORE_INDEX}>
+                <Button className='py-4' size='full-width'>
+                  Search for your friends
+                </Button>
+              </Link>
+              <Button className='py-4' size='full-width' onClick={() => copy()}>
+                {isCopied ? 'Copied!' : 'Copy Invite Link'}
+              </Button>
+            </div>
+          </main>
+        </Page>
+      )
+    }
+
     const isFetchingMore = networkStatus === NetworkStatus.fetchMore
     const isFullPage = data.moviesForYou.length % variables.limit === 0
     const loadMore = async () => {
@@ -107,6 +138,17 @@ const ForYou: NextPage = () => {
   }
 
   return null
+}
+
+const Illustration = () => {
+  const { systemTheme } = useTheme()
+  return (
+    <Image
+      className='mx-auto'
+      src={systemTheme === 'dark' ? PhotoImgDark : PhotoImgLight}
+      alt='Illustration'
+    />
+  )
 }
 
 export default ForYou
