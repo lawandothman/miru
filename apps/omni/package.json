@@ -14,9 +14,9 @@
   },
   "dependencies": {
     "@apollo/server": "^4.3.0",
-    "@sentry/node": "^7.28.1",
+    "@sentry/node": "^7.31.0",
     "@sentry/profiling-node": "^0.0.12",
-    "@sentry/tracing": "^7.28.1",
+    "@sentry/tracing": "^7.31.0",
     "axios": "^1.2.2",
     "axios-retry": "^3.3.1",
     "dataloader": "^2.1.0",
@@ -28,8 +28,7 @@
     "lodash": "^4.17.21",
     "mixpanel": "^0.17.0",
     "neo4j-driver": "^5.4.0",
-    "uuid": "^9.0.0",
-    "workspace": "^0.0.1-preview.1"
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "@faker-js/faker": "^7.6.0",

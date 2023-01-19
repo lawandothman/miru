@@ -30,7 +30,7 @@ export const WatchlistButton = ({
 }: {
   session: Session | null;
   movie: Movie;
-  size?: 'sm' | 'md';
+  size?: 'sm' | 'md' | 'full-width';
 }) => {
   const [addToWatchlist, { loading: addLoading }] = useMutation<
   { movie: Movie },

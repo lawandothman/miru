@@ -32,7 +32,7 @@ export const FollowButton = ({
   size = 'md',
 }: {
   user: Maybe<User>;
-  size?: 'sm' | 'md';
+  size?: 'sm' | 'md' | 'full-width';
 }) => {
   const [follow, { loading: followLoading }] = useMutation<
   User,

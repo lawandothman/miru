@@ -1,18 +1,17 @@
 import type { VariantProps } from 'class-variance-authority'
-import { cva } from 'class-variance-authority'
+import { cva, cx } from 'class-variance-authority'
 import type { ButtonHTMLAttributes, FC, PropsWithChildren } from 'react'
-
-// mx-auto mb-8 mt-4 flex
 
 export const button = cva(
   [
-    'flex',
+    'inline-flex',
     'items-center',
     'justify-center',
     'rounded-lg',
     'font-semibold',
+    'whitespace-nowrap',
     'gap-2',
-    'max-w-xl',
+    'max-w-xl px-6 py-2',
   ],
   {
     variants: {
@@ -21,8 +20,9 @@ export const button = cva(
         danger: 'text-red-500',
       },
       size: {
-        md: 'h-10 w-28',
+        md: 'min-h-10 min-w-28',
         sm: 'max-h-8 max-w-32 p-4',
+        'full-width':'w-full'
       },
       display: {
         solid: 'bg-black dark:bg-white',
@@ -49,7 +49,10 @@ export const Button: FC<PropsWithChildren<ButtonProps>> = ({
   ...props
 }) => {
   return (
-    <button className={button({ intent, size, display })} {...props}>
+    <button
+      {...props}
+      className={cx(button({ intent, size, display }), props.className)}
+    >
       {children}
     </button>
   )

@@ -7,13 +7,55 @@ import { getProviders, getSession, signIn } from 'next-auth/react'
 import { FaFacebookF, FaGoogle } from 'react-icons/fa'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
+import { gql, useQuery } from '@apollo/client'
+import type { User } from '__generated__/resolvers-types'
+import { ProfilePicture } from 'components/Avatar'
+import { setCookie, getCookie } from 'cookies-next'
+
+const GET_INVITEE = gql`
+  query User($userId: ID!) {
+    user(id: $userId) {
+      id
+      name
+      image
+    }
+  }
+`
 
 const SignIn: NextPage<
 InferGetServerSidePropsType<typeof getServerSideProps>
 > = ({ providers }) => {
   const router = useRouter()
+  const [invitedBy, setInvitedBy] = useState(router.query.invitedBy as string)
+
+  const { data } = useQuery<{ user: User }, { userId?: string }>(GET_INVITEE, {
+    variables: {
+      userId: invitedBy,
+    },
+    skip: !invitedBy,
+  })
+
+  useEffect(() => {
+    const storedInvite = getCookie('invitedBy') as string
+    if (storedInvite) {
+      setInvitedBy(storedInvite)
+    }
+    if (invitedBy) {
+      setCookie('invitedBy', invitedBy, {
+        maxAge: 30 * 24 * 60 * 60,
+      })
+    }
+  }, [invitedBy])
+
   return (
     <div className='mx-auto flex h-screen max-w-md flex-col items-center justify-center gap-8'>
+      {data && (
+        <div className='flex flex-col items-center gap-4'>
+          <ProfilePicture size='lg' user={data.user} />
+          <h1>{data.user.name} has invited you to join Miru! </h1>
+        </div>
+      )}
       <h1 className='text-4xl'>Log in</h1>
       {providers &&
         Object.values(providers).map((provider) => (
