@@ -11,8 +11,9 @@ import TalkImgDark from '../../public/illustration/dark/talk.png'
 import TalkImgLight from '../../public/illustration/light/talk.png'
 import { useTheme } from 'next-themes'
 import { FullPageLoader } from 'components/AsyncState'
-import { PAGE_LIMIT, SIGN_IN_INDEX, WATCHLIST_INDEX } from 'config/constants'
+import { EXPLORE_INDEX, PAGE_LIMIT, POPULAR_INDEX, SIGN_IN_INDEX, WATCHLIST_INDEX } from 'config/constants'
 import { Page } from 'components/Page'
+import { Button } from 'components/Button'
 
 export const GET_WATCHLIST = gql`
   query Watchlist($limit: Int, $offset: Int) {
@@ -78,6 +79,19 @@ const Watchlist: NextPage = () => {
             subtitle="You don't have any movies in your watchlist"
           />
           <Illustration />
+
+          <div className='mx-auto mt-8 flex max-w-xl flex-col items-center justify-center gap-4'>
+            <Link className='block w-full' href={EXPLORE_INDEX}>
+              <Button className='py-4' size='full-width'>
+                Find a movie to watch with friends
+              </Button>
+            </Link>
+            <Link className='block w-full' href={POPULAR_INDEX}>
+              <Button className='py-4' size='full-width'>
+                Miru&apos;s popular movies
+              </Button>
+            </Link>
+          </div>
         </main>
       )
     }

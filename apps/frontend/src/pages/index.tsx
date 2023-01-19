@@ -107,7 +107,7 @@ const Home: NextPage = () => {
             </Button>
           </Link>
           <Button className='py-4' size='full-width' onClick={() => copy()}>
-            {isCopied ? 'Copied!' : 'Copy Invite Link'}
+            {isCopied ? 'Copied!' : 'Copy invite link'}
           </Button>
         </div>
       </main>
