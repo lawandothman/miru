@@ -2,7 +2,7 @@ export const Popcorn = () => {
   return (
     <div className='w-20 '>
       <svg
-        className=' p-3 animate-tilt-n-move-shaking'
+        className='animate-tilt-n-move-shaking p-3'
         version='1.1'
         id='Capa_1'
         xmlns='http://www.w3.org/2000/svg'
@@ -13,7 +13,6 @@ export const Popcorn = () => {
       >
         <circle
           id='popcrncirlce'
-          className='firstcirle'
           fill='#FFE477'
           cx='260.426'
           cy='22.695'
@@ -21,7 +20,6 @@ export const Popcorn = () => {
         />
         <circle
           id='popcrncirlce'
-          className='firstcirle'
           fill='#FFE477'
           cx='163.426'
           cy='22.695'
@@ -29,7 +27,6 @@ export const Popcorn = () => {
         />
         <circle
           id='popcrncirlce'
-          className='firstcirle'
           fill='#FFE477'
           cx='65.426'
           cy='22.695'

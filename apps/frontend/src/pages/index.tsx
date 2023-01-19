@@ -211,7 +211,7 @@ const Step = ({
         })}
       </div>
       <div className='w-full'>
-        <p className='text-l mb-4 text-center font-bold'>{text}</p>
+        <p className='mb-4 text-center text-lg font-bold'>{text}</p>
         <p className='text-center'>{description}</p>
       </div>
     </div>

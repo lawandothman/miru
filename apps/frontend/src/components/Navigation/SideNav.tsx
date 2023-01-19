@@ -35,7 +35,7 @@ export const Sidebar: FC<SidebarProps> = ({ genres, router, user }) => {
     <>
       <aside
         className={
-          'fixed inset-y-0 z-30 h-full w-60 -translate-x-full transform overflow-y-auto border-r border-gray-200 bg-white   dark:border-neutral-700 dark:bg-black lg:z-auto lg:translate-x-0'
+          'fixed inset-y-0 z-30 h-full w-60 -translate-x-full overflow-y-auto border-r border-gray-200 bg-white dark:border-neutral-700 dark:bg-black lg:z-auto lg:translate-x-0'
         }
         aria-label='Sidenav'
       >
@@ -117,7 +117,7 @@ export const Sidebar: FC<SidebarProps> = ({ genres, router, user }) => {
       </aside>
       <div
         className={
-          'pointer-events-none fixed inset-0 z-20 bg-white bg-opacity-10 opacity-0 transition duration-200 ease-in-out dark:bg-black dark:bg-opacity-50'
+          'pointer-events-none fixed inset-0 z-20 bg-white/10  opacity-0 transition duration-200 ease-in-out dark:bg-black/50'
         }
       />
     </>

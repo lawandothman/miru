@@ -167,7 +167,7 @@ const Search: NextPage = () => {
         <ExploreSkeleton>
           <div className='flex flex-col items-center '>
             <h1 className='text-3xl'>Nothing Found</h1>
-            <span className='font-lg mt-8 font-thin text-neutral-600 dark:text-neutral-300'>
+            <span className='mt-8 text-lg font-thin text-neutral-600 dark:text-neutral-300'>
               We couldn&apos;t find anything that matches your search :(
             </span>
           </div>
@@ -199,7 +199,7 @@ const Search: NextPage = () => {
                 ) : (
                   <div className='flex flex-col items-center '>
                     <h1 className='text-3xl'>Nothing Found</h1>
-                    <span className='font-lg mt-8 font-thin text-neutral-600 dark:text-neutral-300'>
+                    <span className='mt-8 text-lg font-thin text-neutral-600 dark:text-neutral-300'>
                       We couldn&apos;t find any movies that matches your search
                       :(
                     </span>
@@ -229,7 +229,7 @@ const Search: NextPage = () => {
                 ) : (
                   <div className='flex flex-col items-center '>
                     <h1 className='text-3xl'>Nothing Found</h1>
-                    <span className='font-lg mt-8 font-thin text-neutral-600 dark:text-neutral-300'>
+                    <span className='mt-8 text-lg font-thin text-neutral-600 dark:text-neutral-300'>
                       We couldn&apos;t find any users that matches your search
                       :(
                     </span>
