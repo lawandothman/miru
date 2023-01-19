@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import { useState } from 'react'
-import { cn } from 'utils/cn'
+import { cx } from 'class-variance-authority'
 import { getPoster } from 'utils/image'
 import type { Movie } from '__generated__/resolvers-types'
 
@@ -17,9 +17,11 @@ export const MoviePoster = ({ movie }: { movie: Movie }) => {
         sizes='(max-width: 768px) 100vw,
               (max-width: 1200px) 50vw,
               25vw'
-        className={cn(
+        className={cx(
           'absolute top-0 left-0 bottom-0 right-0 min-h-full min-w-full object-cover',
-          isLoading ? 'animate-pulse dark:bg-neutral-700 bg-neutral-300' : 'blur-0'
+          isLoading
+            ? 'animate-pulse dark:bg-neutral-700 bg-neutral-300'
+            : 'blur-0'
         )}
         onLoadingComplete={() => setLoading(false)}
       />

@@ -1,7 +1,7 @@
 import type { FC, PropsWithChildren } from 'react'
 import React from 'react'
 import * as TooltipPrimitive from '@radix-ui/react-tooltip'
-import { cn } from 'utils/cn'
+import { cx } from 'class-variance-authority'
 
 type TooltipProps = {
   content: React.ReactNode;
@@ -32,7 +32,7 @@ export const Tooltip: FC<PropsWithChildren<TooltipProps>> = ({
           side='bottom'
           align='center'
           sideOffset={4}
-          className={cn(
+          className={cx(
             'radix-side-top:animate-slide-down-fade',
             'radix-side-right:animate-slide-left-fade',
             'radix-side-bottom:animate-slide-up-fade',
