@@ -38,7 +38,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>
 
   useEffect(() => {
     const storedInvite = getCookie('invitedBy') as string
-    if(storedInvite) {
+    if (storedInvite) {
       setInvitedBy(storedInvite)
     }
     if (invitedBy) {
@@ -47,7 +47,6 @@ InferGetServerSidePropsType<typeof getServerSideProps>
       })
     }
   }, [invitedBy])
-
 
   return (
     <div className='mx-auto flex h-screen max-w-md flex-col items-center justify-center gap-8'>
