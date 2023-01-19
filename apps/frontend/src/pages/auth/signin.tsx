@@ -37,6 +37,10 @@ InferGetServerSidePropsType<typeof getServerSideProps>
   })
 
   useEffect(() => {
+    const storedInvite = getCookie('invitedBy') as string
+    if(storedInvite) {
+      setInvitedBy(storedInvite)
+    }
     if (invitedBy) {
       setCookie('invitedBy', invitedBy, {
         maxAge: 30 * 24 * 60 * 60,
@@ -44,12 +48,6 @@ InferGetServerSidePropsType<typeof getServerSideProps>
     }
   }, [invitedBy])
 
-  useEffect(() => {
-    const storedInvite = getCookie('invitedBy') as string
-    if(storedInvite) {
-      setInvitedBy(storedInvite)
-    }
-  }, [invitedBy])
 
   return (
     <div className='mx-auto flex h-screen max-w-md flex-col items-center justify-center gap-8'>
