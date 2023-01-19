@@ -174,7 +174,7 @@ const Movie: NextPage = () => {
             >
               <FiArrowLeft className='h-5 w-5' />
             </button>
-            <div className='mx-auto flex flex-shrink flex-col gap-10 pt-2 lg:flex-row'>
+            <div className='mx-auto flex shrink flex-col gap-10 pt-2 lg:flex-row'>
               <div className='flex flex-1 items-center justify-center'>
                 {data.movie?.posterUrl && (
                   <div className='aspect-w-20 aspect-h-34 overflow-hidden rounded-lg'>

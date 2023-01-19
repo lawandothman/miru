@@ -23,7 +23,8 @@
     "**/*.ts",
     "**/*.tsx",
     "**/*.cjs",
-    "**/*.mjs"
+    "**/*.mjs",
+    "tailwind.config.js"
   ],
   "exclude": ["node_modules", "src/__generated__/*.ts"]
 }
