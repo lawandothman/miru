@@ -6,10 +6,10 @@ import { useEffect, useState } from 'react'
 import { Button } from './Button'
 
 export const CookieConsent = () => {
-  const [consent, setConsent] = useState(false)
+  const [consent, setConsent] = useState(true)
 
   useEffect(() => {
-    const storedConsent = getCookie('cookieConset') as boolean
+    const storedConsent = getCookie('cookieConsent') as boolean
     setConsent(storedConsent)
   }, [])
 
@@ -17,7 +17,9 @@ export const CookieConsent = () => {
     e.preventDefault()
 
     if (!consent) {
-      setCookie('cookieConsent', true)
+      setCookie('cookieConsent', true, {
+        maxAge: 30 * 24 * 60 * 60,
+      })
       setConsent(true)
     }
   }
@@ -27,7 +29,7 @@ export const CookieConsent = () => {
   }
 
   return (
-    <section className='fixed bottom-12 left-2 right-0 flex w-full flex-col bg-neutral-100 px-5 py-8 dark:bg-neutral-900 md:flex-row md:items-stretch md:py-4 lg:bottom-0'>
+    <section className='fixed bottom-12 left-2 right-0 flex max-w-4xl mx-auto rounded-lg flex-col bg-neutral-100 px-5 py-8 dark:bg-neutral-900 md:flex-row md:items-stretch md:py-4 lg:bottom-0'>
       <div className='flex flex-grow items-center text-gray-900'>
         <p className='text-sm font-medium'>
           We use cookies to deliver a better experience. You can learn more

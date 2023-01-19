@@ -38,10 +38,11 @@ InferGetServerSidePropsType<typeof getServerSideProps>
 
   useEffect(() => {
     if (invitedBy) {
-      setCookie('invitedBy', invitedBy)
+      setCookie('invitedBy', invitedBy, {
+        maxAge: 30 * 24 * 60 * 60,
+      })
     }
-    //eslint-disable-next-line
-  },[])
+  }, [invitedBy])
 
   useEffect(() => {
     const storedInvite = getCookie('invitedBy') as string

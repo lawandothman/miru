@@ -113,11 +113,11 @@ const Home: NextPage = () => {
           </p>
           <p className='mt-2 text-sm'>Miru is better with friends</p>
         </div>
-        <div className='mt-8 flex flex-row items-center justify-center gap-4'>
-          <Link href={EXPLORE_INDEX}>
-            <Button size='md'>Search for your friends</Button>
+        <div className='mx-auto mt-8 flex max-w-xl flex-col items-center justify-center gap-4'>
+          <Link className='block w-full' href={EXPLORE_INDEX}>
+            <Button size='full-width'>Search for your friends</Button>
           </Link>
-          <Button onClick={() => copyInviteLink()}>
+          <Button size='full-width' onClick={() => copyInviteLink()}>
             {copied ? 'Copied!' : 'Copy Invite Link'}
           </Button>
         </div>
