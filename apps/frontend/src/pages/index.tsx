@@ -18,6 +18,7 @@ import { DateTime } from 'luxon'
 import { EXPLORE_INDEX, SIGN_IN_INDEX } from 'config/constants'
 import { Button } from 'components/Button'
 import { getCookie, removeCookies } from 'cookies-next'
+import { useInviteLink } from 'hooks/useInviteLink'
 
 const GET_HOME = gql`
   query GetHome($userId: ID!) {
@@ -38,7 +39,7 @@ const GET_HOME = gql`
   }
 `
 const FOLLOW = gql`
-  mutation Follow ($friendId: ID!) {
+  mutation Follow($friendId: ID!) {
     follow(friendId: $friendId) {
       id
       isFollowing
@@ -54,8 +55,8 @@ const Home: NextPage = () => {
     variables: { userId: session?.user?.id },
     fetchPolicy: 'network-only',
   })
+  const { copy, isCopied } = useInviteLink(session?.user)
   const [invitedBy, setInvitedBy] = useState<string | null>(null)
-  const [copied, setCopied] = useState(false)
   const [follow, { loading: followLoading }] = useMutation<
   User,
   { friendId: string | null }
@@ -67,7 +68,7 @@ const Home: NextPage = () => {
     (async () => {
       const invitedBy = getCookie('invitedBy') as string
       setInvitedBy(invitedBy)
-      if (session && invitedBy && invitedBy !== session?.user?.id) {
+      if (session && invitedBy && invitedBy !== session.user?.id) {
         await follow({
           variables: {
             friendId: invitedBy,
@@ -88,20 +89,6 @@ const Home: NextPage = () => {
     return <LoggedOutPage />
   }
 
-  const copyInviteLink = async () => {
-    try {
-      await navigator.clipboard.writeText(
-        `${window.location.origin}/${SIGN_IN_INDEX}?invitedBy=${session?.user?.id}`
-      )
-      setCopied(true)
-      setTimeout(() => {
-        setCopied(false)
-      }, 1000)
-    } catch (err) {
-      console.error('Failed to copy: ', err)
-    }
-  }
-
   if (data && data.user.following?.length === 0 && !invitedBy) {
     return (
       <main>
@@ -115,10 +102,12 @@ const Home: NextPage = () => {
         </div>
         <div className='mx-auto mt-8 flex max-w-xl flex-col items-center justify-center gap-4'>
           <Link className='block w-full' href={EXPLORE_INDEX}>
-            <Button className='py-4' size='full-width'>Search for your friends</Button>
+            <Button className='py-4' size='full-width'>
+              Search for your friends
+            </Button>
           </Link>
-          <Button className='py-4' size='full-width' onClick={() => copyInviteLink()}>
-            {copied ? 'Copied!' : 'Copy Invite Link'}
+          <Button className='py-4' size='full-width' onClick={() => copy()}>
+            {isCopied ? 'Copied!' : 'Copy Invite Link'}
           </Button>
         </div>
       </main>
