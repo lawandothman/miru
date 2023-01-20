@@ -213,7 +213,7 @@ const Movie: NextPage = () => {
                       {data.movie.tagline}
                     </p>
                   </div>
-                  {navigator.canShare && (
+                  {navigator.canShare() && (
                     <button
                       onClick={shareMovie}
                       className='flex h-fit items-center gap-2'
