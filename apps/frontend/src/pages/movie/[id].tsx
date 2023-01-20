@@ -7,7 +7,7 @@ import { FullPageLoader } from 'components/AsyncState'
 import { gql, useQuery } from '@apollo/client'
 import type { Genre, User, WatchProvider } from '__generated__/resolvers-types'
 import { Movie, Trailer } from '__generated__/resolvers-types'
-import { FiArrowLeft, FiLink } from 'react-icons/fi'
+import { FiArrowLeft, FiLink, FiShare } from 'react-icons/fi'
 import { FaImdb } from 'react-icons/fa'
 import { useSession } from 'next-auth/react'
 import { ProfilePicture } from 'components/Avatar'
@@ -159,6 +159,21 @@ const Movie: NextPage = () => {
     }
   )
 
+  const shareMovie = async () => {
+    if (!navigator.canShare) {
+      return
+    }
+    try {
+      await navigator.share({
+        title: `Watch ${data?.movie.title} with me!`,
+        text: 'Check out this movie I found on Miru, we should watch it together!',
+        url: window.location.href
+      })
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
   if (loading) {
     return <FullPageLoader />
   }
@@ -189,10 +204,25 @@ const Movie: NextPage = () => {
                 )}
               </div>
               <div className='flex flex-1 flex-col'>
-                <h1 className='text-4xl font-thin tracking-wider'>
-                  {data.movie.title}
-                </h1>
-                <p className='mt-2 text-xl font-thin'>{data.movie.tagline}</p>
+                <div className='flex flex-row items-center justify-between'>
+                  <div>
+                    <h1 className='text-4xl font-thin tracking-wider'>
+                      {data.movie.title}
+                    </h1>
+                    <p className='mt-2 text-xl font-thin'>
+                      {data.movie.tagline}
+                    </p>
+                  </div>
+                  {navigator.canShare && (
+                    <button
+                      onClick={shareMovie}
+                      className='flex h-fit items-center gap-2'
+                    >
+                      <FiShare />
+                      Share
+                    </button>
+                  )}
+                </div>
                 <div className='mt-3 flex items-center justify-between'>
                   <span>
                     {data.movie.runtime
