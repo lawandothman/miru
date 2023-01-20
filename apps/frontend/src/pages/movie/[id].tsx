@@ -160,7 +160,7 @@ const Movie: NextPage = () => {
   )
 
   const shareMovie = async () => {
-    if (!navigator.canShare) {
+    if (!navigator.canShare()) {
       return
     }
     try {
