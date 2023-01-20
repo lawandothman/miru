@@ -1,6 +1,10 @@
-import { TrailerKeys } from '../services/movieDbService'
+import type { TrailerKeys } from '../services/movieDbService'
 import { requireUser } from '../utils'
-import type { Movie, MovieResolvers, Trailer, VideoProvider } from '../__generated__/resolvers-types'
+import type {
+  Movie,
+  MovieResolvers,
+  Trailer,
+} from '../__generated__/resolvers-types'
 
 const MovieResolver: MovieResolvers = {
   genres: async (parent, _, { movieRepo }) => {
@@ -11,10 +15,7 @@ const MovieResolver: MovieResolvers = {
       return false
     }
     // ⚠️ No data loader code, this is subject to N+1
-    return await neoDataSource.isMovieInWatchlist(
-      parent.id,
-      requireUser(user)
-    )
+    return await neoDataSource.isMovieInWatchlist(parent.id, requireUser(user))
   },
   matches: async (parent, _, { user, movieMatchesLoader }) => {
     if (user == null) {
@@ -22,19 +23,21 @@ const MovieResolver: MovieResolvers = {
     }
     return movieMatchesLoader.load(parent.id)
   },
-  streamProviders: async (parent, _, { streamLoader }) => streamLoader.load(parent.id),
+  streamProviders: async (parent, _, { streamLoader }) =>
+    streamLoader.load(parent.id),
   buyProviders: async (parent, _, { buyLoader }) => buyLoader.load(parent.id),
-  rentProviders: async (parent, _, { rentLoader }) => rentLoader.load(parent.id),
+  rentProviders: async (parent, _, { rentLoader }) =>
+    rentLoader.load(parent.id),
   trailer: (parent, _, _ctx) => {
-    const movie: Movie&TrailerKeys = parent
-    if(movie.trailerProvider == undefined) {
+    const movie: Movie & TrailerKeys = parent
+    if (movie.trailerProvider == undefined) {
       return null
     }
     return {
       key: movie.trailerKey,
-      provider: movie.trailerProvider
+      provider: movie.trailerProvider,
     } as Trailer
-  }
+  },
 }
 
 export default MovieResolver

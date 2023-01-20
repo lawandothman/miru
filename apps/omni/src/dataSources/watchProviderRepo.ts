@@ -1,4 +1,4 @@
-import type { Driver} from 'neo4j-driver'
+import type { Driver } from 'neo4j-driver'
 import type { Dict } from 'neo4j-driver-core/types/record'
 import type { WatchProvider } from '../__generated__/resolvers-types'
 import type { WriteRepository } from './utils'
@@ -23,27 +23,42 @@ export class WatchProviderRepo implements WriteRepository<WatchProvider> {
   }
 
   async upsertStream(watchProviderId: string, movieId: string) {
-    return runOnce<{id: string}>(this.driver, `
+    return runOnce<{ id: string }>(
+      this.driver,
+      `
       MATCH (m:Movie {id: $movieId}), (w:WatchProvider {id: $watchProviderId})
       MERGE (m)-[r:STREAMS_FROM]->(w)
       SET r.updatedAt = dateTime()
-      RETURN m{.id}`, {movieId, watchProviderId}, 'm')
+      RETURN m{.id}`,
+      { movieId, watchProviderId },
+      'm'
+    )
   }
-  
+
   async upsertBuy(watchProviderId: string, movieId: string) {
-    return runOnce<{id: string}>(this.driver, `
+    return runOnce<{ id: string }>(
+      this.driver,
+      `
       MATCH (m:Movie {id: $movieId}), (w:WatchProvider {id: $watchProviderId})
       MERGE (m)-[r:BUYS_FROM]->(w)
       SET r.updatedAt = dateTime()
-      RETURN m{.id}`, {movieId, watchProviderId}, 'm')
+      RETURN m{.id}`,
+      { movieId, watchProviderId },
+      'm'
+    )
   }
 
   async upsertRent(watchProviderId: string, movieId: string) {
-    return runOnce<{id: string}>(this.driver, `
+    return runOnce<{ id: string }>(
+      this.driver,
+      `
       MATCH (m:Movie {id: $movieId}), (w:WatchProvider {id: $watchProviderId})
       MERGE (m)-[r:RENTS_FROM]->(w)
       SET r.updatedAt = dateTime()
-      RETURN m{.id}`, {movieId, watchProviderId}, 'm')
+      RETURN m{.id}`,
+      { movieId, watchProviderId },
+      'm'
+    )
   }
 
   private builtSetQuery(obj: any, entryKey: string): string {

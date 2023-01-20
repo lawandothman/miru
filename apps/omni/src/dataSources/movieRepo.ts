@@ -37,7 +37,7 @@ export class MovieRepo implements WriteRepository<Movie> {
           MATCH (m:Movie {id: $movieId}), (g:Genre {id: $genreId})
           MERGE (m)-[r:IS_A]->(g)
           RETURN m,r,g`,
-            { movieId: movie.id, genreId: genre!.id.toString() }
+            { movieId: movie.id, genreId: genre && genre.id.toString() }
           )
         }) ?? []
       )
@@ -58,7 +58,7 @@ export class MovieRepo implements WriteRepository<Movie> {
       `
       MATCH (m:Movie)-[r:IS_A]->(g:Genre {id: $id})
       WHERE m.tmdbVoteCount > 0
-      RETURN m 
+      RETURN m
       ORDER BY m.tmdbVoteCount DESC
       SKIP $offset
       LIMIT $limit

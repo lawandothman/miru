@@ -1,7 +1,12 @@
 import { groupBy } from 'lodash'
-import type { Driver} from 'neo4j-driver'
+import type { Driver } from 'neo4j-driver'
 import { int } from 'neo4j-driver'
-import type { Genre, Movie, User, WatchProvider } from '../__generated__/resolvers-types'
+import type {
+  Genre,
+  Movie,
+  User,
+  WatchProvider,
+} from '../__generated__/resolvers-types'
 import { mapTo, runAndMap, runAndMapMany, runMany, runOnce } from './utils'
 
 export interface Repository<T> {
@@ -20,48 +25,65 @@ export class NeoDataSource {
       'm'
     )
 
-    return ids.map((id) => movies.find(mov => mov.id == id)!)
+    return ids.map((id) => movies.find((mov) => mov.id == id)!)
   }
 
-  async getMoviesForYou(user: User, offset: number, limit: number): Promise<Movie[]> {
+  async getMoviesForYou(
+    user: User,
+    offset: number,
+    limit: number
+  ): Promise<Movie[]> {
     const email = user.email
-    return await runAndMapMany<Movie>(this.driver, `
+    return await runAndMapMany<Movie>(
+      this.driver,
+      `
       MATCH (u:User {email: $email})-[:FOLLOWS]->(f:User)<-[:IN_WATCHLIST]-(m:Movie)
       RETURN m, count(*) as friendWatchlistRank
       ORDER BY friendWatchlistRank DESC
       SKIP $offset
       LIMIT $limit`,
-    {email, offset: int(offset), limit: int(limit)},
-    'm'
+      { email, offset: int(offset), limit: int(limit) },
+      'm'
     )
   }
 
-  async getPopularMovies(offset:number, limit: number): Promise<Movie[]> {
-    return await runAndMapMany<Movie>(this.driver, `
+  async getPopularMovies(offset: number, limit: number): Promise<Movie[]> {
+    return await runAndMapMany<Movie>(
+      this.driver,
+      `
       MATCH (m:Movie)-[:IN_WATCHLIST]->(u:User)
       RETURN m, count(u) as watchlists
       ORDER BY watchlists DESC
       SKIP $offset
       LIMIT $limit`,
-    {offset: int(offset), limit: int(limit)},
-    'm'
+      { offset: int(offset), limit: int(limit) },
+      'm'
     )
   }
 
   async getGenresByIds(ids: readonly string[]): Promise<Genre[]> {
-    const genres = await runMany<Genre>(this.driver, `
+    const genres = await runMany<Genre>(
+      this.driver,
+      `
       MATCH (g:Genre)
       WHERE g.id IN $ids
       RETURN g{
         .id,
         .name
       }
-    `, {ids}, 'g')
-    return ids.map((id) => genres.find(gen => gen.id == id)!)
+    `,
+      { ids },
+      'g'
+    )
+    return ids.map((id) => genres.find((gen) => gen.id == id)!)
   }
 
-  async getStreamProviders(movieIds: readonly string[]): Promise<WatchProvider[][]> {
-    const providers = await runMany<WatchProvider&{movieId:string}>(this.driver, `
+  async getStreamProviders(
+    movieIds: readonly string[]
+  ): Promise<WatchProvider[][]> {
+    const providers = await runMany<WatchProvider & { movieId: string }>(
+      this.driver,
+      `
       MATCH (w: WatchProvider)<-[r:STREAMS_FROM]-(m:Movie)
       WHERE m.id IN $movieIds
       RETURN w{
@@ -70,13 +92,20 @@ export class NeoDataSource {
         .name,
         .logoPath,
         movieId: m.id
-      }`, {movieIds} , 'w')
+      }`,
+      { movieIds },
+      'w'
+    )
     const groupedByMovie = groupBy(providers, (p) => p.movieId)
-    return movieIds.map(id => groupedByMovie[id])
+    return movieIds.map((id) => groupedByMovie[id])
   }
 
-  async getBuyProviders(movieIds: readonly string[]): Promise<WatchProvider[][]> {
-    const providers = await runMany<WatchProvider&{movieId:string}>(this.driver, `
+  async getBuyProviders(
+    movieIds: readonly string[]
+  ): Promise<WatchProvider[][]> {
+    const providers = await runMany<WatchProvider & { movieId: string }>(
+      this.driver,
+      `
       MATCH (w: WatchProvider)<-[r:BUYS_FROM]-(m:Movie)
       WHERE m.id IN $movieIds
       RETURN w{
@@ -85,13 +114,20 @@ export class NeoDataSource {
         .name,
         .logoPath,
         movieId: m.id
-      }`, {movieIds} , 'w')
+      }`,
+      { movieIds },
+      'w'
+    )
     const groupedByMovie = groupBy(providers, (p) => p.movieId)
-    return movieIds.map(id => groupedByMovie[id])
+    return movieIds.map((id) => groupedByMovie[id])
   }
 
-  async getRentProviders(movieIds: readonly string[]): Promise<WatchProvider[][]> {
-    const providers = await runMany<WatchProvider&{movieId:string}>(this.driver, `
+  async getRentProviders(
+    movieIds: readonly string[]
+  ): Promise<WatchProvider[][]> {
+    const providers = await runMany<WatchProvider & { movieId: string }>(
+      this.driver,
+      `
       MATCH (w: WatchProvider)<-[r:RENTS_FROM]-(m:Movie)
       WHERE m.id IN $movieIds
       RETURN w{
@@ -100,11 +136,13 @@ export class NeoDataSource {
         .name,
         .logoPath,
         movieId: m.id
-      }`, {movieIds} , 'w')
+      }`,
+      { movieIds },
+      'w'
+    )
     const groupedByMovie = groupBy(providers, (p) => p.movieId)
-    return movieIds.map(id => groupedByMovie[id])
+    return movieIds.map((id) => groupedByMovie[id])
   }
-
 
   getUsers =
     (user: User | null) =>
@@ -125,7 +163,7 @@ export class NeoDataSource {
           { ids, email },
           'u'
         )
-        return ids.map((id) => users.find(u => u.id == id)!)
+        return ids.map((id) => users.find((u) => u.id == id)!)
       }
 
   getMatchesWith =
@@ -161,11 +199,12 @@ export class NeoDataSource {
         })
       }
 
-  getMovieMatches = (user: User | null) => async (movieIds: readonly string[]) => {
-    const email = user?.email ?? ''
-    const matches = await runMany<User&{movieId:string}>(
-      this.driver,
-      `MATCH (m:Movie)-[r1:IN_WATCHLIST]->(f:User)<-[r2:FOLLOWS]-(u:User {email: $email})
+  getMovieMatches =
+    (user: User | null) => async (movieIds: readonly string[]) => {
+      const email = user?.email ?? ''
+      const matches = await runMany<User & { movieId: string }>(
+        this.driver,
+        `MATCH (m:Movie)-[r1:IN_WATCHLIST]->(f:User)<-[r2:FOLLOWS]-(u:User {email: $email})
       WHERE m.id IN $movieIds
       RETURN f{
         .id,
@@ -176,12 +215,12 @@ export class NeoDataSource {
         isFollowing: exists((f)<-[:FOLLOWS]-(:User {email: $email})),
         movieId: m.id
       }`,
-      { movieIds, email},
-      'f'
-    )
-    const groupedByMovieId = groupBy(matches, (a) => a.movieId)
-    return movieIds.map(id => groupedByMovieId[id] ?? [])
-  }
+        { movieIds, email },
+        'f'
+      )
+      const groupedByMovieId = groupBy(matches, (a) => a.movieId)
+      return movieIds.map((id) => groupedByMovieId[id] ?? [])
+    }
 
   async searchUsers(query: string, user: User | null): Promise<User[]> {
     const email = user?.email ?? ''
@@ -346,16 +385,17 @@ export class NeoDataSource {
   }
 
   async getWatchProviders(ids: readonly string[]): Promise<WatchProvider[]> {
-    return await runMany<WatchProvider>(this.driver, 
+    return await runMany<WatchProvider>(
+      this.driver,
       `MATCH (w:WatchProvider) WHERE w.id IN $ids RETURN
       w{
         .id,
         .displayPriority,
         .name,
         .logoPath
-      }`, 
+      }`,
       { ids },
-      'w',
+      'w'
     )
   }
 }

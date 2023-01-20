@@ -1,4 +1,8 @@
-import type { ApolloServerPlugin, GraphQLRequestContext, GraphQLRequestListener } from '@apollo/server'
+import type {
+  ApolloServerPlugin,
+  GraphQLRequestContext,
+  GraphQLRequestListener,
+} from '@apollo/server'
 import * as Sentry from '@sentry/node'
 import '@sentry/tracing'
 import { ProfilingIntegration } from '@sentry/profiling-node'
@@ -6,7 +10,6 @@ import type { Context } from '.'
 import { uuid4 } from '@sentry/utils'
 import { config } from './config'
 import Mixpanel = require('mixpanel')
-import { request } from 'http'
 
 Sentry.init({
   dsn: config.sentryUrl,
@@ -17,36 +20,33 @@ Sentry.init({
   tracesSampleRate: process.env.NODE_ENV == 'production' ? 1.0 : 1.0,
   integrations: [
     // add profiling integration
-    new ProfilingIntegration()
+    new ProfilingIntegration(),
   ],
   profilesSampleRate: process.env.NODE_ENV == 'production' ? 1.0 : 1.0,
 })
 
-const mixpanel = Mixpanel.init(
-  config.mixpanelKey,
-  {
-    host: 'api-eu.mixpanel.com',
-  },
-)
-
+const mixpanel = Mixpanel.init(config.mixpanelKey, {
+  host: 'api-eu.mixpanel.com',
+})
 
 export default class TracingPlugin implements ApolloServerPlugin {
-
-  async requestDidStart?(requestContext: GraphQLRequestContext<Context>): Promise<GraphQLRequestListener<Context> | void> {
+  async requestDidStart?(
+    requestContext: GraphQLRequestContext<Context>
+  ): Promise<GraphQLRequestListener<Context> | void> {
     const startTime = Date.now()
     const transaction = Sentry.startTransaction({
       op: uuid4(),
       data: {
         query: requestContext.request.query,
       },
-      name: requestContext.request.operationName ?? 'no-name'
+      name: requestContext.request.operationName ?? 'no-name',
     })
     Sentry.setUser({
       email: requestContext.contextValue.user?.email,
     })
     return {
       async didEncounterErrors(context) {
-        for(const err of context.errors) {
+        for (const err of context.errors) {
           Sentry.captureException(err)
         }
       },
@@ -54,7 +54,7 @@ export default class TracingPlugin implements ApolloServerPlugin {
         return {
           async executionDidEnd() {
             const user = requestContext.contextValue.user
-            if(user) {
+            if (user) {
               mixpanel.people.set(user.id, {
                 $email: user.email,
                 $name: user.name,
@@ -65,12 +65,12 @@ export default class TracingPlugin implements ApolloServerPlugin {
               query: requestContext.source,
               executionTime: Date.now() - startTime,
               name: requestContext.request.operationName,
-              variables: requestContext.request.variables
+              variables: requestContext.request.variables,
             })
             transaction.finish()
-          }
+          },
         }
-      }
+      },
     }
   }
 }
