@@ -48,5 +48,6 @@ module.exports = {
   plugins: [
     require('@tailwindcss/aspect-ratio'),
     require('tailwindcss-radix')(),
+    require('tailwindcss-safe-area')
   ],
 }

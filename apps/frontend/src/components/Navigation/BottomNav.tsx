@@ -25,7 +25,7 @@ export const BottomNavBar = ({
   user?: User | null;
 }) => {
   return (
-    <aside className='fixed bottom-0 z-10 flex h-16 w-full flex-row bg-white p-1 dark:bg-black'>
+    <aside className='pb-safe fixed bottom-0 z-10 flex h-20 w-full flex-row items-center bg-white dark:bg-black'>
       <BottomNavItem
         isSelected={router.pathname === '/'}
         href='/'

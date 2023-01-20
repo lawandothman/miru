@@ -17,6 +17,7 @@ module.exports = {
           'animate-slide-left-fade',
           'animate-slide-right-fade',
           'animate-tilt-n-move-shaking',
+          'pb-safe'
         ],
       },
     ],
