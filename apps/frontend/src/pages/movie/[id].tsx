@@ -24,6 +24,7 @@ import { DateTime, Duration } from 'luxon'
 import { Page } from 'components/Page'
 import { useMobile } from 'hooks/useMobile'
 import type { Maybe } from 'graphql/jsutils/Maybe'
+import { useState } from 'react'
 
 const GET_BY_ID = gql`
   query Movie($movieId: ID!) {
@@ -149,6 +150,7 @@ const Movie: NextPage = () => {
     : router.query.id
   const { data: session } = useSession()
   const mobile = useMobile()
+  const [copied, setCopied] = useState(false)
 
   const { data, loading } = useQuery<{ movie: Movie }, { movieId?: string }>(
     GET_BY_ID,
@@ -160,9 +162,6 @@ const Movie: NextPage = () => {
   )
 
   const shareMovie = async () => {
-    if (!navigator.share) {
-      return
-    }
     try {
       await navigator.share({
         title: `Watch ${data?.movie.title} with me!`,
@@ -170,7 +169,11 @@ const Movie: NextPage = () => {
         url: window.location.href,
       })
     } catch (e) {
-      console.error(e)
+      await navigator.clipboard.writeText(window.location.href)
+      setCopied(true)
+      setTimeout(() => {
+        setCopied(false)
+      }, 1000)
     }
   }
 
@@ -204,23 +207,10 @@ const Movie: NextPage = () => {
                 )}
               </div>
               <div className='flex flex-1 flex-col'>
-                <div className='flex flex-row items-center justify-between'>
-                  <div>
-                    <h1 className='text-4xl font-thin tracking-wider'>
-                      {data.movie.title}
-                    </h1>
-                    <p className='mt-2 text-xl font-thin'>
-                      {data.movie.tagline}
-                    </p>
-                  </div>
-                  <button
-                    onClick={shareMovie}
-                    className='flex h-fit items-center gap-2'
-                  >
-                    <FiShare />
-                    Share
-                  </button>
-                </div>
+                <h1 className='text-4xl font-thin tracking-wider'>
+                  {data.movie.title}
+                </h1>
+                <p className='mt-2 text-xl font-thin'>{data.movie.tagline}</p>
                 <div className='mt-3 flex items-center justify-between'>
                   <span>
                     {data.movie.runtime
@@ -229,14 +219,27 @@ const Movie: NextPage = () => {
                     {data.movie.releaseDate &&
                       DateTime.fromISO(data.movie.releaseDate).year}
                   </span>
-                  <WatchlistButton session={session} movie={data.movie} />
+                  <button
+                    onClick={shareMovie}
+                    className='flex h-fit items-center gap-2'
+                  >
+                    {copied ? (
+                      'Copied!'
+                    ) : (
+                      <>
+                        <FiShare />
+                        Share
+                      </>
+                    )}
+                  </button>
                 </div>
+                <div className='my-8 flex flex-wrap gap-3'>
+                  {data.movie.genres?.map((genre) => (
+                    <GenrePill genre={genre} key={genre?.id} />
+                  ))}
+                </div>
+                <WatchlistButton session={session} movie={data.movie} />
                 <div className='text-sm text-neutral-500 dark:text-neutral-400'>
-                  <div className='mt-8 flex flex-wrap gap-3'>
-                    {data.movie.genres?.map((genre) => (
-                      <GenrePill genre={genre} key={genre?.id} />
-                    ))}
-                  </div>
                   <p className='mt-8 max-w-xl text-neutral-600 dark:text-neutral-400'>
                     {data.movie.overview}
                   </p>
