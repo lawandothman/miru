@@ -75,7 +75,7 @@ const Movie = ({ movie }: { movie: Maybe<Movie> }) => {
       </h3>
       <div className='mt-auto flex items-center justify-center'>
         <WatchlistButton
-          className='w-full py-5'
+          className='h-8 w-full py-5'
           movie={movie}
           session={session}
           size='sm'
