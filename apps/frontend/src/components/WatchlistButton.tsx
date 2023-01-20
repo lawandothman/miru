@@ -5,6 +5,7 @@ import type { Movie } from '__generated__/resolvers-types'
 import { Button } from './Button'
 import { Spinner } from './AsyncState/Spinner'
 import { signIn } from 'next-auth/react'
+import type { ButtonHTMLAttributes } from 'react'
 
 const ADD_TO_WATCHLIST = gql`
   mutation AddMovieToWatchlist($movieId: ID!) {
@@ -23,15 +24,18 @@ const REMOVE_FROM_WATCHLIST = gql`
     }
   }
 `
+
+type WatchlistButtonProps = {
+  session: Session | null;
+  movie: Movie;
+  size?: 'sm' | 'md' | 'full-width';
+} & ButtonHTMLAttributes<HTMLButtonElement>
 export const WatchlistButton = ({
   session,
   movie,
   size = 'md',
-}: {
-  session: Session | null;
-  movie: Movie;
-  size?: 'sm' | 'md' | 'full-width';
-}) => {
+  ...props
+}: WatchlistButtonProps) => {
   const [addToWatchlist, { loading: addLoading }] = useMutation<
   { movie: Movie },
   { movieId?: string }
@@ -64,7 +68,7 @@ export const WatchlistButton = ({
   const isLoading = addLoading || removeLoading
 
   return (
-    <Button size={size} onClick={onClick}>
+    <Button size={size} onClick={onClick} {...props}>
       {isLoading ? (
         <Spinner reverted />
       ) : (

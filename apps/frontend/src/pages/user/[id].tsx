@@ -225,11 +225,12 @@ const User = () => {
                     </div>
                   </div>
                 </div>
-                <div className='ml-auto py-2 md:ml-auto'>
+                <div className='mt-4 md:ml-auto'>
                   {session?.user?.id !== userId ? (
                     <FollowButton user={data.user} />
                   ) : (
                     <Button
+                      className='w-full border border-red-500'
                       intent='danger'
                       display='ghost'
                       onClick={() =>

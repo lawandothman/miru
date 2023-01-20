@@ -55,6 +55,7 @@ export const FollowButton = ({
 
   return (
     <Button
+      className='h-10 w-full'
       size={size}
       onClick={() => {
         if (user?.isFollowing) {
