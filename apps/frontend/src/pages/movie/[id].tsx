@@ -160,14 +160,14 @@ const Movie: NextPage = () => {
   )
 
   const shareMovie = async () => {
-    if (!navigator.canShare()) {
+    if (!navigator.share) {
       return
     }
     try {
       await navigator.share({
         title: `Watch ${data?.movie.title} with me!`,
         text: 'Check out this movie I found on Miru, we should watch it together!',
-        url: window.location.href
+        url: window.location.href,
       })
     } catch (e) {
       console.error(e)
@@ -213,15 +213,13 @@ const Movie: NextPage = () => {
                       {data.movie.tagline}
                     </p>
                   </div>
-                  {navigator.canShare() && (
-                    <button
-                      onClick={shareMovie}
-                      className='flex h-fit items-center gap-2'
-                    >
-                      <FiShare />
-                      Share
-                    </button>
-                  )}
+                  <button
+                    onClick={shareMovie}
+                    className='flex h-fit items-center gap-2'
+                  >
+                    <FiShare />
+                    Share
+                  </button>
                 </div>
                 <div className='mt-3 flex items-center justify-between'>
                   <span>
