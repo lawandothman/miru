@@ -35,7 +35,7 @@ export const MoviesList: FC<MoviesListProps> = ({ movies, loadMore }) => {
       {loadMore ? (
         <InfiniteScroll
           pageStart={0}
-          className='grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8'
+          className='grid grid-cols-2 gap-y-10 gap-x-6 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8'
           loadMore={async () => {
             await loadMore()
           }}
@@ -74,7 +74,12 @@ const Movie = ({ movie }: { movie: Maybe<Movie> }) => {
         {movie?.title}
       </h3>
       <div className='mt-auto flex items-center justify-center'>
-        <WatchlistButton movie={movie} session={session} size='sm' />
+        <WatchlistButton
+          className='w-full py-5'
+          movie={movie}
+          session={session}
+          size='sm'
+        />
       </div>
     </div>
   )
