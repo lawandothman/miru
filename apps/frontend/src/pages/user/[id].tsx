@@ -11,17 +11,16 @@ import { FollowButton } from 'components/FollowButton'
 import { FullPageLoader } from 'components/AsyncState'
 import { MoviesList } from 'components/MoviesList'
 import { UserCard } from 'components/UserCard'
-import { PAGE_LIMIT, USER_INDEX } from 'config/constants'
+import { USER_INDEX } from 'config/constants'
 import { signOut, useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { FiLogOut } from 'react-icons/fi'
-import type { Movie } from '__generated__/resolvers-types'
 import { User } from '__generated__/resolvers-types'
 import { Page } from 'components/Page'
 
 const SEARCH_USER = gql`
-  query User($userId: ID!, $limit: Int, $offset: Int) {
+  query User($userId: ID!) {
     user(id: $userId) {
       id
       name
@@ -52,12 +51,12 @@ const SEARCH_USER = gql`
         }
         isFollowing
       }
-    }
-    watchlist(limit: $limit, offset: $offset) {
-      id
-      title
-      posterUrl
-      inWatchlist
+      watchlist {
+        id
+        title
+        posterUrl
+        inWatchlist
+      }
     }
   }
 `
@@ -136,25 +135,16 @@ const FollowingDialog = ({
 const User = () => {
   const { query } = useRouter()
   const userId = Array.isArray(query.id) ? query.id[0] : query.id
-  const [fullyLoaded, setFullyLoaded] = useState(false)
   const { data: session, status } = useSession({
     required: true,
   })
 
-  const {
-    data,
-    networkStatus,
-    fetchMore,
-    variables = { offset: 0, limit: PAGE_LIMIT },
-    refetch,
-  } = useQuery<
-  { user: User; watchlist?: Movie[] },
-  { userId?: string; offset: number; limit: number }
+  const { data, networkStatus, refetch } = useQuery<
+  { user: User },
+  { userId?: string }
   >(SEARCH_USER, {
     variables: {
       userId,
-      offset: 0,
-      limit: PAGE_LIMIT,
     },
     notifyOnNetworkStatusChange: true,
     fetchPolicy: 'cache-and-network',
@@ -165,20 +155,6 @@ const User = () => {
   }
 
   if (data) {
-    const isFetchingMore = networkStatus === NetworkStatus.fetchMore
-    const isFullPage =
-      data.watchlist && data.watchlist.length % variables.limit === 0
-    const loadMore = async () => {
-      if (!isFetchingMore && isFullPage && !fullyLoaded) {
-        await fetchMore({
-          variables: {
-            limit: PAGE_LIMIT,
-            offset: data.watchlist?.length,
-          },
-        }).then((res) => setFullyLoaded(!res.data.watchlist?.length))
-      }
-    }
-
     return (
       <Page
         name={data.user.name}
@@ -249,14 +225,12 @@ const User = () => {
                   )}
                 </div>
               </div>
-
-              {session?.user?.id === userId && (
+              {data.user.watchlist && data.user.watchlist.length > 0 && (
                 <>
-                  <h3 className='my-8 text-xl font-thin'>Your watchlist</h3>
-                  <MoviesList loadMore={loadMore} movies={data.watchlist} />
+                  <h3 className='mb-4 mt-8 text-3xl font-thin'>Watchlist</h3>
+                  <MoviesList movies={data.user.watchlist} />
                 </>
               )}
-
               {data.user.matches && data.user.matches.length > 0 && (
                 <>
                   <h3 className='my-8 text-xl font-thin'>
