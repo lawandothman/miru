@@ -11,7 +11,7 @@ export const button = cva(
     'font-semibold',
     'whitespace-nowrap',
     'gap-2',
-    'max-w-xl px-6 py-2',
+    'px-6 py-2',
   ],
   {
     variants: {
@@ -22,7 +22,7 @@ export const button = cva(
       size: {
         md: 'min-h-10 min-w-28',
         sm: 'max-h-8 max-w-32 p-4',
-        'full-width':'w-full'
+        'full-width': 'w-full',
       },
       display: {
         solid: 'bg-black dark:bg-white',

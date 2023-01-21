@@ -225,9 +225,13 @@ const User = () => {
                     </div>
                   </div>
                 </div>
-                <div className='mt-4 md:ml-auto'>
+                <div className='mt-4 lg:ml-auto'>
                   {session?.user?.id !== userId ? (
-                    <FollowButton user={data.user} />
+                    <FollowButton
+                      className='h-10 w-full md:w-36 '
+                      size='md'
+                      user={data.user}
+                    />
                   ) : (
                     <Button
                       className='w-full border border-red-500'

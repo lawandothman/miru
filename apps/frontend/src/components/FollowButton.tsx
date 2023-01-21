@@ -4,6 +4,7 @@ import type { User } from '__generated__/resolvers-types'
 import { Button } from './Button'
 import { Spinner } from './AsyncState/Spinner'
 import type { Maybe } from 'graphql/jsutils/Maybe'
+import type { ButtonHTMLAttributes } from 'react'
 
 const FOLLOW = gql`
   mutation ($friendId: ID!) {
@@ -27,13 +28,17 @@ const UNFOLLOW = gql`
     }
   }
 `
+
+type FollowButtonProps = {
+  user: Maybe<User>;
+  size: 'sm' | 'md' | 'full-width';
+} & ButtonHTMLAttributes<HTMLButtonElement>
+
 export const FollowButton = ({
   user,
   size = 'md',
-}: {
-  user: Maybe<User>;
-  size?: 'sm' | 'md' | 'full-width';
-}) => {
+  ...props
+}: FollowButtonProps) => {
   const [follow, { loading: followLoading }] = useMutation<
   User,
   { friendId?: string }
@@ -55,7 +60,6 @@ export const FollowButton = ({
 
   return (
     <Button
-      className='h-10 w-full'
       size={size}
       onClick={() => {
         if (user?.isFollowing) {
@@ -64,6 +68,7 @@ export const FollowButton = ({
           follow()
         }
       }}
+      {...props}
     >
       {loading ? (
         <Spinner reverted />
