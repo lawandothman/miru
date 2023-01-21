@@ -14,6 +14,7 @@
     "lint": "turbo lint",
     "lint:fix": "turbo lint:fix",
     "dev": "turbo dev",
+    "build": "turbo build",
     "generate": "turbo generate"
   },
   "devDependencies": {
