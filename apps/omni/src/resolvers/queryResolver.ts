@@ -5,6 +5,9 @@ const QueryResolver: QueryResolvers = {
   movie: async (_parent, { id }, { movieLoader }) => {
     return await movieLoader.load(id)
   },
+  bots: async (_parent, _args, { user, neoDataSource }) => {
+    return await neoDataSource.getBots(user)()
+  },
   search: async (_parent, { query, offset, limit }, { movieRepo }) => {
     return await movieRepo.search(query, offset ?? 0, limit ?? 20)
   },

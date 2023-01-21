@@ -1,3 +1,4 @@
+import { isDOMError } from '@sentry/utils'
 import { groupBy } from 'lodash'
 import type { Driver } from 'neo4j-driver'
 import { int } from 'neo4j-driver'
@@ -142,6 +143,18 @@ export class NeoDataSource {
     )
     const groupedByMovie = groupBy(providers, (p) => p.movieId)
     return movieIds.map((id) => groupedByMovie[id])
+  }
+
+  getBots = (user: User | null) => async () =>  {
+    const email = user?.email ?? ''
+    return await runMany<User>(
+      this.driver, `
+        MATCH (u:User:Bot) RETURN u{
+          .*,
+          isFollower: exists((u)-[:FOLLOWS]->(:User {email: $email})),
+          isFollowing: exists((u)<-[:FOLLOWS]-(:User {email: $email}))
+        }
+      `, { email }, 'u')
   }
 
   getUsers =

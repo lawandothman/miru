@@ -62,6 +62,7 @@ type Genre {
 
 type Query {
   user(id: ID!): User
+  bots: [User]
   movie(id: ID!): Movie
   watchlist(offset: Int, limit: Int): [Movie]
   moviesByGenre(genreId: ID!, offset: Int, limit: Int): [Movie]
