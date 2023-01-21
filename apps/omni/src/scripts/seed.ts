@@ -23,6 +23,7 @@ async function seed() {
         id: faker.datatype.uuid(),
         email: faker.internet.email(),
         name: faker.name.fullName(),
+        isBot: false,
         image: `https://picsum.photos/${faker.datatype.number({
           min: 30,
           max: 1000,

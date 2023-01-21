@@ -1,3 +1,4 @@
+import { isDOMError } from '@sentry/utils'
 import { groupBy } from 'lodash'
 import type { Driver } from 'neo4j-driver'
 import { int } from 'neo4j-driver'
@@ -144,6 +145,18 @@ export class NeoDataSource {
     return movieIds.map((id) => groupedByMovie[id])
   }
 
+  getBots = (user: User | null) => async () =>  {
+    const email = user?.email ?? ''
+    return await runMany<User>(
+      this.driver, `
+        MATCH (u:User:Bot) RETURN u{
+          .*,
+          isFollower: exists((u)-[:FOLLOWS]->(:User {email: $email})),
+          isFollowing: exists((u)<-[:FOLLOWS]-(:User {email: $email}))
+        }
+      `, { email }, 'u')
+  }
+
   getUsers =
     (user: User | null) =>
       async (ids: readonly string[]): Promise<User[]> => {
@@ -152,10 +165,7 @@ export class NeoDataSource {
           this.driver,
           `MATCH (u:User) WHERE u.id in $ids
       RETURN u{
-          .id,
-          .email,
-          .image,
-          .name,
+          .*,
           isFollower: exists((u)-[:FOLLOWS]->(:User {email: $email})),
           isFollowing: exists((u)<-[:FOLLOWS]-(:User {email: $email}))
       }
@@ -228,10 +238,7 @@ export class NeoDataSource {
       this.driver,
       `MATCH (u:User) WHERE toLower(u.name) CONTAINS toLower($query)
       RETURN u{
-          .id,
-          .email,
-          .image,
-          .name,
+          .*,
           isFollower: exists((u)-[:FOLLOWS]->(:User {email: $email})),
           isFollowing: exists((u)<-[:FOLLOWS]-(:User {email: $email}))
       } LIMIT 20
@@ -299,10 +306,7 @@ export class NeoDataSource {
       MATCH (u:User {email: $email}), (f:User {id: $id})
       MERGE (u)-[r:FOLLOWS]->(f)
       RETURN f{
-        .id,
-        .email,
-        .image,
-        .name,
+        .*,
         isFollower: exists((f)-[:FOLLOWS]->(:User {email: $email})),
         isFollowing: exists((f)<-[:FOLLOWS]-(:User {email: $email})),
         followerId: u.id
@@ -319,10 +323,7 @@ export class NeoDataSource {
       MATCH (u:User {email: $email})-[r:FOLLOWS]->(f:User {id: $id})
       DELETE r
       RETURN f{
-        .id,
-        .email,
-        .image,
-        .name,
+        .*,
         isFollower: exists((f)-[:FOLLOWS]->(:User {email: $email})),
         isFollowing: exists((f)<-[:FOLLOWS]-(:User {email: $email})),
         followerId: u.id

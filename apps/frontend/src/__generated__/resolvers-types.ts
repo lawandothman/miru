@@ -78,6 +78,7 @@ export type MutationUnfollowArgs = {
 
 export type Query = {
   __typename?: 'Query';
+  bots?: Maybe<Array<Maybe<User>>>;
   genre?: Maybe<Genre>;
   genres?: Maybe<Array<Maybe<Genre>>>;
   movie?: Maybe<Movie>;
@@ -155,6 +156,7 @@ export type User = {
   following?: Maybe<Array<Maybe<User>>>;
   id: Scalars['ID'];
   image?: Maybe<Scalars['String']>;
+  isBot: Scalars['Boolean'];
   isFollower?: Maybe<Scalars['Boolean']>;
   isFollowing?: Maybe<Scalars['Boolean']>;
   matches?: Maybe<Array<Maybe<Movie>>>;
@@ -317,6 +319,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 }>;
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
+  bots?: Resolver<Maybe<Array<Maybe<ResolversTypes['User']>>>, ParentType, ContextType>;
   genre?: Resolver<Maybe<ResolversTypes['Genre']>, ParentType, ContextType, RequireFields<QueryGenreArgs, 'genreId'>>;
   genres?: Resolver<Maybe<Array<Maybe<ResolversTypes['Genre']>>>, ParentType, ContextType>;
   movie?: Resolver<Maybe<ResolversTypes['Movie']>, ParentType, ContextType, RequireFields<QueryMovieArgs, 'id'>>;
@@ -341,6 +344,7 @@ export type UserResolvers<ContextType = any, ParentType extends ResolversParentT
   following?: Resolver<Maybe<Array<Maybe<ResolversTypes['User']>>>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   image?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  isBot?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   isFollower?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   isFollowing?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   matches?: Resolver<Maybe<Array<Maybe<ResolversTypes['Movie']>>>, ParentType, ContextType>;
