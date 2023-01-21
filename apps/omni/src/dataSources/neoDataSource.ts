@@ -264,6 +264,20 @@ export class NeoDataSource {
     return rel != null
   }
 
+  getWatchlists = async (userIds: readonly string[]) => {
+    const movies = await runMany<Movie&{userId:string}>(this.driver,`
+      MATCH (m:Movie)-[r:IN_WATCHLIST]->(u:User)
+      WHERE u.id IN $userIds
+      RETURN m{
+        .*,
+        userId: u.id
+      }
+      LIMIT 30
+    `, {userIds}, 'm')
+    const groupedByUser = groupBy(movies, m => m.userId)
+    return userIds.map(id => groupedByUser[id] ?? [])
+  }
+
   async getWatchlist(user: User, offset: number, limit: number) {
     const movies = await runAndMapMany<Movie>(
       this.driver,

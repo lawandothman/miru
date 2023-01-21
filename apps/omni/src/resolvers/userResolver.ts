@@ -13,6 +13,9 @@ const UserResolver: UserResolvers = {
   },
   email: () => {
     return 'REDACTED'
+  },
+  watchlist: async (parent, _, {watchlistLoader}) => {
+    return watchlistLoader.load(parent.id)
   }
 }
 

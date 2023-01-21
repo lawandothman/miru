@@ -27,6 +27,7 @@ export interface Context {
   movieLoader: DataLoader<string, Movie>
   userLoader: DataLoader<string, User>
   matchesLoader: DataLoader<string, Movie[]>
+  watchlistLoader: DataLoader<string, Movie[]>
   movieMatchesLoader: DataLoader<string, User[]>
   followerLoader: DataLoader<string, User[]> 
   followingLoader: DataLoader<string, User[]> 
@@ -84,6 +85,7 @@ async function main() {
         movieLoader: new DataLoader(neo.getMovies.bind(neo)),
         userLoader: new DataLoader(neo.getUsers(user).bind(neo)),
         matchesLoader: new DataLoader(neo.getMatchesWith(user).bind(neo)),
+        watchlistLoader: new DataLoader(neo.getWatchlists.bind(neo)),
         movieMatchesLoader: new DataLoader(neo.getMovieMatches(user).bind(neo)),
         followerLoader: new DataLoader(neo.getFollowers(user).bind(neo)),
         followingLoader: new DataLoader(neo.getFollowing(user).bind(neo)),
