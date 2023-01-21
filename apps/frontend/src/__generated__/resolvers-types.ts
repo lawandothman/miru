@@ -159,6 +159,7 @@ export type User = {
   isFollowing?: Maybe<Scalars['Boolean']>;
   matches?: Maybe<Array<Maybe<Movie>>>;
   name: Scalars['String'];
+  watchlist?: Maybe<Array<Maybe<Movie>>>;
 };
 
 export enum VideoProvider {
@@ -344,6 +345,7 @@ export type UserResolvers<ContextType = any, ParentType extends ResolversParentT
   isFollowing?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   matches?: Resolver<Maybe<Array<Maybe<ResolversTypes['Movie']>>>, ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  watchlist?: Resolver<Maybe<Array<Maybe<ResolversTypes['Movie']>>>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 

@@ -44,6 +44,7 @@ type User {
   isFollower: Boolean
   followers: [User]
   following: [User]
+  watchlist: [Movie]
 }
 
 type WatchProvider {
