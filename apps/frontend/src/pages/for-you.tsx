@@ -121,7 +121,7 @@ const ForYou: NextPage = () => {
               </p>
             </div>
 
-            <div className='mx-auto mt-8 flex w-full grid-cols-3 items-center gap-y-5 gap-x-10'>
+            <div className='mt-8 grid grid-cols-1 gap-y-5 gap-x-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 xl:gap-x-8'>
               {botsData?.bots.map((bot) => (
                 <Link
                   href={`${USER_INDEX}/${bot.id}`}
