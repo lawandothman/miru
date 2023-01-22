@@ -2,7 +2,7 @@ import { LoadingSkeleton, MoviesList } from 'components/MoviesList'
 import { PageHeader } from 'components/PageHeader'
 import type { NextPage } from 'next'
 import { useQuery, gql, NetworkStatus } from '@apollo/client'
-import type { Movie } from '__generated__/resolvers-types'
+import type { Movie, User } from '__generated__/resolvers-types'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -16,10 +16,12 @@ import {
   FOR_YOU_INDEX,
   PAGE_LIMIT,
   SIGN_IN_INDEX,
+  USER_INDEX,
 } from 'config/constants'
 import { Page } from 'components/Page'
 import { Button } from 'components/Button'
 import { useInviteLink } from 'hooks/useInviteLink'
+import { ProfilePicture } from 'components/Avatar'
 
 const GET_FOR_YOU = gql`
   query ForYou($limit: Int, $offset: Int) {
@@ -28,6 +30,22 @@ const GET_FOR_YOU = gql`
       title
       posterUrl
       inWatchlist
+    }
+  }
+`
+
+const GET_BOTS = gql`
+  query getBots {
+    bots {
+      name
+      image
+      id
+      matches {
+        id
+        title
+        posterUrl
+        inWatchlist
+      }
     }
   }
 `
@@ -49,8 +67,12 @@ const ForYou: NextPage = () => {
         offset: 0,
       },
       notifyOnNetworkStatusChange: true,
+      fetchPolicy: 'network-only',
     }
   )
+  const { data: botsData } = useQuery<{ bots: User[] }>(GET_BOTS, {
+    skip: Boolean(data?.moviesForYou.length && data?.moviesForYou.length > 0),
+  })
 
   if (status === 'loading') {
     return <FullPageLoader />
@@ -92,9 +114,24 @@ const ForYou: NextPage = () => {
             <Illustration />
             <div className='mx-auto max-w-2xl text-center'>
               <p className='text-xl'>
-                It&apos;s quiet here, find more friends to follow and we&apos;ll
-                suggest you some movies for you to watch with them
+                It&apos; a bit quiet here, let&apos;s get the party started by
+                following Miru bots. They&apos;ve got some great movie
+                recommendations that will have you adding to your watchlist in
+                no time!
               </p>
+            </div>
+
+            <div className='mx-auto mt-8 flex w-full grid-cols-3 items-center gap-y-5 gap-x-10'>
+              {botsData?.bots.map((bot) => (
+                <Link
+                  href={`${USER_INDEX}/${bot.id}`}
+                  className='flex w-full flex-col items-center justify-center gap-8 rounded-lg border border-neutral-300 p-8  hover:bg-neutral-300 dark:border-neutral-600 hover:dark:bg-neutral-600'
+                  key={bot.id}
+                >
+                  <ProfilePicture size='lg' user={bot} />
+                  <span className='truncate'>{bot.name}</span>
+                </Link>
+              ))}
             </div>
             <div className='mx-auto mt-8 flex max-w-xl flex-col items-center justify-center gap-4'>
               <Link className='block w-full' href={EXPLORE_INDEX}>
