@@ -7,11 +7,17 @@ import { useState } from 'react'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import Image from 'next/image'
-import TalkImgDark from '../../public/illustration/dark/talk.png'
-import TalkImgLight from '../../public/illustration/light/talk.png'
+import HorrorMovieDark from '../../public/illustration/dark/horror_movie.svg'
+import HorrorMovieLight from '../../public/illustration/light/horror_movie.svg'
 import { useTheme } from 'next-themes'
 import { FullPageLoader } from 'components/AsyncState'
-import { EXPLORE_INDEX, PAGE_LIMIT, POPULAR_INDEX, SIGN_IN_INDEX, WATCHLIST_INDEX } from 'config/constants'
+import {
+  EXPLORE_INDEX,
+  PAGE_LIMIT,
+  POPULAR_INDEX,
+  SIGN_IN_INDEX,
+  WATCHLIST_INDEX,
+} from 'config/constants'
 import { Page } from 'components/Page'
 import { Button } from 'components/Button'
 
@@ -127,8 +133,9 @@ const Illustration = () => {
   return (
     <Image
       className='mx-auto'
-      src={systemTheme === 'dark' ? TalkImgDark : TalkImgLight}
+      src={systemTheme === 'dark' ? HorrorMovieDark : HorrorMovieLight}
       alt='Illustration'
+      width={700}
     />
   )
 }

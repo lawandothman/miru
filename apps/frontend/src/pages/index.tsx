@@ -7,8 +7,8 @@ import type { NextPage } from 'next'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import Image from 'next/image'
-import PhoneImgDark from '../../public/illustration/dark/phone.png'
-import PhoneImgLight from '../../public/illustration/light/phone.png'
+import HomeCinemaDark from '../../public/illustration/dark/home_cinema.svg'
+import HomeCinemaLight from '../../public/illustration/light/home_cinema.svg'
 import React, { useEffect, useState } from 'react'
 import { FiSearch, FiShuffle, FiUserPlus } from 'react-icons/fi'
 import type { IconType } from 'react-icons/lib'
@@ -94,7 +94,7 @@ const Home: NextPage = () => {
       <main>
         <PageHeader title={getGreeting()} />
         <Illustration />
-        <div className='mx-auto max-w-2xl text-center'>
+        <div className='mx-auto mt-8 max-w-2xl text-center'>
           <p className='text-xl'>
             Looks like you&apos;re not following anyone yet
           </p>
@@ -141,7 +141,7 @@ const LoggedOutPage = () => (
       Remove the drama from movie night and find the movie that everyone wants
       to watch.
     </p>
-    <p>Get started by making an account and adding movies to your watchlist</p>
+    <p className='mb-8'>Get started by making an account and adding movies to your watchlist</p>
     <Illustration />
 
     <h2 className='mt-4 text-xl'>How it works?</h2>
@@ -242,8 +242,9 @@ const Illustration = () => {
   return (
     <Image
       className='mx-auto'
-      src={systemTheme === 'dark' ? PhoneImgDark : PhoneImgLight}
+      src={systemTheme === 'dark' ? HomeCinemaDark : HomeCinemaLight}
       alt='Illustration'
+      width={500}
     />
   )
 }

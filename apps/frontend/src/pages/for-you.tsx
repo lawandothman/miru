@@ -6,8 +6,8 @@ import type { Movie, User } from '__generated__/resolvers-types'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import Image from 'next/image'
-import PhotoImgDark from '../../public/illustration/dark/photo.png'
-import PhotoImgLight from '../../public/illustration/light/photo.png'
+import WaveDark from '../../public/illustration/dark/wave.svg'
+import WaveLight from '../../public/illustration/light/wave.svg'
 import { useTheme } from 'next-themes'
 import { useState } from 'react'
 import { FullPageLoader } from 'components/AsyncState'
@@ -181,8 +181,9 @@ const Illustration = () => {
   return (
     <Image
       className='mx-auto'
-      src={systemTheme === 'dark' ? PhotoImgDark : PhotoImgLight}
+      src={systemTheme === 'dark' ? WaveDark : WaveLight}
       alt='Illustration'
+      width={500}
     />
   )
 }
