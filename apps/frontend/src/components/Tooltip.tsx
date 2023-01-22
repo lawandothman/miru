@@ -38,12 +38,12 @@ export const Tooltip: FC<PropsWithChildren<TooltipProps>> = ({
             'radix-side-bottom:animate-slide-up-fade',
             'radix-side-left:animate-slide-right-fade',
             'rounded-md px-2 py-1 text-center',
-            'bg-white dark:bg-neutral-800'
+            'bg-neutral-100 dark:bg-neutral-800'
           )}
           {...props}
         >
           {content}
-          <TooltipPrimitive.Arrow className='fill-current text-white dark:text-neutral-800' />
+          <TooltipPrimitive.Arrow className='fill-current text-neutral-100 dark:text-neutral-800' />
         </TooltipPrimitive.Content>
       </TooltipPrimitive.Root>
     </TooltipPrimitive.Provider>

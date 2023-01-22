@@ -18,6 +18,8 @@ import { useState } from 'react'
 import { FiLogOut } from 'react-icons/fi'
 import { User } from '__generated__/resolvers-types'
 import { Page } from 'components/Page'
+import { Tooltip } from 'components/Tooltip'
+import { BiBot } from 'react-icons/bi'
 
 const SEARCH_USER = gql`
   query User($userId: ID!) {
@@ -33,6 +35,7 @@ const SEARCH_USER = gql`
       }
       isFollower
       isFollowing
+      isBot
       followers {
         id
         name
@@ -169,9 +172,20 @@ const User = () => {
                 <div className='flex items-center gap-4'>
                   <ProfilePicture size='lg' user={data.user} />
                   <div>
-                    <h1 className='text-lg dark:text-neutral-300 lg:text-3xl'>
-                      {data.user.name}
-                    </h1>
+                    <div className='flex items-center gap-2'>
+                      <h1 className='text-lg dark:text-neutral-300 lg:text-3xl'>
+                        {data.user.name}
+                      </h1>
+                      {data.user.isBot && (
+                        <Tooltip
+                          content={<div className='text-xs'>Miru Bot</div>}
+                        >
+                          <div>
+                            <BiBot className='h-6 w-6 text-purple-600' />
+                          </div>
+                        </Tooltip>
+                      )}
+                    </div>
                     <div className='mt-1 flex gap-2 text-sm lg:gap-4 lg:text-base'>
                       {session?.user?.id !== userId && (
                         <span className='dark:text-neutral-300'>
