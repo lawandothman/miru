@@ -54,7 +54,7 @@ export class NeoDataSource {
       `
       MATCH (m:Movie)-[:IN_WATCHLIST]->(u:User)
       RETURN m, count(u) as watchlists
-      ORDER BY watchlists DESC
+      ORDER BY watchlists DESC, m.id
       SKIP $offset
       LIMIT $limit`,
       { offset: int(offset), limit: int(limit) },
