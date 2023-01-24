@@ -15,10 +15,9 @@ import type { IconType } from 'react-icons/lib'
 import type { User } from '__generated__/resolvers-types'
 import { useTheme } from 'next-themes'
 import { DateTime } from 'luxon'
-import { EXPLORE_INDEX, SIGN_IN_INDEX } from 'config/constants'
-import { Button } from 'components/Button'
+import { SIGN_IN_INDEX } from 'config/constants'
 import { getCookie, removeCookies } from 'cookies-next'
-import { useInviteLink } from 'hooks/useInviteLink'
+import { InvitePrompt } from 'components/InvitePrompt'
 
 const GET_HOME = gql`
   query GetHome($userId: ID!) {
@@ -55,7 +54,6 @@ const Home: NextPage = () => {
     variables: { userId: session?.user?.id },
     fetchPolicy: 'network-only',
   })
-  const { copy, isCopied } = useInviteLink(session?.user)
   const [invitedBy, setInvitedBy] = useState<string | null>(null)
   const [follow, { loading: followLoading }] = useMutation<
   User,
@@ -85,32 +83,18 @@ const Home: NextPage = () => {
   if (sessionStatus === 'loading' || loading || followLoading) {
     return <FullPageLoader />
   }
+
   if (!session) {
     return <LoggedOutPage />
   }
 
   if (data && data.user.following?.length === 0 && !invitedBy) {
     return (
-      <main>
-        <PageHeader title={getGreeting()} />
-        <Illustration />
-        <div className='mx-auto mt-8 max-w-2xl text-center'>
-          <p className='text-xl'>
-            Looks like you&apos;re not following anyone yet
-          </p>
-          <p className='mt-2 text-sm'>Miru is better with friends</p>
-        </div>
-        <div className='mx-auto mt-8 flex max-w-xl flex-col items-center justify-center gap-4'>
-          <Link className='block w-full' href={EXPLORE_INDEX}>
-            <Button className='py-4' size='full-width'>
-              Search for your friends
-            </Button>
-          </Link>
-          <Button className='py-4' size='full-width' onClick={() => copy()}>
-            {isCopied ? 'Copied!' : 'Copy invite link'}
-          </Button>
-        </div>
-      </main>
+      <InvitePrompt
+        session={session}
+        Illustration={Illustration}
+        pageTitle={getGreeting()}
+      />
     )
   }
 
@@ -141,7 +125,9 @@ const LoggedOutPage = () => (
       Remove the drama from movie night and find the movie that everyone wants
       to watch.
     </p>
-    <p className='mb-8'>Get started by making an account and adding movies to your watchlist</p>
+    <p className='mb-8'>
+      Get started by making an account and adding movies to your watchlist
+    </p>
     <Illustration />
 
     <h2 className='mt-4 text-xl'>How it works?</h2>
