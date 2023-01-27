@@ -1,7 +1,7 @@
-import type { Driver } from 'neo4j-driver-core'
+import type { Driver } from 'neo4j-driver'
 import neo4j from 'neo4j-driver'
 import type { Movie, Genre, User } from '../__generated__/resolvers-types'
-import type { WriteRepository } from './utils'
+import { runOnce, WriteRepository } from './utils'
 import { mapTo } from './utils'
 
 // We will slowly deprecate this for reading of data
@@ -104,33 +104,31 @@ export class MovieRepo implements WriteRepository<Movie> {
   }
 
   async addToWatchlist(movieId: string, user: User): Promise<Movie> {
-    const session = this.driver.session()
-    const res = await session.run(
-      `
+    const movie = await runOnce<Movie>(this.driver, `
       MATCH (u:User {email: $email}), (m:Movie {id: $id})
       MERGE (u)<-[r:IN_WATCHLIST]-(m)
-      RETURN m
-    `,
-      { email: user.email, id: movieId }
+        RETURN m{
+          .*,
+          inWatchlist: exists((m)-[:IN_WATCHLIST]->(u))
+        }
+      `, { email: user.email, id: movieId }, 'm'
     )
-    session.close()
 
-    return mapTo<Movie>(res.records[0].toObject(), 'm') as Movie
+    return movie!
   }
 
   async removeFromWatchlist(movieId: string, user: User): Promise<Movie> {
-    const session = this.driver.session()
-    const res = await session.run(
-      `
-      MATCH (u:User {email: $email})<-[r:IN_WATCHLIST]-(m:Movie {id: $id})
-      DELETE r
-      RETURN m
-    `,
-      { email: user.email, id: movieId }
+    const movie = await runOnce<Movie>(this.driver, `
+        MATCH (u:User {email: $email})<-[r:IN_WATCHLIST]-(m:Movie {id: $id})
+        DELETE r
+        RETURN m{
+          .*,
+          inWatchlist: exists((m)-[:IN_WATCHLIST]->(u))
+        }
+      `, { email: user.email, id: movieId }, 'm'
     )
-    session.close()
 
-    return mapTo<Movie>(res.records[0].toObject(), 'm') as Movie
+    return movie!
   }
 
   private builtSetQuery(obj: any, entryKey: string): string {

@@ -91,7 +91,7 @@ async function main() {
       const context: Context = {
         movieRepo: new MovieRepo(driver),
         genreRepo: new GenreRepo(driver),
-        movieLoader: new DataLoader(neo.getMovies.bind(neo)),
+        movieLoader: new DataLoader(neo.getMovies(user).bind(neo)),
         userLoader: new DataLoader(neo.getUsers(user).bind(neo)),
         matchesLoader: new DataLoader(neo.getMatchesWith(user).bind(neo)),
         watchlistLoader: new DataLoader(neo.getWatchlists.bind(neo)),
