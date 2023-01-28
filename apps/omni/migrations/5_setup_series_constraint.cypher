@@ -1,0 +1,1 @@
+CREATE CONSTRAINT seriesId FOR (s:Series) REQUIRE s.id IS UNIQUE;

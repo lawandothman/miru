@@ -1,6 +1,6 @@
 import { captureException, startTransaction } from '@sentry/node'
 import type { GenreRepo } from '../dataSources/genreRepo'
-import type { MovieRepo } from '../dataSources/movieRepo'
+import type { WatchableRepo } from '../dataSources/watchableRepo'
 import type { WatchProviderRepo } from '../dataSources/watchProviderRepo'
 import type { MovieDbService } from './movieDbService'
 
@@ -9,7 +9,7 @@ const PAGE_SIZE = 20
 export class SyncService {
 
   constructor(
-    private readonly movieRepo: MovieRepo,
+    private readonly watchableRepo: WatchableRepo,
     private readonly genreRepo: GenreRepo,
     private readonly watchProviderRepo: WatchProviderRepo,
     private readonly movieDbService: MovieDbService,
@@ -28,13 +28,19 @@ export class SyncService {
         }
       })
       try {
-        const movies = await this.getPopularMovieSummaries(page)
+        const [movies, series] = await Promise.all([
+          this.getPopularMovieSummaries(page),
+          this.getPopularSeries(page)
+        ])
+        console.log(series)
+
+        // movies
         movies.forEach(async (movieLike) => {
           const [movie, watchProviders] = await Promise.all([
             this.getMovieDetails(movieLike),
             this.getWatchProvidersForMovie(movieLike),
           ])
-          await this.movieRepo.upsert(movie)
+          await this.watchableRepo.upsert(movie)
           await Promise.all(
             [
               ...watchProviders.stream.map((w) => this.watchProviderRepo.upsertStream(w.id, movie.id)),
@@ -42,6 +48,17 @@ export class SyncService {
               ...watchProviders.rent.map((w) => this.watchProviderRepo.upsertRent(w.id, movie.id)),
             ])
         })
+
+        // series
+        series.forEach(async (seriesLike) => {
+          const [series] = await Promise.all([
+            this.getSeriesDetails(seriesLike)
+          ])
+
+          await this.watchableRepo.upsert(series)
+
+        })
+
         page = this.getNextPage(page)
       } catch(e) {
         if(e instanceof Error) {
@@ -73,12 +90,23 @@ export class SyncService {
     return await this.movieDbService.getPopularMovies(page)
   }
 
+  async getPopularSeries(page: number): Promise<{ id: string }[]> {
+    return await this.movieDbService.getPopularSeries(page)
+  }
+
   async getMovieDetails(movieLike: {id: string}) {
     const [movie, trailer] = await Promise.all([
       this.movieDbService.getMovieDetails(movieLike.id),
       this.movieDbService.getMovieTrailer(movieLike.id),
     ])
     return Object.assign({}, movie, trailer)
+  }
+
+  async getSeriesDetails(seriesLike: {id: string}) {
+    const [series] = await Promise.all([
+      this.movieDbService.getSeriesDetails(seriesLike.id),
+    ])
+    return Object.assign({}, series)
   }
 
   async getWatchProvidersForMovie(movieLike: {id: string}) {

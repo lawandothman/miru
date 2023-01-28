@@ -5,7 +5,7 @@ import { config } from '../config'
 import { runMany, runOnce } from '../dataSources/utils'
 import { faker } from '@faker-js/faker'
 import type { User } from '../__generated__/resolvers-types'
-import { MovieRepo } from '../dataSources/movieRepo'
+import { WatchableRepo } from '../dataSources/watchableRepo'
 
 const scriptConfig = {
   userCount: env.get('USER_COUNT').default(10).asInt(),
@@ -59,10 +59,10 @@ async function seed() {
       'm'
     )
 
-    const movieRepo = new MovieRepo(driver)
+    const movieRepo = new WatchableRepo(driver)
 
     for (const movie of moviesToLike) {
-      await movieRepo.addToWatchlist(movie.id, uObj as User)
+      await movieRepo.addMovieToWatchlist(movie.id, uObj as User)
       console.log(`(u:${uObj.name})<-(m${movie.title}) created`)
     }
   }

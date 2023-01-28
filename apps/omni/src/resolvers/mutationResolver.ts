@@ -4,7 +4,7 @@ import type { MutationResolvers } from '../__generated__/resolvers-types'
 const MutationResolver: MutationResolvers = {
   addMovieToWatchlist: async (_parent, { movieId }, { movieRepo, user }) => {
     const u = requireUser(user)
-    return await movieRepo.addToWatchlist(movieId, u)
+    return await movieRepo.addMovieToWatchlist(movieId, u)
   },
   removeMovieFromWatchlist: async (
     _parent,
@@ -12,7 +12,7 @@ const MutationResolver: MutationResolvers = {
     { movieRepo, user }
   ) => {
     const u = requireUser(user)
-    return await movieRepo.removeFromWatchlist(movieId, u)
+    return await movieRepo.removeMovieFromWatchlist(movieId, u)
   },
   follow: async (_parent, { friendId }, { neoDataSource, user }) => {
     const u = requireUser(user)

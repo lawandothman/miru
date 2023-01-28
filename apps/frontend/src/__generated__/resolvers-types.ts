@@ -20,31 +20,19 @@ export type Genre = {
   name: Scalars['String'];
 };
 
-export type Movie = {
+export type Movie = Watchable & {
   __typename?: 'Movie';
   adult?: Maybe<Scalars['Boolean']>;
-  backdropUrl?: Maybe<Scalars['String']>;
   budget?: Maybe<Scalars['Int']>;
   buyProviders?: Maybe<Array<Maybe<WatchProvider>>>;
-  genres?: Maybe<Array<Maybe<Genre>>>;
-  homepage?: Maybe<Scalars['String']>;
-  id: Scalars['ID'];
   imdbId?: Maybe<Scalars['String']>;
   inWatchlist?: Maybe<Scalars['Boolean']>;
-  matches?: Maybe<Array<Maybe<User>>>;
   originalTitle?: Maybe<Scalars['String']>;
-  overview?: Maybe<Scalars['String']>;
-  popularity?: Maybe<Scalars['Float']>;
-  posterUrl?: Maybe<Scalars['String']>;
   releaseDate?: Maybe<Scalars['String']>;
   rentProviders?: Maybe<Array<Maybe<WatchProvider>>>;
   revenue?: Maybe<Scalars['Int']>;
   runtime?: Maybe<Scalars['Int']>;
   streamProviders?: Maybe<Array<Maybe<WatchProvider>>>;
-  tagline?: Maybe<Scalars['String']>;
-  title: Scalars['String'];
-  tmdbVoteAverage?: Maybe<Scalars['Float']>;
-  tmdbVoteCount?: Maybe<Scalars['Int']>;
   trailer?: Maybe<Trailer>;
 };
 
@@ -176,6 +164,21 @@ export type WatchProvider = {
   name?: Maybe<Scalars['String']>;
 };
 
+export type Watchable = {
+  backdropUrl?: Maybe<Scalars['String']>;
+  genres?: Maybe<Array<Maybe<Genre>>>;
+  homepage?: Maybe<Scalars['String']>;
+  id: Scalars['ID'];
+  matches?: Maybe<Array<Maybe<User>>>;
+  overview?: Maybe<Scalars['String']>;
+  popularity?: Maybe<Scalars['Float']>;
+  posterUrl?: Maybe<Scalars['String']>;
+  tagline?: Maybe<Scalars['String']>;
+  title: Scalars['String'];
+  tmdbVoteAverage?: Maybe<Scalars['Float']>;
+  tmdbVoteCount?: Maybe<Scalars['Int']>;
+};
+
 export type WithIndex<TObject> = TObject & Record<string, any>;
 export type ResolversObject<TObject> = WithIndex<TObject>;
 
@@ -259,6 +262,7 @@ export type ResolversTypes = ResolversObject<{
   User: ResolverTypeWrapper<User>;
   VideoProvider: VideoProvider;
   WatchProvider: ResolverTypeWrapper<WatchProvider>;
+  Watchable: ResolversTypes['Movie'];
 }>;
 
 /** Mapping between all available schema types and the resolvers parents */
@@ -275,6 +279,7 @@ export type ResolversParentTypes = ResolversObject<{
   Trailer: Trailer;
   User: User;
   WatchProvider: WatchProvider;
+  Watchable: ResolversParentTypes['Movie'];
 }>;
 
 export type GenreResolvers<ContextType = any, ParentType extends ResolversParentTypes['Genre'] = ResolversParentTypes['Genre']> = ResolversObject<{
@@ -285,28 +290,16 @@ export type GenreResolvers<ContextType = any, ParentType extends ResolversParent
 
 export type MovieResolvers<ContextType = any, ParentType extends ResolversParentTypes['Movie'] = ResolversParentTypes['Movie']> = ResolversObject<{
   adult?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
-  backdropUrl?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   budget?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   buyProviders?: Resolver<Maybe<Array<Maybe<ResolversTypes['WatchProvider']>>>, ParentType, ContextType>;
-  genres?: Resolver<Maybe<Array<Maybe<ResolversTypes['Genre']>>>, ParentType, ContextType>;
-  homepage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   imdbId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   inWatchlist?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
-  matches?: Resolver<Maybe<Array<Maybe<ResolversTypes['User']>>>, ParentType, ContextType>;
   originalTitle?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  overview?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  popularity?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
-  posterUrl?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   releaseDate?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   rentProviders?: Resolver<Maybe<Array<Maybe<ResolversTypes['WatchProvider']>>>, ParentType, ContextType>;
   revenue?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   runtime?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   streamProviders?: Resolver<Maybe<Array<Maybe<ResolversTypes['WatchProvider']>>>, ParentType, ContextType>;
-  tagline?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  tmdbVoteAverage?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
-  tmdbVoteCount?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   trailer?: Resolver<Maybe<ResolversTypes['Trailer']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
@@ -361,6 +354,22 @@ export type WatchProviderResolvers<ContextType = any, ParentType extends Resolve
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
+export type WatchableResolvers<ContextType = any, ParentType extends ResolversParentTypes['Watchable'] = ResolversParentTypes['Watchable']> = ResolversObject<{
+  __resolveType: TypeResolveFn<'Movie', ParentType, ContextType>;
+  backdropUrl?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  genres?: Resolver<Maybe<Array<Maybe<ResolversTypes['Genre']>>>, ParentType, ContextType>;
+  homepage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  matches?: Resolver<Maybe<Array<Maybe<ResolversTypes['User']>>>, ParentType, ContextType>;
+  overview?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  popularity?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  posterUrl?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  tagline?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  tmdbVoteAverage?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  tmdbVoteCount?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+}>;
+
 export type Resolvers<ContextType = any> = ResolversObject<{
   Genre?: GenreResolvers<ContextType>;
   Movie?: MovieResolvers<ContextType>;
@@ -369,5 +378,6 @@ export type Resolvers<ContextType = any> = ResolversObject<{
   Trailer?: TrailerResolvers<ContextType>;
   User?: UserResolvers<ContextType>;
   WatchProvider?: WatchProviderResolvers<ContextType>;
+  Watchable?: WatchableResolvers<ContextType>;
 }>;
 

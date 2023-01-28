@@ -1,0 +1,1 @@
+MATCH (n:Movie) SET n :Watchable RETURN n;

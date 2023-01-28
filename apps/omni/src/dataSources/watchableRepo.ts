@@ -1,11 +1,12 @@
 import type { Driver } from 'neo4j-driver-core'
 import neo4j from 'neo4j-driver'
-import type { Movie, Genre, User } from '../__generated__/resolvers-types'
+import type { Movie, Genre, User, Watchable} from '../__generated__/resolvers-types'
+import { WatchableType } from '../__generated__/resolvers-types'
 import type { WriteRepository } from './utils'
 import { mapTo } from './utils'
 
 // We will slowly deprecate this for reading of data
-export class MovieRepo implements WriteRepository<Movie> {
+export class WatchableRepo implements WriteRepository<Watchable> {
   constructor(private readonly driver: Driver) {}
 
   async get(id: string): Promise<Movie | null> {
@@ -16,28 +17,29 @@ export class MovieRepo implements WriteRepository<Movie> {
 
     session.close().catch(console.error)
 
-    return mapTo<Movie>(res.records[0].toObject(), 'm') ?? null
+    return mapTo<Watchable>(res.records[0].toObject(), 'm') ?? null
   }
 
-  async upsert(movie: Movie): Promise<Movie | null> {
+  async upsert(watchable: Watchable): Promise<Watchable | null> {
     const session = this.driver.session()
     const res = await session.executeWrite(async (tx) => {
+      const label = watchable.type === WatchableType.Movie ? 'Movie' : 'Series'
       const res = await tx.run(
-        `merge (m:Movie {
+        `merge (m:Watchable:${label} {
             id: $id
         })
-        ${this.builtSetQuery(movie, 'm')}
+        ${this.builtSetQuery(watchable, 'm')}
         return m`,
-        { ...movie }
+        { ...watchable }
       )
       await Promise.all(
-        movie.genres?.map((genre) => {
+        watchable.genres?.map((genre) => {
           return tx.run(
             `
-          MATCH (m:Movie {id: $movieId}), (g:Genre {id: $genreId})
+          MATCH (m:Watchable:${label} {id: $movieId}), (g:Genre {id: $genreId})
           MERGE (m)-[r:IS_A]->(g)
           RETURN m,r,g`,
-            { movieId: movie.id, genreId: genre && genre.id.toString() }
+            { movieId: watchable.id, genreId: genre && genre.id.toString() }
           )
         }) ?? []
       )
@@ -45,7 +47,7 @@ export class MovieRepo implements WriteRepository<Movie> {
       return res
     })
 
-    return mapTo<Movie>(res.records[0].toObject(), 'm')
+    return mapTo<Watchable>(res.records[0].toObject(), 'm')
   }
 
   async getMoviesByGenre(
@@ -55,8 +57,9 @@ export class MovieRepo implements WriteRepository<Movie> {
   ): Promise<Movie[]> {
     const session = this.driver.session()
     const res = await session.run(
+      // TODO: continue expanding this
       `
-      MATCH (m:Movie)-[r:IS_A]->(g:Genre {id: $id})
+      MATCH (m:Watchable)-[r:IS_A]->(g:Genre {id: $id})
       WHERE m.tmdbVoteCount > 0
       RETURN m
       ORDER BY m.tmdbVoteCount DESC
@@ -71,11 +74,11 @@ export class MovieRepo implements WriteRepository<Movie> {
     ) as Movie[]
   }
 
-  async getGenres(movie: Movie): Promise<Genre[]> {
+  async getGenres(movie: Watchable): Promise<Genre[]> {
     const session = this.driver.session()
     const res = await session.run(
       `
-      MATCH (m:Movie {id: $id})-[r:IS_A]->(g:Genre)
+      MATCH (m:Watchable {id: $id})-[r:IS_A]->(g:Genre)
       RETURN g
     `,
       { id: movie.id }
@@ -86,11 +89,11 @@ export class MovieRepo implements WriteRepository<Movie> {
     ) as Genre[]
   }
 
-  async search(query: string, offset: number, limit: number): Promise<Movie[]> {
+  async search(query: string, offset: number, limit: number): Promise<Watchable[]> {
     const session = this.driver.session()
     const res = await session.run(
       `
-      MATCH (m:Movie) WHERE
+      MATCH (m:Watchable) WHERE
       toLower(m.title) CONTAINS toLower($query)
       RETURN m SKIP $offset LIMIT $limit
     `,
@@ -99,11 +102,11 @@ export class MovieRepo implements WriteRepository<Movie> {
 
     session.close()
     return res.records.map((record) =>
-      mapTo<Movie>(record.toObject(), 'm')
-    ) as Movie[]
+      mapTo<Watchable>(record.toObject(), 'm')
+    ) as Watchable[]
   }
 
-  async addToWatchlist(movieId: string, user: User): Promise<Movie> {
+  async addMovieToWatchlist(movieId: string, user: User): Promise<Movie> {
     const session = this.driver.session()
     const res = await session.run(
       `
@@ -118,7 +121,7 @@ export class MovieRepo implements WriteRepository<Movie> {
     return mapTo<Movie>(res.records[0].toObject(), 'm') as Movie
   }
 
-  async removeFromWatchlist(movieId: string, user: User): Promise<Movie> {
+  async removeMovieFromWatchlist(movieId: string, user: User): Promise<Movie> {
     const session = this.driver.session()
     const res = await session.run(
       `

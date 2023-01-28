@@ -1,6 +1,6 @@
 import axios from 'axios'
 import axiosRetry from 'axios-retry'
-import type { Genre, Movie, VideoProvider, WatchProvider } from '../__generated__/resolvers-types'
+import { Genre, Movie, Series, VideoProvider, Watchable, WatchableType, WatchProvider } from '../__generated__/resolvers-types'
 
 export class MovieDbService {
   constructor(private readonly http = axios.create()) {
@@ -21,7 +21,7 @@ export class MovieDbService {
         },
       }
     )
-    return res.data.results.map(this.mapToDomain)
+    return res.data.results.map(this.mapMovieToDomain)
   }
 
   async getPopularMovies(page: number): Promise<Movie[]> {
@@ -38,7 +38,24 @@ export class MovieDbService {
       }
     )
 
-    return res.data.results.map(this.mapToDomain)
+    return res.data.results.map(this.mapMovieToDomain)
+  }
+
+  async getPopularSeries(page: number): Promise<Series[]> {
+    const res = await this.http.get<{ results: ApiSeries[] }>(
+      `${process.env.TMDB_API_BASE_URL}/3/tv/popular`,
+      {
+        params: {
+          page,
+        },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${process.env.TMDB_API_READ_ACCESS_TOKEN}`,
+        },
+      }
+    )
+
+    return res.data.results.map(this.mapSeriesToDomain)
   }
 
   async getMovieDetails(movieId: string): Promise<Movie> {
@@ -52,7 +69,22 @@ export class MovieDbService {
       }
     )
 
-    return this.mapToDomain(res.data)
+    return this.mapMovieToDomain(res.data)
+  }
+
+  async getSeriesDetails(seriesId: string): Promise<Series> {
+    const res = await this.http.get<ApiSeries>(
+      `${process.env.TMDB_API_BASE_URL}/3/tv/${seriesId}`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${process.env.TMDB_API_READ_ACCESS_TOKEN}`,
+        },
+      }
+    )
+
+    return this.mapSeriesToDomain(res.data)
+
   }
 
   async getMovieTrailer(movieId: string): Promise<TrailerKeys> {
@@ -148,9 +180,25 @@ export class MovieDbService {
     }
   }
 
-  private mapToDomain(mov: ApiMovie): Movie {
+  private mapSeriesToDomain(series: ApiSeries): Series {
+    return {
+      id: series.id.toString(),
+      backdropUrl: series.backdrop_path,
+      overview: series.overview,
+      popularity: series.popularity,
+      posterUrl: series.poster_path,
+      title: series.name,
+      genres: series.genres,
+      tmdbVoteAverage: series.vote_average,
+      tmdbVoteCount: series.vote_count,
+      type: WatchableType.Series,
+    }
+  }
+
+  private mapMovieToDomain(mov: ApiMovie): Movie {
     return {
       id: mov.id.toString(),
+      type: WatchableType.Movie,
       adult: mov.adult,
       backdropUrl: mov.backdrop_path,
       originalTitle: mov.original_title,
@@ -179,24 +227,36 @@ export interface ApiWatchProvider {
   provider_id: number
 }
 
-export interface ApiMovie {
+export interface ApiWatchable {
+  type: 'MOVIE' | 'SERIES'
+  popularity?: number;
+  vote_average?: number;
+  vote_count?: number;
+  backdrop_path?: string | null;
   poster_path?: string | null;
-  adult?: boolean;
   overview?: string;
-  release_date?: string;
   genres?: Genre[];
+  tagline?: string
   id: number;
+}
+
+export interface ApiSeries extends ApiWatchable {
+  type: 'SERIES'
+  first_air_date?: string;
+  name: string
+  original_name: string
+}
+
+export interface ApiMovie extends ApiWatchable {
+  type: 'MOVIE'
+  adult?: boolean;
+  release_date?: string;
   original_title?: string;
   title: string;
-  backdrop_path?: string | null;
-  popularity?: number;
-  vote_count?: number;
   video?: boolean;
-  vote_average?: number;
   budget?: number
   revenue?: number
   runtime?: number
-  tagline?: string
   imdb_id?: string
   homepage?: string
 }

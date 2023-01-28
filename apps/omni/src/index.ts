@@ -12,18 +12,19 @@ import { config } from './config'
 import { NeoDataSource } from './dataSources/neoDataSource'
 import { GenreRepo } from './dataSources/genreRepo'
 import { WatchProviderRepo } from './dataSources/watchProviderRepo'
-import { MovieRepo } from './dataSources/movieRepo'
+import { WatchableRepo } from './dataSources/watchableRepo'
 import TracingPlugin from './TracingPlugin'
 import UserResolver from './resolvers/userResolver'
 import MovieResolver from './resolvers/movieResolver'
 import MutationResolver from './resolvers/mutationResolver'
 import QueryResolver from './resolvers/queryResolver'
 import { BotManager } from './bots/botManager'
+import watchableResolvers from './resolvers/watchableResolver'
 
 const schema = readFileSync('./schema.graphql').toString()
 
 export interface Context {
-  movieRepo: MovieRepo
+  movieRepo: WatchableRepo
   genreRepo: GenreRepo
   movieLoader: DataLoader<string, Movie>
   userLoader: DataLoader<string, User>
@@ -45,6 +46,7 @@ const resolvers: Resolvers = {
   Mutation: MutationResolver,
   Movie: MovieResolver,
   User: UserResolver,
+  Watchable: watchableResolvers,
 }
 
 const { host, user, pass } = config.neo4j
@@ -61,7 +63,7 @@ const server = new ApolloServer({
 const movieDbService = new MovieDbService()
 
 const syncService = new SyncService(
-  new MovieRepo(driver),
+  new WatchableRepo(driver),
   new GenreRepo(driver),
   new WatchProviderRepo(driver),
   movieDbService
@@ -89,7 +91,7 @@ async function main() {
       const neo = new NeoDataSource(driver)
       const user = getUser(req.headers.authorization?.toString())
       const context: Context = {
-        movieRepo: new MovieRepo(driver),
+        movieRepo: new WatchableRepo(driver),
         genreRepo: new GenreRepo(driver),
         movieLoader: new DataLoader(neo.getMovies.bind(neo)),
         userLoader: new DataLoader(neo.getUsers(user).bind(neo)),
