@@ -52,7 +52,7 @@ export const ProfilePicture: FC<ProfilePictureProps> = ({
           width={imgSize}
           height={imgSize}
           className='object-contain'
-          src={user?.image}
+          src={user.image}
           alt={user?.name ?? ''}
         />
       ) : (
