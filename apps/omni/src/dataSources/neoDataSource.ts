@@ -18,11 +18,16 @@ export interface Repository<T> {
 export class NeoDataSource {
   constructor(private readonly driver: Driver) {}
 
-  async getMovies(ids: readonly string[]): Promise<Movie[]> {
+  getMovies = (user: User |null) => async (ids: readonly string[]): Promise<Movie[]> => {
+    const email = user?.email
     const movies = await runMany<Movie>(
       this.driver,
-      'MATCH (m:Movie) WHERE m.id in $ids RETURN m{.*}',
-      { ids },
+      `MATCH (m:Movie), (u:User {email: $email}) 
+      WHERE m.id in $ids RETURN m{
+        .*,
+        inWatchlist: exists((m)-[:IN_WATCHLIST]->(u))
+      }`,
+      { ids, email },
       'm'
     )
 
