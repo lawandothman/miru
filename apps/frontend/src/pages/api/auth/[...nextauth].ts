@@ -48,6 +48,7 @@ export const authOptions: NextAuthOptions = {
       clientId: facebook.clientId,
       clientSecret: facebook.clientSecret,
       allowDangerousEmailAccountLinking: true,
+      authorization: 'https://www.facebook.com/v11.0/dialog/oauth?scope=email,public_profile',
     }),
     GoogleProvider({
       clientId: google.clientId,

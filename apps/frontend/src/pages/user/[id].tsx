@@ -160,8 +160,8 @@ const User = () => {
   if (data) {
     return (
       <Page
-        name={data.user?.name}
-        index={`${USER_INDEX}/${data.user?.id}`}
+        name={session?.user?.name ?? ''}
+        index={`${USER_INDEX}/${session.user?.id}`}
         nofollow
         noindex
       >
@@ -170,7 +170,7 @@ const User = () => {
             <>
               <div className='grid grid-cols-1 md:grid-cols-[9fr,1fr]'>
                 <div className='flex items-center gap-4'>
-                  <ProfilePicture size='lg' user={data.user} />
+                  <ProfilePicture size='lg' user={session.user} />
                   <div>
                     <div className='flex items-center gap-2'>
                       <h1 className='text-lg dark:text-neutral-300 lg:text-3xl'>
