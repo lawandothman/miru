@@ -157,6 +157,8 @@ const User = () => {
     return <FullPageLoader />
   }
 
+  console.log(data)
+
   if (data) {
     return (
       <Page
@@ -166,7 +168,7 @@ const User = () => {
         noindex
       >
         <main>
-          {data.user && (
+          {session.user && (
             <>
               <div className='grid grid-cols-1 md:grid-cols-[9fr,1fr]'>
                 <div className='flex items-center gap-4'>
@@ -174,9 +176,9 @@ const User = () => {
                   <div>
                     <div className='flex items-center gap-2'>
                       <h1 className='text-lg dark:text-neutral-300 lg:text-3xl'>
-                        {data.user.name}
+                        {session.user.name}
                       </h1>
-                      {data.user.isBot && (
+                      {data?.user?.isBot && (
                         <Tooltip
                           content={<div className='text-xs'>Miru Bot</div>}
                         >
@@ -189,27 +191,27 @@ const User = () => {
                     <div className='mt-1 flex gap-2 text-sm lg:gap-4 lg:text-base'>
                       {session?.user?.id !== userId && (
                         <span className='dark:text-neutral-300'>
-                          {data.user.matches?.length} matches
+                          {data?.user?.matches?.length} matches
                         </span>
                       )}
-                      {data.user.followers && data.user.followers.length > 0 ? (
+                      {data?.user?.followers && data.user.followers.length > 0 ? (
                         <FollowersDialog
                           user={data.user}
                           onOpenChange={refetch}
                         />
                       ) : (
                         <span className='dark:text-neutral-300'>
-                          {data.user.followers?.length} followers
+                          {data?.user?.followers?.length} followers
                         </span>
                       )}
-                      {data.user.following && data.user.following.length > 0 ? (
+                      {data?.user?.following && data?.user?.following.length > 0 ? (
                         <FollowingDialog
                           user={data.user}
                           onOpenChange={refetch}
                         />
                       ) : (
                         <span className='dark:text-neutral-300'>
-                          {data.user.following?.length} following
+                          {data?.user?.following?.length} following
                         </span>
                       )}
                     </div>
@@ -239,13 +241,13 @@ const User = () => {
                   )}
                 </div>
               </div>
-              {data.user.watchlist && data.user.watchlist.length > 0 && (
+              {data?.user?.watchlist && data?.user?.watchlist.length > 0 && (
                 <>
                   <h3 className='mb-4 mt-8 text-3xl font-thin'>Watchlist</h3>
                   <MoviesList movies={data.user.watchlist} />
                 </>
               )}
-              {data.user.matches && data.user.matches.length > 0 && (
+              {data?.user?.matches && data?.user?.matches.length > 0 && (
                 <>
                   <h3 className='my-8 text-xl font-thin'>
                     Your matches with {data.user.name}
