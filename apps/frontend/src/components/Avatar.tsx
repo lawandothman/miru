@@ -47,7 +47,7 @@ export const ProfilePicture: FC<ProfilePictureProps> = ({
     <Avatar.Root
       className={`inline-flex select-none items-center justify-center overflow-hidden rounded-full align-middle ${rootSize}`}
     >
-      {user?.image ? (
+      {/* {user?.image ? (
         <Image
           width={imgSize}
           height={imgSize}
@@ -55,14 +55,14 @@ export const ProfilePicture: FC<ProfilePictureProps> = ({
           src={user.image}
           alt={user?.name ?? ''}
         />
-      ) : (
-        <BoringAvatar
-          size={120}
-          name={user?.name ?? ''}
-          variant='beam'
-          colors={['#273c75', '#c23616', '#fbc531', '#2f3640']}
-        />
-      )}
+      ) : ( */}
+      <BoringAvatar
+        size={120}
+        name={user?.name ?? ''}
+        variant='beam'
+        colors={['#273c75', '#c23616', '#fbc531', '#2f3640']}
+      />
+      {/* )} */}
     </Avatar.Root>
   )
 }
