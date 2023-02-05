@@ -19,7 +19,6 @@ export const authOptions: NextAuthOptions = {
   // Include user.id and jwt token on session
   callbacks: {
     session({ session, token }) {
-      console.log(session.user?.image)
       if (session.user) {
         if (token.sub) {
           session.user.id = token.sub
@@ -40,6 +39,11 @@ export const authOptions: NextAuthOptions = {
       }
       return session
     },
+    signIn({profile, user}) {
+      console.log(profile)
+      user.image = profile?.image
+      return true
+    },
   },
   // Configure one or more authentication providers
   adapter: Neo4jAdapter(neo4jSession),
@@ -53,7 +57,7 @@ export const authOptions: NextAuthOptions = {
       userinfo: {
         url: 'https://graph.facebook.com/me',
         // https://developers.facebook.com/docs/graph-api/reference/user/#fields
-        params: { fields: 'id,name,email,picture' },
+        params: { fields: 'id,name,email,picture,first_name' },
         async request({ tokens, client, provider }) {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           return await client.userinfo(tokens.access_token!, {
@@ -66,6 +70,7 @@ export const authOptions: NextAuthOptions = {
         console.log(profile)
         return {
           id: profile.id,
+          firstName: profile.first_name,
           name: profile.name,
           email: profile.email,
           image: profile.picture.data.url,
