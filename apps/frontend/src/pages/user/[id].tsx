@@ -162,21 +162,21 @@ const User = () => {
   if (data) {
     return (
       <Page
-        name={session?.user?.name ?? ''}
+        name={data?.user?.name ?? ''}
         index={`${USER_INDEX}/${session.user?.id}`}
         nofollow
         noindex
       >
         <main>
-          {session.user && (
+          {data.user && (
             <>
               <div className='grid grid-cols-1 md:grid-cols-[9fr,1fr]'>
                 <div className='flex items-center gap-4'>
-                  <ProfilePicture size='lg' user={session.user} />
+                  <ProfilePicture size='lg' user={data.user} />
                   <div>
                     <div className='flex items-center gap-2'>
                       <h1 className='text-lg dark:text-neutral-300 lg:text-3xl'>
-                        {session.user.name}
+                        {data.user.name}
                       </h1>
                       {data?.user?.isBot && (
                         <Tooltip
