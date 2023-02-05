@@ -88,7 +88,7 @@ const Home: NextPage = () => {
     return <LoggedOutPage />
   }
 
-  if (data && data.user.following?.length === 0 && !invitedBy) {
+  if (data && data?.user?.following?.length === 0 && !invitedBy) {
     return (
       <InvitePrompt
         session={session}
@@ -101,7 +101,7 @@ const Home: NextPage = () => {
   return (
     <main>
       <PageHeader title={getGreeting()} />
-      {sortBy(data?.user.following, [(u) => -(u?.matches?.length ?? 0)]).map(
+      {sortBy(data?.user?.following, [(u) => -(u?.matches?.length ?? 0)]).map(
         (following) => {
           if (following) {
             return <UserSummary key={following.id} user={following} />

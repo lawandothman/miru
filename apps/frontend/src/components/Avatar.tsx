@@ -2,7 +2,7 @@ import * as Avatar from '@radix-ui/react-avatar'
 import type { Maybe } from 'graphql/jsutils/Maybe'
 import type { User } from 'next-auth'
 import Image from 'next/image'
-import type { FC } from 'react'
+import type { FC} from 'react'
 import BoringAvatar from 'boring-avatars'
 
 type ProfilePictureSizes = 'xs' | 'sm' | 'md' | 'lg'

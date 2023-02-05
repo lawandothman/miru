@@ -160,8 +160,8 @@ const User = () => {
   if (data) {
     return (
       <Page
-        name={data.user.name}
-        index={`${USER_INDEX}/${data.user.id}`}
+        name={data.user?.name}
+        index={`${USER_INDEX}/${data.user?.id}`}
         nofollow
         noindex
       >
