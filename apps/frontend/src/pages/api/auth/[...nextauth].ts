@@ -19,6 +19,7 @@ export const authOptions: NextAuthOptions = {
   // Include user.id and jwt token on session
   callbacks: {
     session({ session, token }) {
+      console.log(session.user?.image)
       if (session.user) {
         if (token.sub) {
           session.user.id = token.sub
