@@ -42,7 +42,7 @@ export const ProfilePicture: FC<ProfilePictureProps> = ({
   user,
   size = 'sm',
 }) => {
-  const { rootSize, imgSize } = sizeMap[size]
+  const { rootSize } = sizeMap[size]
   return (
     <Avatar.Root
       className={`inline-flex select-none items-center justify-center overflow-hidden rounded-full align-middle ${rootSize}`}
