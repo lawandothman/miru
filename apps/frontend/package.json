@@ -19,7 +19,7 @@
     "@radix-ui/react-dialog": "^1.0.2",
     "@radix-ui/react-tabs": "^1.0.1",
     "@radix-ui/react-tooltip": "^1.0.2",
-    "@sentry/nextjs": "^7.31.0",
+    "@sentry/nextjs": "^7.52.1",
     "@vercel/analytics": "^0.1.8",
     "@vercel/og": "^0.0.27",
     "boring-avatars": "^1.7.0",
