@@ -6303,27 +6303,27 @@ negotiator@0.6.3, negotiator@^0.6.3:
   resolved "https://registry.yarnpkg.com/negotiator/-/negotiator-0.6.3.tgz#58e323a72fedc0d6f9cd4d31fe49f51479590ccd"
   integrity sha512-+EUsqGPLsM+j/zdChZjsnX51g4XrHFOIXwfnCVPGlQk/k5giakcKsuxCObBRu6DSm9opw/O6slWbJdghQM4bBg==
 
-neo4j-driver-bolt-connection@^5.4.0:
-  version "5.4.0"
-  resolved "https://registry.yarnpkg.com/neo4j-driver-bolt-connection/-/neo4j-driver-bolt-connection-5.4.0.tgz#6b515e5668339ff9bc99a05e7122290f21ec0c88"
-  integrity sha512-Eq/hds2F0TdfrvmfCNvxuzJNGyFQoXRImjb87FO4+QtEbkEmLaVUvcGWr7lkmbDTjT2p+5dwwaeWDEUHXqqY9Q==
+neo4j-driver-bolt-connection@5.8.1:
+  version "5.8.1"
+  resolved "https://registry.yarnpkg.com/neo4j-driver-bolt-connection/-/neo4j-driver-bolt-connection-5.8.1.tgz#342c2c97b88ad6b7dcc5f598c4e74bb48e5e6114"
+  integrity sha512-jkob0HV54hojJ4CPGlQ4OXu8bN4yeVRaq99K0UYrNG03ddgbjTG0XB8TH6uaD1o7T7tPydZCJfKfiJj1qpin0A==
   dependencies:
     buffer "^6.0.3"
-    neo4j-driver-core "^5.4.0"
+    neo4j-driver-core "5.8.1"
     string_decoder "^1.3.0"
 
-neo4j-driver-core@^5.4.0:
-  version "5.4.0"
-  resolved "https://registry.yarnpkg.com/neo4j-driver-core/-/neo4j-driver-core-5.4.0.tgz#cf740648b5597ee4226eafc7ba0ed44d3fa85adc"
-  integrity sha512-3IWuhiQG2EU8SidgNwaBPeiH9EzS7frNODUCEM3VLhogoX3cO57T+hxA4qEDJrVIAzUfY+600K7zZFYEunhCag==
+neo4j-driver-core@5.8.1:
+  version "5.8.1"
+  resolved "https://registry.yarnpkg.com/neo4j-driver-core/-/neo4j-driver-core-5.8.1.tgz#25301e088924474eb4c32a56ac95f75269202201"
+  integrity sha512-bikefWmPF1RYjyKWzK/Sgyr7Q+T3U3h+Q4fFs0P3lptTQvP8wY5xQ/l5xZjO2HiENch/5MX/TwghOfXGm7Yz7w==
 
-neo4j-driver@^5.4.0, neo4j-driver@v5:
-  version "5.4.0"
-  resolved "https://registry.yarnpkg.com/neo4j-driver/-/neo4j-driver-5.4.0.tgz#0b8454c54b37c1fc79c7e2ada508a905acc06626"
-  integrity sha512-VzD9F1BxK0khFLuzFJbK6PH52imrdXah0iFY4O3R+Tj1ws2XHnoSm5zVUIdfC5MVpKvatM/1q72l48wmW/u9jQ==
+neo4j-driver@^5.8.1, neo4j-driver@v5:
+  version "5.8.1"
+  resolved "https://registry.yarnpkg.com/neo4j-driver/-/neo4j-driver-5.8.1.tgz#0dde15c07b4e3b942a54f516572f8e9131b9e6e7"
+  integrity sha512-ePHZXoyliRhwd+gpRCWo1bnA7jSzjix2FJxzBDspkUjI4CeXRApnTbtC4xYx5GxqqjxIie15J1LeZVP5ENBYEg==
   dependencies:
-    neo4j-driver-bolt-connection "^5.4.0"
-    neo4j-driver-core "^5.4.0"
+    neo4j-driver-bolt-connection "5.8.1"
+    neo4j-driver-core "5.8.1"
     rxjs "^7.8.0"
 
 next-auth@^4.20.1:
