@@ -25,7 +25,7 @@
     "boring-avatars": "^1.7.0",
     "class-variance-authority": "^0.4.0",
     "cookies-next": "^2.1.1",
-    "graphql": "^16.6.0",
+    "graphql": "^16.8.1",
     "jsonwebtoken": "^9.0.0",
     "lodash": "^4.17.21",
     "luxon": "^3.2.1",
