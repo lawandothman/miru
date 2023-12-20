@@ -4,7 +4,7 @@ import FacebookProvider from 'next-auth/providers/facebook'
 import GoogleProvider from 'next-auth/providers/google'
 
 import neo4j from 'neo4j-driver'
-import { Neo4jAdapter } from '@next-auth/neo4j-adapter'
+import { Neo4jAdapter } from '@auth/neo4j-adapter'
 import { config } from 'config/env'
 import { SIGN_IN_INDEX } from 'config/constants'
 
