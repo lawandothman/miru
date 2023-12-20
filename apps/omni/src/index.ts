@@ -30,11 +30,11 @@ export interface Context {
   matchesLoader: DataLoader<string, Movie[]>
   watchlistLoader: DataLoader<string, Movie[]>
   movieMatchesLoader: DataLoader<string, User[]>
-  followerLoader: DataLoader<string, User[]> 
-  followingLoader: DataLoader<string, User[]> 
-  streamLoader: DataLoader<string, WatchProvider[]> 
-  buyLoader: DataLoader<string, WatchProvider[]> 
-  rentLoader: DataLoader<string, WatchProvider[]> 
+  followerLoader: DataLoader<string, User[]>
+  followingLoader: DataLoader<string, User[]>
+  streamLoader: DataLoader<string, WatchProvider[]>
+  buyLoader: DataLoader<string, WatchProvider[]>
+  rentLoader: DataLoader<string, WatchProvider[]>
   genreLoader: DataLoader<string, Genre>
   neoDataSource: NeoDataSource
   user: User | null
