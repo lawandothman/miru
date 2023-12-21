@@ -11,6 +11,9 @@ services:
       - neo4j
   neo4j:
     image: neo4j:5.3
+    build: 
+      context: . 
+      dockerfile: Dockerfile.neo4j
     ports: 
         - 7474:7474
         - 7687:7687
@@ -19,4 +22,5 @@ services:
     #     - neo4j_data:/data/
     environment:
       NEO4J_AUTH: "neo4j/password"
+      PORT: 3005
 

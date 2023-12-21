@@ -1,0 +1,6 @@
+FROM neo4j:5.15.0
+
+COPY ./neo4j.conf /conf/neo4j.conf
+COPY ./railway-entrypoint.sh /startup/railway-entrypoint.sh
+
+ENTRYPOINT ["tini", "--", "/startup/railway-entrypoint.sh"]
