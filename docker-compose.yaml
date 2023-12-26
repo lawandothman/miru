@@ -22,5 +22,5 @@ services:
     #     - neo4j_data:/data/
     environment:
       NEO4J_AUTH: "neo4j/password"
-      PORT: 3005
+      PORT: 7687
 
