@@ -8079,10 +8079,10 @@ tailwindcss-radix@^2.6.2:
   resolved "https://registry.yarnpkg.com/tailwindcss-radix/-/tailwindcss-radix-2.7.0.tgz#f10ee210aa6fd544312f6adc6e1f84c7cf50bcb7"
   integrity sha512-fIVkT5zQYdsjT9+/Mvp+DTlJDdTFpRDuyS5+PLuJDAIIVr9+rWYKhK6rsB9QtjwUwwb0YF+BkAJN6CjZivOfLA==
 
-tailwindcss-safe-area@^0.2.2:
-  version "0.2.2"
-  resolved "https://registry.yarnpkg.com/tailwindcss-safe-area/-/tailwindcss-safe-area-0.2.2.tgz#ba64869e2c9f0901f2c2e0a4a85accfe8fb28bde"
-  integrity sha512-sygGuEFFBBzjqR6d2gB9hDW9xX/4yLt7ymhR2E/XVa6Ar4B86Net8/9EmPAsqFUvXY40+W0HnXwFavFJEM+eCQ==
+tailwindcss-safe-area@^0.4.1:
+  version "0.4.1"
+  resolved "https://registry.yarnpkg.com/tailwindcss-safe-area/-/tailwindcss-safe-area-0.4.1.tgz#e340bd606c92d182de5316d6511a4c30a8287fe9"
+  integrity sha512-6EOe8D39F8N8poKWkeOcIt2SchyJ8CVfm/k5iZak6+QgOzii0TukNIfItdGbf7ylVtq3CF2CK/Oxo5xvtLwVmQ==
 
 tailwindcss@^3.2.0:
   version "3.2.4"
