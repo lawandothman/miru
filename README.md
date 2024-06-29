@@ -1,4 +1,4 @@
-![ミル Miru](https://miru.space/api/og)
+![ミル Miru](https://miru-chi.vercel.app/api/og)
 
 #  Miru
 
