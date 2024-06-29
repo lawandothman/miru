@@ -1,6 +1,6 @@
 ![ミル Miru](https://miru-chi.vercel.app/api/og)
 
-#  Miru
+# Miru
 
 This is a monorepo managed by [Turborepo](https://github.com/vercel/turbo)
 
