@@ -8,10 +8,10 @@ export const config = {
   },
   nextAuth: {
     secret: env.get('NEXTAUTH_SECRET').required().asString(),
-    facebook: {
-      clientId: env.get('FACEBOOK_CLIENT_ID').required().asString(),
-      clientSecret: env.get('FACEBOOK_CLIENT_SECRET').required().asString(),
-    },
+    // facebook: {
+    //   clientId: env.get('FACEBOOK_CLIENT_ID').required().asString(),
+    //   clientSecret: env.get('FACEBOOK_CLIENT_SECRET').required().asString(),
+    // },
     google: {
       clientId: env.get('GOOGLE_CLIENT_ID').required().asString(),
       clientSecret: env.get('GOOGLE_CLIENT_SECRET').required().asString(),
