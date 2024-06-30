@@ -5,7 +5,6 @@
   "license": "MIT",
   "private": true,
   "packageManager": "pnpm@9.4.0",
-  "workspaces": ["apps/*", "packages/*"],
   "scripts": {
     "lint": "turbo lint",
     "lint:fix": "turbo lint:fix",
@@ -14,10 +13,7 @@
     "generate": "turbo generate"
   },
   "devDependencies": {
-    "@rushstack/eslint-patch": "^1.2.0",
     "eslint": "^8.32.0",
-    "eslint-config-custom": "*",
-    "nodemon": "^2.0.20",
     "turbo": "^1.7.0"
   }
 }
