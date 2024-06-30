@@ -11,7 +11,7 @@ const Privacy: NextPage = () => {
         <PageHeader title='Privacy Policy' />
         <div className='flex flex-col gap-2 text-neutral-400'>
           <p>
-            At Miru, accessible from miru.space, one of our main priorities is
+            At Miru, accessible from miru-chi.vercel.app, one of our main priorities is
             the privacy of our visitors. This Privacy Policy document contains
             types of information that is collected and recorded by Miru and how
             we use it.

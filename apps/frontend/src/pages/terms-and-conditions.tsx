@@ -15,9 +15,9 @@ const TermsAndConditions: NextPage = () => {
             By accessing this Website, accessible from{' '}
             <Link
               className='text-neutral-700 underline dark:text-neutral-300'
-              href='https://miru.space'
+              href='https://miru-chi.vercel.app'
             >
-              https://miru.space
+              https://miru-chi.vercel.app
             </Link>{' '}
             , you are agreeing to be bound by these Website Terms and Conditions
             of Use and agree that you are responsible for the agreement with any

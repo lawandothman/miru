@@ -16,7 +16,7 @@ export const Page: React.FC<PageProps> = ({
   nofollow = false,
 }) => {
   const title = `${name} • Miru`
-  const url = `https://miru.space${index}`
+  const url = `https://miru-chi.vercel.app${index}`
 
   return (
     <>

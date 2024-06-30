@@ -4,15 +4,15 @@ const config: DefaultSeoProps = {
   title: 'Miru',
   description:
     'Miru helps you remove the drama from movie night and find the movie that everyone wants to watch.',
-  canonical: 'https://miru.space',
+  canonical: 'https://miru-chi.vercel.app/',
   openGraph: {
-    url: 'https://www.miru.space/',
+    url: 'https://miru-chi.vercel.app/',
     type: 'website',
     locale: 'en_IE',
     siteName: 'Miru',
     images: [
       {
-        url: 'https://miru.space/api/og',
+        url: 'https://miru-chi.vercel.app/api/og',
         alt: 'Miru',
         width: 1200,
         height: 600,
