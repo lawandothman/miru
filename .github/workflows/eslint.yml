@@ -30,9 +30,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: dependencies
-        run: yarn install 
+      - name: Install pnpm
+        run: npm install -g pnpm
 
-      - name: lint
-        run: yarn lint
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Lint code
+        run: pnpm lint
         continue-on-error: true

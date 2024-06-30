@@ -6,7 +6,7 @@ import { getBackdrop, getLogo, getPoster } from 'utils/image'
 import { FullPageLoader } from 'components/AsyncState'
 import { gql, useQuery } from '@apollo/client'
 import type { Genre, User, WatchProvider } from '__generated__/resolvers-types'
-import { Movie, Trailer } from '__generated__/resolvers-types'
+import { type Movie, type Trailer } from '__generated__/resolvers-types'
 import { FiArrowLeft, FiLink, FiShare } from 'react-icons/fi'
 import { FaImdb } from 'react-icons/fa'
 import { useSession } from 'next-auth/react'
@@ -25,6 +25,7 @@ import { Page } from 'components/Page'
 import { useMobile } from 'hooks/useMobile'
 import type { Maybe } from 'graphql/jsutils/Maybe'
 import { useState } from 'react'
+import React from 'react'
 
 const GET_BY_ID = gql`
   query Movie($movieId: ID!) {
@@ -73,7 +74,7 @@ const StreamProviders = ({
         {providers?.map((provider, i) => (
           <Tooltip
             key={i}
-            content={<div className='text-xs '>{provider?.name}</div>}
+            content={(<div className='text-xs'>{provider?.name}</div>) as any}
           >
             <Image
               src={getLogo(provider?.logoPath ?? '')}
@@ -124,7 +125,7 @@ const Matches = ({ matches }: { matches: Maybe<User>[] }) => {
           if (match) {
             return (
               <Tooltip
-                content={<span className='text-xs'>{match.name}</span>}
+                content={(<span className='text-xs'>{match.name}</span>) as any}
                 key={match.id}
               >
                 <Link

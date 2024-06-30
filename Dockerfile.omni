@@ -1,15 +1,18 @@
 FROM node:18
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
 
 # Create app directory
 WORKDIR .
 
 COPY apps/omni/package.json ./
-COPY yarn.lock ./
+COPY pnpm-lock.yaml ./
 
-RUN yarn install
+RUN pnpm install
 
 # Bundle app source
 COPY apps/omni/. .
-RUN yarn build
+RUN pnpm run build
 
-CMD [ "yarn", "start" ]
+CMD [ "pnpm", "start" ]

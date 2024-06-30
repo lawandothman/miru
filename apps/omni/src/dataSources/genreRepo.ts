@@ -1,5 +1,4 @@
 import type { Driver } from 'neo4j-driver'
-import type { Dict } from 'neo4j-driver-core/types/record'
 import type { Genre } from '../__generated__/resolvers-types'
 
 export interface Repository<T> {
@@ -48,7 +47,7 @@ export class GenreRepo implements Repository<Genre> {
   }
 
   private mapTo<T>(
-    record: Dict<PropertyKey, any> | null,
+    record: Record<string,any> | null,
     key: string
   ): T | null {
     if (record == null) {

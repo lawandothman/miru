@@ -1,4 +1,3 @@
-import { isDOMError } from '@sentry/utils'
 import { groupBy } from 'lodash'
 import type { Driver } from 'neo4j-driver'
 import { int } from 'neo4j-driver'

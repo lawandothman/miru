@@ -13,7 +13,7 @@ This Turborepo includes the following packages/apps:
 
 * Install Dependencies.
 ```bash
-yarn install
+pnpm install
 ```
 
 * Create a `.env` in the root of the project following the `.env.example` template.
@@ -25,7 +25,7 @@ docker compose up -d
 
 * Run the development server
 ```bash
-yarn dev
+pnpm dev
 ```
 
 * Frontend app at http://localhost:3000

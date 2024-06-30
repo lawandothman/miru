@@ -11,7 +11,7 @@ MATCH (m:Migration) DELETE m;
 
 WIPE DB (Keeps migrations)
 ```cql
-MATCH (n) 
+MATCH (n)
 WHERE not n:Migration
 DETACH DELETE n
 ```
@@ -22,5 +22,5 @@ Will create a few users with a fixed watchlist (Watchlist is most likely skewed 
 
 ```bash
 # cd apps/omni
-yarn script:seed
+pnpm script:seed
 ```

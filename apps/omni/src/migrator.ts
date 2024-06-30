@@ -1,4 +1,4 @@
-import type { Driver } from 'neo4j-driver-core'
+import type { Driver } from 'neo4j-driver'
 import { readdirSync, readFileSync } from 'fs'
 
 export class Migrator {

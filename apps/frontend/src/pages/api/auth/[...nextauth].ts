@@ -47,7 +47,7 @@ export const authOptions: NextAuthOptions = {
     },
   },
   // Configure one or more authentication providers
-  adapter: Neo4jAdapter(neo4jSession),
+  adapter: Neo4jAdapter(neo4jSession) as any,
   providers: [
     // FacebookProvider({
     //   clientId: facebook.clientId,

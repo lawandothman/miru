@@ -1,5 +1,4 @@
-import type { Driver } from 'neo4j-driver-core'
-import neo4j from 'neo4j-driver'
+import neo4j, { type Driver } from 'neo4j-driver'
 import type { Movie, Genre, User } from '../__generated__/resolvers-types'
 import type { WriteRepository } from './utils'
 import { mapTo } from './utils'

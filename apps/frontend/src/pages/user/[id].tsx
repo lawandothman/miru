@@ -16,7 +16,7 @@ import { signOut, useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { FiLogOut } from 'react-icons/fi'
-import { User } from '__generated__/resolvers-types'
+import { type User } from '__generated__/resolvers-types'
 import { Page } from 'components/Page'
 import { Tooltip } from 'components/Tooltip'
 import { BiBot } from 'react-icons/bi'
@@ -180,7 +180,7 @@ const User = () => {
                       </h1>
                       {data?.user?.isBot && (
                         <Tooltip
-                          content={<div className='text-xs'>Miru Bot</div>}
+                          content={(<div className='text-xs'>Miru Bot</div>) as any}
                         >
                           <div>
                             <BiBot className='h-6 w-6 text-purple-600' />

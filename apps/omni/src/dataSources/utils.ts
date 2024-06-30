@@ -1,5 +1,4 @@
 import type { Driver } from 'neo4j-driver'
-import type { Dict } from 'neo4j-driver-core/types/record'
 
 export async function runMany<T>(
   driver: Driver,
@@ -29,11 +28,11 @@ export async function runOnce<T>(
 
 /**
  * @deprecated use #runMany() instead
- * @param driver 
- * @param query 
- * @param args 
- * @param key 
- * @returns 
+ * @param driver
+ * @param query
+ * @param args
+ * @param key
+ * @returns
  */
 export async function runAndMapMany<T>(
   driver: Driver,
@@ -49,11 +48,11 @@ export async function runAndMapMany<T>(
 }
 /**
  * @deprecated use #runOnce() instead
- * @param driver 
- * @param query 
- * @param args 
- * @param key 
- * @returns 
+ * @param driver
+ * @param query
+ * @param args
+ * @param key
+ * @returns
  */
 export async function runAndMap<T>(
   driver: Driver,
@@ -69,7 +68,7 @@ export async function runAndMap<T>(
 }
 
 export function mapTo<T>(
-  record: Dict<PropertyKey, any> | null,
+  record: Record<string, any>| null,
   key: string
 ): T | null {
   if (record == null) {
