@@ -19,6 +19,28 @@ import { SIGN_IN_INDEX } from 'config/constants'
 import { getCookie, removeCookies } from 'cookies-next'
 import { InvitePrompt } from 'components/InvitePrompt'
 
+const getGreeting = (name?: string | null) => {
+  const now = DateTime.local()
+  const hour = now.hour
+  let greeting = ''
+
+  if (hour >= 6 && hour < 12) {
+    greeting = 'Good morning'
+  } else if (hour >= 12 && hour < 17) {
+    greeting = 'Good afternoon'
+  } else if (hour >= 17 && hour <= 23) {
+    greeting = 'Good evening'
+  } else {
+    greeting = 'Welcome back'
+  }
+
+  if (!name) {
+    return `${greeting}!`
+  }
+
+  return `${greeting} ${name}!`
+}
+
 const GET_HOME = gql`
   query GetHome($userId: ID!) {
     user(id: $userId) {
@@ -93,14 +115,14 @@ const Home: NextPage = () => {
       <InvitePrompt
         session={session}
         Illustration={Illustration}
-        pageTitle={getGreeting()}
+        pageTitle={getGreeting(session.user?.name)}
       />
     )
   }
 
   return (
     <main>
-      <PageHeader title={getGreeting()} />
+      <PageHeader title={getGreeting(session.user?.name)} />
       {sortBy(data?.user?.following, [(u) => -(u?.matches?.length ?? 0)]).map(
         (following) => {
           if (following) {
@@ -165,19 +187,6 @@ const LoggedOutPage = () => (
   </main>
 )
 
-const getGreeting = () => {
-  const now = DateTime.local()
-  const hour = now.hour
-  if (hour < 12 && hour >= 6) {
-    return 'Good morning!'
-  } else if (hour < 17 && hour > 12) {
-    return 'Good afternoon!'
-  } else if (hour <= 23 && hour > 17) {
-    return 'Good evening!'
-  } else {
-    return 'Welcome back!'
-  }
-}
 
 const Step = ({
   icon,
