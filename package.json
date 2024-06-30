@@ -1,15 +1,10 @@
 {
   "name": "miru",
   "version": "1.0.0",
-  "main": "index.js",
   "repository": "https://github.com/lawandothman/miru.git",
-  "author": "Pedro Santos de Mendonca <peumendonca@gmail.com>",
   "license": "MIT",
   "private": true,
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
+  "workspaces": ["apps/*", "packages/*"],
   "scripts": {
     "lint": "turbo lint",
     "lint:fix": "turbo lint:fix",
