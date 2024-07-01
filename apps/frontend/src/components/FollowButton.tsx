@@ -1,10 +1,10 @@
 import { gql, useMutation } from '@apollo/client'
-import { FiUserMinus, FiUserPlus } from 'react-icons/fi'
 import type { User } from '__generated__/resolvers-types'
-import { Button } from './Button'
+import { Button } from './ui/button'
 import { Spinner } from './AsyncState/Spinner'
 import type { Maybe } from 'graphql/jsutils/Maybe'
 import type { ButtonHTMLAttributes } from 'react'
+import { UserMinus, UserPlus } from 'lucide-react'
 
 const FOLLOW = gql`
   mutation ($friendId: ID!) {
@@ -60,7 +60,6 @@ export const FollowButton = ({
 
   return (
     <Button
-      size={size}
       onClick={() => {
         if (user?.isFollowing) {
           unfollow()
@@ -74,12 +73,12 @@ export const FollowButton = ({
         <Spinner reverted />
       ) : user?.isFollowing ? (
         <>
-          <FiUserMinus />
+          <UserMinus size={16} className='mr-2' />
           {size != 'sm' && 'Unfollow'}
         </>
       ) : (
         <>
-          <FiUserPlus />
+          <UserPlus size={16} className='mr-2' />
           {size != 'sm' && 'Follow'}
         </>
       )}

@@ -3,7 +3,7 @@ import type { Maybe } from 'graphql/jsutils/Maybe'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import type { User } from '__generated__/resolvers-types'
-import { ProfilePicture } from './Avatar'
+import { ProfilePicture } from './ProfilePicture'
 import { FollowButton } from './FollowButton'
 
 export const UserCard = ({ user }: { user: Maybe<User> }) => {

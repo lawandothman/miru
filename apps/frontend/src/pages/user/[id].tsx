@@ -1,6 +1,6 @@
 import { gql, NetworkStatus, useQuery } from '@apollo/client'
-import { ProfilePicture } from 'components/Avatar'
-import { Button } from 'components/Button'
+import { ProfilePicture } from '@/components/ProfilePicture'
+import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogTrigger,
@@ -15,11 +15,10 @@ import { USER_INDEX } from 'config/constants'
 import { signOut, useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { FiLogOut } from 'react-icons/fi'
 import { type User } from '__generated__/resolvers-types'
 import { Page } from 'components/Page'
 import { Tooltip } from 'components/Tooltip'
-import { BiBot } from 'react-icons/bi'
+import { Bot, LogOut } from 'lucide-react'
 
 const SEARCH_USER = gql`
   query User($userId: ID!) {
@@ -167,7 +166,7 @@ const User = () => {
         nofollow
         noindex
       >
-        <main>
+        <main className='max-w-screen-2xl'>
           {data.user && (
             <>
               <div className='grid grid-cols-1 md:grid-cols-[9fr,1fr]'>
@@ -183,7 +182,7 @@ const User = () => {
                           content={(<div className='text-xs'>Miru Bot</div>) as any}
                         >
                           <div>
-                            <BiBot className='h-6 w-6 text-purple-600' />
+                            <Bot className='size-6 text-purple-600' />
                           </div>
                         </Tooltip>
                       )}
@@ -227,15 +226,14 @@ const User = () => {
                   ) : (
                     <Button
                       className='w-full border border-red-500'
-                      intent='danger'
-                      display='ghost'
+                      variant='destructive'
                       onClick={() =>
                         signOut({
                           callbackUrl: '/',
                         })
                       }
                     >
-                      <FiLogOut />
+                      <LogOut size={16} className='mr-2' />
                       Log out
                     </Button>
                   )}

@@ -52,7 +52,7 @@ const ForYou: NextPage = () => {
 
   if (!session) {
     return (
-      <main>
+      <main className='max-w-screen-2xl'>
         <PageHeader title='For you' />
         <p>Login so that we can recommend you movies</p>
         <Illustration />
@@ -93,7 +93,7 @@ const ForYou: NextPage = () => {
     }
     return (
       <Page name='For You' index={FOR_YOU_INDEX}>
-        <main>
+        <main className='max-w-screen-2xl'>
           <PageHeader
             title='For you'
             subtitle='Movies to watch with the people you follow'

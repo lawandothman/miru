@@ -39,7 +39,7 @@ const PopularMovies: NextPage = () => {
   if (networkStatus === NetworkStatus.loading) {
     return (
       <Page name='Popular' index={POPULAR_INDEX}>
-        <main>
+        <main className='max-w-screen-2xl'>
           <PageHeader title='Popular' />
           <LoadingSkeleton />
         </main>
@@ -63,7 +63,7 @@ const PopularMovies: NextPage = () => {
 
     return (
       <Page name='Popular' index={POPULAR_INDEX}>
-        <main>
+        <main className='max-w-screen-2xl'>
           <PageHeader title='Popular' subtitle='The top of Miru' />
           <MoviesList loadMore={loadMore} movies={data?.popularMovies} />
         </main>

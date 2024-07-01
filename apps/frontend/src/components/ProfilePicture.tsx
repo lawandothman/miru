@@ -1,9 +1,8 @@
-import * as Avatar from '@radix-ui/react-avatar'
 import type { Maybe } from 'graphql/jsutils/Maybe'
 import type { User } from 'next-auth'
 import type { FC } from 'react'
 import BoringAvatar from 'boring-avatars'
-import Image from 'next/image'
+import { Avatar, AvatarImage } from './ui/avatar'
 
 type ProfilePictureSizes = 'xs' | 'sm' | 'md' | 'lg'
 
@@ -44,11 +43,11 @@ export const ProfilePicture: FC<ProfilePictureProps> = ({
 }) => {
   const { rootSize, imgSize } = sizeMap[size]
   return (
-    <Avatar.Root
+    <Avatar
       className={`inline-flex select-none items-center justify-center overflow-hidden rounded-full align-middle ${rootSize}`}
     >
       {user?.image ? (
-        <Image
+        <AvatarImage
           width={imgSize}
           height={imgSize}
           className='object-contain'
@@ -63,6 +62,6 @@ export const ProfilePicture: FC<ProfilePictureProps> = ({
           colors={['#273c75', '#c23616', '#fbc531', '#2f3640']}
         />
       )}
-    </Avatar.Root>
+    </Avatar>
   )
 }

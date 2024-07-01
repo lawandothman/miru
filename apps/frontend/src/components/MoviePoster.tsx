@@ -7,7 +7,7 @@ import type { Movie } from '__generated__/resolvers-types'
 export const MoviePoster = ({ movie }: { movie: Movie }) => {
   const [isLoading, setLoading] = useState(true)
   return (
-    <div className='aspect-w-8 aspect-h-12 w-full overflow-hidden rounded-lg'>
+    <div className='aspect-h-12 aspect-w-8 w-full overflow-hidden rounded-lg'>
       <Image
         alt={movie?.title ?? ''}
         src={getPoster(movie?.posterUrl ?? '')}
@@ -23,7 +23,7 @@ export const MoviePoster = ({ movie }: { movie: Movie }) => {
             ? 'animate-pulse dark:bg-neutral-700 bg-neutral-300'
             : 'blur-0'
         )}
-        onLoadingComplete={() => setLoading(false)}
+        onLoad={() => setLoading(false)}
       />
     </div>
   )
