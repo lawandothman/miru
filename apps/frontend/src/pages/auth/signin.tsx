@@ -4,14 +4,16 @@ import type {
   NextPage,
 } from 'next'
 import { getProviders, getSession, signIn } from 'next-auth/react'
-import { FaFacebookF, FaGoogle } from 'react-icons/fa'
+import { FaFacebookF } from 'react-icons/fa'
+import { FcGoogle } from 'react-icons/fc'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { gql, useQuery } from '@apollo/client'
 import type { User } from '__generated__/resolvers-types'
-import { ProfilePicture } from 'components/Avatar'
+import { ProfilePicture } from '@/components/ProfilePicture'
 import { setCookie, getCookie } from 'cookies-next'
+import { Button } from '@/components/ui/button'
 
 const GET_INVITEE = gql`
   query User($userId: ID!) {
@@ -59,26 +61,26 @@ InferGetServerSidePropsType<typeof getServerSideProps>
       <h1 className='text-4xl'>Log in</h1>
       {providers &&
         Object.values(providers).map((provider) => (
-          <button
+          <Button
             onClick={() =>
               signIn(provider.id, {
                 callbackUrl: router.query.callbackUrl as string,
               })
             }
             key={provider.name}
-            className='flex w-72 items-center justify-center gap-4 rounded-lg bg-black p-4 text-white dark:bg-white dark:text-neutral-900 '
+            className='flex w-72 items-center justify-center gap-4 rounded-lg bg-black px-4 py-8 text-white dark:bg-white dark:text-neutral-900 '
           >
             {provider.name === 'Facebook' ? (
               <FaFacebookF className='fill-white dark:fill-neutral-900' />
             ) : (
-              <FaGoogle className='fill-white dark:fill-neutral-900' />
+              <FcGoogle size={32}/>
             )}
             Continue with {provider.name}
-          </button>
+          </Button>
         ))}
 
       <div className='max-w-md border-t-[0.1px] border-t-neutral-500 p-8 text-center text-xs text-neutral-500'>
-        By clicking “Continue with Facebook/Google” above, you acknowledge that
+        By clicking “Continue with Google” above, you acknowledge that
         you have read and understood, and agree to Miru&apos;s{' '}
         <Link className='underline' href='/terms-and-conditions'>
           Terms & Conditions

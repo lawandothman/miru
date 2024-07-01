@@ -3,10 +3,10 @@ import { getCookie, setCookie } from 'cookies-next'
 import Link from 'next/link'
 import type { MouseEvent } from 'react'
 import { useEffect, useState } from 'react'
-import { Button } from './Button'
+import { Button } from './ui/button'
 
 export const CookieConsent = () => {
-  const [consent, setConsent] = useState(true)
+  const [consent, setConsent] = useState(false)
 
   useEffect(() => {
     const storedConsent = getCookie('cookieConsent') as boolean
@@ -29,9 +29,9 @@ export const CookieConsent = () => {
   }
 
   return (
-    <section className='fixed inset-x-0 bottom-12 mx-auto flex max-w-4xl flex-col gap-3 rounded-lg bg-neutral-100 px-5 py-8 dark:bg-neutral-900 md:items-stretch md:py-4 lg:left-60 lg:bottom-0'>
-      <div className='flex grow items-center justify-center text-gray-900'>
-        <p className='text-center text-sm font-medium'>
+    <section className='fixed inset-x-0 bottom-12 mx-auto mb-8 flex max-w-4xl flex-col gap-3 rounded-lg bg-neutral-50 px-6 py-4 shadow-lg dark:bg-neutral-900 dark:shadow-none md:flex-row md:items-center md:py-3 lg:bottom-0 lg:left-60'>
+      <div className='flex flex-1 items-center justify-center md:justify-start'>
+        <p className='text-center text-sm font-medium text-gray-800 dark:text-gray-300 md:text-left'>
           We use cookies to deliver a better experience. You can learn more
           about the services we use at our{' '}
           <Link className='text-sm underline' href={PRIVACY_POLICY_INDEX}>
@@ -40,8 +40,11 @@ export const CookieConsent = () => {
           .
         </p>
       </div>
-      <div className='flex w-full justify-center'>
-        <Button className='w-full py-4' onClick={onClick}>
+      <div className='flex justify-center md:justify-end'>
+        <Button
+          className='w-full py-2 md:ml-4 md:w-auto md:py-1'
+          onClick={onClick}
+        >
           Got it
         </Button>
       </div>

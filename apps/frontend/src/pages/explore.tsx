@@ -3,11 +3,11 @@ import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { gql, NetworkStatus, useQuery } from '@apollo/client'
 import type { Genre, Movie, User } from '__generated__/resolvers-types'
-import { FiSearch } from 'react-icons/fi'
+import { Search as SearchIcon } from 'lucide-react'
 import type { ChangeEvent, FC, FormEvent, PropsWithChildren } from 'react'
 import { useState } from 'react'
 import { Popcorn } from 'components/AsyncState'
-import { ProfilePicture } from 'components/Avatar'
+import { ProfilePicture } from '@/components/ProfilePicture'
 import Link from 'next/link'
 import { PageHeader } from 'components/PageHeader'
 import { PAGE_LIMIT, USER_INDEX } from 'config/constants'
@@ -41,7 +41,7 @@ const ExploreSkeleton: FC<PropsWithChildren> = ({ children }) => {
     })
   }
   return (
-    <main>
+    <main className='max-w-screen-2xl'>
       <PageHeader title='Explore'></PageHeader>
       <form onSubmit={onSubmit} className='relative mx-auto mb-8 w-full'>
         <input
@@ -52,7 +52,7 @@ const ExploreSkeleton: FC<PropsWithChildren> = ({ children }) => {
           defaultValue={searchQuery}
           onChange={onChange}
         />
-        <FiSearch className='absolute inset-y-0 my-auto h-8 w-12 stroke-neutral-400 px-3.5' />
+        <SearchIcon className='absolute inset-y-0 my-auto h-8 w-12 stroke-neutral-400 px-3.5' />
       </form>
       {children}
     </main>
@@ -212,7 +212,7 @@ const Search: NextPage = () => {
             title: 'Users',
             value: 'tab2',
             content: (
-              <div className='grid grid-cols-1 gap-y-5 gap-x-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8'>
+              <div className='grid grid-cols-1 gap-x-10 gap-y-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8'>
                 {data.users.length > 0 ? (
                   <>
                     {data.users.map((user) => (
@@ -251,7 +251,7 @@ const Search: NextPage = () => {
           {data?.users && data.users.length > 0 && (
             <div className='mb-8 dark:text-white'>
               <h1 className='mb-8 text-lg'>Users</h1>
-              <div className='grid grid-cols-1 gap-y-5 gap-x-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8'>
+              <div className='grid grid-cols-1 gap-x-10 gap-y-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8'>
                 {data.users.map((user) => (
                   <Link
                     href={`${USER_INDEX}/${user.id}`}

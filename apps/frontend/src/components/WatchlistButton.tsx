@@ -1,11 +1,11 @@
 import { gql, useMutation } from '@apollo/client'
 import type { Session } from 'next-auth'
-import { FiMinus, FiPlus } from 'react-icons/fi'
 import type { Movie } from '__generated__/resolvers-types'
-import { Button } from './Button'
+import { Button } from './ui/button'
 import { Spinner } from './AsyncState/Spinner'
 import { signIn } from 'next-auth/react'
 import type { ButtonHTMLAttributes } from 'react'
+import { Minus, Plus } from 'lucide-react'
 
 const ADD_TO_WATCHLIST = gql`
   mutation AddMovieToWatchlist($movieId: ID!) {
@@ -28,12 +28,10 @@ const REMOVE_FROM_WATCHLIST = gql`
 type WatchlistButtonProps = {
   session: Session | null;
   movie: Movie;
-  size?: 'sm' | 'md' | 'full-width';
 } & ButtonHTMLAttributes<HTMLButtonElement>
 export const WatchlistButton = ({
   session,
   movie,
-  size = 'md',
   ...props
 }: WatchlistButtonProps) => {
   const [addToWatchlist, { loading: addLoading }] = useMutation<
@@ -68,11 +66,11 @@ export const WatchlistButton = ({
   const isLoading = addLoading || removeLoading
 
   return (
-    <Button size={size} onClick={onClick} {...props}>
+    <Button disabled={isLoading} onClick={onClick} {...props}>
       {isLoading ? (
-        <Spinner reverted />
+        <Spinner reverted  />
       ) : (
-        <>{movie?.inWatchlist ? <FiMinus /> : <FiPlus />}</>
+        <>{movie?.inWatchlist ? <Minus size={16} className='mr-2' /> : <Plus size={16} className='mr-2' />}</>
       )}
       Watchlist
     </Button>

@@ -1,20 +1,13 @@
 import Link from 'next/link'
-import {
-  FiHeart,
-  FiHome,
-  FiPlay,
-  FiSearch,
-  FiTrendingUp,
-} from 'react-icons/fi'
 import type { FC } from 'react'
 import React from 'react'
 import { signIn } from 'next-auth/react'
-import { ProfilePicture } from 'components/Avatar'
+import { ProfilePicture } from '@/components/ProfilePicture'
 import type { Genre } from '__generated__/resolvers-types'
 import _ from 'lodash'
 import type { NextRouter } from 'next/dist/client/router'
 import type { User } from 'next-auth'
-import { Button } from 'components/Button'
+import { Button } from '@/components/ui/button'
 import { SideNavItem } from './SideNavItem'
 import {
   EXPLORE_INDEX,
@@ -24,6 +17,7 @@ import {
   USER_INDEX,
   WATCHLIST_INDEX,
 } from 'config/constants'
+import { Heart, Home, Play, Search, TrendingUp } from 'lucide-react'
 
 type SidebarProps = {
   genres: Genre[];
@@ -39,7 +33,7 @@ export const Sidebar: FC<SidebarProps> = ({ genres, router, user }) => {
         }
         aria-label='Sidenav'
       >
-        <div className='mt-4 mb-6 flex items-center justify-between pl-4 dark:text-white'>
+        <div className='mb-6 mt-4 flex items-center justify-between pl-4 dark:text-white'>
           <Link href='/' className='text-lg'>
             ミル Miru
           </Link>
@@ -52,40 +46,40 @@ export const Sidebar: FC<SidebarProps> = ({ genres, router, user }) => {
             <SideNavItem
               isSelected={router.pathname === '/'}
               href='/'
-              icon={<FiHome />}
+              Icon={Home}
             >
               Home
             </SideNavItem>
             <SideNavItem
               isSelected={router.pathname === EXPLORE_INDEX}
               href={EXPLORE_INDEX}
-              icon={<FiSearch />}
+              Icon={Search}
             >
               Explore
             </SideNavItem>
             <SideNavItem
               isSelected={router.pathname === WATCHLIST_INDEX}
               href={WATCHLIST_INDEX}
-              icon={<FiPlay />}
+              Icon={Play}
             >
               Watchlist
             </SideNavItem>
             <SideNavItem
               isSelected={router.pathname === FOR_YOU_INDEX}
               href={FOR_YOU_INDEX}
-              icon={<FiHeart />}
+              Icon={Heart}
             >
               For you
             </SideNavItem>
             <SideNavItem
               isSelected={router.pathname === POPULAR_INDEX}
               href={POPULAR_INDEX}
-              icon={<FiTrendingUp />}
+              Icon={TrendingUp}
             >
               Popular
             </SideNavItem>
           </ul>
-          <p className='pt-4 pb-2 pl-3 text-sm'>Genres</p>
+          <p className='pb-2 pl-3 pt-4 text-sm'>Genres</p>
           <ul className='space-y-2'>
             {_.sortBy(genres, (genre) => genre.name).map((genre) => (
               <SideNavItem

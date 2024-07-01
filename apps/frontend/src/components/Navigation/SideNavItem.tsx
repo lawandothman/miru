@@ -1,16 +1,17 @@
 import Link from 'next/link'
 import type { FC, PropsWithChildren } from 'react'
 import { cx } from 'class-variance-authority'
+import { type LucideIcon } from 'lucide-react'
 
 interface SideNavItemProps {
   href: string;
   isSelected: boolean;
-  icon?: React.ReactNode;
+  Icon?: LucideIcon
 }
 export const SideNavItem: FC<PropsWithChildren<SideNavItemProps>> = ({
   href,
   isSelected,
-  icon,
+  Icon,
   children,
 }) => {
   return (
@@ -24,7 +25,8 @@ export const SideNavItem: FC<PropsWithChildren<SideNavItemProps>> = ({
         )}
         href={href}
       >
-        {icon}
+
+        {Icon && <Icon size={16} />}
         <span className='ml-3 text-sm'>{children}</span>
       </Link>
     </li>

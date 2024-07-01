@@ -19,7 +19,7 @@ import {
   WATCHLIST_INDEX,
 } from 'config/constants'
 import { Page } from 'components/Page'
-import { Button } from 'components/Button'
+import { Button } from '@/components/ui/button'
 
 export const GET_WATCHLIST = gql`
   query Watchlist($limit: Int, $offset: Int) {
@@ -79,7 +79,7 @@ const Watchlist: NextPage = () => {
   if (data) {
     if (data.watchlist.length === 0) {
       return (
-        <main>
+        <main className='max-w-screen-2xl'>
           <PageHeader
             title='Watchlist'
             subtitle="You don't have any movies in your watchlist"
@@ -88,12 +88,12 @@ const Watchlist: NextPage = () => {
 
           <div className='mx-auto mt-8 flex max-w-xl flex-col items-center justify-center gap-4'>
             <Link className='block w-full' href={EXPLORE_INDEX}>
-              <Button className='py-4' size='full-width'>
+              <Button className='py-4'>
                 Find a movie to watch with friends
               </Button>
             </Link>
             <Link className='block w-full' href={POPULAR_INDEX}>
-              <Button className='py-4' size='full-width'>
+              <Button className='py-4'>
                 Miru&apos;s popular movies
               </Button>
             </Link>
@@ -117,7 +117,7 @@ const Watchlist: NextPage = () => {
 
     return (
       <Page name='Watchlist' index={WATCHLIST_INDEX}>
-        <main>
+        <main className='max-w-screen-2xl'>
           <PageHeader title='Watchlist' />
           <MoviesList loadMore={loadMore} movies={data.watchlist} />
         </main>

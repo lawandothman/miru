@@ -10,14 +10,13 @@ import Image from 'next/image'
 import HomeCinemaDark from '../../public/illustration/dark/home_cinema.svg'
 import HomeCinemaLight from '../../public/illustration/light/home_cinema.svg'
 import React, { useEffect, useState } from 'react'
-import { FiSearch, FiShuffle, FiUserPlus } from 'react-icons/fi'
-import type { IconType } from 'react-icons/lib'
 import type { User } from '__generated__/resolvers-types'
 import { useTheme } from 'next-themes'
 import { DateTime } from 'luxon'
 import { SIGN_IN_INDEX } from 'config/constants'
 import { getCookie, removeCookies } from 'cookies-next'
 import { InvitePrompt } from 'components/InvitePrompt'
+import { Popcorn, Search, UserPlus, type LucideIcon } from 'lucide-react'
 
 const GET_HOME = gql`
   query GetHome($userId: ID!) {
@@ -99,7 +98,7 @@ const Home: NextPage = () => {
   }
 
   return (
-    <main>
+    <main className='max-w-screen-2xl'>
       <PageHeader title={getGreeting()} />
       {sortBy(data?.user?.following, [(u) => -(u?.matches?.length ?? 0)]).map(
         (following) => {
@@ -133,21 +132,21 @@ const LoggedOutPage = () => (
     <h2 className='mt-4 text-xl'>How it works?</h2>
     <div className='grid grid-cols-1 gap-8 md:grid-cols-3'>
       <Step
-        icon={FiUserPlus}
+        Icon={UserPlus}
         text={'Find your friends'}
         description={
           'Follow your friends in Miru and we will recommend movies for you to watch together.'
         }
       />
       <Step
-        icon={FiSearch}
+        Icon={Search}
         text={'Find your movies'}
         description={
           'Search for movies you want to watch, or just check your For you page for recommendations based on the people you follow.'
         }
       />
       <Step
-        icon={FiShuffle}
+        Icon={Popcorn}
         text={'Find your matches'}
         description={
           'Miru will match you and the people you follow to show what you should watch together'
@@ -180,21 +179,20 @@ const getGreeting = () => {
 }
 
 const Step = ({
-  icon,
+  Icon,
   text,
   description,
 }: {
-  icon: IconType;
+  Icon: LucideIcon;
   text: string;
   description: string;
 }) => {
   return (
     <div>
       <div className='flex w-full justify-center'>
-        {React.createElement(icon, {
-          className:
-            'h-24 w-24 text-4xl bg-black dark:bg-white text-white dark:text-black border-full rounded-full p-8 m-4',
-        })}
+        <div className='m-8 flex size-32 items-center justify-center rounded-full bg-black text-white dark:bg-white dark:text-black'>
+          <Icon size={32} />
+        </div>
       </div>
       <div className='w-full'>
         <p className='mb-4 text-center text-lg font-bold'>{text}</p>
@@ -205,7 +203,7 @@ const Step = ({
 }
 
 const Footer = () => (
-  <div className='mt-12 mb-2 flex w-full gap-2  text-sm text-neutral-500'>
+  <div className='mb-2 mt-12 flex w-full gap-2  text-sm text-neutral-500'>
     <Link href='/about' className='hover:text-black dark:hover:text-white'>
       About
     </Link>

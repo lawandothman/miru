@@ -3,7 +3,7 @@ import { MoviesList } from 'components/MoviesList'
 import { PageHeader } from 'components/PageHeader'
 import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
-import { Genre } from '__generated__/resolvers-types'
+import { type Genre } from '__generated__/resolvers-types'
 import type { Movie } from '__generated__/resolvers-types'
 import { FullPageLoader } from 'components/AsyncState'
 import { useState } from 'react'
@@ -64,7 +64,7 @@ const Genre: NextPage = () => {
     }
     return (
       <Page name={data.genre.name} index={`${GENRE_INDEX}/${data.genre.id}`}>
-        <main>
+        <main className='max-w-screen-2xl'>
           <PageHeader title={data.genre.name ?? ''} />
           <MoviesList loadMore={loadMore} movies={data.moviesByGenre} />
         </main>

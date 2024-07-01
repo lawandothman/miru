@@ -1,7 +1,7 @@
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import type { FC } from 'react'
-import { Movie } from '__generated__/resolvers-types'
+import { type Movie } from '__generated__/resolvers-types'
 import { MoviePoster } from './MoviePoster'
 import InfiniteScroll from 'react-infinite-scroller'
 import { WatchlistButton } from './WatchlistButton'
@@ -16,10 +16,10 @@ interface MoviesListProps {
 export const LoadingSkeleton = () => {
   return (
     <div className='my-8'>
-      <div className='grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 xl:gap-x-8'>
+      <div className='grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 xl:gap-x-8'>
         {new Array(24).fill(true)?.map((item, idx) => {
           return (
-            <div key={idx} className='h-full w-full'>
+            <div key={idx} className='size-full'>
               <div className='h-[400px] min-h-full w-full min-w-full animate-pulse rounded-lg bg-neutral-300 dark:bg-neutral-700' />
             </div>
           )
@@ -35,7 +35,7 @@ export const MoviesList: FC<MoviesListProps> = ({ movies, loadMore }) => {
       {loadMore ? (
         <InfiniteScroll
           pageStart={0}
-          className='grid grid-cols-2 gap-y-10 gap-x-6 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8'
+          className='grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8'
           loadMore={async () => {
             await loadMore()
           }}
@@ -46,7 +46,7 @@ export const MoviesList: FC<MoviesListProps> = ({ movies, loadMore }) => {
           })}
         </InfiniteScroll>
       ) : (
-        <div className='grid grid-cols-2 gap-y-10 gap-x-6 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8'>
+        <div className='grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8'>
           {movies?.map((movie) => {
             return <Movie key={movie?.id} movie={movie} />
           })}
@@ -64,7 +64,7 @@ const Movie = ({ movie }: { movie: Maybe<Movie> }) => {
   }
 
   return (
-    <div className='flex h-full w-full flex-col'>
+    <div className='flex size-full flex-col'>
       {movie && (
         <Link href={`${MOVIE_INDEX}/${movie?.id}`}>
           <MoviePoster movie={movie} />
@@ -78,7 +78,6 @@ const Movie = ({ movie }: { movie: Maybe<Movie> }) => {
           className='h-8 w-full py-5'
           movie={movie}
           session={session}
-          size='sm'
         />
       </div>
     </div>

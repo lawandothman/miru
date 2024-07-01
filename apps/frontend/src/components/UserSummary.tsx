@@ -1,7 +1,7 @@
 import { MOVIE_INDEX, USER_INDEX } from 'config/constants'
 import Link from 'next/link'
 import type { User } from '__generated__/resolvers-types'
-import { ProfilePicture } from './Avatar'
+import { ProfilePicture } from './ProfilePicture'
 import { MovieBackdrop } from './MovieBackdrop'
 
 export const UserSummary = ({ user }: { user: User }) => {

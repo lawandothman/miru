@@ -7,13 +7,13 @@ import type { Movie } from '__generated__/resolvers-types'
 export const MovieBackdrop = ({ movie }: { movie: Movie }) => {
   const [isLoading, setLoading] = useState(true)
   return (
-    <div className='aspect-w-12 aspect-h-8 w-full overflow-hidden rounded-lg'>
+    <div className='aspect-h-8 aspect-w-12 w-full overflow-hidden rounded-lg'>
       <Image
         alt={movie?.title ?? ''}
         src={getBackdrop(movie?.backdropUrl ?? '')}
         fill
         unoptimized
-        loading='lazy'
+        priority
         sizes='(max-width: 160px) 50vw,
               (max-width: 240px) 100vw,
               25vw'

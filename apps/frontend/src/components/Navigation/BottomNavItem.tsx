@@ -1,12 +1,12 @@
+import type { LucideIcon } from 'lucide-react'
 import Link from 'next/link'
 import type { FC, PropsWithChildren } from 'react'
 import { createElement } from 'react'
-import type { IconType } from 'react-icons'
 
 interface BottomNavItemProps {
   href: string;
   isSelected: boolean;
-  icon: IconType;
+  icon: LucideIcon
   onClick?: () => void;
 }
 

@@ -10,7 +10,7 @@ import { type Movie, type Trailer } from '__generated__/resolvers-types'
 import { FiArrowLeft, FiLink, FiShare } from 'react-icons/fi'
 import { FaImdb } from 'react-icons/fa'
 import { useSession } from 'next-auth/react'
-import { ProfilePicture } from 'components/Avatar'
+import { ProfilePicture } from '@/components/ProfilePicture'
 import { Tooltip } from 'components/Tooltip'
 import { WatchlistButton } from 'components/WatchlistButton'
 import {
@@ -189,9 +189,9 @@ const Movie: NextPage = () => {
           <main>
             <button
               onClick={() => router.back()}
-              className='flex h-8 w-8  items-center justify-center  rounded-full border text-black hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-800'
+              className='flex size-8 items-center justify-center rounded-full  border text-black hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-800'
             >
-              <FiArrowLeft className='h-5 w-5' />
+              <FiArrowLeft className='size-5' />
             </button>
             <div className='mx-auto flex shrink flex-col gap-10 pt-2 lg:flex-row'>
               <div className='flex flex-1 items-center justify-center'>
@@ -203,6 +203,7 @@ const Movie: NextPage = () => {
                       className='rounded-lg'
                       width={520}
                       height={1000}
+                      priority
                     />
                   </div>
                 )}
@@ -289,7 +290,7 @@ const Movie: NextPage = () => {
 
     return (
       <Page name={data.movie.title} index={`${MOVIE_INDEX}/${data.movie.id}`}>
-        <div className='relative flex h-[500px] w-full items-end overflow-hidden'>
+        <div className='relative mx-auto flex h-[500px] w-full max-w-screen-2xl items-end overflow-hidden'>
           <Image
             src={getBackdrop(data.movie.backdropUrl ?? '', 'w1280')}
             alt=''
@@ -306,6 +307,7 @@ const Movie: NextPage = () => {
               className='rounded-lg'
               width={400}
               height={1000}
+              priority
             />
           </div>
           <div className='relative ml-8 flex w-4/5 items-center justify-between pr-8'>
@@ -327,7 +329,7 @@ const Movie: NextPage = () => {
             <WatchlistButton session={session} movie={data.movie} />
           </div>
         </div>
-        <main className='px-8'>
+        <main className='max-w-screen-2xl px-8'>
           {data.movie.matches &&
             data.movie.matches.filter((match) => match?.isFollowing).length >
               0 && <Matches matches={data.movie.matches} />}
@@ -336,7 +338,7 @@ const Movie: NextPage = () => {
               <GenrePill key={genre?.id} genre={genre} />
             ))}
           </div>
-          <div className='mt-16 mb-8 flex gap-16'>
+          <div className='mb-8 mt-16 flex gap-16'>
             <div className='max-w-xl flex-1'>
               <p className='mt-8 text-neutral-600 dark:text-neutral-400'>
                 {data?.movie.overview}

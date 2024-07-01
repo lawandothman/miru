@@ -46,10 +46,10 @@ export const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps
             {children}
             <DialogPrimitive.Close asChild>
               <button
-                className='absolute top-2 right-2 inline-flex items-center p-2 dark:text-white '
+                className='absolute right-2 top-2 inline-flex items-center p-2 dark:text-white '
                 aria-label='Close'
               >
-                <FiX className='h-6 w-6' />
+                <FiX className='size-6' />
               </button>
             </DialogPrimitive.Close>
           </DialogPrimitive.Content>
