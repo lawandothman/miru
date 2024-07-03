@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.7.5",
-    "@auth/neo4j-adapter": "1.0.9",
+    "@auth/neo4j-adapter": "2.4.1",
     "@headlessui/react": "^1.7.7",
     "@radix-ui/react-avatar": "^1.1.0",
     "@radix-ui/react-dialog": "^1.0.2",
