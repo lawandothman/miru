@@ -11,7 +11,6 @@ import { FiArrowLeft, FiLink, FiShare } from 'react-icons/fi'
 import { FaImdb } from 'react-icons/fa'
 import { useSession } from 'next-auth/react'
 import { ProfilePicture } from '@/components/ProfilePicture'
-import { Tooltip } from 'components/Tooltip'
 import { WatchlistButton } from 'components/WatchlistButton'
 import {
   GENRE_INDEX,
@@ -26,6 +25,7 @@ import { useMobile } from 'hooks/useMobile'
 import type { Maybe } from 'graphql/jsutils/Maybe'
 import { useState } from 'react'
 import React from 'react'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
 const GET_BY_ID = gql`
   query Movie($movieId: ID!) {
@@ -72,18 +72,22 @@ const StreamProviders = ({
       <h3 className='mb-4'>Stream</h3>
       <div className='flex gap-4'>
         {providers?.map((provider, i) => (
-          <Tooltip
-            key={i}
-            content={(<div className='text-xs'>{provider?.name}</div>) as any}
-          >
-            <Image
-              src={getLogo(provider?.logoPath ?? '')}
-              alt={provider?.name ?? ''}
-              width={40}
-              height={40}
-              className='rounded-lg'
-            />
-          </Tooltip>
+          <TooltipProvider key={i}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Image
+                  src={getLogo(provider?.logoPath ?? '')}
+                  alt={provider?.name ?? ''}
+                  width={40}
+                  height={40}
+                  className='rounded-lg'
+                />
+              </TooltipTrigger>
+              <TooltipContent sideOffset={4}>
+                <div className='text-xs'>{provider?.name}</div>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         ))}
       </div>
     </div>
@@ -124,17 +128,21 @@ const Matches = ({ matches }: { matches: Maybe<User>[] }) => {
         .map((match) => {
           if (match) {
             return (
-              <Tooltip
-                content={(<span className='text-xs'>{match.name}</span>) as any}
-                key={match.id}
-              >
-                <Link
-                  className='mr-2 inline-flex items-center gap-2'
-                  href={`${USER_INDEX}/${match.id}`}
-                >
-                  <ProfilePicture size='md' user={match} />
-                </Link>
-              </Tooltip>
+              <TooltipProvider key={match.id}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Link
+                      className='mr-2 inline-flex items-center gap-2'
+                      href={`${USER_INDEX}/${match.id}`}
+                    >
+                      <ProfilePicture size='md' user={match} />
+                    </Link>
+                  </TooltipTrigger>
+                  <TooltipContent sideOffset={4}>
+                    <span className='text-xs'>{match.name}</span>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             )
           } else {
             return null

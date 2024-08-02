@@ -17,8 +17,9 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { type User } from '__generated__/resolvers-types'
 import { Page } from 'components/Page'
-import { Tooltip } from 'components/Tooltip'
 import { Bot, LogOut } from 'lucide-react'
+import { TooltipProvider, TooltipTrigger, Tooltip } from '@/components/ui/tooltip'
+import { TooltipContent } from '@radix-ui/react-tooltip'
 
 const SEARCH_USER = gql`
   query User($userId: ID!) {
@@ -178,13 +179,18 @@ const User = () => {
                         {data.user.name}
                       </h1>
                       {data?.user?.isBot && (
-                        <Tooltip
-                          content={(<div className='text-xs'>Miru Bot</div>) as any}
-                        >
-                          <div>
-                            <Bot className='size-6 text-purple-600' />
-                          </div>
-                        </Tooltip>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <div>
+                                <Bot className='size-6 text-purple-600' />
+                              </div>
+                            </TooltipTrigger>
+                            <TooltipContent sideOffset={4}>
+                              <div className='text-xs'>Miru Bot</div>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
                       )}
                     </div>
                     <div className='mt-1 flex gap-2 text-sm lg:gap-4 lg:text-base'>

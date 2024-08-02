@@ -22,42 +22,42 @@ export const BottomNavBar = ({
     <aside className='fixed bottom-0 z-10 flex h-20 w-full flex-row items-start bg-white pt-1 pb-safe dark:bg-black'>
       <BottomNavItem
         isSelected={router.pathname === '/'}
-        href='/'
-        icon={Home}
-      />
+        href='/'>
+        <Home />
+      </BottomNavItem>
       <BottomNavItem
         isSelected={router.pathname === EXPLORE_INDEX}
         href={EXPLORE_INDEX}
-        icon={Search}
-      />
+      >
+        <Search />
+      </BottomNavItem>
       <BottomNavItem
         isSelected={router.pathname === FOR_YOU_INDEX}
         href={FOR_YOU_INDEX}
-        icon={Heart}
-      />
+      >
+        <Heart />
+      </BottomNavItem>
       <BottomNavItem
         isSelected={router.pathname === POPULAR_INDEX}
         href={POPULAR_INDEX}
-        icon={TrendingUp}
-      />
+      >
+        <TrendingUp />
+      </BottomNavItem>
       {user != null ? (
         <BottomNavItem
           isSelected={router.asPath === `${USER_INDEX}/${user.id}`}
           href={`${USER_INDEX}/${user.id}`}
-          icon={ProfileIcon(user) as any}
-        />
+        >
+          <ProfilePicture user={user} size={'sm'} />
+        </BottomNavItem>
       ) : (
         <BottomNavItem
           isSelected={router.pathname === SIGN_IN_INDEX}
           href={SIGN_IN_INDEX}
-          icon={UserIcon}
-        />
+        >
+          <UserIcon />
+        </BottomNavItem>
       )}
     </aside>
   )
-}
-
-// eslint-disable-next-line react/display-name
-const ProfileIcon = (user: User) => () => {
-  return <ProfilePicture user={user} size={'sm'} />
 }

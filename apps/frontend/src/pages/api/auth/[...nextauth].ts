@@ -47,6 +47,7 @@ export const authOptions: NextAuthOptions = {
     },
   },
   // Configure one or more authentication providers
+  // eslint-disable-next-line
   adapter: Neo4jAdapter(neo4jSession) as any,
   providers: [
     // FacebookProvider({
