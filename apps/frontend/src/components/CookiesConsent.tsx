@@ -6,22 +6,26 @@ import { useEffect, useState } from 'react'
 import { Button } from './ui/button'
 
 export const CookieConsent = () => {
-  const [consent, setConsent] = useState(false)
+  const [consent, setConsent] = useState<boolean | null>(null)
 
   useEffect(() => {
-    const storedConsent = getCookie('cookieConsent') as boolean
-    setConsent(storedConsent)
+    const storedConsent = getCookie('cookieConsent') as boolean | null
+    setConsent(storedConsent ?? false)
   }, [])
 
   const onClick = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault()
 
-    if (!consent) {
+    if (consent === false) {
       setCookie('cookieConsent', true, {
         maxAge: 30 * 24 * 60 * 60,
       })
       setConsent(true)
     }
+  }
+
+  if (consent === null) {
+    return null
   }
 
   if (consent) {
