@@ -7,7 +7,7 @@ import type {
   User,
   WatchProvider,
 } from '../__generated__/resolvers-types'
-import { mapTo, runAndMap, runAndMapMany, runMany, runOnce } from './utils'
+import { mapTo, runMany, runOnce } from './utils'
 
 export interface Repository<T> {
   get(id: string): Promise<T | null>;
@@ -34,7 +34,7 @@ export class NeoDataSource {
     limit: number
   ): Promise<Movie[]> {
     const email = user.email
-    return await runAndMapMany<Movie>(
+    return await runMany<Movie>(
       this.driver,
       `
       MATCH (u:User {email: $email})-[:FOLLOWS]->(f:User)<-[:IN_WATCHLIST]-(m:Movie)
@@ -48,7 +48,7 @@ export class NeoDataSource {
   }
 
   async getPopularMovies(offset: number, limit: number): Promise<Movie[]> {
-    return await runAndMapMany<Movie>(
+    return await runMany<Movie>(
       this.driver,
       `
       MATCH (m:Movie)-[:IN_WATCHLIST]->(u:User)
@@ -260,7 +260,7 @@ export class NeoDataSource {
   }
 
   async isMovieInWatchlist(movieId: string, user: User): Promise<boolean> {
-    const rel = await runAndMap<object>(
+    const rel = await runOnce<object>(
       this.driver,
       `MATCH (m:Movie {id: $movieId})-[r:IN_WATCHLIST]->(u:User {email: $email})
       RETURN r`,
@@ -285,7 +285,7 @@ export class NeoDataSource {
   }
 
   async getWatchlist(user: User, offset: number, limit: number) {
-    const movies = await runAndMapMany<Movie>(
+    const movies = await runMany<Movie>(
       this.driver,
       `MATCH (m:Movie)-[r:IN_WATCHLIST]->(u:User {email: $email})
       RETURN m
@@ -388,7 +388,7 @@ export class NeoDataSource {
       }
 
   async isFollowed(friendId: string, me: User | null): Promise<boolean> {
-    const rel = await runAndMap<object>(
+    const rel = await runOnce<object>(
       this.driver,
       `MATCH (f:User {id: $friendId})<-[r:FOLLOWS]-(u:User {email: $email})
       RETURN r`,

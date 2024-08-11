@@ -29,6 +29,7 @@
     "lodash": "^4.17.21",
     "mixpanel": "^0.17.0",
     "neo4j-driver": "^5.9.1",
+    "pino": "^9.3.2",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
