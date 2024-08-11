@@ -41,7 +41,6 @@ export const authOptions: NextAuthOptions = {
       return session
     },
     signIn({profile, user}) {
-      console.log(profile)
       user.image = profile?.image
       return true
     },

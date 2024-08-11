@@ -19,6 +19,7 @@ import MovieResolver from './resolvers/movieResolver'
 import MutationResolver from './resolvers/mutationResolver'
 import QueryResolver from './resolvers/queryResolver'
 import { BotManager } from './bots/botManager'
+import { logger } from './utils/logger'
 
 const schema = readFileSync('./schema.graphql').toString()
 
@@ -30,11 +31,11 @@ export interface Context {
   matchesLoader: DataLoader<string, Movie[]>
   watchlistLoader: DataLoader<string, Movie[]>
   movieMatchesLoader: DataLoader<string, User[]>
-  followerLoader: DataLoader<string, User[]> 
-  followingLoader: DataLoader<string, User[]> 
-  streamLoader: DataLoader<string, WatchProvider[]> 
-  buyLoader: DataLoader<string, WatchProvider[]> 
-  rentLoader: DataLoader<string, WatchProvider[]> 
+  followerLoader: DataLoader<string, User[]>
+  followingLoader: DataLoader<string, User[]>
+  streamLoader: DataLoader<string, WatchProvider[]>
+  buyLoader: DataLoader<string, WatchProvider[]>
+  rentLoader: DataLoader<string, WatchProvider[]>
   genreLoader: DataLoader<string, Genre>
   neoDataSource: NeoDataSource
   user: User | null
@@ -75,8 +76,7 @@ async function main() {
     await migrator.up()
     await botManager.up()
   } catch(e) {
-    console.error(e)
-    console.error('Failed to start DB tasks. Exiting')
+    logger.error('Failed to start DB tasks. Exiting', e)
     process.exit(1)
   }
 
@@ -109,7 +109,7 @@ async function main() {
     },
   })
 
-  console.log(`🚀  Server ready at: ${url}`)
+  logger.info(`🚀  Server ready at: ${url}`)
 }
 
 function getUser(authHeader: string | undefined): User | null {
@@ -122,7 +122,6 @@ function getUser(authHeader: string | undefined): User | null {
   try {
     return verify(token, process.env.OMNI_SECRET as string) as unknown as User
   } catch (e) {
-    console.error(e)
     return null
   }
 }

@@ -1,16 +1,17 @@
 import type { Driver } from 'neo4j-driver'
 import { readdirSync, readFileSync } from 'fs'
+import { logger } from './utils/logger'
 
 export class Migrator {
   constructor(private readonly driver: Driver) {}
 
   async up(): Promise<void> {
-    console.log('Starting migrations')
+    logger.info('Running migrations')
     const migrations = readdirSync('./migrations')
-    console.log(`Found ${migrations.length} migrations`)
+    logger.info('Migrations found:', migrations)
     for (const migration of migrations) {
       if (await this.hasAppliedMigration(migration)) {
-        console.log(migration, '- has already been applied, skipping')
+        logger.info(`${migration}- has already been applied, skipping`)
         continue
       }
       const cql = readFileSync(`./migrations/${migration}`).toString()
@@ -18,18 +19,17 @@ export class Migrator {
         .replaceAll('\n', ' ')
         .split(';')
         .filter((string) => string != '')
-      console.log(migration, '- Applying')
+      logger.info(`${migration}- Applying`)
       await this.driver.session().executeWrite((tx) => {
-        console.log(statements)
         statements.forEach(async (statement) => {
-          console.log('Running - ', statement)
+          logger.info(`${migration}- Running statement: ${statement}`)
           await tx.run(statement)
         })
       })
       await this.persistMigration(migration)
     }
+    logger.info('Migrations complete')
 
-    console.log('Migrations finished')
     return
   }
 

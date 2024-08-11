@@ -157,8 +157,6 @@ const User = () => {
     return <FullPageLoader />
   }
 
-  console.log(data)
-
   if (data) {
     return (
       <Page

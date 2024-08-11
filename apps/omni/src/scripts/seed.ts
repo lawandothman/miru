@@ -6,6 +6,7 @@ import { runMany, runOnce } from '../dataSources/utils'
 import { faker } from '@faker-js/faker'
 import type { User } from '../__generated__/resolvers-types'
 import { MovieRepo } from '../dataSources/movieRepo'
+import { logger } from '../utils/logger'
 
 const scriptConfig = {
   userCount: env.get('USER_COUNT').default(10).asInt(),
@@ -16,7 +17,7 @@ const { host, user, pass } = config.neo4j
 const driver = neo4j.driver(host, neo4j.auth.basic(user, pass))
 
 async function seed() {
-  console.log(`Creating group of ${scriptConfig.userCount} test users`)
+  logger.info(`Creating group of ${scriptConfig.userCount} test users`)
   const users: User[] = fill(Array(scriptConfig.userCount), null).map(
     (): User => {
       const user: User = {
@@ -49,7 +50,7 @@ async function seed() {
     if (uObj == null) {
       throw new Error('Could not create user')
     }
-    console.log(`u:(${uObj.name}) created`)
+    logger.info(`u:(${uObj.name}) created`)
 
     const moviesToLike = await runMany<{ id: string; title: string }>(
       driver,
@@ -63,7 +64,7 @@ async function seed() {
 
     for (const movie of moviesToLike) {
       await movieRepo.addToWatchlist(movie.id, uObj as User)
-      console.log(`(u:${uObj.name})<-(m${movie.title}) created`)
+      logger.info(`(u:${uObj.name})<-(m${movie.title}) created`)
     }
   }
 

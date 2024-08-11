@@ -2,6 +2,7 @@ import type { Driver } from 'neo4j-driver'
 import type { Movie, User } from '../__generated__/resolvers-types'
 import { difference } from 'lodash'
 import { runMany, runOnce } from '../dataSources/utils'
+import { logger } from '../utils/logger';
 
 interface Bot extends User {
   isBot: true;
@@ -107,25 +108,25 @@ export class BotManager {
   constructor(private readonly driver: Driver) {}
 
   async up(): Promise<void> {
-    console.log('Syncing bots')
-
+    logger.info('🤖 Upserting bots...')
     const existingBotIds = await this.getAllBotIds()
     const botsToBeDeleted = difference(
       existingBotIds,
       bots.map((b) => b.id)
     )
-    console.log(`Bots to be deleted: ${botsToBeDeleted}`)
+
+    logger.info(`🤖 Bots to be deleted: ${botsToBeDeleted}`)
     await Promise.all(
       botsToBeDeleted.map((botId) => this.deleteBotUser(botId))
     )
 
-    console.log(`Upserting ${bots.length} bots`)
+    logger.info(`🤖 Bots to be upserted: ${bots.length}`)
 
     await Promise.all(bots.map((bot) => this.upsertBotUser(bot)))
   }
 
   private async deleteBotUser(botId: string): Promise<void> {
-    await void runOnce<void>(
+    await runOnce<void>(
       this.driver,
       `
       MATCH (bot:User:Bot {id: $id})
@@ -134,7 +135,7 @@ export class BotManager {
       { id: botId },
       'bot'
     )
-    console.log(`Bot: ${botId} deleted`)
+    logger.info(`🤖 Bot: ${botId} deleted`)
   }
 
   private async upsertBotUser(bot: Bot): Promise<void> {
@@ -152,7 +153,7 @@ export class BotManager {
       'bot'
     )
     this.upsertWatchlistItem(bot)
-    console.log(`Bot: ${bot.id} upserted`)
+    logger.info(`🤖 Bot: ${bot.id} upserted`)
   }
 
   private async upsertWatchlistItem(bot: Bot) {
@@ -178,7 +179,7 @@ export class BotManager {
       { ...bot },
       'mov'
     )
-    console.log(`Bot: ${bot.id} upserted ${movies.length} movies`)
+    logger.info(`🤖 Bot: ${bot.id} upserted ${movies.length} movies`)
   }
 
   private async getAllBotIds(): Promise<string[]> {
