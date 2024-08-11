@@ -1,51 +1,82 @@
 import type { Driver } from 'neo4j-driver'
-import { logger } from '../utils/logger'
-
-async function executeQuery<T>(
-  driver: Driver,
-  query: string,
-  args: Record<string, any>,
-  resultHandler: (records: any[]) => T
-): Promise<T> {
-  const session = driver.session()
-  try {
-    const res = await session.run(query, args)
-    return resultHandler(res.records)
-  } catch (error) {
-    logger.error('Neo4j Query Execution Error:', error)
-    throw error
-  } finally {
-    await session.close()
-  }
-}
 
 export async function runMany<T>(
   driver: Driver,
   query: string,
-  args: Record<string, any>,
+  args: any,
   key: string
 ): Promise<T[]> {
-  return executeQuery(driver, query, args, (records) => {
-    return records.map(rec => rec.toObject()[key] as T)
-  })
+  const session = driver.session()
+  const res = await session.run(query, args)
+  session.close().catch(console.error)
+
+  return (res.records.map((rec) => rec.toObject()[key]) as T[]) ?? []
 }
 
 export async function runOnce<T>(
   driver: Driver,
   query: string,
-  args: Record<string, any>,
+  args: any,
   key: string
 ): Promise<T | null> {
-  return executeQuery(driver, query, args, (records) => {
-    return records.length > 0 ? (records[0].toObject()[key] as T) : null
-  })
+  const session = driver.session()
+  const res = await session.run(query, args)
+  session.close().catch(console.error)
+
+  return res.records[0]?.toObject()[key] as T
+}
+
+/**
+ * @deprecated use #runMany() instead
+ * @param driver
+ * @param query
+ * @param args
+ * @param key
+ * @returns
+ */
+export async function runAndMapMany<T>(
+  driver: Driver,
+  query: string,
+  args: any,
+  key: string
+): Promise<T[]> {
+  const session = driver.session()
+  const res = await session.run(query, args)
+  session.close().catch(console.error)
+
+  return (res.records.map((rec) => mapTo<T>(rec.toObject(), key)) as T[]) ?? []
+}
+/**
+ * @deprecated use #runOnce() instead
+ * @param driver
+ * @param query
+ * @param args
+ * @param key
+ * @returns
+ */
+export async function runAndMap<T>(
+  driver: Driver,
+  query: string,
+  args: any,
+  key: string
+): Promise<T | null> {
+  const session = driver.session()
+  const res = await session.run(query, args)
+  session.close().catch(console.error)
+
+  return mapTo<T>(res.records[0]?.toObject() ?? null, key)
 }
 
 export function mapTo<T>(
   record: Record<string, any>| null,
   key: string
 ): T | null {
-  return record ? (record[key].properties as T) : null
+  if (record == null) {
+    return null
+  }
+  return {
+    ...record[key].properties,
+  }
 }
 
 export interface WriteRepository<T> {

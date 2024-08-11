@@ -2,7 +2,6 @@ import type { Driver } from 'neo4j-driver'
 import type { Movie, User } from '../__generated__/resolvers-types'
 import { difference } from 'lodash'
 import { runMany, runOnce } from '../dataSources/utils'
-import { createLogger } from '../utils/logger';
 
 interface Bot extends User {
   isBot: true;
@@ -17,7 +16,7 @@ function createBot(
 ): Bot {
   return {
     id,
-    email: `${id}@miru.bot`,
+    email: `${id}@miru.space`,
     name,
     image,
     isBot: true,
@@ -104,31 +103,29 @@ const bots: Bot[] = [
   ]),
 ]
 
-const logger = createLogger({ service: 'bot-manager' })
-
 export class BotManager {
   constructor(private readonly driver: Driver) {}
 
   async up(): Promise<void> {
-    logger.info('Syncing bots')
+    console.log('Syncing bots')
 
     const existingBotIds = await this.getAllBotIds()
     const botsToBeDeleted = difference(
       existingBotIds,
       bots.map((b) => b.id)
     )
-
-    logger.info(`Bots to be deleted: ${botsToBeDeleted}`)
+    console.log(`Bots to be deleted: ${botsToBeDeleted}`)
     await Promise.all(
       botsToBeDeleted.map((botId) => this.deleteBotUser(botId))
     )
 
-    logger.info(`Upserting ${bots.length} bots`)
+    console.log(`Upserting ${bots.length} bots`)
+
     await Promise.all(bots.map((bot) => this.upsertBotUser(bot)))
   }
 
   private async deleteBotUser(botId: string): Promise<void> {
-    await runOnce<void>(
+    await void runOnce<void>(
       this.driver,
       `
       MATCH (bot:User:Bot {id: $id})
@@ -137,7 +134,7 @@ export class BotManager {
       { id: botId },
       'bot'
     )
-    logger.info(`Bot: ${botId} deleted`)
+    console.log(`Bot: ${botId} deleted`)
   }
 
   private async upsertBotUser(bot: Bot): Promise<void> {
@@ -145,30 +142,30 @@ export class BotManager {
       this.driver,
       `
       MERGE (bot:User:Bot {id: $id})
-      SET bot.email = $email,
-          bot.image = $image,
-          bot.name = $name,
-          bot.isBot = $isBot
+      SET bot.email = $email
+      SET bot.image = $image
+      SET bot.name = $name
+      SET bot.isBot = $isBot
       RETURN bot{ .* }
     `,
       { ...bot },
       'bot'
     )
-    await this.upsertWatchlistItems(bot)
+    this.upsertWatchlistItem(bot)
     console.log(`Bot: ${bot.id} upserted`)
   }
 
-  private async upsertWatchlistItems(bot: Bot) {
+  private async upsertWatchlistItem(bot: Bot) {
     // Clearing old relationships before upserting
-    await runMany<void>(
+    void (await runMany<void>(
       this.driver,
       `
       MATCH (bot:User:Bot {id: $id})-[r:IN_WATCHLIST]-(mov: Movie)
       DELETE r
     `,
-      { id: bot.id },
+      { ...bot },
       'mov'
-    )
+    ))
 
     const movies = await runMany<Movie>(
       this.driver,
@@ -178,21 +175,20 @@ export class BotManager {
       MERGE (mov)-[:IN_WATCHLIST]->(bot)
       RETURN mov{ .* }
     `,
-      { id: bot.id, movieIds: bot.movieIds },
+      { ...bot },
       'mov'
     )
-    logger.info(`Bot: ${bot.id} upserted ${movies.length} movie`)
+    console.log(`Bot: ${bot.id} upserted ${movies.length} movies`)
   }
 
   private async getAllBotIds(): Promise<string[]> {
     const botIds = await runMany<{ id: string }>(
       this.driver,
       `
-      MATCH (bot:User:Bot)
-      RETURN bot{.id} as id
+      MATCH (bot:User:Bot) RETURN bot{.id}
     `,
       {},
-      'id'
+      'bot'
     )
     return botIds.map((a) => a.id)
   }
