@@ -4,7 +4,6 @@ import type { UserResolvers } from '../__generated__/resolvers-types'
 const UserResolver: UserResolvers = {
   matches: async (parent, _, { matchesLoader }) => {
     const res = await matchesLoader.load(parent.id)
-    console.log(res)
     return res
   },
   followers: async (parent, _, { followerLoader }) => {

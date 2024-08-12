@@ -48,6 +48,11 @@ const client = new ApolloClient({
           moviesForYou: offsetLimitPagination(),
           moviesByGenre: offsetLimitPagination(['genreId']),
           watchlist: offsetLimitPagination(),
+          genres: {
+            read(existing) {
+              return existing || undefined
+            }
+          }
         },
       },
     },
@@ -90,8 +95,11 @@ const MyApp = (props: AppProps & { genres: Genre[] }) => {
   )
 }
 MyApp.getInitialProps = async (appContext: AppContext) => {
-  const session = await getSession(appContext.ctx)
-  const appProps = await App.getInitialProps(appContext)
+  const [session, appProps] = await Promise.all([
+    getSession(appContext.ctx),
+    App.getInitialProps(appContext),
+  ])
+
   try {
     const res = await client.query<{ genres: Genre[] }>({
       query: gql`
