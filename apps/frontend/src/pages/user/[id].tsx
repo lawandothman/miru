@@ -158,6 +158,7 @@ const User = () => {
   }
 
   if (data) {
+    console.log(data.user.watchlist?.map(x => x?.inWatchlist))
     return (
       <Page
         name={data?.user?.name ?? ''}
