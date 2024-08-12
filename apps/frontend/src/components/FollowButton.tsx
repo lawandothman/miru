@@ -70,15 +70,15 @@ export const FollowButton = ({
       {...props}
     >
       {loading ? (
-        <Spinner reverted />
+        <Spinner reverted size={size} />
       ) : user?.isFollowing ? (
         <>
-          <UserMinus size={16} className='mr-2' />
+          <UserMinus size={16} className={size !== 'sm' ? 'mr-2': ''} />
           {size != 'sm' && 'Unfollow'}
         </>
       ) : (
         <>
-          <UserPlus size={16} className='mr-2' />
+          <UserPlus size={16} className={size !== 'sm' ? 'mr-2': ''} />
           {size != 'sm' && 'Follow'}
         </>
       )}
