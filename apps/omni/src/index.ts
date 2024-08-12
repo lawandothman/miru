@@ -21,7 +21,7 @@ import QueryResolver from './resolvers/queryResolver'
 import { BotManager } from './bots/botManager'
 import { logger } from './utils/logger'
 
-const schema = readFileSync('./schema.graphql').toString()
+const schema = readFileSync('./schema.graphql', 'utf-8')
 
 export interface Context {
   movieRepo: MovieRepo
@@ -60,16 +60,14 @@ const server = new ApolloServer({
 })
 
 const movieDbService = new MovieDbService()
-
+const botManager = new BotManager(driver)
+const migrator = new Migrator(driver)
 const syncService = new SyncService(
   new MovieRepo(driver),
   new GenreRepo(driver),
   new WatchProviderRepo(driver),
   movieDbService
 )
-
-const migrator = new Migrator(driver)
-const botManager = new BotManager(driver)
 
 async function main() {
   try {
@@ -80,7 +78,7 @@ async function main() {
     process.exit(1)
   }
 
-  syncService.start().catch(console.error)
+  syncService.start().catch(logger.error)
 
   const port = +(process.env?.PORT ?? '4000')
   const { url } = await startStandaloneServer(server, {
@@ -113,7 +111,7 @@ async function main() {
 }
 
 function getUser(authHeader: string | undefined): User | null {
-  if (authHeader == null) {
+  if (!authHeader) {
     return null
   }
 
@@ -126,4 +124,7 @@ function getUser(authHeader: string | undefined): User | null {
   }
 }
 
-main()
+main().catch(e => {
+  logger.error(e, `Application failed to start. Exiting...`)
+  process.exit(1)
+})

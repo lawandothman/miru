@@ -37,13 +37,13 @@ async function seed() {
   for (const user of users) {
     const uObj = await runOnce<{ id: string; email: string; name: string }>(
       driver,
-      `
-        CREATE (u:User {
-            id: $id,
-            email: $email,
-            name: $name,
-            image: $image
-        }) RETURN u{.id, .email, .name}`,
+      `CREATE (u:User {
+        id: $id,
+        email: $email,
+        name: $name,
+        image: $image
+      })
+        RETURN u{.id, .email, .name}`,
       { ...user },
       'u'
     )
@@ -54,8 +54,10 @@ async function seed() {
 
     const moviesToLike = await runMany<{ id: string; title: string }>(
       driver,
-      `
-            MATCH (m:Movie) RETURN m{.id, .title}, rand() as r ORDER BY r LIMIT $limit`,
+      `MATCH (m:Movie)
+       RETURN m{.id, .title}, rand() as r
+       ORDER BY r
+       LIMIT $limit`,
       { limit: neo4j.int(scriptConfig.likes) },
       'm'
     )

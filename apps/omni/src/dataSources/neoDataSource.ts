@@ -7,7 +7,7 @@ import type {
   User,
   WatchProvider,
 } from '../__generated__/resolvers-types'
-import { mapTo, runAndMap, runAndMapMany, runMany, runOnce } from './utils'
+import { mapTo, runMany, runOnce } from './utils'
 
 export interface Repository<T> {
   get(id: string): Promise<T | null>;
@@ -34,11 +34,11 @@ export class NeoDataSource {
     limit: number
   ): Promise<Movie[]> {
     const email = user.email
-    return await runAndMapMany<Movie>(
+    return await runMany<Movie>(
       this.driver,
       `
       MATCH (u:User {email: $email})-[:FOLLOWS]->(f:User)<-[:IN_WATCHLIST]-(m:Movie)
-      RETURN m, count(*) as friendWatchlistRank
+      RETURN m{.*}, count(*) as friendWatchlistRank
       ORDER BY friendWatchlistRank DESC
       SKIP $offset
       LIMIT $limit`,
@@ -48,11 +48,11 @@ export class NeoDataSource {
   }
 
   async getPopularMovies(offset: number, limit: number): Promise<Movie[]> {
-    return await runAndMapMany<Movie>(
+    return await runMany<Movie>(
       this.driver,
       `
       MATCH (m:Movie)-[:IN_WATCHLIST]->(u:User)
-      RETURN m, count(u) as watchlists
+      RETURN m{.*}, count(u) as watchlists
       ORDER BY watchlists DESC, m.id
       SKIP $offset
       LIMIT $limit`,
@@ -70,8 +70,7 @@ export class NeoDataSource {
       RETURN g{
         .id,
         .name
-      }
-    `,
+      }`,
       { ids },
       'g'
     )
@@ -147,13 +146,17 @@ export class NeoDataSource {
   getBots = (user: User | null) => async () =>  {
     const email = user?.email ?? ''
     return await runMany<User>(
-      this.driver, `
-        MATCH (u:User:Bot) RETURN u{
-          .*,
-          isFollower: exists((u)-[:FOLLOWS]->(:User {email: $email})),
-          isFollowing: exists((u)<-[:FOLLOWS]-(:User {email: $email}))
-        }
-      `, { email }, 'u')
+      this.driver,
+      `
+      MATCH (u:User:Bot)
+      RETURN u{
+        .*,
+        isFollower: exists((u)-[:FOLLOWS]->(:User {email: $email})),
+        isFollowing: exists((u)<-[:FOLLOWS]-(:User {email: $email}))
+      }`,
+      { email },
+      'u'
+    )
   }
 
   getUsers =
@@ -162,13 +165,13 @@ export class NeoDataSource {
         const email = user?.email ?? ''
         const users = await runMany<User>(
           this.driver,
-          `MATCH (u:User) WHERE u.id in $ids
-      RETURN u{
-          .*,
-          isFollower: exists((u)-[:FOLLOWS]->(:User {email: $email})),
-          isFollowing: exists((u)<-[:FOLLOWS]-(:User {email: $email}))
-      }
-      `,
+          `
+          MATCH (u:User) WHERE u.id in $ids
+          RETURN u{
+            .*,
+            isFollower: exists((u)-[:FOLLOWS]->(:User {email: $email})),
+            isFollowing: exists((u)<-[:FOLLOWS]-(:User {email: $email}))
+          }`,
           { ids, email },
           'u'
         )
@@ -184,20 +187,21 @@ export class NeoDataSource {
 
         const res = await runMany<Movie & { friendId: string }>(
           this.driver,
-          `MATCH (f:User)<-[r1:IN_WATCHLIST]-(m:Movie)-[r2:IN_WATCHLIST]->(me:User {email: $myEmail})
-      WHERE f.id IN $ids
-      RETURN m{
-          .overview,
-          .posterUrl,
-          .releaseDate,
-          .backdropUrl,
-          .originalTitle,
-          .id,
-          .popularity,
-          .title,
-          .adult,
-          friendId: f.id
-      }`,
+          `
+          MATCH (f:User)<-[r1:IN_WATCHLIST]-(m:Movie)-[r2:IN_WATCHLIST]->(me:User {email: $myEmail})
+          WHERE f.id IN $ids
+          RETURN m{
+            .overview,
+            .posterUrl,
+            .releaseDate,
+            .backdropUrl,
+            .originalTitle,
+            .id,
+            .popularity,
+            .title,
+            .adult,
+            friendId: f.id
+          }`,
           { ids, myEmail: me.email },
           'm'
         )
@@ -260,9 +264,10 @@ export class NeoDataSource {
   }
 
   async isMovieInWatchlist(movieId: string, user: User): Promise<boolean> {
-    const rel = await runAndMap<object>(
+    const rel = await runOnce<object>(
       this.driver,
-      `MATCH (m:Movie {id: $movieId})-[r:IN_WATCHLIST]->(u:User {email: $email})
+      `
+      MATCH (m:Movie {id: $movieId})-[r:IN_WATCHLIST]->(u:User {email: $email})
       RETURN r`,
       { movieId, email: user.email },
       'r'
@@ -285,17 +290,15 @@ export class NeoDataSource {
   }
 
   async getWatchlist(user: User, offset: number, limit: number) {
-    const movies = await runAndMapMany<Movie>(
+    return await runMany<Movie>(
       this.driver,
       `MATCH (m:Movie)-[r:IN_WATCHLIST]->(u:User {email: $email})
-      RETURN m
+      RETURN m{.*}
       SKIP $offset
       LIMIT $limit`,
       { email: user.email, offset: int(offset), limit: int(limit) },
       'm'
     )
-
-    return movies
   }
 
   async follow(me: User, friendId: string): Promise<User | null> {
@@ -366,17 +369,18 @@ export class NeoDataSource {
         const email = user?.email ?? ''
         const followers = await runMany<User & { followingId: string }>(
           this.driver,
-          `MATCH (f:User)<-[r:FOLLOWS]-(u:User)
-      WHERE u.id IN $userIds
-      RETURN f{
-          .id,
-          .email,
-          .image,
-          .name,
-          isFollower: exists((f)-[:FOLLOWS]->(:User {email: $email})),
-          isFollowing: exists((f)<-[:FOLLOWS]-(:User {email: $email})),
-          followingId: u.id
-      }`,
+          `
+          MATCH (f:User)<-[r:FOLLOWS]-(u:User)
+          WHERE u.id IN $userIds
+          RETURN f{
+            .id,
+            .email,
+            .image,
+            .name,
+            isFollower: exists((f)-[:FOLLOWS]->(:User {email: $email})),
+            isFollowing: exists((f)<-[:FOLLOWS]-(:User {email: $email})),
+            followingId: u.id
+          }`,
           { userIds, email },
           'f'
         )
@@ -388,9 +392,10 @@ export class NeoDataSource {
       }
 
   async isFollowed(friendId: string, me: User | null): Promise<boolean> {
-    const rel = await runAndMap<object>(
+    const rel = await runOnce<object>(
       this.driver,
-      `MATCH (f:User {id: $friendId})<-[r:FOLLOWS]-(u:User {email: $email})
+      `
+      MATCH (f:User {id: $friendId})<-[r:FOLLOWS]-(u:User {email: $email})
       RETURN r`,
       { friendId, email: me?.email },
       'r'
