@@ -1,6 +1,6 @@
 import neo4j, { type Driver } from 'neo4j-driver'
 import type { Movie, Genre, User } from '../__generated__/resolvers-types'
-import type { WriteRepository } from './utils'
+import { runOnce, WriteRepository } from './utils'
 import { mapTo } from './utils'
 
 // We will slowly deprecate this for reading of data
@@ -47,28 +47,32 @@ export class MovieRepo implements WriteRepository<Movie> {
     return mapTo<Movie>(res.records[0].toObject(), 'm')
   }
 
-  async getMoviesByGenre(
-    genreId: string,
-    offset: number,
-    limit: number
-  ): Promise<Movie[]> {
+  getMoviesByGenre = (user: User | null) => async (genreId: string, offset: number, limit: number) => {
+    const email = user?.email
     const session = this.driver.session()
     const res = await session.run(
       `
       MATCH (m:Movie)-[r:IS_A]->(g:Genre {id: $id})
       WHERE m.tmdbVoteCount > 0
-      RETURN m
+      WITH m
+      OPTIONAL MATCH (m)-[:IN_WATCHLIST]->(currentUser:User {email: $email})
+      RETURN m{
+        .*,
+        inWatchlist: exists((m)-[:IN_WATCHLIST]->(currentUser))
+      }
       ORDER BY m.tmdbVoteCount DESC
       SKIP $offset
       LIMIT $limit
     `,
-      { id: genreId, offset: neo4j.int(offset), limit: neo4j.int(limit) }
+      { id: genreId, offset: neo4j.int(offset), limit: neo4j.int(limit), email }
     )
+    session.close()
 
-    return res.records.map((record) =>
-      mapTo<Movie>(record.toObject(), 'm')
-    ) as Movie[]
-  }
+    return res.records.map((record) => ({
+      ...record.toObject().m,
+    })
+  )}
+
 
   async getGenres(movie: Movie): Promise<Genre[]> {
     const session = this.driver.session()
@@ -103,33 +107,31 @@ export class MovieRepo implements WriteRepository<Movie> {
   }
 
   async addToWatchlist(movieId: string, user: User): Promise<Movie> {
-    const session = this.driver.session()
-    const res = await session.run(
-      `
+    const movie = await runOnce<Movie>(this.driver, `
       MATCH (u:User {email: $email}), (m:Movie {id: $id})
       MERGE (u)<-[r:IN_WATCHLIST]-(m)
-      RETURN m
-    `,
-      { email: user.email, id: movieId }
+        RETURN m{
+          .*,
+          inWatchlist: exists((m)-[:IN_WATCHLIST]->(u))
+        }
+      `, { email: user.email, id: movieId }, 'm'
     )
-    session.close()
 
-    return mapTo<Movie>(res.records[0].toObject(), 'm') as Movie
+    return movie!
   }
 
   async removeFromWatchlist(movieId: string, user: User): Promise<Movie> {
-    const session = this.driver.session()
-    const res = await session.run(
-      `
-      MATCH (u:User {email: $email})<-[r:IN_WATCHLIST]-(m:Movie {id: $id})
-      DELETE r
-      RETURN m
-    `,
-      { email: user.email, id: movieId }
+    const movie = await runOnce<Movie>(this.driver, `
+        MATCH (u:User {email: $email})<-[r:IN_WATCHLIST]-(m:Movie {id: $id})
+        DELETE r
+        RETURN m{
+          .*,
+          inWatchlist: exists((m)-[:IN_WATCHLIST]->(u))
+        }
+      `, { email: user.email, id: movieId }, 'm'
     )
-    session.close()
 
-    return mapTo<Movie>(res.records[0].toObject(), 'm') as Movie
+    return movie!
   }
 
   private builtSetQuery(obj: any, entryKey: string): string {

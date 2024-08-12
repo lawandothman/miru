@@ -17,11 +17,16 @@ export interface Repository<T> {
 export class NeoDataSource {
   constructor(private readonly driver: Driver) {}
 
-  async getMovies(ids: readonly string[]): Promise<Movie[]> {
+  getMovies = (user: User | null) => async (ids: readonly string[]): Promise<Movie[]> => {
+    const email = user?.email
     const movies = await runMany<Movie>(
       this.driver,
-      'MATCH (m:Movie) WHERE m.id in $ids RETURN m{.*}',
-      { ids },
+      `MATCH (m:Movie), (u:User {email: $email})
+      WHERE m.id in $ids RETURN m{
+        .*,
+        inWatchlist: exists((m)-[:IN_WATCHLIST]->(u))
+      }`,
+      { ids, email },
       'm'
     )
 
@@ -38,7 +43,12 @@ export class NeoDataSource {
       this.driver,
       `
       MATCH (u:User {email: $email})-[:FOLLOWS]->(f:User)<-[:IN_WATCHLIST]-(m:Movie)
-      RETURN m{.*}, count(*) as friendWatchlistRank
+      WITH m, count(*) as friendWatchlistRank
+      OPTIONAL MATCH (m)-[:IN_WATCHLIST]->(currentUser:User { email: $email })
+      RETURN m{
+        .*,
+        inWatchlist: currentUser IS NOT NULL
+      }, friendWatchlistRank
       ORDER BY friendWatchlistRank DESC
       SKIP $offset
       LIMIT $limit`,
@@ -47,16 +57,22 @@ export class NeoDataSource {
     )
   }
 
-  async getPopularMovies(offset: number, limit: number): Promise<Movie[]> {
+  getPopularMovies = (user: User | null) => async (offset: number, limit: number): Promise<Movie[]> => {
+    const email = user?.email
     return await runMany<Movie>(
       this.driver,
       `
       MATCH (m:Movie)-[:IN_WATCHLIST]->(u:User)
-      RETURN m{.*}, count(u) as watchlists
+      WITH m, count(u) as watchlists
+      OPTIONAL MATCH (m)-[:IN_WATCHLIST]->(currentUser:User { email: $email })
+      RETURN m{
+        .*,
+        inWatchlist: currentUser IS NOT NULL
+      }, watchlists
       ORDER BY watchlists DESC, m.id
       SKIP $offset
       LIMIT $limit`,
-      { offset: int(offset), limit: int(limit) },
+      { offset: int(offset), limit: int(limit), email},
       'm'
     )
   }
@@ -159,28 +175,24 @@ export class NeoDataSource {
     )
   }
 
-  getUsers =
-    (user: User | null) =>
-      async (ids: readonly string[]): Promise<User[]> => {
-        const email = user?.email ?? ''
-        const users = await runMany<User>(
-          this.driver,
-          `
-          MATCH (u:User) WHERE u.id in $ids
-          RETURN u{
-            .*,
-            isFollower: exists((u)-[:FOLLOWS]->(:User {email: $email})),
-            isFollowing: exists((u)<-[:FOLLOWS]-(:User {email: $email}))
-          }`,
-          { ids, email },
-          'u'
-        )
-        return ids.map((id) => users.find((u) => u.id == id)!)
-      }
+  getUsers = (user: User | null) => async (ids: readonly string[]): Promise<User[]> => {
+    const email = user?.email ?? ''
+    const users = await runMany<User>(
+      this.driver,
+      `
+      MATCH (u:User) WHERE u.id in $ids
+      RETURN u{
+        .*,
+        isFollower: exists((u)-[:FOLLOWS]->(:User {email: $email})),
+        isFollowing: exists((u)<-[:FOLLOWS]-(:User {email: $email}))
+      }`,
+      { ids, email },
+      'u'
+    )
+    return ids.map((id) => users.find((u) => u.id == id)!)
+  }
 
-  getMatchesWith =
-    (me: User | null) =>
-      async (ids: readonly string[]): Promise<Movie[][]> => {
+  getMatchesWith = (me: User | null) => async (ids: readonly string[]): Promise<Movie[][]> => {
         if (me == null) {
           return []
         }
@@ -190,6 +202,7 @@ export class NeoDataSource {
           `
           MATCH (f:User)<-[r1:IN_WATCHLIST]-(m:Movie)-[r2:IN_WATCHLIST]->(me:User {email: $myEmail})
           WHERE f.id IN $ids
+          OPTIONAL MATCH (m)-[:IN_WATCHLIST]->(currentUser:User { email: $myEmail })
           RETURN m{
             .overview,
             .posterUrl,
@@ -200,7 +213,8 @@ export class NeoDataSource {
             .popularity,
             .title,
             .adult,
-            friendId: f.id
+            friendId: f.id,
+            inWatchlist: currentUser IS NOT NULL
           }`,
           { ids, myEmail: me.email },
           'm'
@@ -212,8 +226,7 @@ export class NeoDataSource {
         })
       }
 
-  getMovieMatches =
-    (user: User | null) => async (movieIds: readonly string[]) => {
+  getMovieMatches = (user: User | null) => async (movieIds: readonly string[]) => {
       const email = user?.email ?? ''
       const matches = await runMany<User & { movieId: string }>(
         this.driver,
@@ -275,16 +288,24 @@ export class NeoDataSource {
     return rel != null
   }
 
-  getWatchlists = async (userIds: readonly string[]) => {
-    const movies = await runMany<Movie&{userId:string}>(this.driver,`
+  getWatchlists = (user: User | null) =>  async (userIds: readonly string[]) => {
+    const email = user?.email
+    const movies = await runMany<Movie&{userId:string}>(
+      this.driver,
+      `
       MATCH (m:Movie)-[r:IN_WATCHLIST]->(u:User)
       WHERE u.id IN $userIds
+      OPTIONAL MATCH (m)-[:IN_WATCHLIST]->(currentUser:User {email: $email})
       RETURN m{
         .*,
-        userId: u.id
+        userId: u.id,
+        inWatchlist: currentUser IS NOT NULL
       }
       LIMIT 30
-    `, {userIds}, 'm')
+    `,
+    { userIds, email },
+    'm'
+    )
     const groupedByUser = groupBy(movies, m => m.userId)
     return userIds.map(id => groupedByUser[id] ?? [])
   }
@@ -293,7 +314,10 @@ export class NeoDataSource {
     return await runMany<Movie>(
       this.driver,
       `MATCH (m:Movie)-[r:IN_WATCHLIST]->(u:User {email: $email})
-      RETURN m{.*}
+      RETURN m{
+        .*,
+        inWatchlist: exists((m)-[:IN_WATCHLIST]->(u))
+      }
       SKIP $offset
       LIMIT $limit`,
       { email: user.email, offset: int(offset), limit: int(limit) },
