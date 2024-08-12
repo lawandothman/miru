@@ -14,7 +14,7 @@ import type { User } from '__generated__/resolvers-types'
 import { useTheme } from 'next-themes'
 import { DateTime } from 'luxon'
 import { SIGN_IN_INDEX } from 'config/constants'
-import { getCookie, removeCookies } from 'cookies-next'
+import { deleteCookie, getCookie } from 'cookies-next'
 import { InvitePrompt } from 'components/InvitePrompt'
 import { Popcorn, Search, UserPlus, type LucideIcon } from 'lucide-react'
 
@@ -72,7 +72,7 @@ const Home: NextPage = () => {
           },
         }).then(async () => {
           await refetch()
-          removeCookies('invitedBy')
+          deleteCookie('invitedBy')
           setInvitedBy(null)
         })
       }
