@@ -48,7 +48,7 @@ export class MovieRepo implements WriteRepository<Movie> {
   }
 
   getMoviesByGenre = (user: User | null) => async (genreId: string, offset: number, limit: number) => {
-    const email = user?.email
+    const email = user?.email ?? ''
     const session = this.driver.session()
     const res = await session.run(
       `

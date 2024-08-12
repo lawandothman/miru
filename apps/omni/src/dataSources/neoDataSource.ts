@@ -58,7 +58,7 @@ export class NeoDataSource {
   }
 
   getPopularMovies = (user: User | null) => async (offset: number, limit: number): Promise<Movie[]> => {
-    const email = user?.email
+    const email = user?.email ?? ''
     return await runMany<Movie>(
       this.driver,
       `
