@@ -41,7 +41,7 @@
     "@types/jsonwebtoken": "^9.0.6",
     "@types/lodash": "^4.14.191",
     "@types/node": "^18.11.18",
-    "eslint-config-custom": "*",
+    "eslint-config-custom": "workspace:*",
     "nodemon": "^3.1.4",
     "pino-pretty": "^11.2.2",
     "ts-node": "^10.9.1",

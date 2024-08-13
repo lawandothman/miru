@@ -1,5 +1,4 @@
 import type { TrailerKeys } from '../services/movieDbService'
-import { requireUser } from '../utils'
 import type {
   Movie,
   MovieResolvers,

@@ -9,7 +9,7 @@ import { ProfilingIntegration } from '@sentry/profiling-node'
 import type { Context } from '.'
 import { uuid4 } from '@sentry/utils'
 import { config } from './config'
-import Mixpanel = require('mixpanel')
+import Mixpanel from 'mixpanel'
 
 Sentry.init({
   dsn: config.sentryUrl,

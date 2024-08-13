@@ -1,5 +1,6 @@
 import type { Driver } from 'neo4j-driver'
 import type { Genre } from '../__generated__/resolvers-types'
+import { mapTo } from './utils'
 
 export interface Repository<T> {
   get(id: string): Promise<T | null>;
@@ -8,7 +9,7 @@ export interface Repository<T> {
 
 // We will slowly deprecate this for loading of data
 export class GenreRepo implements Repository<Genre> {
-  constructor(private readonly driver: Driver) {}
+  constructor(private readonly driver: Driver) { }
 
   async get(id: string): Promise<Genre | null> {
     const session = this.driver.session()
@@ -21,7 +22,7 @@ export class GenreRepo implements Repository<Genre> {
       .then(() => void 0)
       .catch(console.error)
 
-    return this.mapTo<Genre>(res.records[0].toObject(), 'g') ?? null
+    return mapTo<Genre>(res.records[0], 'g') ?? null
   }
 
   async upsert(genre: Genre): Promise<Genre | null> {
@@ -36,25 +37,13 @@ export class GenreRepo implements Repository<Genre> {
     )
     session.close()
 
-    return this.mapTo<Genre>(res.records[0].toObject(), 'g')
+    return mapTo<Genre>(res.records[0], 'g')
   }
 
-  private builtSetQuery(obj: any, entryKey: string): string {
+  private builtSetQuery(obj: Partial<Genre>, entryKey: string): string {
     return Object.entries(obj)
       .filter(([_, value]) => value != null)
       .map(([key, _]) => `SET ${entryKey}.${key} = $${key}`)
       .join('\n')
-  }
-
-  private mapTo<T>(
-    record: Record<string,any> | null,
-    key: string
-  ): T | null {
-    if (record == null) {
-      return null
-    }
-    return {
-      ...record[key].properties,
-    }
   }
 }

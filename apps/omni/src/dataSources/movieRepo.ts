@@ -1,6 +1,6 @@
 import neo4j, { type Driver } from 'neo4j-driver'
 import type { Movie, Genre, User } from '../__generated__/resolvers-types'
-import { runOnce, WriteRepository } from './utils'
+import { runOnce, type WriteRepository } from './utils'
 import { mapTo } from './utils'
 
 // We will slowly deprecate this for reading of data
@@ -15,7 +15,7 @@ export class MovieRepo implements WriteRepository<Movie> {
 
     session.close().catch(console.error)
 
-    return mapTo<Movie>(res.records[0].toObject(), 'm') ?? null
+    return mapTo<Movie>(res.records[0], 'm') ?? null
   }
 
   async upsert(movie: Movie): Promise<Movie | null> {
@@ -44,7 +44,7 @@ export class MovieRepo implements WriteRepository<Movie> {
       return res
     })
 
-    return mapTo<Movie>(res.records[0].toObject(), 'm')
+    return mapTo<Movie>(res.records[0], 'm')
   }
 
   getMoviesByGenre = (user: User | null) => async (genreId: string, offset: number, limit: number) => {
@@ -71,7 +71,7 @@ export class MovieRepo implements WriteRepository<Movie> {
     return res.records.map((record) => ({
       ...record.toObject().m,
     })
-  )}
+    )}
 
 
   async getGenres(movie: Movie): Promise<Genre[]> {
@@ -85,7 +85,7 @@ export class MovieRepo implements WriteRepository<Movie> {
     )
 
     return res.records.map((record) =>
-      mapTo<Genre>(record.toObject(), 'g')
+      mapTo<Genre>(record, 'g')
     ) as Genre[]
   }
 
@@ -102,7 +102,7 @@ export class MovieRepo implements WriteRepository<Movie> {
 
     session.close()
     return res.records.map((record) =>
-      mapTo<Movie>(record.toObject(), 'm')
+      mapTo<Movie>(record, 'm')
     ) as Movie[]
   }
 
@@ -134,7 +134,7 @@ export class MovieRepo implements WriteRepository<Movie> {
     return movie!
   }
 
-  private builtSetQuery(obj: any, entryKey: string): string {
+  private builtSetQuery<T extends object>(obj: Partial<T>, entryKey: string): string {
     return Object.entries(obj)
       .filter(([_, value]) => !Array.isArray(value))
       .filter(([_, value]) => value != null)

@@ -1,7 +1,7 @@
 import type { Driver } from 'neo4j-driver'
 import type { WatchProvider } from '../__generated__/resolvers-types'
 import type { WriteRepository } from './utils'
-import { runOnce } from './utils'
+import { mapTo, runOnce } from './utils'
 
 export class WatchProviderRepo implements WriteRepository<WatchProvider> {
   constructor(private readonly driver: Driver) {}
@@ -18,7 +18,7 @@ export class WatchProviderRepo implements WriteRepository<WatchProvider> {
     )
     session.close()
 
-    return this.mapTo<WatchProvider>(res.records[0].toObject(), 'w')
+    return mapTo<WatchProvider>(res.records[0], 'w')
   }
 
   async upsertStream(watchProviderId: string, movieId: string) {
@@ -60,22 +60,10 @@ export class WatchProviderRepo implements WriteRepository<WatchProvider> {
     )
   }
 
-  private builtSetQuery(obj: any, entryKey: string): string {
+  private builtSetQuery<T extends object>(obj: Partial<T>, entryKey: string): string {
     return Object.entries(obj)
       .filter(([_, value]) => value != null)
       .map(([key, _]) => `SET ${entryKey}.${key} = $${key}`)
       .join('\n')
-  }
-
-  private mapTo<T>(
-    record: Record<string, any> | null,
-    key: string
-  ): T | null {
-    if (record == null) {
-      return null
-    }
-    return {
-      ...record[key].properties,
-    }
   }
 }

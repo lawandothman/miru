@@ -2,7 +2,7 @@ import type { Driver } from 'neo4j-driver'
 import type { Movie, User } from '../__generated__/resolvers-types'
 import { difference } from 'lodash'
 import { runMany, runOnce } from '../dataSources/utils'
-import { logger } from '../utils/logger';
+import { logger } from '../utils/logger'
 
 interface Bot extends User {
   isBot: true;

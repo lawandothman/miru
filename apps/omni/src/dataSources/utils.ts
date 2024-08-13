@@ -1,9 +1,9 @@
-import type { Driver } from 'neo4j-driver'
+import type { Driver, Record as Neo4jRecord } from 'neo4j-driver'
 
 export async function runMany<T>(
   driver: Driver,
   query: string,
-  args: any,
+  args: Record<string, unknown>,
   key: string
 ): Promise<T[]> {
   const session = driver.session()
@@ -16,7 +16,7 @@ export async function runMany<T>(
 export async function runOnce<T>(
   driver: Driver,
   query: string,
-  args: any,
+  args: Record<string, unknown>,
   key: string
 ): Promise<T | null> {
   const session = driver.session()
@@ -27,15 +27,21 @@ export async function runOnce<T>(
 }
 
 export function mapTo<T>(
-  record: Record<string, any>| null,
+  record: Neo4jRecord | null,
   key: string
 ): T | null {
   if (record == null) {
     return null
   }
-  return {
-    ...record[key].properties,
+  const node = record.get(key)
+
+  if (node && typeof node === 'object' && 'properties' in node) {
+    return {
+      ...node.properties,
+    } as T
   }
+
+  return null
 }
 
 export interface WriteRepository<T> {

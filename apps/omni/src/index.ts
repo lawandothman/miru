@@ -125,6 +125,6 @@ function getUser(authHeader: string | undefined): User | null {
 }
 
 main().catch(e => {
-  logger.error(e, `Application failed to start. Exiting...`)
+  logger.error(e, 'Application failed to start. Exiting...')
   process.exit(1)
 })
