@@ -1,12 +1,6 @@
 import { gql, NetworkStatus, useQuery } from '@apollo/client'
 import { ProfilePicture } from '@/components/ProfilePicture'
 import { Button } from '@/components/ui/button'
-import {
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogTitle,
-} from 'components/Dialog'
 import { FollowButton } from 'components/FollowButton'
 import { FullPageLoader } from 'components/AsyncState'
 import { MoviesList } from 'components/MoviesList'
@@ -20,6 +14,7 @@ import { Page } from 'components/Page'
 import { Bot, LogOut } from 'lucide-react'
 import { TooltipProvider, TooltipTrigger, Tooltip } from '@/components/ui/tooltip'
 import { TooltipContent } from '@radix-ui/react-tooltip'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 
 const SEARCH_USER = gql`
   query User($userId: ID!) {
@@ -80,16 +75,15 @@ const FollowersDialog = ({
         onOpenChange()
       }}
     >
-      <DialogTrigger>
-        <span className='dark:text-neutral-300'>
-          {user.followers?.length} followers
-        </span>
+      <DialogTrigger className='dark:text-neutral-300'>
+        {user.followers?.length} followers
       </DialogTrigger>
-      <DialogContent show={open}>
-        <DialogTitle className='py-2 text-center text-lg font-semibold dark:text-neutral-300'>
-          Following
-        </DialogTitle>
-
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle className='py-2 text-center text-lg font-semibold dark:text-neutral-300'>
+            Following
+          </DialogTitle>
+        </DialogHeader>
         <div className='mt-1 max-h-[325px] overflow-y-auto'>
           {user.followers?.map((follower) => (
             <UserCard user={follower} key={follower?.id} />
@@ -116,15 +110,15 @@ const FollowingDialog = ({
         onOpenChange()
       }}
     >
-      <DialogTrigger>
-        <span className='dark:text-neutral-300'>
-          {user.following?.length} following
-        </span>
+      <DialogTrigger className='dark:text-neutral-300'>
+        {user.following?.length} following
       </DialogTrigger>
-      <DialogContent show={open}>
-        <DialogTitle className='py-2 text-center text-lg font-semibold dark:text-neutral-300'>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle className='py-2 text-center text-lg font-semibold dark:text-neutral-300'>
           Following
-        </DialogTitle>
+          </DialogTitle>
+        </DialogHeader>
         <div className='mt-1 max-h-[325px] overflow-y-auto'>
           {user.following?.map((following) => (
             <UserCard user={following} key={following?.id} />
