@@ -22,12 +22,12 @@ export class NeoDataSource {
     const movies = await runMany<Movie>(
       this.driver,
       `
-      MATCH (m:Movie)
-      OPTIONAL MATCH (m)-[:IN_WATCHLIST]->(u:User {email: $email})
-      WHERE m.id in $ids
+      UNWIND $ids as id
+      MATCH (m:Movie {id: id})
+      OPTIONAL MATCH (m)-[r:IN_WATCHLIST]->(u:User {email: $email})
       RETURN m{
         .*,
-        inWatchlist: exists((m)-[:IN_WATCHLIST]->(u))
+        inWatchlist: CASE WHEN r IS NOT NULL THEN true ELSE false END
       }`,
       { ids, email },
       'm'
@@ -46,11 +46,13 @@ export class NeoDataSource {
       this.driver,
       `
       MATCH (u:User {email: $email})-[:FOLLOWS]->(f:User)<-[:IN_WATCHLIST]-(m:Movie)
-      WITH m, count(*) as friendWatchlistRank
-      OPTIONAL MATCH (m)-[:IN_WATCHLIST]->(currentUser:User { email: $email })
-      RETURN m{
-        .*,
-        inWatchlist: currentUser IS NOT NULL
+      WITH m, u, count(f) as friendWatchlistRank
+      RETURN m {
+        .id,
+        .title,
+        .posterUrl,
+        .releaseDate,
+        inWatchlist: EXISTS((m)-[:IN_WATCHLIST]->(u))
       }, friendWatchlistRank
       ORDER BY friendWatchlistRank DESC
       SKIP $offset

@@ -50,28 +50,28 @@ export class MovieRepo implements WriteRepository<Movie> {
   getMoviesByGenre = (user: User | null) => async (genreId: string, offset: number, limit: number) => {
     const email = user?.email ?? ''
     const session = this.driver.session()
-    const res = await session.run(
-      `
-      MATCH (m:Movie)-[r:IS_A]->(g:Genre {id: $id})
-      WHERE m.tmdbVoteCount > 0
-      WITH m
-      OPTIONAL MATCH (m)-[:IN_WATCHLIST]->(currentUser:User {email: $email})
-      RETURN m{
-        .*,
-        inWatchlist: exists((m)-[:IN_WATCHLIST]->(currentUser))
-      }
-      ORDER BY m.tmdbVoteCount DESC
-      SKIP $offset
-      LIMIT $limit
-    `,
-      { id: genreId, offset: neo4j.int(offset), limit: neo4j.int(limit), email }
-    )
-    session.close()
-
-    return res.records.map((record) => ({
-      ...record.toObject().m,
-    })
-    )}
+    try {
+      const res = await session.run(
+        `
+        MATCH (m:Movie)-[r:IS_A]->(g:Genre {id: $id})
+        WHERE m.tmdbVoteCount > 0
+        RETURN m{
+          id: m.id,
+          title: m.title,
+          posterUrl: m.posterUrl,
+          inWatchlist: exists((m)-[:IN_WATCHLIST]->(:User {email: $email}))
+        }
+        ORDER BY m.tmdbVoteCount DESC
+        SKIP $offset
+        LIMIT $limit
+      `,
+        { id: genreId, offset: neo4j.int(offset), limit: neo4j.int(limit), email }
+      )
+      return res.records.map((record) => record.toObject().m)
+    } finally {
+      await session.close()
+    }
+  }
 
 
   async getGenres(movie: Movie): Promise<Genre[]> {
