@@ -8,6 +8,7 @@
     "build": "npm run generate && tsc",
     "lint": "eslint src --ext .ts",
     "lint:fix": "eslint src --ext .ts --fix",
+    "typecheck": "tsc --noEmit",
     "script:seed": "ts-node src/scripts/seed.ts",
     "dev": "nodemon -e ts --exec \"(tsc || exit 1) && node dist/index.js\"",
     "start": "node ./dist/index.js"

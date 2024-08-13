@@ -18,7 +18,7 @@ export class NeoDataSource {
   constructor(private readonly driver: Driver) {}
 
   getMovies = (user: User | null) => async (ids: readonly string[]): Promise<Movie[]> => {
-    const email = user?.email
+    const email = user?.email ?? ''
     const movies = await runMany<Movie>(
       this.driver,
       `MATCH (m:Movie), (u:User {email: $email})
