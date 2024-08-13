@@ -21,8 +21,11 @@ export class NeoDataSource {
     const email = user?.email ?? ''
     const movies = await runMany<Movie>(
       this.driver,
-      `MATCH (m:Movie), (u:User {email: $email})
-      WHERE m.id in $ids RETURN m{
+      `
+      MATCH (m:Movie)
+      OPTIONAL MATCH (m)-[:IN_WATCHLIST]->(u:User {email: $email})
+      WHERE m.id in $ids
+      RETURN m{
         .*,
         inWatchlist: exists((m)-[:IN_WATCHLIST]->(u))
       }`,
