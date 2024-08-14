@@ -9,8 +9,8 @@ export const CookieConsent = () => {
   const [consent, setConsent] = useState<boolean | null>(null)
 
   useEffect(() => {
-    const storedConsent = getCookie('cookieConsent') as boolean | null
-    setConsent(storedConsent ?? false)
+    const storedConsent = getCookie('cookieConsent')
+    setConsent(!!storedConsent)
   }, [])
 
   const onClick = (e: MouseEvent<HTMLButtonElement>) => {
