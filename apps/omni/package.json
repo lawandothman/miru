@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "generate-types": "graphql-codegen --config codegen.yaml",
-    "build": "npm run generate && tsc",
+    "build": "pnpm run generate-types && tsc",
     "lint": "eslint src --ext .ts",
     "lint:fix": "eslint src --ext .ts --fix",
     "typecheck": "tsc --noEmit",
