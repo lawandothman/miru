@@ -8,8 +8,9 @@
     "dev": "next dev",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
+    "typecheck": "tsc --noEmit",
     "start": "next start",
-    "generate": "graphql-codegen --config codegen.yaml"
+    "generate-types": "graphql-codegen --config codegen.yaml"
   },
   "dependencies": {
     "@apollo/client": "^3.7.5",
@@ -52,7 +53,7 @@
   "devDependencies": {
     "@graphql-codegen/cli": "^2.16.4",
     "@graphql-codegen/typescript": "^4.0.9",
-    "@graphql-codegen/typescript-resolvers": "^2.7.12",
+    "@graphql-codegen/typescript-resolvers": "^4.2.1",
     "@tailwindcss/aspect-ratio": "^0.4.2",
     "@types/jsonwebtoken": "^9.0.6",
     "@types/lodash": "^4.14.191",

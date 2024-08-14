@@ -8,12 +8,13 @@
   "scripts": {
     "lint": "turbo lint",
     "lint:fix": "turbo lint:fix",
+    "typecheck": "turbo typecheck",
     "dev": "turbo dev",
     "build": "turbo build",
-    "generate": "turbo generate"
+    "generate-types": "turbo generate-types"
   },
   "devDependencies": {
     "eslint": "^8.32.0",
-    "turbo": "^1.7.0"
+    "turbo": "^2.0.12"
   }
 }
