@@ -87,8 +87,8 @@ importers:
         specifier: ^14.2.4
         version: 14.2.4(@babel/core@7.24.7)(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
       next-auth:
-        specifier: 4.24.5
-        version: 4.24.5(next@14.2.4(@babel/core@7.24.7)(react-dom@18.2.0(react@18.3.1))(react@18.3.1))(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
+        specifier: 4.24.7
+        version: 4.24.7(next@14.2.4(@babel/core@7.24.7)(react-dom@18.2.0(react@18.3.1))(react@18.3.1))(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
       next-pwa:
         specifier: ^5.6.0
         version: 5.6.0(@babel/core@7.24.7)(next@14.2.4(@babel/core@7.24.7)(react-dom@18.2.0(react@18.3.1))(react@18.3.1))(webpack@5.92.1)
@@ -4309,8 +4309,8 @@ packages:
   neo4j-driver@5.22.0:
     resolution: {integrity: sha512-DmyUBUMZWOGYIJCYNdze3pCqJE7ZcK3wGORt+WG+yfWnhWUwLS8tT8N4I8FboSl7i7i3X710h6vhWh333n7CNQ==}
 
-  next-auth@4.24.5:
-    resolution: {integrity: sha512-3RafV3XbfIKk6rF6GlLE4/KxjTcuMCifqrmD+98ejFq73SRoj2rmzoca8u764977lH/Q7jo6Xu6yM+Re1Mz/Og==}
+  next-auth@4.24.7:
+    resolution: {integrity: sha512-iChjE8ov/1K/z98gdKbn2Jw+2vLgJtVV39X+rCP5SGnVQuco7QOr19FRNGMIrD8d3LYhHWV9j9sKLzq1aDWWQQ==}
     peerDependencies:
       next: ^12.2.5 || ^13 || ^14
       nodemailer: ^6.6.5
@@ -10838,7 +10838,7 @@ snapshots:
       neo4j-driver-core: 5.22.0
       rxjs: 7.8.1
 
-  next-auth@4.24.5(next@14.2.4(@babel/core@7.24.7)(react-dom@18.2.0(react@18.3.1))(react@18.3.1))(react-dom@18.2.0(react@18.3.1))(react@18.3.1):
+  next-auth@4.24.7(next@14.2.4(@babel/core@7.24.7)(react-dom@18.2.0(react@18.3.1))(react@18.3.1))(react-dom@18.2.0(react@18.3.1))(react@18.3.1):
     dependencies:
       '@babel/runtime': 7.24.7
       '@panva/hkdf': 1.2.0
