@@ -1,6 +1,6 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "pipeline": {
+  "tasks": {
     "build": {
       "outputs": [".next/**"]
     },
@@ -10,10 +10,15 @@
     "lint:fix": {
       "outputs": []
     },
-    "generate": {
+    "generate-types": {
       "outputs": ["src/__generated__/**"]
     },
     "dev": {
+      "persistent": true,
+      "cache": false,
+      "outputs": []
+    },
+    "typecheck": {
       "outputs": []
     },
     "start": {

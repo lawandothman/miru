@@ -8,8 +8,9 @@
     "dev": "next dev",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
+    "typecheck": "tsc --noEmit",
     "start": "next start",
-    "generate": "graphql-codegen --config codegen.yaml"
+    "generate-types": "graphql-codegen --config codegen.yaml"
   },
   "dependencies": {
     "@apollo/client": "^3.7.5",

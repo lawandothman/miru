@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "generate": "graphql-codegen --config codegen.yaml",
+    "generate-types": "graphql-codegen --config codegen.yaml",
     "build": "npm run generate && tsc",
     "lint": "eslint src --ext .ts",
     "lint:fix": "eslint src --ext .ts --fix",

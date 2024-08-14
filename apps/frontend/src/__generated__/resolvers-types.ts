@@ -4,47 +4,49 @@ export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
+export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never };
+export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
 export type RequireFields<T, K extends keyof T> = Omit<T, K> & { [P in K]-?: NonNullable<T[P]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
-  ID: string;
-  String: string;
-  Boolean: boolean;
-  Int: number;
-  Float: number;
+  ID: { input: string; output: string; }
+  String: { input: string; output: string; }
+  Boolean: { input: boolean; output: boolean; }
+  Int: { input: number; output: number; }
+  Float: { input: number; output: number; }
 };
 
 export type Genre = {
   __typename?: 'Genre';
-  id: Scalars['ID'];
-  name: Scalars['String'];
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
 };
 
 export type Movie = {
   __typename?: 'Movie';
-  adult?: Maybe<Scalars['Boolean']>;
-  backdropUrl?: Maybe<Scalars['String']>;
-  budget?: Maybe<Scalars['Int']>;
+  adult?: Maybe<Scalars['Boolean']['output']>;
+  backdropUrl?: Maybe<Scalars['String']['output']>;
+  budget?: Maybe<Scalars['Int']['output']>;
   buyProviders?: Maybe<Array<Maybe<WatchProvider>>>;
   genres?: Maybe<Array<Maybe<Genre>>>;
-  homepage?: Maybe<Scalars['String']>;
-  id: Scalars['ID'];
-  imdbId?: Maybe<Scalars['String']>;
-  inWatchlist?: Maybe<Scalars['Boolean']>;
+  homepage?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  imdbId?: Maybe<Scalars['String']['output']>;
+  inWatchlist?: Maybe<Scalars['Boolean']['output']>;
   matches?: Maybe<Array<Maybe<User>>>;
-  originalTitle?: Maybe<Scalars['String']>;
-  overview?: Maybe<Scalars['String']>;
-  popularity?: Maybe<Scalars['Float']>;
-  posterUrl?: Maybe<Scalars['String']>;
-  releaseDate?: Maybe<Scalars['String']>;
+  originalTitle?: Maybe<Scalars['String']['output']>;
+  overview?: Maybe<Scalars['String']['output']>;
+  popularity?: Maybe<Scalars['Float']['output']>;
+  posterUrl?: Maybe<Scalars['String']['output']>;
+  releaseDate?: Maybe<Scalars['String']['output']>;
   rentProviders?: Maybe<Array<Maybe<WatchProvider>>>;
-  revenue?: Maybe<Scalars['Int']>;
-  runtime?: Maybe<Scalars['Int']>;
+  revenue?: Maybe<Scalars['Int']['output']>;
+  runtime?: Maybe<Scalars['Int']['output']>;
   streamProviders?: Maybe<Array<Maybe<WatchProvider>>>;
-  tagline?: Maybe<Scalars['String']>;
-  title: Scalars['String'];
-  tmdbVoteAverage?: Maybe<Scalars['Float']>;
-  tmdbVoteCount?: Maybe<Scalars['Int']>;
+  tagline?: Maybe<Scalars['String']['output']>;
+  title: Scalars['String']['output'];
+  tmdbVoteAverage?: Maybe<Scalars['Float']['output']>;
+  tmdbVoteCount?: Maybe<Scalars['Int']['output']>;
   trailer?: Maybe<Trailer>;
 };
 
@@ -58,22 +60,22 @@ export type Mutation = {
 
 
 export type MutationAddMovieToWatchlistArgs = {
-  movieId: Scalars['ID'];
+  movieId: Scalars['ID']['input'];
 };
 
 
 export type MutationFollowArgs = {
-  friendId: Scalars['ID'];
+  friendId: Scalars['ID']['input'];
 };
 
 
 export type MutationRemoveMovieFromWatchlistArgs = {
-  movieId: Scalars['ID'];
+  movieId: Scalars['ID']['input'];
 };
 
 
 export type MutationUnfollowArgs = {
-  friendId: Scalars['ID'];
+  friendId: Scalars['ID']['input'];
 };
 
 export type Query = {
@@ -93,74 +95,74 @@ export type Query = {
 
 
 export type QueryGenreArgs = {
-  genreId: Scalars['ID'];
+  genreId: Scalars['ID']['input'];
 };
 
 
 export type QueryMovieArgs = {
-  id: Scalars['ID'];
+  id: Scalars['ID']['input'];
 };
 
 
 export type QueryMoviesByGenreArgs = {
-  genreId: Scalars['ID'];
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
+  genreId: Scalars['ID']['input'];
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
 export type QueryMoviesForYouArgs = {
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
 export type QueryPopularMoviesArgs = {
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
 export type QuerySearchArgs = {
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  query: Scalars['String'];
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  query: Scalars['String']['input'];
 };
 
 
 export type QuerySearchUsersArgs = {
-  nameQuery: Scalars['String'];
+  nameQuery: Scalars['String']['input'];
 };
 
 
 export type QueryUserArgs = {
-  id: Scalars['ID'];
+  id: Scalars['ID']['input'];
 };
 
 
 export type QueryWatchlistArgs = {
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type Trailer = {
   __typename?: 'Trailer';
-  key?: Maybe<Scalars['String']>;
+  key?: Maybe<Scalars['String']['output']>;
   provider?: Maybe<VideoProvider>;
 };
 
 export type User = {
   __typename?: 'User';
-  email: Scalars['String'];
+  email: Scalars['String']['output'];
   followers?: Maybe<Array<Maybe<User>>>;
   following?: Maybe<Array<Maybe<User>>>;
-  id: Scalars['ID'];
-  image?: Maybe<Scalars['String']>;
-  isBot: Scalars['Boolean'];
-  isFollower?: Maybe<Scalars['Boolean']>;
-  isFollowing?: Maybe<Scalars['Boolean']>;
+  id: Scalars['ID']['output'];
+  image?: Maybe<Scalars['String']['output']>;
+  isBot: Scalars['Boolean']['output'];
+  isFollower?: Maybe<Scalars['Boolean']['output']>;
+  isFollowing?: Maybe<Scalars['Boolean']['output']>;
   matches?: Maybe<Array<Maybe<Movie>>>;
-  name: Scalars['String'];
+  name: Scalars['String']['output'];
   watchlist?: Maybe<Array<Maybe<Movie>>>;
 };
 
@@ -170,10 +172,10 @@ export enum VideoProvider {
 
 export type WatchProvider = {
   __typename?: 'WatchProvider';
-  displayPriority?: Maybe<Scalars['Int']>;
-  id: Scalars['ID'];
-  logoPath?: Maybe<Scalars['String']>;
-  name?: Maybe<Scalars['String']>;
+  displayPriority?: Maybe<Scalars['Int']['output']>;
+  id: Scalars['ID']['output'];
+  logoPath?: Maybe<Scalars['String']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
 };
 
 export type WithIndex<TObject> = TObject & Record<string, any>;
@@ -244,17 +246,19 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
   info: GraphQLResolveInfo
 ) => TResult | Promise<TResult>;
 
+
+
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = ResolversObject<{
-  Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
-  Float: ResolverTypeWrapper<Scalars['Float']>;
+  Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
+  Float: ResolverTypeWrapper<Scalars['Float']['output']>;
   Genre: ResolverTypeWrapper<Genre>;
-  ID: ResolverTypeWrapper<Scalars['ID']>;
-  Int: ResolverTypeWrapper<Scalars['Int']>;
+  ID: ResolverTypeWrapper<Scalars['ID']['output']>;
+  Int: ResolverTypeWrapper<Scalars['Int']['output']>;
   Movie: ResolverTypeWrapper<Movie>;
   Mutation: ResolverTypeWrapper<{}>;
   Query: ResolverTypeWrapper<{}>;
-  String: ResolverTypeWrapper<Scalars['String']>;
+  String: ResolverTypeWrapper<Scalars['String']['output']>;
   Trailer: ResolverTypeWrapper<Trailer>;
   User: ResolverTypeWrapper<User>;
   VideoProvider: VideoProvider;
@@ -263,15 +267,15 @@ export type ResolversTypes = ResolversObject<{
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = ResolversObject<{
-  Boolean: Scalars['Boolean'];
-  Float: Scalars['Float'];
+  Boolean: Scalars['Boolean']['output'];
+  Float: Scalars['Float']['output'];
   Genre: Genre;
-  ID: Scalars['ID'];
-  Int: Scalars['Int'];
+  ID: Scalars['ID']['output'];
+  Int: Scalars['Int']['output'];
   Movie: Movie;
   Mutation: {};
   Query: {};
-  String: Scalars['String'];
+  String: Scalars['String']['output'];
   Trailer: Trailer;
   User: User;
   WatchProvider: WatchProvider;

@@ -1,4 +1,4 @@
-import type { ResolversTypes, UserResolvers } from '../__generated__/resolvers-types'
+import type { UserResolvers } from '../__generated__/resolvers-types'
 
 
 const UserResolver: UserResolvers = {
@@ -13,13 +13,13 @@ const UserResolver: UserResolvers = {
     return await followingLoader.load(parent.id)
   },
   email: () => {
-    return 'REDACTED' as unknown as ResolversTypes['String']
+    return 'REDACTED'
   },
   watchlist: async (parent, _, { watchlistLoader }) => {
     return watchlistLoader.load(parent.id)
   },
   isBot: (parent) => {
-    return !!parent.isBot as unknown as ResolversTypes['Boolean']
+    return !!parent.isBot
   },
 }
 
