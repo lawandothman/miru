@@ -52,7 +52,7 @@
   "devDependencies": {
     "@graphql-codegen/cli": "^2.16.4",
     "@graphql-codegen/typescript": "^4.0.9",
-    "@graphql-codegen/typescript-resolvers": "^2.7.12",
+    "@graphql-codegen/typescript-resolvers": "^4.2.1",
     "@tailwindcss/aspect-ratio": "^0.4.2",
     "@types/jsonwebtoken": "^9.0.6",
     "@types/lodash": "^4.14.191",
