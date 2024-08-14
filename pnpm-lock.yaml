@@ -181,8 +181,8 @@ importers:
         specifier: ^3.2.0
         version: 3.4.4(ts-node@10.9.2(typescript@4.9.5))
       tailwindcss-radix:
-        specifier: ^2.6.2
-        version: 2.9.0
+        specifier: ^3.0.4
+        version: 3.0.4
       tailwindcss-safe-area:
         specifier: ^0.4.1
         version: 0.4.1
@@ -5377,8 +5377,8 @@ packages:
     peerDependencies:
       tailwindcss: '>=3.0.0 || insiders'
 
-  tailwindcss-radix@2.9.0:
-    resolution: {integrity: sha512-N49SnciSeRgLC+VK+Fu5VULNJIvJUvN7tUKF1kEHPXrS76WAlwrSVthCbJ9NUw0Cj/ptxs73pdVEdosomAN5Lg==}
+  tailwindcss-radix@3.0.4:
+    resolution: {integrity: sha512-nnMdBWHGBon4OxfRsF0LfOaoW09WeSU5extMUpk8RckYl94nwu9uyJ6IO5eIrRpvrHNm5CVaWz6PaldcEoQ4SQ==}
 
   tailwindcss-safe-area@0.4.1:
     resolution: {integrity: sha512-6EOe8D39F8N8poKWkeOcIt2SchyJ8CVfm/k5iZak6+QgOzii0TukNIfItdGbf7ylVtq3CF2CK/Oxo5xvtLwVmQ==}
@@ -12052,7 +12052,7 @@ snapshots:
     dependencies:
       tailwindcss: 3.4.4(ts-node@10.9.2(typescript@4.9.5))
 
-  tailwindcss-radix@2.9.0: {}
+  tailwindcss-radix@3.0.4: {}
 
   tailwindcss-safe-area@0.4.1: {}
 
