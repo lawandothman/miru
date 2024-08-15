@@ -15,6 +15,6 @@
   },
   "devDependencies": {
     "eslint": "^8.32.0",
-    "turbo": "^2.0.12"
+    "turbo": "^2.0.13"
   }
 }
