@@ -139,8 +139,8 @@ importers:
         specifier: ^9.0.6
         version: 9.0.6
       '@types/lodash':
-        specifier: ^4.14.191
-        version: 4.17.6
+        specifier: ^4.17.7
+        version: 4.17.7
       '@types/luxon':
         specifier: ^3.2.0
         version: 3.4.2
@@ -260,8 +260,8 @@ importers:
         specifier: ^9.0.6
         version: 9.0.6
       '@types/lodash':
-        specifier: ^4.14.191
-        version: 4.17.6
+        specifier: ^4.17.7
+        version: 4.17.7
       '@types/node':
         specifier: ^18.11.18
         version: 18.19.39
@@ -2008,8 +2008,8 @@ packages:
   '@types/jsonwebtoken@9.0.6':
     resolution: {integrity: sha512-/5hndP5dCjloafCXns6SZyESp3Ldq7YjH3zwzwczYnjxIT0Fqzk5ROSYVGfFyczIue7IUEj8hkvLbPoLQ18vQw==}
 
-  '@types/lodash@4.17.6':
-    resolution: {integrity: sha512-OpXEVoCKSS3lQqjx9GGGOapBeuW5eUboYHRlHP9urXPX25IKZ6AnP5ZRxtVf63iieUbsHxLn8NQ5Nlftc6yzAA==}
+  '@types/lodash@4.17.7':
+    resolution: {integrity: sha512-8wTvZawATi/lsmNu10/j2hk1KEP0IvjubqPE3cu1Xz7xfXXt5oCq3SNUz4fMIP4XGF9Ky+Ue2tBA3hcS7LSBlA==}
 
   '@types/long@4.0.2':
     resolution: {integrity: sha512-MqTGEo5bj5t157U6fA/BiDynNkn0YknVdh48CMPkTSpFTVmvao5UQmm7uEF6xBEo7qIMAlY/JSleYaE6VOdpaA==}
@@ -8106,7 +8106,7 @@ snapshots:
     dependencies:
       '@types/node': 18.19.39
 
-  '@types/lodash@4.17.6': {}
+  '@types/lodash@4.17.7': {}
 
   '@types/long@4.0.2': {}
 

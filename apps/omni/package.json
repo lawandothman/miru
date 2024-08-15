@@ -39,7 +39,7 @@
     "@graphql-codegen/typescript": "^4.0.9",
     "@graphql-codegen/typescript-resolvers": "^4.2.1",
     "@types/jsonwebtoken": "^9.0.6",
-    "@types/lodash": "^4.14.191",
+    "@types/lodash": "^4.17.7",
     "@types/node": "^18.11.18",
     "eslint-config-custom": "workspace:*",
     "nodemon": "^3.1.4",
