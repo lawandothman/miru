@@ -13,7 +13,7 @@
     "generate-types": "graphql-codegen --config codegen.yaml"
   },
   "dependencies": {
-    "@apollo/client": "^3.7.5",
+    "@apollo/client": "^3.11.4",
     "@auth/neo4j-adapter": "2.4.2",
     "@headlessui/react": "^1.7.7",
     "@radix-ui/react-avatar": "^1.1.0",
