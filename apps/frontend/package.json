@@ -55,7 +55,7 @@
     "@graphql-codegen/typescript-resolvers": "^4.2.1",
     "@tailwindcss/aspect-ratio": "^0.4.2",
     "@types/jsonwebtoken": "^9.0.6",
-    "@types/lodash": "^4.14.191",
+    "@types/lodash": "^4.17.7",
     "@types/luxon": "^3.2.0",
     "@types/node": "^18.11.18",
     "@types/react": "^18.0.27",
