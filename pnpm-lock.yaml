@@ -71,9 +71,6 @@ importers:
       jsonwebtoken:
         specifier: ^9.0.0
         version: 9.0.2
-      lodash:
-        specifier: ^4.17.21
-        version: 4.17.21
       lucide-react:
         specifier: ^0.427.0
         version: 0.427.0(react@18.3.1)

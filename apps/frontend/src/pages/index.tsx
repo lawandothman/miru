@@ -2,7 +2,6 @@ import { gql, useMutation, useQuery } from '@apollo/client'
 import { FullPageLoader } from 'components/AsyncState'
 import { PageHeader } from 'components/PageHeader'
 import { UserSummary } from 'components/UserSummary'
-import { sortBy } from 'lodash'
 import type { NextPage } from 'next'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
@@ -100,15 +99,15 @@ const Home: NextPage = () => {
   return (
     <main className='max-w-screen-2xl'>
       <PageHeader title={getGreeting()} />
-      {sortBy(data?.user?.following, [(u) => -(u?.matches?.length ?? 0)]).map(
-        (following) => {
+      {[...data?.user?.following ?? []]
+        .sort((a, b) => (b?.matches?.length ?? 0) - (a?.matches?.length ?? 0))
+        .map((following) => {
           if (following) {
             return <UserSummary key={following.id} user={following} />
           } else {
             return null
           }
-        }
-      )}
+        })}
       <Footer />
     </main>
   )

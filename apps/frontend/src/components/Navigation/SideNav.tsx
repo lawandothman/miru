@@ -4,7 +4,6 @@ import React from 'react'
 import { signIn } from 'next-auth/react'
 import { ProfilePicture } from '@/components/ProfilePicture'
 import type { Genre } from '__generated__/resolvers-types'
-import _ from 'lodash'
 import type { NextRouter } from 'next/dist/client/router'
 import type { User } from 'next-auth'
 import { Button } from '@/components/ui/button'
@@ -81,7 +80,7 @@ export const Sidebar: FC<SidebarProps> = ({ genres, router, user }) => {
           </ul>
           <p className='pb-2 pl-3 pt-4 text-sm'>Genres</p>
           <ul className='space-y-2'>
-            {_.sortBy(genres, (genre) => genre.name).map((genre) => (
+            {[...genres].sort((a, b) => a.name.localeCompare(b.name)).map((genre) => (
               <SideNavItem
                 href={`${GENRE_INDEX}/${genre.id}`}
                 isSelected={router.asPath === `${GENRE_INDEX}/${genre.id}`}
