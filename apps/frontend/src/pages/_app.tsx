@@ -7,6 +7,7 @@ import {
   createHttpLink,
   gql,
 } from '@apollo/client'
+import { RetryLink } from '@apollo/client/link/retry'
 import { setContext } from '@apollo/client/link/context'
 import { Analytics } from '@vercel/analytics/react'
 import { DefaultSeo } from 'next-seo'
@@ -22,7 +23,7 @@ import { Navigation } from 'components/Navigation'
 import Head from 'next/head'
 import { CookieConsent } from 'components/CookiesConsent'
 
-const httpLinkt = createHttpLink({
+const httpLink = createHttpLink({
   uri: `${process.env.NEXT_PUBLIC_OMNI_URL}/graphql`,
 })
 
@@ -37,8 +38,20 @@ const authLink = setContext(async (_, { headers }) => {
   }
 })
 
+const retryLink = new RetryLink({
+  delay: {
+    initial: 300,
+    max: Infinity,
+    jitter: true,
+  },
+  attempts: {
+    max: 3,
+    retryIf: (error, _operation) => !!error,
+  },
+})
+
 const client = new ApolloClient({
-  link: authLink.concat(httpLinkt),
+  link: retryLink.concat(authLink).concat(httpLink),
   cache: new InMemoryCache({
     typePolicies: {
       Query: {
