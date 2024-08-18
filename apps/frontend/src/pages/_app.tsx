@@ -22,27 +22,8 @@ import { Navigation } from 'components/Navigation'
 import Head from 'next/head'
 import { CookieConsent } from 'components/CookiesConsent'
 
-const customFetch = (input: RequestInfo | URL, options?: RequestInit): Promise<Response> => {
-  return new Promise((resolve, reject) => {
-    const timeout = setTimeout(() => {
-      reject(new Error('Request timed out'))
-    }, 10000) // 10 seconds timeout
-
-    fetch(input, options)
-      .then((response) => {
-        clearTimeout(timeout)
-        resolve(response)
-      })
-      .catch((err) => {
-        clearTimeout(timeout)
-        reject(err)
-      })
-  })
-}
-
 const httpLinkt = createHttpLink({
   uri: `${process.env.NEXT_PUBLIC_OMNI_URL}/graphql`,
-  fetch: customFetch,
 })
 
 const authLink = setContext(async (_, { headers }) => {
