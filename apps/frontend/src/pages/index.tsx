@@ -50,7 +50,7 @@ const Home: NextPage = () => {
   const { data: session, status: sessionStatus } = useSession()
   const { data, loading, refetch } = useQuery<{ user: User }>(GET_HOME, {
     variables: { userId: session?.user?.id },
-    fetchPolicy: 'network-only',
+    fetchPolicy: 'cache-and-network',
   })
   const [invitedBy, setInvitedBy] = useState<string | null>(null)
   const [follow, { loading: followLoading }] = useMutation<
