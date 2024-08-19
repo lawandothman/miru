@@ -102,7 +102,7 @@ const Illustration = () => {
       className='mx-auto'
       src={systemTheme === 'dark' ? HomeCinemaDark : HomeCinemaLight}
       alt='Illustration'
-      width={500}
+      width={390}
     />
   )
 }

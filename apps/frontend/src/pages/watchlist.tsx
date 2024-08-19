@@ -86,14 +86,14 @@ const Watchlist: NextPage = () => {
           />
           <Illustration />
 
-          <div className='mx-auto mt-8 flex max-w-xl flex-col items-center justify-center gap-4'>
-            <Link className='block w-full' href={EXPLORE_INDEX}>
-              <Button className='py-4'>
+          <div className='mx-auto mt-8 flex max-w-xl flex-col items-center gap-4'>
+            <Link className='w-full' href={EXPLORE_INDEX}>
+              <Button className='w-full py-8 text-lg'>
                 Find a movie to watch with friends
               </Button>
             </Link>
-            <Link className='block w-full' href={POPULAR_INDEX}>
-              <Button className='py-4'>
+            <Link className='w-full' href={POPULAR_INDEX}>
+              <Button className='w-full py-8 text-lg'>
                 Miru&apos;s popular movies
               </Button>
             </Link>
@@ -135,7 +135,7 @@ const Illustration = () => {
       className='mx-auto'
       src={systemTheme === 'dark' ? HorrorMovieDark : HorrorMovieLight}
       alt='Illustration'
-      width={700}
+      width={390}
     />
   )
 }

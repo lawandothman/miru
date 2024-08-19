@@ -36,36 +36,34 @@ export const InvitePrompt = ({
   const { copy, isCopied } = useInviteLink(session?.user)
 
   return (
-    <main>
+    <main className='max-w-screen-2xl'>
       <PageHeader title={pageTitle} />
       <Illustration />
-      <p className='mx-auto mt-8 max-w-2xl text-center text-xl'>
-        It&apos;s a bit quiet here... let&apos;s get the party started by finding
-        your friends or following some Miru bots. They&apos;ve got some great
-        movie recommendations that will have you adding to your watchlist in no
-        time!
+      <p className='mx-auto mt-4 max-w-2xl text-center text-xl'>
+        It&apos;s a bit quiet here... Get the party started by connecting
+        with friends or following Miru bots for top-notch movie recommendations!
       </p>
 
-      <div className='mt-8 grid grid-cols-1 gap-x-10 gap-y-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 xl:gap-x-8'>
+      <div className='mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3'>
         {botsData?.bots.map((bot) => (
           <Link
             href={`${USER_INDEX}/${bot.id}`}
-            className='flex w-full flex-col items-center justify-center gap-8 rounded-lg border border-neutral-300 p-8  hover:bg-neutral-300 dark:border-neutral-600 hover:dark:bg-neutral-900'
+            className='flex flex-col items-center rounded-lg border p-6 hover:bg-neutral-300 dark:border-neutral-600 hover:dark:bg-neutral-900'
             key={bot.id}
           >
             <ProfilePicture size='lg' user={bot} />
-            <span>{bot.name}</span>
+            <span className='mt-4 text-lg font-medium'>{bot.name}</span>
           </Link>
         ))}
       </div>
-      <div className='mx-auto mt-8 flex max-w-xl flex-col items-center justify-center gap-4'>
-        <Link className='block w-full' href={EXPLORE_INDEX}>
-          <Button className='w-full py-8 text-base' >
+      <div className='mx-auto mt-8 flex max-w-md flex-col items-center space-y-4'>
+        <Link className='w-full' href={EXPLORE_INDEX}>
+          <Button className='w-full py-8 text-lg' >
             Search for your friends
           </Button>
         </Link>
-        <Button className='w-full py-8 text-base'  onClick={() => copy()}>
-          {isCopied ? 'Copied!' : 'Copy Invite Link'}
+        <Button className='w-full py-8 text-lg'  onClick={() => copy()}>
+          {isCopied ? 'Invite Link Copied!' : 'Copy Invite Link'}
         </Button>
       </div>
     </main>

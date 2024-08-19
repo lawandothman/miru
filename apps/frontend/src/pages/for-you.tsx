@@ -114,7 +114,7 @@ const Illustration = () => {
       className='mx-auto'
       src={systemTheme === 'dark' ? WaveDark : WaveLight}
       alt='Illustration'
-      width={500}
+      width={340}
     />
   )
 }
