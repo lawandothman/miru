@@ -4,7 +4,7 @@ import type { MovieRepo } from '../dataSources/movieRepo'
 import type { WatchProviderRepo } from '../dataSources/watchProviderRepo'
 import type { MovieDbService } from './movieDbService'
 
-const PAGE_SIZE = 20
+const BATCH_SIZE = 10
 
 export class SyncService {
 
@@ -23,25 +23,26 @@ export class SyncService {
       const transaction = startTransaction({
         op: 'Sync',
         name: 'sync',
-        data: {
-          page
-        }
+        data: { page }
       })
       try {
         const movies = await this.getPopularMovieSummaries(page)
-        movies.forEach(async (movieLike) => {
-          const [movie, watchProviders] = await Promise.all([
-            this.getMovieDetails(movieLike),
-            this.getWatchProvidersForMovie(movieLike),
-          ])
-          await this.movieRepo.upsert(movie)
-          await Promise.all(
-            [
-              ...watchProviders.stream.map((w) => this.watchProviderRepo.upsertStream(w.id, movie.id)),
-              ...watchProviders.buy.map((w) => this.watchProviderRepo.upsertBuy(w.id, movie.id)),
-              ...watchProviders.rent.map((w) => this.watchProviderRepo.upsertRent(w.id, movie.id)),
+        for (let i = 0; i < movies.length; i += BATCH_SIZE) {
+          const batch = movies.slice(i, i + BATCH_SIZE)
+          await Promise.all(batch.map(async (movieLike) => {
+            const [movie, watchProviders] = await Promise.all([
+              this.getMovieDetails(movieLike),
+              this.getWatchProvidersForMovie(movieLike),
             ])
-        })
+            await this.movieRepo.upsert(movie)
+            await Promise.all(
+              [
+                ...watchProviders.stream.map((w) => this.watchProviderRepo.upsertStream(w.id, movie.id)),
+                ...watchProviders.buy.map((w) => this.watchProviderRepo.upsertBuy(w.id, movie.id)),
+                ...watchProviders.rent.map((w) => this.watchProviderRepo.upsertRent(w.id, movie.id)),
+              ])
+          }))
+        }
         page = this.getNextPage(page)
       } catch(e) {
         if(e instanceof Error) {
@@ -87,7 +88,7 @@ export class SyncService {
 
 
   private getNextPage(currentPage: number) {
-    const maxPages = Math.ceil(this.maxMovies / PAGE_SIZE)
+    const maxPages = Math.ceil(this.maxMovies / BATCH_SIZE)
 
     return (currentPage % maxPages) + 1
   }
