@@ -43,7 +43,7 @@ export const Sidebar: FC<SidebarProps> = ({ genres, router, user }) => {
         <nav className='flex flex-col p-2'>
           <ul className='space-y-2'>
             <SideNavItem
-              isSelected={router.pathname === '/'}
+              isSelected={router.pathname === '/' || router.pathname === '/dashboard'}
               href='/'
               Icon={Home}
             >
