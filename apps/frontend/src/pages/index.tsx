@@ -20,7 +20,7 @@ const Home: NextPage = () => {
   }
 
   return (
-    <main>
+    <main className='max-w-screen-2xl'>
       <PageHeader
         title='Welcome to Miru'
         subtitle='The social movie watching platform'

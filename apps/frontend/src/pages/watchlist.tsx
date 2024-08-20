@@ -60,7 +60,7 @@ const Watchlist: NextPage = () => {
 
   if (!session) {
     return (
-      <main>
+      <main className='max-w-screen-2xl'>
         <PageHeader
           title='Watchlist'
           subtitle='Login to add movies to your watchlist and match with friends'
