@@ -15,7 +15,7 @@
   "dependencies": {
     "@apollo/client": "^3.11.4",
     "@auth/neo4j-adapter": "2.4.2",
-    "@headlessui/react": "^1.7.7",
+    "@headlessui/react": "^2.1.2",
     "@radix-ui/react-avatar": "^1.1.0",
     "@radix-ui/react-dialog": "^1.1.1",
     "@radix-ui/react-slot": "^1.1.0",
