@@ -7,8 +7,8 @@ import { useState } from 'react'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import Image from 'next/image'
-import HorrorMovieDark from '../../public/illustration/dark/horror_movie.svg'
-import HorrorMovieLight from '../../public/illustration/light/horror_movie.svg'
+import HomeCinemaDark from '../../public/illustration/dark/home_cinema.svg'
+import HomeCinemaLight from '../../public/illustration/light/home_cinema.svg'
 import { useTheme } from 'next-themes'
 import { FullPageLoader } from 'components/AsyncState'
 import {
@@ -133,7 +133,7 @@ const Illustration = () => {
   return (
     <Image
       className='mx-auto'
-      src={systemTheme === 'dark' ? HorrorMovieDark : HorrorMovieLight}
+      src={systemTheme === 'dark' ? HomeCinemaDark : HomeCinemaLight}
       alt='Illustration'
       width={390}
     />

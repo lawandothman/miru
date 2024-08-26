@@ -4,8 +4,8 @@ import type { GetServerSidePropsContext, NextPage } from 'next'
 import { getSession, useSession } from 'next-auth/react'
 import Link from 'next/link'
 import Image from 'next/image'
-import HomeCinemaDark from '../../public/illustration/dark/home_cinema.svg'
-import HomeCinemaLight from '../../public/illustration/light/home_cinema.svg'
+import HorrorMovieDark from '../../public/illustration/dark/horror_movie.svg'
+import HorrorMovieLight from '../../public/illustration/light/horror_movie.svg'
 import React from 'react'
 import { useTheme } from 'next-themes'
 import { SIGN_IN_INDEX } from 'config/constants'
@@ -100,7 +100,7 @@ const Illustration = () => {
   return (
     <Image
       className='mx-auto'
-      src={systemTheme === 'dark' ? HomeCinemaDark : HomeCinemaLight}
+      src={systemTheme === 'dark' ? HorrorMovieDark : HorrorMovieLight}
       alt='Illustration'
       width={390}
     />
