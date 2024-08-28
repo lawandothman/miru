@@ -196,8 +196,8 @@ importers:
         specifier: ^7.31.0
         version: 7.114.0
       '@sentry/utils':
-        specifier: ^8.13.0
-        version: 8.13.0
+        specifier: ^8.27.0
+        version: 8.27.0
       axios:
         specifier: ^1.7.4
         version: 1.7.4
@@ -1879,8 +1879,8 @@ packages:
     resolution: {integrity: sha512-2drqrD2+6kgeg+W/ycmiti3G4lJrV3hGjY9PpJ3bJeXrh6T2+LxKPzlgSEnKFaeQWkXdZ4eaUbtTXVebMjb5JA==}
     engines: {node: '>=8'}
 
-  '@sentry/types@8.13.0':
-    resolution: {integrity: sha512-r63s/H5gvQnQM9tTGBXz2xErUbxZALh4e2Lg/1aHj4zIvGLBjA2z5qWsh6TEZYbpmgAyGShLDr6+rWeUVf9yBQ==}
+  '@sentry/types@8.27.0':
+    resolution: {integrity: sha512-B6lrP46+m2x0lfqWc9F4VcUbN893mVGnPEd7KIMRk95mPzkFJ3sNxggTQF5/ZfNO7lDQYQb22uysB5sj/BqFiw==}
     engines: {node: '>=14.18'}
 
   '@sentry/utils@7.114.0':
@@ -1891,8 +1891,8 @@ packages:
     resolution: {integrity: sha512-43qItc/ydxZV1Zb3Kn2M54RwL9XXFa3IAYBO8S82Qvq5YUYmU2AmJ1jgg7DabXlVSWgMA1HntwqnOV3JLaEnTQ==}
     engines: {node: '>=8'}
 
-  '@sentry/utils@8.13.0':
-    resolution: {integrity: sha512-PxV0v9VbGWH9zP37P5w2msLUFDr287nYjoY2XVF+RSolyiTs1CQNI5ZMUO3o4MsSac/dpXxjyrZXQd72t/jRYA==}
+  '@sentry/utils@8.27.0':
+    resolution: {integrity: sha512-gyJM3SyLQe0A3mkQVVNdKYvk3ZoikkYgyA/D+5StFNLKdyUgEbJgXOGXrQSSYPF7BSX6Sc5b0KHCglPII0KuKw==}
     engines: {node: '>=14.18'}
 
   '@sentry/vercel-edge@7.118.0':
@@ -7953,7 +7953,7 @@ snapshots:
 
   '@sentry/types@7.118.0': {}
 
-  '@sentry/types@8.13.0': {}
+  '@sentry/types@8.27.0': {}
 
   '@sentry/utils@7.114.0':
     dependencies:
@@ -7963,9 +7963,9 @@ snapshots:
     dependencies:
       '@sentry/types': 7.118.0
 
-  '@sentry/utils@8.13.0':
+  '@sentry/utils@8.27.0':
     dependencies:
-      '@sentry/types': 8.13.0
+      '@sentry/types': 8.27.0
 
   '@sentry/vercel-edge@7.118.0':
     dependencies:
