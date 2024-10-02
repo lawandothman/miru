@@ -40,7 +40,7 @@
     "@graphql-codegen/typescript-resolvers": "^4.2.1",
     "@types/jsonwebtoken": "^9.0.6",
     "@types/lodash": "^4.17.7",
-    "@types/node": "^18.11.18",
+    "@types/node": "^22.7.4",
     "eslint-config-custom": "workspace:*",
     "nodemon": "^3.1.4",
     "pino-pretty": "^11.2.2",
