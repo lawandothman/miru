@@ -229,8 +229,8 @@ importers:
         specifier: ^0.17.0
         version: 0.17.0
       neo4j-driver:
-        specifier: ^5.9.1
-        version: 5.22.0
+        specifier: ^5.25.0
+        version: 5.25.0
       pino:
         specifier: ^9.3.2
         version: 9.3.2
@@ -4278,11 +4278,20 @@ packages:
   neo4j-driver-bolt-connection@5.22.0:
     resolution: {integrity: sha512-tpw4URUn8AkpIPaUnz79B3X9hypZYnTKlm7IPrThKNIEOM8U2hUV7/mLoNcaqX39ebiWbuFy4EKK0DOQ+fdd+g==}
 
+  neo4j-driver-bolt-connection@5.25.0:
+    resolution: {integrity: sha512-plQnrqu14rMLX4p/8a5/BjdFKbLihpslsV0+uTe+9sa1iAtelanTsgkPscZuQRW041anGvO0KE/vN7xqbPJaFg==}
+
   neo4j-driver-core@5.22.0:
     resolution: {integrity: sha512-tta/zBfbjm24uGgumckYgVxqnTDenPNo2BQwy+eOD7H2tn9oP3U/OikzOvQuRzfRkRtag0ynrTjXw0JsAXZJkw==}
 
+  neo4j-driver-core@5.25.0:
+    resolution: {integrity: sha512-fdPAKlhtosNJw8eDrDZ+Krpgl9Yqe/dTUTVdU7Ud83E3QHl3ILp8n/uN7zyixf5sPI+11t/bqH4Z6vtANwYqPw==}
+
   neo4j-driver@5.22.0:
     resolution: {integrity: sha512-DmyUBUMZWOGYIJCYNdze3pCqJE7ZcK3wGORt+WG+yfWnhWUwLS8tT8N4I8FboSl7i7i3X710h6vhWh333n7CNQ==}
+
+  neo4j-driver@5.25.0:
+    resolution: {integrity: sha512-1CNl5ArQH5nXrH0sJOsrM3/ezra8ivxTeXiBzas1HBizi7zPXhrpnQTSDvFcTW1NV9GOioW8/ei7B59kcVaK3Q==}
 
   next-auth@4.24.7:
     resolution: {integrity: sha512-iChjE8ov/1K/z98gdKbn2Jw+2vLgJtVV39X+rCP5SGnVQuco7QOr19FRNGMIrD8d3LYhHWV9j9sKLzq1aDWWQQ==}
@@ -10778,12 +10787,26 @@ snapshots:
       neo4j-driver-core: 5.22.0
       string_decoder: 1.3.0
 
+  neo4j-driver-bolt-connection@5.25.0:
+    dependencies:
+      buffer: 6.0.3
+      neo4j-driver-core: 5.25.0
+      string_decoder: 1.3.0
+
   neo4j-driver-core@5.22.0: {}
+
+  neo4j-driver-core@5.25.0: {}
 
   neo4j-driver@5.22.0:
     dependencies:
       neo4j-driver-bolt-connection: 5.22.0
       neo4j-driver-core: 5.22.0
+      rxjs: 7.8.1
+
+  neo4j-driver@5.25.0:
+    dependencies:
+      neo4j-driver-bolt-connection: 5.25.0
+      neo4j-driver-core: 5.25.0
       rxjs: 7.8.1
 
   next-auth@4.24.7(next@14.2.4(@babel/core@7.24.7)(react-dom@18.2.0(react@18.3.1))(react@18.3.1))(react-dom@18.2.0(react@18.3.1))(react@18.3.1):
