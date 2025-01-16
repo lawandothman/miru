@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@apollo/server": "^4.11.0",
-    "@sentry/node": "^7.31.0",
+    "@sentry/node": "^8.50.0",
     "@sentry/profiling-node": "^0.0.12",
     "@sentry/tracing": "^7.31.0",
     "@sentry/utils": "^8.13.0",
