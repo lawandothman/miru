@@ -38,7 +38,12 @@ export const movieRouter = router({
 					schema.movies,
 					eq(schema.movies.id, schema.movieGenres.movieId),
 				)
-				.where(eq(schema.movieGenres.genreId, input.genreId))
+				.where(
+					and(
+						eq(schema.movieGenres.genreId, input.genreId),
+						eq(schema.movies.adult, false),
+					),
+				)
 				.orderBy(desc(schema.movies.tmdbVoteCount))
 				.limit(20)
 				.offset((page - 1) * 20);
@@ -141,7 +146,12 @@ export const movieRouter = router({
 					schema.movies,
 					eq(schema.movies.id, schema.watchlistEntries.movieId),
 				)
-				.where(eq(schema.follows.followerId, userId))
+				.where(
+					and(
+						eq(schema.follows.followerId, userId),
+						eq(schema.movies.adult, false),
+					),
+				)
 				.groupBy(schema.movies.id)
 				.orderBy(desc(count(schema.follows.followingId)))
 				.limit(input.limit)
@@ -199,6 +209,7 @@ export const movieRouter = router({
 					schema.watchlistEntries,
 					eq(schema.watchlistEntries.movieId, schema.movies.id),
 				)
+				.where(eq(schema.movies.adult, false))
 				.groupBy(schema.movies.id)
 				.orderBy(
 					desc(count(schema.watchlistEntries.userId)),
@@ -224,15 +235,17 @@ export const movieRouter = router({
 			const tmdbResults = await ctx.tmdb.search.movies({
 				query: input.query,
 				page: input.page,
+				include_adult: false,
 			});
 
-			const movieIds = tmdbResults.results.map((r) => r.id);
+			const safeResults = tmdbResults.results.filter((r) => !r.adult);
+			const movieIds = safeResults.map((r) => r.id);
 
 			if (movieIds.length > 0) {
 				await ctx.db
 					.insert(schema.movies)
 					.values(
-						tmdbResults.results.map((result) => ({
+						safeResults.map((result) => ({
 							id: result.id,
 							title: result.title,
 							originalTitle: result.original_title ?? null,
@@ -240,7 +253,7 @@ export const movieRouter = router({
 							posterPath: result.poster_path ?? null,
 							backdropPath: result.backdrop_path ?? null,
 							releaseDate: result.release_date ?? null,
-							adult: result.adult ?? false,
+							adult: false,
 							popularity: result.popularity ?? null,
 						})),
 					)
@@ -250,7 +263,7 @@ export const movieRouter = router({
 			const watchlistSet = await getWatchlistSet(ctx, movieIds);
 
 			return {
-				results: tmdbResults.results.map((r) => ({
+				results: safeResults.map((r) => ({
 					id: r.id,
 					title: r.title,
 					posterPath: r.poster_path,
