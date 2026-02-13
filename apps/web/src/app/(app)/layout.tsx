@@ -1,11 +1,8 @@
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import { AppSidebar } from "@/components/app-sidebar";
-import {
-	SidebarInset,
-	SidebarProvider,
-	SidebarTrigger,
-} from "@/components/ui/sidebar";
+import { BottomNav } from "@/components/bottom-nav";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 
 export default async function AppLayout({
 	children,
@@ -16,28 +13,25 @@ export default async function AppLayout({
 		headers: await headers(),
 	});
 
+	const user = session?.user
+		? {
+				id: session.user.id,
+				image: session.user.image ?? null,
+				name: session.user.name,
+			}
+		: null;
+
 	return (
 		<SidebarProvider>
-			<AppSidebar
-				user={
-					session?.user
-						? {
-								id: session.user.id,
-								image: session.user.image ?? null,
-								name: session.user.name,
-							}
-						: null
-				}
-			/>
+			<div className="hidden md:contents">
+				<AppSidebar user={user} />
+			</div>
 			<SidebarInset>
-				<header className="flex h-12 items-center gap-2 border-b border-border/50 px-4 md:hidden">
-					<SidebarTrigger />
-					<span className="font-display text-sm font-bold">Miru</span>
-				</header>
-				<div className="mx-auto w-full max-w-6xl px-4 py-6 lg:px-8 lg:py-8">
+				<div className="mx-auto w-full max-w-6xl px-4 py-6 pb-28 md:pb-6 lg:px-8 lg:py-8">
 					{children}
 				</div>
 			</SidebarInset>
+			<BottomNav user={user} />
 		</SidebarProvider>
 	);
 }
