@@ -1,6 +1,6 @@
 import { schema } from "@miru/db";
 import { TRPCError } from "@trpc/server";
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { z } from "zod";
 import { protectedProcedure, publicProcedure, router } from "../trpc";
 
@@ -84,15 +84,19 @@ export const watchlistRouter = router({
 				orderBy: (we, { desc }) => [desc(we.createdAt)],
 			});
 
-			const watchlistSet = new Set<number>();
-			if (ctx.session?.user) {
+			const movieIds = entries.map((e) => e.movie.id);
+			let watchlistSet = new Set<number>();
+			if (ctx.session?.user && movieIds.length > 0) {
 				const myEntries = await ctx.db
 					.select({ movieId: schema.watchlistEntries.movieId })
 					.from(schema.watchlistEntries)
-					.where(eq(schema.watchlistEntries.userId, ctx.session.user.id));
-				for (const e of myEntries) {
-					watchlistSet.add(e.movieId);
-				}
+					.where(
+						and(
+							eq(schema.watchlistEntries.userId, ctx.session.user.id),
+							inArray(schema.watchlistEntries.movieId, movieIds),
+						),
+					);
+				watchlistSet = new Set(myEntries.map((e) => e.movieId));
 			}
 
 			return entries.map((e) => ({

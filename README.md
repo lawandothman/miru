@@ -1,37 +1,43 @@
-![ミル Miru](https://miru-chi.vercel.app/api/og)
-
 # Miru
 
-This is a monorepo managed by [Turborepo](https://github.com/vercel/turbo)
+A social movie-watching platform. Follow friends, build watchlists, and find movies to watch together.
 
-## What's Inside?
+## Stack
 
-This Turborepo includes the following packages/apps:
+- **Web**: Next.js 16 (App Router), React 19, Tailwind CSS v4
+- **API**: tRPC v11
+- **Database**: Drizzle ORM + Neon Postgres
+- **Auth**: Better Auth
+- **UI**: shadcn/ui
 
-- `frontend`: a [Next.js](https://github.com/vercel/next.js) app
-- `omni`: a GraphQL API
+## Monorepo Structure
 
-## Run locally
+```
+apps/
+  web/              # Next.js web app
+packages/
+  db/               # Drizzle schema + Postgres client
+  trpc/             # tRPC routers (shared API)
+  typescript-config/ # Shared tsconfig
+```
 
-- Install Dependencies.
+## Development
 
 ```bash
 pnpm install
-```
-
-- Create a `.env` in the root of the project following the `.env.example` template.
-
-- Start the local development database
-
-```bash
-docker compose up -d
-```
-
-- Run the development server
-
-```bash
 pnpm dev
 ```
 
-- Frontend app at http://localhost:3000
-- Omni API at http://localhost:4000
+Web app runs at http://localhost:3000
+
+## Scripts
+
+```bash
+pnpm dev          # Start dev server
+pnpm build        # Build all packages
+pnpm lint         # Run oxlint
+pnpm format       # Run oxfmt
+pnpm typecheck    # Type-check all packages
+pnpm db:generate  # Generate Drizzle migrations
+pnpm db:push      # Push schema to database
+```

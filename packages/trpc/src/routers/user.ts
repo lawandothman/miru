@@ -1,7 +1,8 @@
 import { schema } from "@miru/db";
 import { TRPCError } from "@trpc/server";
-import { and, count, eq, sql } from "drizzle-orm";
+import { and, count, eq } from "drizzle-orm";
 import { z } from "zod";
+import { annotateFollowStatus } from "../helpers";
 import { publicProcedure, router } from "../trpc";
 
 export const userRouter = router({
@@ -16,40 +17,7 @@ export const userRouter = router({
 			.from(schema.users)
 			.where(eq(schema.users.isBot, true));
 
-		if (!ctx.session?.user) {
-			return bots.map((b) => ({ ...b, isFollowing: false, isFollower: false }));
-		}
-
-		const botIds = bots.map((b) => b.id);
-		const myId = ctx.session.user.id;
-
-		const followingRows = await ctx.db
-			.select({ followingId: schema.follows.followingId })
-			.from(schema.follows)
-			.where(
-				and(
-					eq(schema.follows.followerId, myId),
-					sql`${schema.follows.followingId} IN ${botIds}`,
-				),
-			);
-		const followingSet = new Set(followingRows.map((r) => r.followingId));
-
-		const followerRows = await ctx.db
-			.select({ followerId: schema.follows.followerId })
-			.from(schema.follows)
-			.where(
-				and(
-					eq(schema.follows.followingId, myId),
-					sql`${schema.follows.followerId} IN ${botIds}`,
-				),
-			);
-		const followerSet = new Set(followerRows.map((r) => r.followerId));
-
-		return bots.map((b) => ({
-			...b,
-			isFollowing: followingSet.has(b.id),
-			isFollower: followerSet.has(b.id),
-		}));
+		return annotateFollowStatus(ctx, bots);
 	}),
 
 	getById: publicProcedure
@@ -63,40 +31,42 @@ export const userRouter = router({
 				throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
 			}
 
-			const [followerCount] = await ctx.db
-				.select({ count: count() })
-				.from(schema.follows)
-				.where(eq(schema.follows.followingId, input.id));
-
-			const [followingCount] = await ctx.db
-				.select({ count: count() })
-				.from(schema.follows)
-				.where(eq(schema.follows.followerId, input.id));
+			const [[followerCount], [followingCount]] = await Promise.all([
+				ctx.db
+					.select({ count: count() })
+					.from(schema.follows)
+					.where(eq(schema.follows.followingId, input.id)),
+				ctx.db
+					.select({ count: count() })
+					.from(schema.follows)
+					.where(eq(schema.follows.followerId, input.id)),
+			]);
 
 			let isFollowing = false;
 			let isFollower = false;
 
 			if (ctx.session?.user) {
-				const [followingRow] = await ctx.db
-					.select({ id: schema.follows.followingId })
-					.from(schema.follows)
-					.where(
-						and(
-							eq(schema.follows.followerId, ctx.session.user.id),
-							eq(schema.follows.followingId, input.id),
+				const [[followingRow], [followerRow]] = await Promise.all([
+					ctx.db
+						.select({ id: schema.follows.followingId })
+						.from(schema.follows)
+						.where(
+							and(
+								eq(schema.follows.followerId, ctx.session.user.id),
+								eq(schema.follows.followingId, input.id),
+							),
 						),
-					);
+					ctx.db
+						.select({ id: schema.follows.followerId })
+						.from(schema.follows)
+						.where(
+							and(
+								eq(schema.follows.followerId, input.id),
+								eq(schema.follows.followingId, ctx.session.user.id),
+							),
+						),
+				]);
 				isFollowing = Boolean(followingRow);
-
-				const [followerRow] = await ctx.db
-					.select({ id: schema.follows.followerId })
-					.from(schema.follows)
-					.where(
-						and(
-							eq(schema.follows.followerId, input.id),
-							eq(schema.follows.followingId, ctx.session.user.id),
-						),
-					);
 				isFollower = Boolean(followerRow);
 			}
 

@@ -1,5 +1,3 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
 # dependencies
 node_modules
 dist
@@ -8,10 +6,6 @@ dist
 
 # testing
 /coverage
-
-# database
-/prisma/db.sqlite
-/prisma/db.sqlite-journal
 
 # next.js
 .next
@@ -41,5 +35,5 @@ yarn-error.log*
 *.tsbuildinfo
 .turbo
 
-# Sentry
-.sentryclirc
+# Claude Code
+.claude/settings.local.json

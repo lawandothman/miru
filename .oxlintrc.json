@@ -57,7 +57,8 @@
 		"arrow-body-style": "off",
 		"typescript/explicit-function-return-type": "off",
 		"typescript/explicit-module-boundary-types": "off",
-		"typescript/consistent-type-imports": "off"
+		"typescript/consistent-type-imports": "off",
+		"react/iframe-missing-sandbox": "off"
 	},
 	"ignorePatterns": ["node_modules", ".next", "dist", "drizzle"]
 }

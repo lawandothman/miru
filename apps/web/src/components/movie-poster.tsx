@@ -7,7 +7,7 @@ interface MoviePosterProps {
 	title: string;
 	posterPath: string | null;
 	className?: string;
-	priority?: boolean | undefined;
+	priority?: boolean;
 }
 
 export function MoviePoster({

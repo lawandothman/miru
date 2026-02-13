@@ -20,19 +20,13 @@ export function FollowButton({
 	const router = useRouter();
 	const utils = trpc.useUtils();
 
-	const follow = trpc.social.follow.useMutation({
-		onSuccess: () => {
-			utils.invalidate();
-			router.refresh();
-		},
-	});
+	const onSuccess = () => {
+		utils.invalidate();
+		router.refresh();
+	};
 
-	const unfollow = trpc.social.unfollow.useMutation({
-		onSuccess: () => {
-			utils.invalidate();
-			router.refresh();
-		},
-	});
+	const follow = trpc.social.follow.useMutation({ onSuccess });
+	const unfollow = trpc.social.unfollow.useMutation({ onSuccess });
 
 	const isLoading = follow.isPending || unfollow.isPending;
 
@@ -48,13 +42,9 @@ export function FollowButton({
 			size="sm"
 			className={cn("gap-1.5", className)}
 		>
-			{isLoading ? (
-				<Loader2 className="size-3.5 animate-spin" />
-			) : isFollowing ? (
-				<UserMinus className="size-3.5" />
-			) : (
-				<UserPlus className="size-3.5" />
-			)}
+			{isLoading && <Loader2 className="size-3.5 animate-spin" />}
+			{!isLoading && isFollowing && <UserMinus className="size-3.5" />}
+			{!isLoading && !isFollowing && <UserPlus className="size-3.5" />}
 			{isFollowing ? "Unfollow" : "Follow"}
 		</Button>
 	);

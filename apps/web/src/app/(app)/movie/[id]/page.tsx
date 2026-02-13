@@ -203,7 +203,7 @@ export default async function MoviePage({ params }: MoviePageProps) {
 							title={`${movie.title} trailer`}
 							allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
 							allowFullScreen
-							sandbox="allow-scripts allow-presentation"
+							sandbox="allow-scripts allow-same-origin allow-presentation"
 							className="h-full w-full"
 						/>
 					</div>

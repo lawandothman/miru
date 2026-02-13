@@ -22,19 +22,13 @@ export function WatchlistButton({
 	const router = useRouter();
 	const utils = trpc.useUtils();
 
-	const add = trpc.watchlist.add.useMutation({
-		onSuccess: () => {
-			utils.invalidate();
-			router.refresh();
-		},
-	});
+	const onSuccess = () => {
+		utils.invalidate();
+		router.refresh();
+	};
 
-	const remove = trpc.watchlist.remove.useMutation({
-		onSuccess: () => {
-			utils.invalidate();
-			router.refresh();
-		},
-	});
+	const add = trpc.watchlist.add.useMutation({ onSuccess });
+	const remove = trpc.watchlist.remove.useMutation({ onSuccess });
 
 	const isLoading = add.isPending || remove.isPending;
 

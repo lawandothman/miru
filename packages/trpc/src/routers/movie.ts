@@ -1,10 +1,19 @@
+import type { Database } from "@miru/db";
 import { schema } from "@miru/db";
+import type { TMDB } from "@lorenzopant/tmdb";
 import { TRPCError } from "@trpc/server";
-import { and, count, desc, eq, sql } from "drizzle-orm";
+import { and, count, desc, eq, inArray } from "drizzle-orm";
 import { z } from "zod";
 import { protectedProcedure, publicProcedure, router } from "../trpc";
 
 const STALE_AFTER_MS = 24 * 60 * 60 * 1000; // 24 hours
+
+const movieWithProvidersQuery = {
+	buyProviders: { with: { provider: true } },
+	genres: { with: { genre: true } },
+	rentProviders: { with: { provider: true } },
+	streamProviders: { with: { provider: true } },
+} as const;
 
 export const movieRouter = router({
 	getByGenre: publicProcedure
@@ -49,12 +58,7 @@ export const movieRouter = router({
 		.query(async ({ ctx, input }) => {
 			const existing = await ctx.db.query.movies.findFirst({
 				where: eq(schema.movies.id, input.tmdbId),
-				with: {
-					genres: { with: { genre: true } },
-					streamProviders: { with: { provider: true } },
-					buyProviders: { with: { provider: true } },
-					rentProviders: { with: { provider: true } },
-				},
+				with: movieWithProvidersQuery,
 			});
 
 			const isStale =
@@ -67,39 +71,42 @@ export const movieRouter = router({
 			}
 
 			let inWatchlist = false;
-			if (ctx.session?.user) {
-				const entry = await ctx.db.query.watchlistEntries.findFirst({
-					where: and(
-						eq(schema.watchlistEntries.userId, ctx.session.user.id),
-						eq(schema.watchlistEntries.movieId, movie.id),
-					),
-				});
-				inWatchlist = Boolean(entry);
-			}
-
 			let matches: { id: string; name: string | null; image: string | null }[] =
 				[];
+
 			if (ctx.session?.user) {
-				const result = await ctx.db
-					.select({
-						id: schema.users.id,
-						name: schema.users.name,
-						image: schema.users.image,
-					})
-					.from(schema.watchlistEntries)
-					.innerJoin(
-						schema.follows,
-						and(
-							eq(schema.follows.followerId, ctx.session.user.id),
-							eq(schema.follows.followingId, schema.watchlistEntries.userId),
+				const userId = ctx.session.user.id;
+
+				const [entry, friendMatches] = await Promise.all([
+					ctx.db.query.watchlistEntries.findFirst({
+						where: and(
+							eq(schema.watchlistEntries.userId, userId),
+							eq(schema.watchlistEntries.movieId, movie.id),
 						),
-					)
-					.innerJoin(
-						schema.users,
-						eq(schema.users.id, schema.watchlistEntries.userId),
-					)
-					.where(eq(schema.watchlistEntries.movieId, movie.id));
-				matches = result;
+					}),
+					ctx.db
+						.select({
+							id: schema.users.id,
+							name: schema.users.name,
+							image: schema.users.image,
+						})
+						.from(schema.watchlistEntries)
+						.innerJoin(
+							schema.follows,
+							and(
+								eq(schema.follows.followerId, userId),
+								eq(schema.follows.followingId, schema.watchlistEntries.userId),
+							),
+						)
+						.innerJoin(
+							schema.users,
+							eq(schema.users.id, schema.watchlistEntries.userId),
+						)
+						.where(eq(schema.watchlistEntries.movieId, movie.id)),
+				]);
+
+				inWatchlist = Boolean(entry);
+				matches = friendMatches;
 			}
 
 			return { ...movie, inWatchlist, matches };
@@ -216,40 +223,28 @@ export const movieRouter = router({
 				page: input.page,
 			});
 
-			const movieIds: number[] = [];
-			for (const result of tmdbResults.results) {
+			const movieIds = tmdbResults.results.map((r) => r.id);
+
+			if (movieIds.length > 0) {
 				await ctx.db
 					.insert(schema.movies)
-					.values({
-						id: result.id,
-						title: result.title,
-						originalTitle: result.original_title ?? null,
-						overview: result.overview ?? null,
-						posterPath: result.poster_path ?? null,
-						backdropPath: result.backdrop_path ?? null,
-						releaseDate: result.release_date ?? null,
-						adult: result.adult ?? false,
-						popularity: result.popularity ?? null,
-					})
+					.values(
+						tmdbResults.results.map((result) => ({
+							id: result.id,
+							title: result.title,
+							originalTitle: result.original_title ?? null,
+							overview: result.overview ?? null,
+							posterPath: result.poster_path ?? null,
+							backdropPath: result.backdrop_path ?? null,
+							releaseDate: result.release_date ?? null,
+							adult: result.adult ?? false,
+							popularity: result.popularity ?? null,
+						})),
+					)
 					.onConflictDoNothing();
-				movieIds.push(result.id);
 			}
 
-			const watchlistSet = new Set<number>();
-			if (ctx.session?.user && movieIds.length > 0) {
-				const entries = await ctx.db
-					.select({ movieId: schema.watchlistEntries.movieId })
-					.from(schema.watchlistEntries)
-					.where(
-						and(
-							eq(schema.watchlistEntries.userId, ctx.session.user.id),
-							sql`${schema.watchlistEntries.movieId} IN ${movieIds}`,
-						),
-					);
-				for (const e of entries) {
-					watchlistSet.add(e.movieId);
-				}
-			}
+			const watchlistSet = await getWatchlistSet(ctx, movieIds);
 
 			return {
 				results: tmdbResults.results.map((r) => ({
@@ -267,13 +262,27 @@ export const movieRouter = router({
 		}),
 });
 
-async function refreshMovie(
-	ctx: {
-		db: import("@miru/db").Database;
-		tmdb: import("@lorenzopant/tmdb").TMDB;
-	},
-	tmdbId: number,
-) {
+function findMovieWithProviders(db: Database, tmdbId: number) {
+	return db.query.movies.findFirst({
+		where: eq(schema.movies.id, tmdbId),
+		with: movieWithProvidersQuery,
+	});
+}
+
+interface TMDBProvider {
+	provider_id: number;
+	provider_name: string;
+	logo_path: string;
+	display_priority: number;
+}
+
+interface TMDBRegionProviders {
+	flatrate?: TMDBProvider[];
+	buy?: TMDBProvider[];
+	rent?: TMDBProvider[];
+}
+
+async function refreshMovie(ctx: { db: Database; tmdb: TMDB }, tmdbId: number) {
 	try {
 		const [details, videos, watchProviders] = await Promise.all([
 			ctx.tmdb.movies.details({ movie_id: tmdbId }),
@@ -281,99 +290,58 @@ async function refreshMovie(
 			ctx.tmdb.movies.watch_providers({ movie_id: tmdbId }),
 		]);
 
-		const trailer = videos.results?.filter(
+		const trailer = videos.results?.find(
 			(v) => v.site === "YouTube" && v.type === "Trailer",
-		)?.[0];
+		);
 
-		// Upsert movie
+		const movieData = {
+			adult: details.adult ?? false,
+			backdropPath: details.backdrop_path ?? null,
+			budget: details.budget ?? null,
+			homepage: details.homepage ?? null,
+			imdbId: details.imdb_id ?? null,
+			originalTitle: details.original_title ?? null,
+			overview: details.overview ?? null,
+			popularity: details.popularity ?? null,
+			posterPath: details.poster_path ?? null,
+			releaseDate: details.release_date ?? null,
+			revenue: details.revenue ?? null,
+			runtime: details.runtime ?? null,
+			tagline: details.tagline ?? null,
+			title: details.title,
+			tmdbVoteAverage: details.vote_average ?? null,
+			tmdbVoteCount: details.vote_count ?? null,
+			trailerKey: trailer?.key ?? null,
+			trailerSite: trailer?.site ?? null,
+			updatedAt: new Date(),
+		};
+
 		await ctx.db
 			.insert(schema.movies)
-			.values({
-				adult: details.adult ?? false,
-				backdropPath: details.backdrop_path ?? null,
-				budget: details.budget ?? null,
-				homepage: details.homepage ?? null,
-				id: details.id,
-				imdbId: details.imdb_id ?? null,
-				originalTitle: details.original_title ?? null,
-				overview: details.overview ?? null,
-				popularity: details.popularity ?? null,
-				posterPath: details.poster_path ?? null,
-				releaseDate: details.release_date ?? null,
-				revenue: details.revenue ?? null,
-				runtime: details.runtime ?? null,
-				tagline: details.tagline ?? null,
-				title: details.title,
-				tmdbVoteAverage: details.vote_average ?? null,
-				tmdbVoteCount: details.vote_count ?? null,
-				trailerKey: trailer?.key ?? null,
-				trailerSite: trailer?.site ?? null,
-				updatedAt: new Date(),
-			})
+			.values({ id: details.id, ...movieData })
 			.onConflictDoUpdate({
-				set: {
-					title: details.title,
-					originalTitle: details.original_title ?? null,
-					overview: details.overview ?? null,
-					posterPath: details.poster_path ?? null,
-					backdropPath: details.backdrop_path ?? null,
-					releaseDate: details.release_date ?? null,
-					adult: details.adult ?? false,
-					popularity: details.popularity ?? null,
-					budget: details.budget ?? null,
-					revenue: details.revenue ?? null,
-					runtime: details.runtime ?? null,
-					tagline: details.tagline ?? null,
-					homepage: details.homepage ?? null,
-					imdbId: details.imdb_id ?? null,
-					tmdbVoteAverage: details.vote_average ?? null,
-					tmdbVoteCount: details.vote_count ?? null,
-					trailerKey: trailer?.key ?? null,
-					trailerSite: trailer?.site ?? null,
-					updatedAt: new Date(),
-				},
+				set: movieData,
 				target: schema.movies.id,
 			});
 
-		// Upsert genres
 		if (details.genres?.length) {
-			for (const g of details.genres) {
-				await ctx.db
-					.insert(schema.genres)
-					.values({ id: g.id, name: g.name })
-					.onConflictDoNothing();
-				await ctx.db
-					.insert(schema.movieGenres)
-					.values({ genreId: g.id, movieId: details.id })
-					.onConflictDoNothing();
-			}
+			await ctx.db
+				.insert(schema.genres)
+				.values(details.genres.map((g) => ({ id: g.id, name: g.name })))
+				.onConflictDoNothing();
+			await ctx.db
+				.insert(schema.movieGenres)
+				.values(
+					details.genres.map((g) => ({
+						genreId: g.id,
+						movieId: details.id,
+					})),
+				)
+				.onConflictDoNothing();
 		}
 
-		// Upsert watch providers (GB region)
 		const gbProviders = (
-			watchProviders.results as Record<
-				string,
-				{
-					flatrate?: {
-						provider_id: number;
-						provider_name: string;
-						logo_path: string;
-						display_priority: number;
-					}[];
-					buy?: {
-						provider_id: number;
-						provider_name: string;
-						logo_path: string;
-						display_priority: number;
-					}[];
-					rent?: {
-						provider_id: number;
-						provider_name: string;
-						logo_path: string;
-						display_priority: number;
-					}[];
-				}
-			>
+			watchProviders.results as Record<string, TMDBRegionProviders>
 		)?.["GB"];
 
 		if (gbProviders) {
@@ -387,38 +355,17 @@ async function refreshMovie(
 			await upsertProviders(ctx.db, details.id, gbProviders.rent ?? [], "rent");
 		}
 
-		return ctx.db.query.movies.findFirst({
-			where: eq(schema.movies.id, tmdbId),
-			with: {
-				buyProviders: { with: { provider: true } },
-				genres: { with: { genre: true } },
-				rentProviders: { with: { provider: true } },
-				streamProviders: { with: { provider: true } },
-			},
-		});
+		return findMovieWithProviders(ctx.db, tmdbId);
 	} catch {
 		// If TMDB is down, return stale data from DB
-		return ctx.db.query.movies.findFirst({
-			where: eq(schema.movies.id, tmdbId),
-			with: {
-				buyProviders: { with: { provider: true } },
-				genres: { with: { genre: true } },
-				rentProviders: { with: { provider: true } },
-				streamProviders: { with: { provider: true } },
-			},
-		});
+		return findMovieWithProviders(ctx.db, tmdbId);
 	}
 }
 
 async function upsertProviders(
-	db: import("@miru/db").Database,
+	db: Database,
 	movieId: number,
-	providers: {
-		provider_id: number;
-		provider_name: string;
-		logo_path: string;
-		display_priority: number;
-	}[],
+	providers: TMDBProvider[],
 	type: "stream" | "buy" | "rent",
 ) {
 	const junctionTables = {
@@ -428,29 +375,30 @@ async function upsertProviders(
 	} as const;
 	const junctionTable = junctionTables[type];
 
-	for (const p of providers) {
-		await db
-			.insert(schema.watchProviders)
-			.values({
+	if (providers.length === 0) {
+		return;
+	}
+
+	await db
+		.insert(schema.watchProviders)
+		.values(
+			providers.map((p) => ({
 				displayPriority: p.display_priority,
 				id: p.provider_id,
 				logoPath: p.logo_path,
 				name: p.provider_name,
-			})
-			.onConflictDoNothing();
+			})),
+		)
+		.onConflictDoNothing();
 
-		await db
-			.insert(junctionTable)
-			.values({ movieId, providerId: p.provider_id })
-			.onConflictDoNothing();
-	}
+	await db
+		.insert(junctionTable)
+		.values(providers.map((p) => ({ movieId, providerId: p.provider_id })))
+		.onConflictDoNothing();
 }
 
 async function getWatchlistSet(
-	ctx: {
-		db: import("@miru/db").Database;
-		session: { user: { id: string } } | null;
-	},
+	ctx: { db: Database; session: { user: { id: string } } | null },
 	movieIds: number[],
 ): Promise<Set<number>> {
 	if (!ctx.session?.user || movieIds.length === 0) {
@@ -463,7 +411,7 @@ async function getWatchlistSet(
 		.where(
 			and(
 				eq(schema.watchlistEntries.userId, ctx.session.user.id),
-				sql`${schema.watchlistEntries.movieId} IN ${movieIds}`,
+				inArray(schema.watchlistEntries.movieId, movieIds),
 			),
 		);
 
