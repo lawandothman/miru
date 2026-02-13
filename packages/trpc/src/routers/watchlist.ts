@@ -54,16 +54,17 @@ export const watchlistRouter = router({
 	getMyWatchlist: protectedProcedure
 		.input(
 			z.object({
+				cursor: z.number().nullish(),
 				limit: z.number().default(20),
-				offset: z.number().default(0),
 			}),
 		)
 		.query(async ({ ctx, input }) => {
+			const offset = input.cursor ?? 0;
 			const entries = await ctx.db.query.watchlistEntries.findMany({
 				where: eq(schema.watchlistEntries.userId, ctx.session.user.id),
 				with: { movie: true },
 				limit: input.limit,
-				offset: input.offset,
+				offset,
 				orderBy: (we, { desc }) => [desc(we.createdAt)],
 			});
 

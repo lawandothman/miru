@@ -19,11 +19,12 @@ export const movieRouter = router({
 	getByGenre: publicProcedure
 		.input(
 			z.object({
+				cursor: z.number().nullish(),
 				genreId: z.number(),
-				page: z.number().default(1),
 			}),
 		)
 		.query(async ({ ctx, input }) => {
+			const page = input.cursor ?? 1;
 			const movies = await ctx.db
 				.select({
 					id: schema.movies.id,
@@ -40,7 +41,7 @@ export const movieRouter = router({
 				.where(eq(schema.movieGenres.genreId, input.genreId))
 				.orderBy(desc(schema.movies.tmdbVoteCount))
 				.limit(20)
-				.offset((input.page - 1) * 20);
+				.offset((page - 1) * 20);
 
 			const watchlistSet = await getWatchlistSet(
 				ctx,
@@ -115,12 +116,13 @@ export const movieRouter = router({
 	getForYou: protectedProcedure
 		.input(
 			z.object({
+				cursor: z.number().nullish(),
 				limit: z.number().default(20),
-				offset: z.number().default(0),
 			}),
 		)
 		.query(async ({ ctx, input }) => {
 			const userId = ctx.session.user.id;
+			const offset = input.cursor ?? 0;
 
 			const movies = await ctx.db
 				.select({
@@ -143,7 +145,7 @@ export const movieRouter = router({
 				.groupBy(schema.movies.id)
 				.orderBy(desc(count(schema.follows.followingId)))
 				.limit(input.limit)
-				.offset(input.offset);
+				.offset(offset);
 
 			// Exclude movies already in user's watchlist
 			const watchlistSet = await getWatchlistSet(
@@ -178,11 +180,12 @@ export const movieRouter = router({
 	getPopular: publicProcedure
 		.input(
 			z.object({
+				cursor: z.number().nullish(),
 				limit: z.number().default(20),
-				offset: z.number().default(0),
 			}),
 		)
 		.query(async ({ ctx, input }) => {
+			const offset = input.cursor ?? 0;
 			const movies = await ctx.db
 				.select({
 					id: schema.movies.id,
@@ -202,7 +205,7 @@ export const movieRouter = router({
 					desc(schema.movies.id),
 				)
 				.limit(input.limit)
-				.offset(input.offset);
+				.offset(offset);
 
 			const watchlistSet = await getWatchlistSet(
 				ctx,

@@ -1,15 +1,11 @@
 import type { Metadata } from "next";
-import { trpc } from "@/lib/trpc/server";
-import { MovieGrid } from "@/components/movie-grid";
+import { PopularMovies } from "@/components/popular-movies";
 
 export const metadata: Metadata = {
 	title: "Popular",
 };
 
-export default async function PopularPage() {
-	const api = await trpc();
-	const movies = await api.movie.getPopular({ limit: 40, offset: 0 });
-
+export default function PopularPage() {
 	return (
 		<div className="space-y-8">
 			<div>
@@ -21,14 +17,7 @@ export default async function PopularPage() {
 				</p>
 			</div>
 
-			<MovieGrid
-				movies={movies.map((m) => ({
-					id: m.id,
-					posterPath: m.posterPath,
-					title: m.title,
-				}))}
-				emptyMessage="No popular movies yet"
-			/>
+			<PopularMovies />
 		</div>
 	);
 }

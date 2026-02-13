@@ -4,7 +4,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { auth } from "@/lib/auth";
 import { trpc } from "@/lib/trpc/server";
-import { MovieGrid } from "@/components/movie-grid";
+import { ForYouMovies } from "@/components/for-you-movies";
 
 export const metadata: Metadata = {
 	title: "For You",
@@ -20,20 +20,20 @@ export default async function ForYouPage() {
 	}
 
 	const api = await trpc();
-	const movies = await api.movie.getForYou({ limit: 40, offset: 0 });
+	const initialMovies = await api.movie.getForYou({ limit: 20 });
 
-	return (
-		<div className="space-y-8">
-			<div>
-				<h1 className="font-display text-2xl font-semibold tracking-tight">
-					For You
-				</h1>
-				<p className="mt-1 text-sm text-muted-foreground">
-					Movies your friends are watching
-				</p>
-			</div>
+	if (initialMovies.length === 0) {
+		return (
+			<div className="space-y-8">
+				<div>
+					<h1 className="font-display text-2xl font-semibold tracking-tight">
+						For You
+					</h1>
+					<p className="mt-1 text-sm text-muted-foreground">
+						Movies your friends are watching
+					</p>
+				</div>
 
-			{movies.length === 0 ? (
 				<div className="rounded-xl border border-border/50 bg-card p-10 text-center">
 					<h2 className="font-display text-lg font-semibold">
 						Nothing here yet
@@ -48,15 +48,22 @@ export default async function ForYouPage() {
 						Find Friends
 					</Link>
 				</div>
-			) : (
-				<MovieGrid
-					movies={movies.map((m) => ({
-						id: m.id,
-						posterPath: m.posterPath,
-						title: m.title,
-					}))}
-				/>
-			)}
+			</div>
+		);
+	}
+
+	return (
+		<div className="space-y-8">
+			<div>
+				<h1 className="font-display text-2xl font-semibold tracking-tight">
+					For You
+				</h1>
+				<p className="mt-1 text-sm text-muted-foreground">
+					Movies your friends are watching
+				</p>
+			</div>
+
+			<ForYouMovies />
 		</div>
 	);
 }
