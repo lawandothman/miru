@@ -132,6 +132,10 @@
 	body {
 		@apply bg-background text-foreground;
 	}
+	button,
+	[role="button"] {
+		cursor: pointer;
+	}
 	::selection {
 		background: oklch(0.78 0.115 80 / 25%);
 	}
