@@ -33,7 +33,7 @@ export default async function Home() {
 	}
 
 	return (
-		<div className="relative min-h-svh bg-background text-foreground">
+		<div className="relative min-h-svh overflow-x-clip bg-background text-foreground">
 			{/* ── Nav ── */}
 			<nav className="flex items-center justify-between px-6 py-6 lg:px-16">
 				<span className="font-display text-lg font-bold tracking-tight">
@@ -51,7 +51,7 @@ export default async function Home() {
 			<section className="relative px-6 pb-32 pt-16 lg:px-16 lg:pt-24">
 				{/* Ambient glow */}
 				<div className="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2">
-					<div className="h-[600px] w-[800px] rounded-full bg-foreground/[0.015] blur-[120px]" />
+					<div className="h-[600px] w-[800px] max-w-[100vw] rounded-full bg-foreground/[0.015] blur-[120px]" />
 				</div>
 
 				<div className="relative mx-auto grid max-w-6xl items-center gap-16 lg:grid-cols-2 lg:gap-20">
@@ -276,7 +276,7 @@ export default async function Home() {
 			<section className="relative mt-20 px-6 pb-20 pt-36 lg:px-16">
 				{/* Ambient glow */}
 				<div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-					<div className="h-[400px] w-[600px] rounded-full bg-foreground/[0.02] blur-[120px]" />
+					<div className="h-[400px] w-[600px] max-w-[100vw] rounded-full bg-foreground/[0.02] blur-[120px]" />
 				</div>
 
 				<RevealOnScroll>
