@@ -9,10 +9,10 @@ importers:
   .:
     devDependencies:
       oxfmt:
-        specifier: ^0.32.0
+        specifier: 0.32.0
         version: 0.32.0
       oxlint:
-        specifier: ^1.47.0
+        specifier: 1.47.0
         version: 1.47.0
       turbo:
         specifier: 2.5.4
