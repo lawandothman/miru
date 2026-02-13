@@ -20,10 +20,7 @@ export const socialRouter = router({
 				moviePosterPath: schema.movies.posterPath,
 			})
 			.from(schema.follows)
-			.innerJoin(
-				schema.users,
-				eq(schema.users.id, schema.follows.followingId),
-			)
+			.innerJoin(schema.users, eq(schema.users.id, schema.follows.followingId))
 			.innerJoin(
 				schema.watchlistEntries,
 				eq(schema.watchlistEntries.userId, schema.follows.followingId),

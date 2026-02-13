@@ -32,9 +32,7 @@ export function GenreMovies({ genreId }: { genreId: number }) {
 				posterPath: m.posterPath,
 				title: m.title,
 			}))}
-			hasMore={
-				(query.data?.pages.at(-1)?.length ?? PAGE_SIZE) >= PAGE_SIZE
-			}
+			hasMore={(query.data?.pages.at(-1)?.length ?? PAGE_SIZE) >= PAGE_SIZE}
 			isFetching={query.isFetchingNextPage}
 			onLoadMore={onLoadMore}
 			emptyMessage="No movies in this genre"

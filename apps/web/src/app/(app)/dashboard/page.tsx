@@ -42,9 +42,7 @@ export default async function DashboardPage() {
 
 			{friendsWithMatches.length === 0 ? (
 				<div className="rounded-xl border border-border/50 bg-card p-10 text-center">
-					<h2 className="font-display text-lg font-semibold">
-						No matches yet
-					</h2>
+					<h2 className="font-display text-lg font-semibold">No matches yet</h2>
 					<p className="mt-2 text-sm text-muted-foreground">
 						Follow friends and add movies to your watchlist to find matches.
 					</p>
