@@ -1,1 +1,0 @@
-CREATE CONSTRAINT migrationId FOR (m:Migration) REQUIRE m.id IS UNIQUE;
