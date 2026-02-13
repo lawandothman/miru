@@ -17,10 +17,33 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
-	description: "Find movies to watch with your friends",
+	description:
+		"Build your watchlist, follow friends, and instantly see which movies you both want to watch. The social way to pick your next movie.",
+	keywords: [
+		"movies",
+		"watchlist",
+		"social",
+		"movie recommendations",
+		"watch together",
+		"film",
+	],
+	metadataBase: new URL(
+		process.env["BETTER_AUTH_URL"] ?? "https://miru-chi.vercel.app",
+	),
+	openGraph: {
+		description:
+			"Build your watchlist, follow friends, and instantly see which movies you both want to watch.",
+		locale: "en_GB",
+		siteName: "Miru",
+		title: "Miru",
+		type: "website",
+	},
 	title: {
-		default: "Miru",
+		default: "Miru — Find movies to watch with friends",
 		template: "%s — Miru",
+	},
+	twitter: {
+		card: "summary_large_image",
 	},
 };
 

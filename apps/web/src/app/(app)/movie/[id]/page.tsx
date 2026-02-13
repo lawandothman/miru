@@ -18,9 +18,16 @@ export async function generateMetadata({
 	const api = await trpc();
 	try {
 		const movie = await api.movie.getById({ tmdbId: parseInt(id, 10) });
+		const year = movie.releaseDate?.split("-")[0];
+		const title = year ? `${movie.title} (${year})` : movie.title;
 		return {
 			description: movie.overview ?? undefined,
-			title: movie.title,
+			openGraph: {
+				description: movie.overview ?? undefined,
+				title,
+				type: "video.movie",
+			},
+			title,
 		};
 	} catch {
 		return { title: "Movie" };
