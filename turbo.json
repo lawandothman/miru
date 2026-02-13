@@ -1,28 +1,29 @@
 {
-  "$schema": "https://turbo.build/schema.json",
-  "tasks": {
-    "build": {
-      "outputs": [".next/**"]
-    },
-    "lint": {
-      "outputs": []
-    },
-    "lint:fix": {
-      "outputs": []
-    },
-    "generate-types": {
-      "outputs": ["src/__generated__/**"]
-    },
-    "dev": {
-      "persistent": true,
-      "cache": false,
-      "outputs": []
-    },
-    "typecheck": {
-      "outputs": []
-    },
-    "start": {
-      "outputs": []
-    }
-  }
+	"$schema": "https://turbo.build/schema.json",
+	"tasks": {
+		"build": {
+			"dependsOn": ["^build"],
+			"env": [
+				"DATABASE_URL",
+				"BETTER_AUTH_SECRET",
+				"BETTER_AUTH_URL",
+				"GOOGLE_CLIENT_ID",
+				"GOOGLE_CLIENT_SECRET",
+				"TMDB_API_READ_ACCESS_TOKEN"
+			],
+			"outputs": [".next/**", "dist/**"]
+		},
+		"dev": {
+			"persistent": true,
+			"cache": false
+		},
+		"lint": {},
+		"typecheck": {},
+		"db:generate": {
+			"cache": false
+		},
+		"db:push": {
+			"cache": false
+		}
+	}
 }

@@ -1,0 +1,25 @@
+{
+	"name": "@miru/trpc",
+	"version": "0.0.1",
+	"private": true,
+	"type": "module",
+	"exports": {
+		".": "./src/index.ts",
+		"./context": "./src/context.ts"
+	},
+	"scripts": {
+		"typecheck": "tsc --noEmit"
+	},
+	"dependencies": {
+		"@lorenzopant/tmdb": "1.1.1",
+		"@miru/db": "workspace:*",
+		"@trpc/server": "11.10.0",
+		"drizzle-orm": "0.45.1",
+		"superjson": "2.2.6",
+		"zod": "4.3.6"
+	},
+	"devDependencies": {
+		"@miru/typescript-config": "workspace:*",
+		"typescript": "5.9.3"
+	}
+}

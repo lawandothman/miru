@@ -1,0 +1,31 @@
+{
+	"name": "@miru/db",
+	"version": "0.0.1",
+	"private": true,
+	"type": "module",
+	"exports": {
+		".": "./src/index.ts",
+		"./schema": "./src/schema/index.ts"
+	},
+	"scripts": {
+		"db:generate": "drizzle-kit generate",
+		"db:migrate": "drizzle-kit migrate",
+		"db:push": "drizzle-kit push",
+		"db:studio": "drizzle-kit studio",
+		"db:seed": "tsx src/seed.ts",
+		"db:migrate-from-neo4j": "tsx src/migrate-from-neo4j.ts",
+		"typecheck": "tsc --noEmit"
+	},
+	"dependencies": {
+		"@neondatabase/serverless": "1.0.2",
+		"drizzle-orm": "0.45.1"
+	},
+	"devDependencies": {
+		"@miru/typescript-config": "workspace:*",
+		"dotenv": "17.3.1",
+		"drizzle-kit": "0.31.9",
+		"neo4j-driver": "6.0.1",
+		"tsx": "4.21.0",
+		"typescript": "5.9.3"
+	}
+}
