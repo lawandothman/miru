@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { Button } from "@/components/ui/button";
+import { RotateCcw } from "lucide-react";
 
 export default function AppError({
 	error,
@@ -15,16 +15,52 @@ export default function AppError({
 	}, [error]);
 
 	return (
-		<div className="flex flex-col items-center justify-center py-24 text-center">
-			<h2 className="font-display text-lg font-semibold">
+		<div className="relative flex flex-col items-center justify-center py-32 text-center">
+			{/* Background glow */}
+			<div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+				<div className="h-[400px] w-[400px] rounded-full bg-destructive/[0.04] blur-[100px]" />
+			</div>
+
+			{/* Broken film strip icon */}
+			<div className="relative mb-8 flex items-center gap-1.5 text-muted-foreground/30">
+				<div className="flex flex-col gap-1">
+					{[...Array(3)].map((_, i) => (
+						<div key={i} className="h-1.5 w-5 rounded-full bg-current" />
+					))}
+				</div>
+				<div className="h-10 w-14 rounded border-2 border-current" />
+				<div className="h-10 w-14 rounded border-2 border-dashed border-current opacity-40" />
+				<div className="flex flex-col gap-1">
+					{[...Array(3)].map((_, i) => (
+						<div
+							key={i}
+							className="h-1.5 w-5 rounded-full bg-current opacity-40"
+						/>
+					))}
+				</div>
+			</div>
+
+			<h2 className="font-display text-xl font-semibold tracking-tight sm:text-2xl">
 				Something went wrong
 			</h2>
-			<p className="mt-2 text-sm text-muted-foreground">
-				An unexpected error occurred. Please try again.
+			<p className="mx-auto mt-3 max-w-xs text-sm leading-relaxed text-muted-foreground">
+				An unexpected error interrupted the show. Give it another take.
 			</p>
-			<Button onClick={reset} className="mt-6" size="sm">
+
+			<button
+				type="button"
+				onClick={reset}
+				className="mt-8 inline-flex h-10 items-center gap-2 rounded-lg bg-primary px-6 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+			>
+				<RotateCcw className="size-4" />
 				Try again
-			</Button>
+			</button>
+
+			{error.digest && (
+				<p className="mt-6 font-mono text-[11px] text-muted-foreground/40">
+					Error ID: {error.digest}
+				</p>
+			)}
 		</div>
 	);
 }
