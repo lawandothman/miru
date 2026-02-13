@@ -27,21 +27,7 @@ export default async function DashboardPage() {
 	}
 
 	const api = await trpc();
-	const following = await api.social.getFollowing({
-		userId: session.user.id,
-	});
-
-	const friendsWithMatches = await Promise.all(
-		following.map(async (friend) => {
-			const matches = await api.social.getMatchesWith({
-				friendId: friend.id,
-			});
-			return { ...friend, matches };
-		}),
-	);
-
-	friendsWithMatches.sort((a, b) => b.matches.length - a.matches.length);
-	const withMatches = friendsWithMatches.filter((f) => f.matches.length > 0);
+	const friendsWithMatches = await api.social.getDashboardMatches();
 
 	return (
 		<div className="space-y-8">
@@ -54,13 +40,13 @@ export default async function DashboardPage() {
 				</p>
 			</div>
 
-			{following.length === 0 ? (
+			{friendsWithMatches.length === 0 ? (
 				<div className="rounded-xl border border-border/50 bg-card p-10 text-center">
 					<h2 className="font-display text-lg font-semibold">
-						Start building your circle
+						No matches yet
 					</h2>
 					<p className="mt-2 text-sm text-muted-foreground">
-						Follow friends to see which movies you can watch together.
+						Follow friends and add movies to your watchlist to find matches.
 					</p>
 					<Link
 						href="/explore"
@@ -69,22 +55,9 @@ export default async function DashboardPage() {
 						Find Friends
 					</Link>
 				</div>
-			) : withMatches.length === 0 ? (
-				<div className="rounded-xl border border-border/50 bg-card p-10 text-center">
-					<p className="text-muted-foreground">No matches yet.</p>
-					<p className="mt-1 text-sm text-muted-foreground">
-						Add movies to your watchlist to find matches with friends.
-					</p>
-					<Link
-						href="/explore"
-						className="mt-6 inline-flex h-9 items-center rounded-lg bg-primary px-5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-					>
-						Find Movies
-					</Link>
-				</div>
 			) : (
 				<div className="space-y-6">
-					{withMatches.map((friend) => (
+					{friendsWithMatches.map((friend) => (
 						<div key={friend.id} className="space-y-3">
 							<Link
 								href={`/user/${friend.id}`}

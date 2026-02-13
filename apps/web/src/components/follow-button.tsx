@@ -1,6 +1,7 @@
 "use client";
 
 import { Loader2, UserMinus, UserPlus } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc/client";
 import { useRouter } from "next/navigation";
@@ -21,12 +22,19 @@ export function FollowButton({
 	const utils = trpc.useUtils();
 
 	const onSuccess = () => {
-		utils.invalidate();
+		utils.social.invalidate();
+		utils.user.getById.invalidate({ id: userId });
 		router.refresh();
 	};
 
-	const follow = trpc.social.follow.useMutation({ onSuccess });
-	const unfollow = trpc.social.unfollow.useMutation({ onSuccess });
+	const follow = trpc.social.follow.useMutation({
+		onSuccess,
+		onError: () => toast.error("Failed to follow user"),
+	});
+	const unfollow = trpc.social.unfollow.useMutation({
+		onSuccess,
+		onError: () => toast.error("Failed to unfollow user"),
+	});
 
 	const isLoading = follow.isPending || unfollow.isPending;
 

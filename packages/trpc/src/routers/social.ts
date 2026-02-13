@@ -6,6 +6,83 @@ import { annotateFollowStatus } from "../helpers";
 import { protectedProcedure, publicProcedure, router } from "../trpc";
 
 export const socialRouter = router({
+	getDashboardMatches: protectedProcedure.query(async ({ ctx }) => {
+		const userId = ctx.session.user.id;
+
+		// Single query: for each friend I follow, find movies we both have in our watchlists
+		const rows = await ctx.db
+			.select({
+				friendId: schema.users.id,
+				friendName: schema.users.name,
+				friendImage: schema.users.image,
+				movieId: schema.movies.id,
+				movieTitle: schema.movies.title,
+				moviePosterPath: schema.movies.posterPath,
+			})
+			.from(schema.follows)
+			.innerJoin(
+				schema.users,
+				eq(schema.users.id, schema.follows.followingId),
+			)
+			.innerJoin(
+				schema.watchlistEntries,
+				eq(schema.watchlistEntries.userId, schema.follows.followingId),
+			)
+			.innerJoin(
+				schema.movies,
+				eq(schema.movies.id, schema.watchlistEntries.movieId),
+			)
+			.where(
+				and(
+					eq(schema.follows.followerId, userId),
+					eq(schema.movies.adult, false),
+				),
+			);
+
+		// Get my watchlist movie IDs to filter for actual matches
+		const myWatchlist = await ctx.db
+			.select({ movieId: schema.watchlistEntries.movieId })
+			.from(schema.watchlistEntries)
+			.where(eq(schema.watchlistEntries.userId, userId));
+
+		const myMovieIds = new Set(myWatchlist.map((w) => w.movieId));
+
+		// Group by friend, only keep movies that are also in my watchlist
+		const friendMap = new Map<
+			string,
+			{
+				id: string;
+				name: string | null;
+				image: string | null;
+				matches: { id: number; title: string; posterPath: string | null }[];
+			}
+		>();
+
+		for (const row of rows) {
+			if (!myMovieIds.has(row.movieId)) continue;
+
+			let friend = friendMap.get(row.friendId);
+			if (!friend) {
+				friend = {
+					id: row.friendId,
+					name: row.friendName,
+					image: row.friendImage,
+					matches: [],
+				};
+				friendMap.set(row.friendId, friend);
+			}
+			friend.matches.push({
+				id: row.movieId,
+				title: row.movieTitle,
+				posterPath: row.moviePosterPath,
+			});
+		}
+
+		return Array.from(friendMap.values()).sort(
+			(a, b) => b.matches.length - a.matches.length,
+		);
+	}),
+
 	follow: protectedProcedure
 		.input(z.object({ friendId: z.string() }))
 		.mutation(async ({ ctx, input }) => {

@@ -1,6 +1,7 @@
 "use client";
 
 import { Bookmark, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc/client";
 import { cn } from "@/lib/utils";
@@ -23,12 +24,20 @@ export function WatchlistButton({
 	const utils = trpc.useUtils();
 
 	const onSuccess = () => {
-		utils.invalidate();
+		utils.watchlist.invalidate();
+		utils.movie.getById.invalidate({ tmdbId: movieId });
+		utils.movie.getPopular.invalidate();
 		router.refresh();
 	};
 
-	const add = trpc.watchlist.add.useMutation({ onSuccess });
-	const remove = trpc.watchlist.remove.useMutation({ onSuccess });
+	const add = trpc.watchlist.add.useMutation({
+		onSuccess,
+		onError: () => toast.error("Failed to add to watchlist"),
+	});
+	const remove = trpc.watchlist.remove.useMutation({
+		onSuccess,
+		onError: () => toast.error("Failed to remove from watchlist"),
+	});
 
 	const isLoading = add.isPending || remove.isPending;
 
