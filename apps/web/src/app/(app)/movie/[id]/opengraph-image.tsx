@@ -66,6 +66,7 @@ export default async function MovieOGImage({
 		>
 			{/* Poster */}
 			{posterUrl && (
+				// oxlint-disable-next-line nextjs/no-img-element -- OG images use Satori which requires <img>
 				<img
 					src={posterUrl}
 					alt=""

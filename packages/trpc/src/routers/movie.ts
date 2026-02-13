@@ -1,5 +1,4 @@
-import type { Database } from "@miru/db";
-import { schema } from "@miru/db";
+import { type Database, schema } from "@miru/db";
 import type { TMDB } from "@lorenzopant/tmdb";
 import { TRPCError } from "@trpc/server";
 import { and, count, desc, eq, inArray } from "drizzle-orm";

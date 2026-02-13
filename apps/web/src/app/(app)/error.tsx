@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
 import { RotateCcw } from "lucide-react";
 
 export default function AppError({
@@ -10,10 +9,6 @@ export default function AppError({
 	error: Error & { digest?: string };
 	reset: () => void;
 }) {
-	useEffect(() => {
-		console.error(error);
-	}, [error]);
-
 	return (
 		<div className="relative flex flex-col items-center justify-center py-32 text-center">
 			{/* Background glow */}
@@ -24,16 +19,16 @@ export default function AppError({
 			{/* Broken film strip icon */}
 			<div className="relative mb-8 flex items-center gap-1.5 text-muted-foreground/30">
 				<div className="flex flex-col gap-1">
-					{[...Array(3)].map((_, i) => (
-						<div key={i} className="h-1.5 w-5 rounded-full bg-current" />
+					{["a", "b", "c"].map((id) => (
+						<div key={id} className="h-1.5 w-5 rounded-full bg-current" />
 					))}
 				</div>
 				<div className="h-10 w-14 rounded border-2 border-current" />
 				<div className="h-10 w-14 rounded border-2 border-dashed border-current opacity-40" />
 				<div className="flex flex-col gap-1">
-					{[...Array(3)].map((_, i) => (
+					{["d", "e", "f"].map((id) => (
 						<div
-							key={i}
+							key={id}
 							className="h-1.5 w-5 rounded-full bg-current opacity-40"
 						/>
 					))}

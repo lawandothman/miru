@@ -1,5 +1,4 @@
-import type { Database } from "@miru/db";
-import { schema } from "@miru/db";
+import { type Database, schema } from "@miru/db";
 import { and, eq, inArray } from "drizzle-orm";
 
 export async function annotateFollowStatus<

@@ -56,23 +56,23 @@ export const socialRouter = router({
 		>();
 
 		for (const row of rows) {
-			if (!myMovieIds.has(row.movieId)) continue;
-
-			let friend = friendMap.get(row.friendId);
-			if (!friend) {
-				friend = {
-					id: row.friendId,
-					name: row.friendName,
-					image: row.friendImage,
-					matches: [],
-				};
-				friendMap.set(row.friendId, friend);
+			if (myMovieIds.has(row.movieId)) {
+				let friend = friendMap.get(row.friendId);
+				if (!friend) {
+					friend = {
+						id: row.friendId,
+						name: row.friendName,
+						image: row.friendImage,
+						matches: [],
+					};
+					friendMap.set(row.friendId, friend);
+				}
+				friend.matches.push({
+					id: row.movieId,
+					title: row.movieTitle,
+					posterPath: row.moviePosterPath,
+				});
 			}
-			friend.matches.push({
-				id: row.movieId,
-				title: row.movieTitle,
-				posterPath: row.moviePosterPath,
-			});
 		}
 
 		return Array.from(friendMap.values()).sort(

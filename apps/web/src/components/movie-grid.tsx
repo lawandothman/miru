@@ -1,5 +1,5 @@
-import { MoviePoster } from "./movie-poster";
 import { Skeleton } from "@/components/ui/skeleton";
+import { MoviePoster } from "./movie-poster";
 
 interface Movie {
 	id: number;
@@ -40,10 +40,11 @@ export function MovieGrid({
 }
 
 export function MovieGridSkeleton({ count = 20 }: { count?: number }) {
+	const ids = Array.from({ length: count }, (_, i) => `skeleton-${i}`);
 	return (
 		<div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-			{Array.from({ length: count }).map((_, i) => (
-				<Skeleton key={i} className="aspect-[2/3] rounded-lg" />
+			{ids.map((id) => (
+				<Skeleton key={id} className="aspect-[2/3] rounded-lg" />
 			))}
 		</div>
 	);

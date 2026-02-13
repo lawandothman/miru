@@ -29,7 +29,9 @@ export function InfiniteMovieGrid({
 
 	useEffect(() => {
 		const el = sentinelRef.current;
-		if (!el || !hasMore) return;
+		if (!el || !hasMore) {
+			return;
+		}
 
 		const observer = new IntersectionObserver(
 			(entries) => {

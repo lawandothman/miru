@@ -283,11 +283,17 @@ export default async function Home() {
 					<div className="relative mx-auto flex max-w-lg flex-col items-center text-center">
 						{/* Decorative film frames */}
 						<div className="mb-8 flex items-center gap-1.5">
-							{[...Array(5)].map((_, i) => (
+							{[
+									{ id: "a", opacity: 0.06 },
+									{ id: "b", opacity: 0.06 },
+									{ id: "c", opacity: 0.15 },
+									{ id: "d", opacity: 0.06 },
+									{ id: "e", opacity: 0.06 },
+								].map((dot) => (
 								<div
-									key={i}
+									key={dot.id}
 									className="size-2 rounded-[3px] border border-foreground/[0.08]"
-									style={{ opacity: i === 2 ? 0.15 : 0.06 }}
+									style={{ opacity: dot.opacity }}
 								/>
 							))}
 						</div>
