@@ -5,6 +5,8 @@ import { createDb, schema } from "@miru/db";
 
 const db = createDb(process.env["DATABASE_URL"] ?? "");
 
+const isDev = process.env.NODE_ENV !== "production";
+
 export const auth = betterAuth({
 	baseURL: process.env["BETTER_AUTH_URL"],
 	database: drizzleAdapter(db, {
@@ -17,6 +19,7 @@ export const auth = betterAuth({
 			verification: schema.verifications,
 		},
 	}),
+	emailAndPassword: { enabled: isDev },
 	plugins: [nextCookies()],
 	socialProviders: {
 		google: {
@@ -31,6 +34,9 @@ export const auth = betterAuth({
 				defaultValue: false,
 				input: false,
 			},
+		},
+		deleteUser: {
+			enabled: true,
 		},
 	},
 });

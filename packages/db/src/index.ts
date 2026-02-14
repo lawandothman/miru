@@ -13,3 +13,5 @@ export type Database = ReturnType<typeof createDb>;
 export type User = InferSelectModel<typeof schema.users>;
 
 export { schema };
+
+export { eq } from "drizzle-orm";

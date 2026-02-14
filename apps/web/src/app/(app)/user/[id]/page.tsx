@@ -1,14 +1,16 @@
 import { Suspense } from "react";
 import { headers } from "next/headers";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import { Settings } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { trpc } from "@/lib/trpc/server";
 import { UserAvatar } from "@/components/user-avatar";
 import { FollowButton } from "@/components/follow-button";
 import { MovieGrid, MovieGridSkeleton } from "@/components/movie-grid";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { SignOutButton } from "./sign-out-button";
 
 interface UserPageProps {
 	params: Promise<{ id: string }>;
@@ -47,7 +49,6 @@ export default async function UserPage({ params }: UserPageProps) {
 
 	return (
 		<div className="space-y-8">
-			{/* Profile Header — renders immediately */}
 			<div className="flex items-start gap-5">
 				<UserAvatar name={user.name ?? "?"} image={user.image} size="xl" />
 				<div className="flex-1">
@@ -75,23 +76,32 @@ export default async function UserPage({ params }: UserPageProps) {
 							hasSession={Boolean(session)}
 						/>
 					</Suspense>
-					<div className="mt-4 flex gap-2">
-						{!isOwnProfile && session && (
+					{!isOwnProfile && session && (
+						<div className="mt-4">
 							<FollowButton userId={id} isFollowing={user.isFollowing} />
-						)}
-						{isOwnProfile && <SignOutButton />}
-					</div>
+						</div>
+					)}
 				</div>
+				{isOwnProfile && (
+					<Button
+						variant="ghost"
+						size="icon"
+						asChild
+						className="shrink-0 text-muted-foreground"
+					>
+						<Link href="/settings" aria-label="Settings">
+							<Settings className="size-5" />
+						</Link>
+					</Button>
+				)}
 			</div>
 
-			{/* Matches — streamed */}
 			{!isOwnProfile && session && (
 				<Suspense fallback={<MatchesSkeleton />}>
 					<UserMatches userId={id} />
 				</Suspense>
 			)}
 
-			{/* Watchlist — streamed */}
 			<Suspense
 				fallback={
 					<MovieSectionSkeleton
@@ -110,7 +120,6 @@ export default async function UserPage({ params }: UserPageProps) {
 				/>
 			</Suspense>
 
-			{/* Watched — streamed */}
 			<Suspense
 				fallback={
 					<MovieSectionSkeleton
