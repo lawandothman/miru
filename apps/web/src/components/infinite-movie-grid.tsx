@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { MoviePoster } from "./movie-poster";
+import { MovieGridSkeleton } from "./movie-grid";
 import { Loader2 } from "lucide-react";
 
 interface Movie {
@@ -14,6 +15,7 @@ interface InfiniteMovieGridProps {
 	movies: Movie[];
 	hasMore: boolean;
 	isFetching: boolean;
+	isLoading?: boolean;
 	onLoadMore: () => void;
 	emptyMessage?: string;
 }
@@ -22,6 +24,7 @@ export function InfiniteMovieGrid({
 	movies,
 	hasMore,
 	isFetching,
+	isLoading,
 	onLoadMore,
 	emptyMessage = "No movies found",
 }: InfiniteMovieGridProps) {
@@ -45,6 +48,10 @@ export function InfiniteMovieGrid({
 		observer.observe(el);
 		return () => observer.disconnect();
 	}, [hasMore, isFetching, onLoadMore]);
+
+	if (isLoading) {
+		return <MovieGridSkeleton />;
+	}
 
 	if (movies.length === 0 && !isFetching) {
 		return (

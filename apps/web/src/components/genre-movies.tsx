@@ -34,6 +34,7 @@ export function GenreMovies({ genreId }: { genreId: number }) {
 			}))}
 			hasMore={(query.data?.pages.at(-1)?.length ?? PAGE_SIZE) >= PAGE_SIZE}
 			isFetching={query.isFetchingNextPage}
+			isLoading={query.isLoading}
 			onLoadMore={onLoadMore}
 			emptyMessage="No movies in this genre"
 		/>
