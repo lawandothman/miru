@@ -178,12 +178,4 @@ export const onboardingRouter = router({
 
 			return { success: true };
 		}),
-
-	skip: protectedProcedure.mutation(async ({ ctx }) => {
-		await ctx.db
-			.update(schema.users)
-			.set({ onboardingCompletedAt: new Date() })
-			.where(eq(schema.users.id, ctx.session.user.id));
-		return { success: true };
-	}),
 });

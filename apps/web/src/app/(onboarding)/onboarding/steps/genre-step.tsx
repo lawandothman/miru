@@ -1,11 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
 	Bomb,
+	Camera,
 	Drama,
+	Film,
 	Ghost,
 	Heart,
+	Landmark,
 	Laugh,
 	Map,
 	Music,
@@ -15,7 +18,7 @@ import {
 	Shield,
 	Sparkles,
 	Sword,
-	Clapperboard,
+	Tv,
 	Users,
 	Wand2,
 	type LucideIcon,
@@ -28,20 +31,20 @@ import { cn } from "@/lib/utils";
 const genreIcons: Record<string, LucideIcon> = {
 	Action: Sword,
 	Adventure: Map,
-	Animation: Clapperboard,
+	Animation: Film,
 	Comedy: Laugh,
 	Crime: Search,
-	Documentary: Clapperboard,
+	Documentary: Camera,
 	Drama: Drama,
 	Family: Users,
 	Fantasy: Wand2,
-	History: Clapperboard,
+	History: Landmark,
 	Horror: Ghost,
 	Music: Music,
 	Mystery: Puzzle,
 	Romance: Heart,
 	"Science Fiction": Rocket,
-	"TV Movie": Clapperboard,
+	"TV Movie": Tv,
 	Thriller: Shield,
 	War: Bomb,
 	Western: Map,
@@ -49,15 +52,10 @@ const genreIcons: Record<string, LucideIcon> = {
 
 interface GenreStepProps {
 	selectedGenres: number[];
-	onSelectionStateChange: (hasSelection: boolean) => void;
 	onComplete: (genreIds: number[]) => void;
 }
 
-export function GenreStep({
-	selectedGenres,
-	onSelectionStateChange,
-	onComplete,
-}: GenreStepProps) {
+export function GenreStep({ selectedGenres, onComplete }: GenreStepProps) {
 	const [selected, setSelected] = useState<Set<number>>(
 		new Set(selectedGenres),
 	);
@@ -88,10 +86,6 @@ export function GenreStep({
 		});
 	};
 
-	useEffect(() => {
-		onSelectionStateChange(selected.size > 0);
-	}, [onSelectionStateChange, selected]);
-
 	return (
 		<form
 			id="onboarding-genre-form"
@@ -104,13 +98,13 @@ export function GenreStep({
 			<div className="space-y-3 text-center">
 				<div className="inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-xs font-medium text-amber-200">
 					<Sparkles className="size-3.5" />
-					Personalize your recommendations
+					Your taste
 				</div>
 				<h2 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
 					What do you like to watch?
 				</h2>
 				<p className="text-sm text-muted-foreground sm:text-base">
-					Choose at least one genre to build your For You feed.
+					Pick your favourites and we&apos;ll recommend things you&apos;ll love.
 				</p>
 			</div>
 
@@ -139,23 +133,24 @@ export function GenreStep({
 				</div>
 			) : isEmpty ? (
 				<div className="space-y-2 rounded-2xl border border-border/60 bg-card/50 p-4 text-center">
-					<p className="text-sm font-medium">No genres found yet</p>
+					<p className="text-sm font-medium">No genres available</p>
 					<p className="text-sm text-muted-foreground">
-						Run `pnpm db:seed` to pull the initial TMDB catalog, then reload.
+						Please try again later.
 					</p>
 				</div>
 			) : (
 				<div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
-					{genres?.map((genre) => {
-						const Icon = genreIcons[genre.name] ?? Clapperboard;
+					{genres?.map((genre, i) => {
+						const Icon = genreIcons[genre.name] ?? Film;
 						const isSelected = selected.has(genre.id);
 						return (
 							<button
 								key={genre.id}
 								type="button"
 								onClick={() => toggle(genre.id)}
+								style={{ animationDelay: `${Math.min(i * 30, 500)}ms` }}
 								className={cn(
-									"group relative flex min-h-24 flex-col items-center justify-center gap-2.5 overflow-hidden rounded-2xl border px-4 py-4 text-center transition-all",
+									"animate-scale-in group relative flex min-h-24 flex-col items-center justify-center gap-2.5 overflow-hidden rounded-2xl border px-4 py-4 text-center transition-all",
 									isSelected
 										? "border-amber-500/70 bg-amber-500/15 text-amber-100"
 										: "border-border/60 bg-card/40 hover:border-amber-500/40 hover:bg-card",
@@ -163,10 +158,10 @@ export function GenreStep({
 							>
 								<div
 									className={cn(
-										"flex size-9 shrink-0 items-center justify-center rounded-xl border",
+										"flex size-9 shrink-0 items-center justify-center rounded-xl",
 										isSelected
-											? "border-amber-400/40 bg-amber-400/15"
-											: "border-border/60 bg-background/60",
+											? "bg-amber-400/15"
+											: "border border-border/60 bg-background/60",
 									)}
 								>
 									<Icon className="size-4" />
@@ -179,7 +174,6 @@ export function GenreStep({
 					})}
 				</div>
 			)}
-
 		</form>
 	);
 }

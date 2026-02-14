@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import { Sparkles } from "lucide-react";
 import { toast } from "sonner";
@@ -13,14 +13,12 @@ import { countryFlag, countryName } from "./region-data";
 interface StreamingStepProps {
 	selectedProviders: number[];
 	country: string | null;
-	onSelectionStateChange: (hasSelection: boolean) => void;
 	onComplete: (providerIds: number[]) => void;
 }
 
 export function StreamingStep({
 	selectedProviders,
 	country,
-	onSelectionStateChange,
 	onComplete,
 }: StreamingStepProps) {
 	const [selected, setSelected] = useState<Set<number>>(
@@ -28,7 +26,8 @@ export function StreamingStep({
 	);
 	const [search, setSearch] = useState("");
 
-	const { data: providers, isLoading } = trpc.movie.getWatchProviders.useQuery();
+	const { data: providers, isLoading } =
+		trpc.movie.getWatchProviders.useQuery();
 	const setServices = trpc.onboarding.setStreamingServices.useMutation({
 		onError: () => toast.error("Failed to save streaming services"),
 		onSuccess: () => onComplete(Array.from(selected)),
@@ -50,10 +49,6 @@ export function StreamingStep({
 		provider.name.toLowerCase().includes(search.toLowerCase()),
 	);
 
-	useEffect(() => {
-		onSelectionStateChange(selected.size > 0);
-	}, [onSelectionStateChange, selected]);
-
 	return (
 		<form
 			id="onboarding-streaming-form"
@@ -66,13 +61,14 @@ export function StreamingStep({
 			<div className="space-y-3 text-center">
 				<div className="inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-xs font-medium text-amber-200">
 					<Sparkles className="size-3.5" />
-					Streaming setup
+					Your services
 				</div>
 				<h2 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
 					Where do you stream?
 				</h2>
 				<p className="text-sm text-muted-foreground sm:text-base">
-					Pick the services you use in {countryName(country)} {countryFlag(country ?? "GB")}
+					Select the services you subscribe to in {countryName(country)}{" "}
+					{countryFlag(country ?? "GB")}
 				</p>
 			</div>
 
@@ -87,10 +83,6 @@ export function StreamingStep({
 				/>
 			</div>
 
-			<p className="text-center text-xs text-muted-foreground">
-				Choose as many services as you like.
-			</p>
-
 			{isLoading ? (
 				<div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
 					{Array.from({ length: 12 }, (_, i) => (
@@ -100,15 +92,16 @@ export function StreamingStep({
 			) : (
 				<>
 					<div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-						{filteredProviders?.map((provider) => {
+						{filteredProviders?.map((provider, i) => {
 							const isSelected = selected.has(provider.id);
 							return (
 								<button
 									key={provider.id}
 									type="button"
 									onClick={() => toggle(provider.id)}
+									style={{ animationDelay: `${Math.min(i * 30, 500)}ms` }}
 									className={cn(
-										"flex h-24 flex-col items-center justify-center gap-2 rounded-2xl border p-3 text-center transition-all",
+										"animate-scale-in flex h-24 flex-col items-center justify-center gap-2 rounded-2xl border p-3 text-center transition-all",
 										isSelected
 											? "border-amber-500/60 bg-amber-500/10"
 											: "border-border/70 bg-card/40 hover:border-amber-500/40 hover:bg-card",
@@ -142,7 +135,6 @@ export function StreamingStep({
 					)}
 				</>
 			)}
-
 		</form>
 	);
 }

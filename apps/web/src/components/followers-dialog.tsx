@@ -59,16 +59,14 @@ export function FollowersDialog({
 				onClick={() => openWith("followers")}
 				className="hover:text-foreground transition-colors"
 			>
-				<strong className="text-foreground">{followerCount}</strong>{" "}
-				followers
+				<strong className="text-foreground">{followerCount}</strong> followers
 			</button>
 			<button
 				type="button"
 				onClick={() => openWith("following")}
 				className="hover:text-foreground transition-colors"
 			>
-				<strong className="text-foreground">{followingCount}</strong>{" "}
-				following
+				<strong className="text-foreground">{followingCount}</strong> following
 			</button>
 
 			{isMobile && (
@@ -121,8 +119,11 @@ function UserList({ userId, mode }: { userId: string; mode: Mode }) {
 		<div className="max-h-80 overflow-y-auto">
 			{data.isLoading ? (
 				<div className="space-y-3">
-					{Array.from({ length: 4 }).map((_, i) => (
-						<div key={i} className="flex items-center gap-3">
+					{Array.from(
+						{ length: 4 },
+						(_, i) => `follower-skeleton-${i + 1}`,
+					).map((skeletonId) => (
+						<div key={skeletonId} className="flex items-center gap-3">
 							<Skeleton className="size-8 rounded-full" />
 							<Skeleton className="h-4 w-28" />
 							<Skeleton className="ml-auto h-8 w-20" />
@@ -138,10 +139,7 @@ function UserList({ userId, mode }: { userId: string; mode: Mode }) {
 			) : (
 				<div className="space-y-4">
 					{users.map((user) => (
-						<div
-							key={user.id}
-							className="flex items-center gap-3 py-1"
-						>
+						<div key={user.id} className="flex items-center gap-3 py-1">
 							<Link
 								href={`/user/${user.id}`}
 								className="flex min-w-0 flex-1 items-center gap-3"
@@ -156,11 +154,8 @@ function UserList({ userId, mode }: { userId: string; mode: Mode }) {
 								</span>
 							</Link>
 							{user.id !== currentUserId && (
-							<FollowButton
-								userId={user.id}
-								isFollowing={user.isFollowing}
-							/>
-						)}
+								<FollowButton userId={user.id} isFollowing={user.isFollowing} />
+							)}
 						</div>
 					))}
 				</div>

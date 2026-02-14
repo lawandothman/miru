@@ -165,38 +165,36 @@ async function main() {
 			);
 
 			const regional = watchProvidersResponse.results?.[DEFAULT_REGION];
-			if (!regional) {
-				continue;
-			}
+			if (regional) {
+				for (const provider of regional.flatrate ?? []) {
+					providerMap.set(provider.provider_id, {
+						display_priority: provider.display_priority ?? null,
+						id: provider.provider_id,
+						logo_path: provider.logo_path ?? null,
+						name: provider.provider_name,
+					});
+					streamRows.push({ movie_id: movieId, provider_id: provider.provider_id });
+				}
 
-			for (const provider of regional.flatrate ?? []) {
-				providerMap.set(provider.provider_id, {
-					display_priority: provider.display_priority ?? null,
-					id: provider.provider_id,
-					logo_path: provider.logo_path ?? null,
-					name: provider.provider_name,
-				});
-				streamRows.push({ movie_id: movieId, provider_id: provider.provider_id });
-			}
+				for (const provider of regional.buy ?? []) {
+					providerMap.set(provider.provider_id, {
+						display_priority: provider.display_priority ?? null,
+						id: provider.provider_id,
+						logo_path: provider.logo_path ?? null,
+						name: provider.provider_name,
+					});
+					buyRows.push({ movie_id: movieId, provider_id: provider.provider_id });
+				}
 
-			for (const provider of regional.buy ?? []) {
-				providerMap.set(provider.provider_id, {
-					display_priority: provider.display_priority ?? null,
-					id: provider.provider_id,
-					logo_path: provider.logo_path ?? null,
-					name: provider.provider_name,
-				});
-				buyRows.push({ movie_id: movieId, provider_id: provider.provider_id });
-			}
-
-			for (const provider of regional.rent ?? []) {
-				providerMap.set(provider.provider_id, {
-					display_priority: provider.display_priority ?? null,
-					id: provider.provider_id,
-					logo_path: provider.logo_path ?? null,
-					name: provider.provider_name,
-				});
-				rentRows.push({ movie_id: movieId, provider_id: provider.provider_id });
+				for (const provider of regional.rent ?? []) {
+					providerMap.set(provider.provider_id, {
+						display_priority: provider.display_priority ?? null,
+						id: provider.provider_id,
+						logo_path: provider.logo_path ?? null,
+						name: provider.provider_name,
+					});
+					rentRows.push({ movie_id: movieId, provider_id: provider.provider_id });
+				}
 			}
 		}
 
@@ -239,7 +237,7 @@ async function main() {
 		}
 
 		writeOut(
-			[
+			`${[
 				`Seed complete for ${DEFAULT_REGION}`,
 				`genres=${genres.length}`,
 				`movies=${uniqueMovies.length}`,
@@ -248,7 +246,7 @@ async function main() {
 				`streamLinks=${streamRows.length}`,
 				`buyLinks=${buyRows.length}`,
 				`rentLinks=${rentRows.length}`,
-			].join(" | ") + "\n",
+			].join(" | ")}\n`,
 		);
 	} finally {
 		await sql.end();
@@ -294,22 +292,16 @@ function readEnvValue(filePath, key) {
 
 	const content = readFileSync(filePath, "utf8");
 	for (const line of content.split(/\r?\n/u)) {
-		if (!line || line.trimStart().startsWith("#")) {
-			continue;
+		if (line && !line.trimStart().startsWith("#")) {
+			const separatorIndex = line.indexOf("=");
+			if (separatorIndex > 0) {
+				const envKey = line.slice(0, separatorIndex).trim();
+				if (envKey === key) {
+					const rawValue = line.slice(separatorIndex + 1).trim();
+					return rawValue.replace(/^"|"$/gu, "");
+				}
+			}
 		}
-
-		const separatorIndex = line.indexOf("=");
-		if (separatorIndex <= 0) {
-			continue;
-		}
-
-		const envKey = line.slice(0, separatorIndex).trim();
-		if (envKey !== key) {
-			continue;
-		}
-
-		const rawValue = line.slice(separatorIndex + 1).trim();
-		return rawValue.replace(/^"|"$/gu, "");
 	}
 
 	return null;

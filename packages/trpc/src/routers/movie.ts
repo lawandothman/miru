@@ -76,7 +76,11 @@ export const movieRouter = router({
 				!existing || Date.now() - existing.updatedAt.getTime() > STALE_AFTER_MS;
 
 			const movie = isStale
-				? await refreshMovie(ctx, input.tmdbId, ctx.session?.user?.country ?? undefined)
+				? await refreshMovie(
+						ctx,
+						input.tmdbId,
+						ctx.session?.user?.country ?? undefined,
+					)
 				: existing;
 
 			if (!movie) {
@@ -293,7 +297,10 @@ export const movieRouter = router({
 					.filter((genre) => Boolean(genre.name));
 
 				if (tmdbGenres.length > 0) {
-					await ctx.db.insert(schema.genres).values(tmdbGenres).onConflictDoNothing();
+					await ctx.db
+						.insert(schema.genres)
+						.values(tmdbGenres)
+						.onConflictDoNothing();
 					genres = await ctx.db.select().from(schema.genres);
 				}
 			} catch {
@@ -444,7 +451,11 @@ interface TMDBRegionProviders {
 	rent?: TMDBProvider[];
 }
 
-async function refreshMovie(ctx: { db: Database; tmdb: TMDB }, tmdbId: number, country?: string) {
+async function refreshMovie(
+	ctx: { db: Database; tmdb: TMDB },
+	tmdbId: number,
+	country?: string,
+) {
 	try {
 		const [details, videos, watchProviders] = await Promise.all([
 			ctx.tmdb.movies.details({ movie_id: tmdbId }),
@@ -514,8 +525,18 @@ async function refreshMovie(ctx: { db: Database; tmdb: TMDB }, tmdbId: number, c
 				regionProviders.flatrate ?? [],
 				"stream",
 			);
-			await upsertProviders(ctx.db, details.id, regionProviders.buy ?? [], "buy");
-			await upsertProviders(ctx.db, details.id, regionProviders.rent ?? [], "rent");
+			await upsertProviders(
+				ctx.db,
+				details.id,
+				regionProviders.buy ?? [],
+				"buy",
+			);
+			await upsertProviders(
+				ctx.db,
+				details.id,
+				regionProviders.rent ?? [],
+				"rent",
+			);
 		}
 
 		return findMovieWithProviders(ctx.db, tmdbId);
