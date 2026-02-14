@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import { MoviePoster } from "./movie-poster";
 import { MovieGridSkeleton } from "./movie-grid";
-import { Loader2 } from "lucide-react";
+import { Spinner } from "@/components/ui/spinner";
 
 interface Movie {
 	id: number;
@@ -78,9 +78,7 @@ export function InfiniteMovieGrid({
 			{/* Sentinel for IntersectionObserver */}
 			{hasMore && (
 				<div ref={sentinelRef} className="flex justify-center py-8">
-					{isFetching && (
-						<Loader2 className="size-5 animate-spin text-muted-foreground" />
-					)}
+					{isFetching && <Spinner className="size-5 text-muted-foreground" />}
 				</div>
 			)}
 		</div>

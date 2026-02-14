@@ -1,6 +1,7 @@
 "use client";
 
-import { CircleCheck, Eye, Loader2 } from "lucide-react";
+import { CircleCheck, Eye } from "lucide-react";
+import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc/client";
@@ -67,11 +68,7 @@ export function WatchedButton({
 					className,
 				)}
 			>
-				{isLoading ? (
-					<Loader2 className="size-4 animate-spin" />
-				) : (
-					<WatchedIcon className="size-4" />
-				)}
+				{isLoading ? <Spinner /> : <WatchedIcon className="size-4" />}
 			</button>
 		);
 	}
@@ -85,7 +82,7 @@ export function WatchedButton({
 			className={cn("gap-1.5", className)}
 		>
 			{isLoading ? (
-				<Loader2 className="size-3.5 animate-spin" />
+				<Spinner className="size-3.5" />
 			) : (
 				<WatchedIcon className="size-3.5" />
 			)}

@@ -6,10 +6,14 @@ import { z } from "zod";
 import { protectedProcedure, publicProcedure, router } from "../trpc";
 
 const STALE_AFTER_MS = 24 * 60 * 60 * 1000; // 24 hours
+const GENRES_CACHE_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+const DEFAULT_PAGE_SIZE = 20;
+const DEFAULT_REGION = "GB";
+const TRAILER_SITE = "YouTube";
+const TRAILER_TYPE = "Trailer";
 
 let genresCache: { data: { id: number; name: string }[]; ts: number } | null =
 	null;
-const GENRES_CACHE_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 
 const movieWithProvidersQuery = {
 	buyProviders: { with: { provider: true } },
@@ -27,7 +31,7 @@ export const movieRouter = router({
 			}),
 		)
 		.query(async ({ ctx, input }) => {
-			const page = input.cursor ?? 1;
+			const offset = input.cursor ?? 0;
 			const movies = await ctx.db
 				.select({
 					id: schema.movies.id,
@@ -48,13 +52,13 @@ export const movieRouter = router({
 					),
 				)
 				.orderBy(desc(schema.movies.tmdbVoteCount))
-				.limit(20)
-				.offset((page - 1) * 20);
+				.limit(DEFAULT_PAGE_SIZE)
+				.offset(offset);
 
 			const movieIds = movies.map((m) => m.id);
 			const [watchlistSet, watchedSet] = await Promise.all([
-				getWatchlistSet(ctx, movieIds),
-				getWatchedSet(ctx, movieIds),
+				getMovieIdSet(ctx, schema.watchlistEntries, movieIds),
+				getMovieIdSet(ctx, schema.watchedEntries, movieIds),
 			]);
 
 			return movies.map((m) => ({
@@ -154,7 +158,7 @@ export const movieRouter = router({
 		.input(
 			z.object({
 				cursor: z.number().nullish(),
-				limit: z.number().default(20),
+				limit: z.number().default(DEFAULT_PAGE_SIZE),
 			}),
 		)
 		.query(async ({ ctx, input }) => {
@@ -324,7 +328,7 @@ export const movieRouter = router({
 		.input(
 			z.object({
 				cursor: z.number().nullish(),
-				limit: z.number().default(20),
+				limit: z.number().default(DEFAULT_PAGE_SIZE),
 				providerIds: z.array(z.number()).optional(),
 			}),
 		)
@@ -367,8 +371,8 @@ export const movieRouter = router({
 
 			const popularMovieIds = movies.map((m) => m.id);
 			const [watchlistSet, watchedSet] = await Promise.all([
-				getWatchlistSet(ctx, popularMovieIds),
-				getWatchedSet(ctx, popularMovieIds),
+				getMovieIdSet(ctx, schema.watchlistEntries, popularMovieIds),
+				getMovieIdSet(ctx, schema.watchedEntries, popularMovieIds),
 			]);
 
 			return movies.map((m) => ({
@@ -410,8 +414,8 @@ export const movieRouter = router({
 			}
 
 			const [watchlistSet, watchedSet] = await Promise.all([
-				getWatchlistSet(ctx, movieIds),
-				getWatchedSet(ctx, movieIds),
+				getMovieIdSet(ctx, schema.watchlistEntries, movieIds),
+				getMovieIdSet(ctx, schema.watchedEntries, movieIds),
 			]);
 
 			return {
@@ -464,7 +468,7 @@ async function refreshMovie(
 		]);
 
 		const trailer = videos.results?.find(
-			(v) => v.site === "YouTube" && v.type === "Trailer",
+			(v) => v.site === TRAILER_SITE && v.type === TRAILER_TYPE,
 		);
 
 		const movieData = {
@@ -513,30 +517,22 @@ async function refreshMovie(
 				.onConflictDoNothing();
 		}
 
-		const region = country ?? "GB";
+		const region = country ?? DEFAULT_REGION;
 		const regionProviders = (
 			watchProviders.results as Record<string, TMDBRegionProviders>
 		)?.[region];
 
 		if (regionProviders) {
-			await upsertProviders(
-				ctx.db,
-				details.id,
-				regionProviders.flatrate ?? [],
-				"stream",
-			);
-			await upsertProviders(
-				ctx.db,
-				details.id,
-				regionProviders.buy ?? [],
-				"buy",
-			);
-			await upsertProviders(
-				ctx.db,
-				details.id,
-				regionProviders.rent ?? [],
-				"rent",
-			);
+			await Promise.all([
+				upsertProviders(
+					ctx.db,
+					details.id,
+					regionProviders.flatrate ?? [],
+					"stream",
+				),
+				upsertProviders(ctx.db, details.id, regionProviders.buy ?? [], "buy"),
+				upsertProviders(ctx.db, details.id, regionProviders.rent ?? [], "rent"),
+			]);
 		}
 
 		return findMovieWithProviders(ctx.db, tmdbId);
@@ -581,8 +577,9 @@ async function upsertProviders(
 		.onConflictDoNothing();
 }
 
-async function getWatchlistSet(
+async function getMovieIdSet(
 	ctx: { db: Database; session: { user: { id: string } } | null },
+	table: typeof schema.watchlistEntries | typeof schema.watchedEntries,
 	movieIds: number[],
 ): Promise<Set<number>> {
 	if (!ctx.session?.user || movieIds.length === 0) {
@@ -590,33 +587,12 @@ async function getWatchlistSet(
 	}
 
 	const entries = await ctx.db
-		.select({ movieId: schema.watchlistEntries.movieId })
-		.from(schema.watchlistEntries)
+		.select({ movieId: table.movieId })
+		.from(table)
 		.where(
 			and(
-				eq(schema.watchlistEntries.userId, ctx.session.user.id),
-				inArray(schema.watchlistEntries.movieId, movieIds),
-			),
-		);
-
-	return new Set(entries.map((e) => e.movieId));
-}
-
-async function getWatchedSet(
-	ctx: { db: Database; session: { user: { id: string } } | null },
-	movieIds: number[],
-): Promise<Set<number>> {
-	if (!ctx.session?.user || movieIds.length === 0) {
-		return new Set();
-	}
-
-	const entries = await ctx.db
-		.select({ movieId: schema.watchedEntries.movieId })
-		.from(schema.watchedEntries)
-		.where(
-			and(
-				eq(schema.watchedEntries.userId, ctx.session.user.id),
-				inArray(schema.watchedEntries.movieId, movieIds),
+				eq(table.userId, ctx.session.user.id),
+				inArray(table.movieId, movieIds),
 			),
 		);
 

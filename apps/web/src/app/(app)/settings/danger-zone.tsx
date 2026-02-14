@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, LogOut, Trash2 } from "lucide-react";
+import { LogOut, Trash2 } from "lucide-react";
+import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -61,11 +62,7 @@ export function DangerZone() {
 					className="w-full justify-start gap-3"
 					size="lg"
 				>
-					{isSigningOut ? (
-						<Loader2 className="size-4 animate-spin" />
-					) : (
-						<LogOut className="size-4" />
-					)}
+					{isSigningOut ? <Spinner /> : <LogOut className="size-4" />}
 					Sign out
 				</Button>
 
@@ -118,7 +115,7 @@ export function DangerZone() {
 									deleteConfirmation !== "delete my account" || isDeleting
 								}
 							>
-								{isDeleting && <Loader2 className="size-3.5 animate-spin" />}
+								{isDeleting && <Spinner className="size-3.5" />}
 								Delete account
 							</Button>
 						</DialogFooter>

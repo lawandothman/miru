@@ -34,11 +34,10 @@ export async function generateMetadata({
 export default async function UserPage({ params }: UserPageProps) {
 	const { id } = await params;
 
-	const session = await auth.api.getSession({
-		headers: await headers(),
-	});
-
-	const api = await trpc();
+	const [session, api] = await Promise.all([
+		auth.api.getSession({ headers: await headers() }),
+		trpc(),
+	]);
 
 	let user;
 	try {

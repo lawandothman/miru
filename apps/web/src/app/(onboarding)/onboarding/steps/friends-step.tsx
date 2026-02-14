@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { Check, Copy, Search, Sparkles } from "lucide-react";
-import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
+import { useDebounce } from "@/hooks/use-debounce";
 import { trpc } from "@/lib/trpc/client";
 import { UserAvatar } from "@/components/user-avatar";
 import { FollowButton } from "@/components/follow-button";
@@ -13,19 +14,9 @@ interface FriendsStepProps {
 	onComplete: () => void;
 }
 
-function useDebounce(value: string, delay: number) {
-	const [debouncedValue, setDebouncedValue] = useState(value);
-	useEffect(() => {
-		const timer = setTimeout(() => setDebouncedValue(value), delay);
-		return () => clearTimeout(timer);
-	}, [value, delay]);
-	return debouncedValue;
-}
-
 export function FriendsStep({ onComplete }: FriendsStepProps) {
 	const [searchQuery, setSearchQuery] = useState("");
-	const [copied, setCopied] = useState(false);
-	const copiedTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+	const { copied, copy } = useCopyToClipboard();
 	const debouncedQuery = useDebounce(searchQuery, 300);
 
 	const { data: suggestedUsers, isLoading: isSuggestedLoading } =
@@ -54,26 +45,8 @@ export function FriendsStep({ onComplete }: FriendsStepProps) {
 			}
 		}
 
-		try {
-			await navigator.clipboard.writeText(url);
-			setCopied(true);
-			toast("Link copied");
-			if (copiedTimeoutRef.current) {
-				clearTimeout(copiedTimeoutRef.current);
-			}
-			copiedTimeoutRef.current = setTimeout(() => setCopied(false), 2000);
-		} catch {
-			toast.error("Unable to copy link");
-		}
+		await copy(url);
 	};
-
-	useEffect(() => {
-		return () => {
-			if (copiedTimeoutRef.current) {
-				clearTimeout(copiedTimeoutRef.current);
-			}
-		};
-	}, []);
 
 	const usersToShow =
 		debouncedQuery.length > 0 ? searchResults : suggestedUsers;

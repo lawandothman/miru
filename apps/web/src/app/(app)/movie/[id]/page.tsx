@@ -218,6 +218,7 @@ export default async function MoviePage({ params }: MoviePageProps) {
 							allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
 							allowFullScreen
 							sandbox="allow-scripts allow-same-origin allow-presentation"
+							loading="lazy"
 							className="h-full w-full"
 						/>
 					</div>

@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
 import { Check, Share2 } from "lucide-react";
-import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
 import { cn } from "@/lib/utils";
 
 interface ShareButtonProps {
@@ -19,30 +18,7 @@ export function ShareButton({
 	variant = "default",
 	className,
 }: ShareButtonProps) {
-	const [copied, setCopied] = useState(false);
-	const copiedTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-	useEffect(() => {
-		return () => {
-			if (copiedTimeoutRef.current) {
-				clearTimeout(copiedTimeoutRef.current);
-			}
-		};
-	}, []);
-
-	const handleCopyLink = async (url: string) => {
-		await navigator.clipboard.writeText(url);
-		toast("Link copied");
-		setCopied(true);
-
-		if (copiedTimeoutRef.current) {
-			clearTimeout(copiedTimeoutRef.current);
-		}
-
-		copiedTimeoutRef.current = setTimeout(() => {
-			setCopied(false);
-		}, 2000);
-	};
+	const { copied, copy } = useCopyToClipboard();
 
 	const handleShare = async () => {
 		const url = window.location.href;
@@ -55,15 +31,10 @@ export function ShareButton({
 				if (error instanceof Error && error.name === "AbortError") {
 					return;
 				}
-				// Fall back to clipboard when native share fails.
 			}
 		}
 
-		try {
-			await handleCopyLink(url);
-		} catch {
-			toast.error("Unable to copy link");
-		}
+		await copy(url);
 	};
 
 	const Icon = copied ? Check : Share2;

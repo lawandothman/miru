@@ -1,6 +1,7 @@
 "use client";
 
-import { Loader2, UserMinus, UserPlus } from "lucide-react";
+import { UserMinus, UserPlus } from "lucide-react";
+import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc/client";
@@ -51,7 +52,7 @@ export function FollowButton({
 			size="sm"
 			className={cn("gap-1.5", className)}
 		>
-			{isLoading && <Loader2 className="size-3.5 animate-spin" />}
+			{isLoading && <Spinner className="size-3.5" />}
 			{!isLoading && isFollowing && <UserMinus className="size-3.5" />}
 			{!isLoading && !isFollowing && <UserPlus className="size-3.5" />}
 			{isFollowing ? "Unfollow" : "Follow"}

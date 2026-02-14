@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Loader2, Monitor, Smartphone, X } from "lucide-react";
+import { Monitor, Smartphone, X } from "lucide-react";
+import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -127,7 +128,7 @@ export function SessionsList({ currentSessionId }: SessionsListProps) {
 	if (isLoading) {
 		return (
 			<div className="flex items-center justify-center py-8">
-				<Loader2 className="size-5 animate-spin text-muted-foreground" />
+				<Spinner className="size-5 text-muted-foreground" />
 			</div>
 		);
 	}
@@ -181,7 +182,7 @@ export function SessionsList({ currentSessionId }: SessionsListProps) {
 									className="shrink-0 text-muted-foreground hover:text-destructive"
 								>
 									{revokingId === session.id ? (
-										<Loader2 className="size-3.5 animate-spin" />
+										<Spinner className="size-3.5" />
 									) : (
 										<X className="size-3.5" />
 									)}
@@ -199,7 +200,7 @@ export function SessionsList({ currentSessionId }: SessionsListProps) {
 					disabled={revokingAll}
 					className="w-full"
 				>
-					{revokingAll && <Loader2 className="size-4 animate-spin" />}
+					{revokingAll && <Spinner />}
 					Sign out of all other sessions
 				</Button>
 			)}

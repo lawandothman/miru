@@ -21,7 +21,7 @@ export function MoviePoster({
 		<Link
 			href={`/movie/${id}`}
 			className={cn(
-				"group relative block overflow-hidden rounded-lg",
+				"group relative block overflow-hidden rounded-lg [content-visibility:auto] [contain-intrinsic-size:auto_300px]",
 				className,
 			)}
 		>

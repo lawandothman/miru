@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2 } from "lucide-react";
+import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -54,7 +54,7 @@ export function EditProfileForm({ currentName }: EditProfileFormProps) {
 					size="sm"
 					className="shrink-0 self-center"
 				>
-					{isPending && <Loader2 className="size-3.5 animate-spin" />}
+					{isPending && <Spinner className="size-3.5" />}
 					Save
 				</Button>
 			</div>

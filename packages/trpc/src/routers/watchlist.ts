@@ -1,44 +1,14 @@
 import { schema } from "@miru/db";
-import { TRPCError } from "@trpc/server";
 import { and, eq, inArray } from "drizzle-orm";
 import { z } from "zod";
 import { protectedProcedure, publicProcedure, router } from "../trpc";
+import { ensureMovieExists } from "./helpers";
 
 export const watchlistRouter = router({
 	add: protectedProcedure
 		.input(z.object({ movieId: z.number() }))
 		.mutation(async ({ ctx, input }) => {
-			// Ensure movie exists in DB — fetch from TMDB if not
-			const existing = await ctx.db.query.movies.findFirst({
-				where: eq(schema.movies.id, input.movieId),
-			});
-
-			if (!existing) {
-				try {
-					const details = await ctx.tmdb.movies.details({
-						movie_id: input.movieId,
-					});
-					await ctx.db
-						.insert(schema.movies)
-						.values({
-							id: details.id,
-							title: details.title,
-							originalTitle: details.original_title ?? null,
-							overview: details.overview ?? null,
-							posterPath: details.poster_path ?? null,
-							backdropPath: details.backdrop_path ?? null,
-							releaseDate: details.release_date ?? null,
-							adult: details.adult ?? false,
-							popularity: details.popularity ?? null,
-						})
-						.onConflictDoNothing();
-				} catch {
-					throw new TRPCError({
-						code: "NOT_FOUND",
-						message: "Movie not found on TMDB",
-					});
-				}
-			}
+			await ensureMovieExists(ctx.db, ctx.tmdb, input.movieId);
 
 			await ctx.db
 				.insert(schema.watchlistEntries)

@@ -1,117 +1,142 @@
-import { schema } from "@miru/db";
+import { type Database, schema } from "@miru/db";
 import { TRPCError } from "@trpc/server";
-import { and, eq, ilike } from "drizzle-orm";
+import { and, eq, ilike, ne } from "drizzle-orm";
 import { z } from "zod";
 import { annotateFollowStatus } from "../helpers";
 import { protectedProcedure, publicProcedure, router } from "../trpc";
+
+function fetchFriendWatchlistRows(db: Database, userId: string) {
+	return db
+		.select({
+			friendId: schema.users.id,
+			friendName: schema.users.name,
+			friendImage: schema.users.image,
+			movieId: schema.movies.id,
+			movieTitle: schema.movies.title,
+			moviePosterPath: schema.movies.posterPath,
+		})
+		.from(schema.follows)
+		.innerJoin(schema.users, eq(schema.users.id, schema.follows.followingId))
+		.innerJoin(
+			schema.watchlistEntries,
+			eq(schema.watchlistEntries.userId, schema.follows.followingId),
+		)
+		.innerJoin(
+			schema.movies,
+			eq(schema.movies.id, schema.watchlistEntries.movieId),
+		)
+		.where(
+			and(
+				eq(schema.follows.followerId, userId),
+				eq(schema.movies.adult, false),
+			),
+		);
+}
+
+function fetchUserMovieSets(db: Database, userId: string) {
+	return Promise.all([
+		db
+			.select({ movieId: schema.watchlistEntries.movieId })
+			.from(schema.watchlistEntries)
+			.where(eq(schema.watchlistEntries.userId, userId)),
+		db
+			.select({ movieId: schema.watchedEntries.movieId })
+			.from(schema.watchedEntries)
+			.where(eq(schema.watchedEntries.userId, userId)),
+		db
+			.select({
+				userId: schema.watchedEntries.userId,
+				movieId: schema.watchedEntries.movieId,
+			})
+			.from(schema.watchedEntries)
+			.innerJoin(
+				schema.follows,
+				and(
+					eq(schema.follows.followerId, userId),
+					eq(schema.follows.followingId, schema.watchedEntries.userId),
+				),
+			),
+	]);
+}
+
+function buildFriendWatchedMap(
+	friendWatched: { userId: string; movieId: number }[],
+) {
+	const map = new Map<string, Set<number>>();
+	for (const fw of friendWatched) {
+		let set = map.get(fw.userId);
+		if (!set) {
+			set = new Set();
+			map.set(fw.userId, set);
+		}
+		set.add(fw.movieId);
+	}
+	return map;
+}
+
+type FriendWatchlistRow = Awaited<
+	ReturnType<typeof fetchFriendWatchlistRows>
+>[number];
+
+function groupMatchesByFriend(
+	rows: FriendWatchlistRow[],
+	myMovieIds: Set<number>,
+	myWatchedIds: Set<number>,
+	friendWatchedMap: Map<string, Set<number>>,
+) {
+	const friendMap = new Map<
+		string,
+		{
+			id: string;
+			name: string | null;
+			image: string | null;
+			matches: { id: number; title: string; posterPath: string | null }[];
+		}
+	>();
+
+	for (const row of rows) {
+		if (
+			myMovieIds.has(row.movieId) &&
+			!myWatchedIds.has(row.movieId) &&
+			!friendWatchedMap.get(row.friendId)?.has(row.movieId)
+		) {
+			let friend = friendMap.get(row.friendId);
+			if (!friend) {
+				friend = {
+					id: row.friendId,
+					name: row.friendName,
+					image: row.friendImage,
+					matches: [],
+				};
+				friendMap.set(row.friendId, friend);
+			}
+			friend.matches.push({
+				id: row.movieId,
+				title: row.movieTitle,
+				posterPath: row.moviePosterPath,
+			});
+		}
+	}
+
+	return Array.from(friendMap.values()).sort(
+		(a, b) => b.matches.length - a.matches.length,
+	);
+}
 
 export const socialRouter = router({
 	getDashboardMatches: protectedProcedure.query(async ({ ctx }) => {
 		const userId = ctx.session.user.id;
 
-		// Single query: for each friend I follow, find movies we both have in our watchlists
-		const rows = await ctx.db
-			.select({
-				friendId: schema.users.id,
-				friendName: schema.users.name,
-				friendImage: schema.users.image,
-				movieId: schema.movies.id,
-				movieTitle: schema.movies.title,
-				moviePosterPath: schema.movies.posterPath,
-			})
-			.from(schema.follows)
-			.innerJoin(schema.users, eq(schema.users.id, schema.follows.followingId))
-			.innerJoin(
-				schema.watchlistEntries,
-				eq(schema.watchlistEntries.userId, schema.follows.followingId),
-			)
-			.innerJoin(
-				schema.movies,
-				eq(schema.movies.id, schema.watchlistEntries.movieId),
-			)
-			.where(
-				and(
-					eq(schema.follows.followerId, userId),
-					eq(schema.movies.adult, false),
-				),
-			);
-
-		// Get my watchlist and watched movie IDs
-		const [myWatchlist, myWatched, friendWatched] = await Promise.all([
-			ctx.db
-				.select({ movieId: schema.watchlistEntries.movieId })
-				.from(schema.watchlistEntries)
-				.where(eq(schema.watchlistEntries.userId, userId)),
-			ctx.db
-				.select({ movieId: schema.watchedEntries.movieId })
-				.from(schema.watchedEntries)
-				.where(eq(schema.watchedEntries.userId, userId)),
-			ctx.db
-				.select({
-					userId: schema.watchedEntries.userId,
-					movieId: schema.watchedEntries.movieId,
-				})
-				.from(schema.watchedEntries)
-				.innerJoin(
-					schema.follows,
-					and(
-						eq(schema.follows.followerId, userId),
-						eq(schema.follows.followingId, schema.watchedEntries.userId),
-					),
-				),
+		const [rows, [myWatchlist, myWatched, friendWatched]] = await Promise.all([
+			fetchFriendWatchlistRows(ctx.db, userId),
+			fetchUserMovieSets(ctx.db, userId),
 		]);
 
-		const myMovieIds = new Set(myWatchlist.map((w) => w.movieId));
-		const myWatchedIds = new Set(myWatched.map((w) => w.movieId));
-
-		// Build map of friend -> watched movie IDs
-		const friendWatchedMap = new Map<string, Set<number>>();
-		for (const fw of friendWatched) {
-			let set = friendWatchedMap.get(fw.userId);
-			if (!set) {
-				set = new Set();
-				friendWatchedMap.set(fw.userId, set);
-			}
-			set.add(fw.movieId);
-		}
-
-		// Group by friend, only keep unwatched movies that are in both watchlists
-		const friendMap = new Map<
-			string,
-			{
-				id: string;
-				name: string | null;
-				image: string | null;
-				matches: { id: number; title: string; posterPath: string | null }[];
-			}
-		>();
-
-		for (const row of rows) {
-			if (
-				myMovieIds.has(row.movieId) &&
-				!myWatchedIds.has(row.movieId) &&
-				!friendWatchedMap.get(row.friendId)?.has(row.movieId)
-			) {
-				let friend = friendMap.get(row.friendId);
-				if (!friend) {
-					friend = {
-						id: row.friendId,
-						name: row.friendName,
-						image: row.friendImage,
-						matches: [],
-					};
-					friendMap.set(row.friendId, friend);
-				}
-				friend.matches.push({
-					id: row.movieId,
-					title: row.movieTitle,
-					posterPath: row.moviePosterPath,
-				});
-			}
-		}
-
-		return Array.from(friendMap.values()).sort(
-			(a, b) => b.matches.length - a.matches.length,
+		return groupMatchesByFriend(
+			rows,
+			new Set(myWatchlist.map((w) => w.movieId)),
+			new Set(myWatched.map((w) => w.movieId)),
+			buildFriendWatchedMap(friendWatched),
 		);
 	}),
 
@@ -222,7 +247,7 @@ export const socialRouter = router({
 		.query(async ({ ctx, input }) => {
 			const escaped = input.query.replace(/[%_\\]/g, "\\$&");
 			const currentUserId = ctx.session?.user.id;
-			let users = await ctx.db
+			const users = await ctx.db
 				.select({
 					id: schema.users.id,
 					name: schema.users.name,
@@ -230,12 +255,13 @@ export const socialRouter = router({
 					email: schema.users.email,
 				})
 				.from(schema.users)
-				.where(ilike(schema.users.name, `%${escaped}%`))
+				.where(
+					and(
+						ilike(schema.users.name, `%${escaped}%`),
+						currentUserId ? ne(schema.users.id, currentUserId) : undefined,
+					),
+				)
 				.limit(20);
-
-			if (currentUserId) {
-				users = users.filter((user) => user.id !== currentUserId);
-			}
 
 			return annotateFollowStatus(ctx, users);
 		}),
