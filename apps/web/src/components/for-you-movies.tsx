@@ -1,10 +1,9 @@
 "use client";
 
 import { useCallback } from "react";
+import { PAGE_SIZE } from "@/lib/constants";
 import { trpc } from "@/lib/trpc/client";
 import { InfiniteMovieGrid } from "./infinite-movie-grid";
-
-const PAGE_SIZE = 20;
 
 export function ForYouMovies() {
 	const query = trpc.movie.getForYou.useInfiniteQuery(
@@ -20,11 +19,10 @@ export function ForYouMovies() {
 
 	const movies = query.data?.pages.flat() ?? [];
 
+	const { fetchNextPage } = query;
 	const onLoadMore = useCallback(() => {
-		if (query.hasNextPage && !query.isFetchingNextPage) {
-			query.fetchNextPage();
-		}
-	}, [query]);
+		fetchNextPage();
+	}, [fetchNextPage]);
 
 	return (
 		<InfiniteMovieGrid

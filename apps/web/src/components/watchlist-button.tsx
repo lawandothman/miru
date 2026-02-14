@@ -1,6 +1,7 @@
 "use client";
 
-import { Bookmark, Loader2 } from "lucide-react";
+import { Bookmark } from "lucide-react";
+import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc/client";
@@ -65,7 +66,7 @@ export function WatchlistButton({
 				)}
 			>
 				{isLoading ? (
-					<Loader2 className="size-4 animate-spin" />
+					<Spinner />
 				) : (
 					<Bookmark className={cn("size-4", inWatchlist && "fill-current")} />
 				)}
@@ -82,7 +83,7 @@ export function WatchlistButton({
 			className={cn("gap-1.5", className)}
 		>
 			{isLoading ? (
-				<Loader2 className="size-3.5 animate-spin" />
+				<Spinner className="size-3.5" />
 			) : (
 				<Bookmark className={cn("size-3.5", inWatchlist && "fill-current")} />
 			)}

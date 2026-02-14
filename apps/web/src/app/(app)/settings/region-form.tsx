@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Loader2 } from "lucide-react";
+import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -59,7 +59,7 @@ export function RegionForm() {
 	if (isLoading) {
 		return (
 			<div className="flex items-center justify-center py-8">
-				<Loader2 className="size-5 animate-spin text-muted-foreground" />
+				<Spinner className="size-5 text-muted-foreground" />
 			</div>
 		);
 	}

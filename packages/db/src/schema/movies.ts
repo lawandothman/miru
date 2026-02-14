@@ -76,7 +76,10 @@ export const movieStreamProviders = pgTable(
 			.references(() => watchProviders.id, { onDelete: "cascade" }),
 		updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow().notNull(),
 	},
-	(table) => [primaryKey({ columns: [table.movieId, table.providerId] })],
+	(table) => [
+		primaryKey({ columns: [table.movieId, table.providerId] }),
+		index("movie_stream_providers_provider_idx").on(table.providerId),
+	],
 );
 
 export const movieBuyProviders = pgTable(
@@ -90,7 +93,10 @@ export const movieBuyProviders = pgTable(
 			.references(() => watchProviders.id, { onDelete: "cascade" }),
 		updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow().notNull(),
 	},
-	(table) => [primaryKey({ columns: [table.movieId, table.providerId] })],
+	(table) => [
+		primaryKey({ columns: [table.movieId, table.providerId] }),
+		index("movie_buy_providers_provider_idx").on(table.providerId),
+	],
 );
 
 export const movieRentProviders = pgTable(
@@ -104,5 +110,8 @@ export const movieRentProviders = pgTable(
 			.references(() => watchProviders.id, { onDelete: "cascade" }),
 		updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow().notNull(),
 	},
-	(table) => [primaryKey({ columns: [table.movieId, table.providerId] })],
+	(table) => [
+		primaryKey({ columns: [table.movieId, table.providerId] }),
+		index("movie_rent_providers_provider_idx").on(table.providerId),
+	],
 );

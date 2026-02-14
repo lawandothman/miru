@@ -1,4 +1,5 @@
 import {
+	index,
 	integer,
 	pgTable,
 	primaryKey,
@@ -19,7 +20,10 @@ export const userGenrePreferences = pgTable(
 			.notNull()
 			.references(() => users.id, { onDelete: "cascade" }),
 	},
-	(table) => [primaryKey({ columns: [table.userId, table.genreId] })],
+	(table) => [
+		primaryKey({ columns: [table.userId, table.genreId] }),
+		index("user_genre_preferences_genre_idx").on(table.genreId),
+	],
 );
 
 export const userStreamingServices = pgTable(
