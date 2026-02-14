@@ -221,7 +221,8 @@ export const socialRouter = router({
 		.input(z.object({ query: z.string().min(1) }))
 		.query(async ({ ctx, input }) => {
 			const escaped = input.query.replace(/[%_\\]/g, "\\$&");
-			const users = await ctx.db
+			const currentUserId = ctx.session?.user.id;
+			let users = await ctx.db
 				.select({
 					id: schema.users.id,
 					name: schema.users.name,
@@ -231,6 +232,10 @@ export const socialRouter = router({
 				.from(schema.users)
 				.where(ilike(schema.users.name, `%${escaped}%`))
 				.limit(20);
+
+			if (currentUserId) {
+				users = users.filter((user) => user.id !== currentUserId);
+			}
 
 			return annotateFollowStatus(ctx, users);
 		}),

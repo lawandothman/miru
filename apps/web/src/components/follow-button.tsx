@@ -40,6 +40,7 @@ export function FollowButton({
 
 	return (
 		<Button
+			type="button"
 			onClick={() =>
 				isFollowing
 					? unfollow.mutate({ friendId: userId })

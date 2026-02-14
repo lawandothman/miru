@@ -282,12 +282,31 @@ export const movieRouter = router({
 		if (genresCache && Date.now() - genresCache.ts < GENRES_CACHE_MS) {
 			return genresCache.data;
 		}
-		const genres = await ctx.db.select().from(schema.genres);
+
+		let genres = await ctx.db.select().from(schema.genres);
+
+		if (genres.length === 0) {
+			try {
+				const response = await ctx.tmdb.genres.movie_list({ language: "en" });
+				const tmdbGenres = (response.genres ?? [])
+					.map((genre) => ({ id: genre.id, name: genre.name }))
+					.filter((genre) => Boolean(genre.name));
+
+				if (tmdbGenres.length > 0) {
+					await ctx.db.insert(schema.genres).values(tmdbGenres).onConflictDoNothing();
+					genres = await ctx.db.select().from(schema.genres);
+				}
+			} catch {
+				// Ignore TMDB errors and return whatever is currently in the DB.
+			}
+		}
+
+		genres.sort((a, b) => a.name.localeCompare(b.name));
 		genresCache = { data: genres, ts: Date.now() };
 		return genres;
 	}),
 
-	getWatchProviders: publicProcedure.query(async ({ ctx }) => {
+	getWatchProviders: publicProcedure.query(({ ctx }) => {
 		return ctx.db
 			.select()
 			.from(schema.watchProviders)

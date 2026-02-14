@@ -10,13 +10,14 @@
 	"scripts": {
 		"db:generate": "drizzle-kit generate",
 		"db:migrate": "drizzle-kit migrate",
+		"db:seed": "node --env-file=.env scripts/seed.mjs",
 		"db:push": "drizzle-kit push",
 		"db:studio": "drizzle-kit studio",
 		"typecheck": "tsc --noEmit"
 	},
 	"dependencies": {
-		"@neondatabase/serverless": "1.0.2",
-		"drizzle-orm": "0.45.1"
+		"drizzle-orm": "0.45.1",
+		"postgres": "3.4.7"
 	},
 	"devDependencies": {
 		"@miru/typescript-config": "workspace:*",

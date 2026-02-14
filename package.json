@@ -13,6 +13,8 @@
 		"format:check": "oxfmt --check apps/web/src/ packages/db/src/ packages/trpc/src/ packages/db/drizzle.config.ts",
 		"typecheck": "turbo typecheck",
 		"db:generate": "turbo db:generate",
+		"db:migrate": "turbo db:migrate",
+		"db:seed": "turbo db:seed",
 		"db:push": "turbo db:push"
 	},
 	"devDependencies": {

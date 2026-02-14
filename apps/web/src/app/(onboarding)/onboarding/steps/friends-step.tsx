@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Check, Copy, Search } from "lucide-react";
+import { Check, Copy, Search, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,10 +28,10 @@ export function FriendsStep({ onComplete }: FriendsStepProps) {
 	const copiedTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const debouncedQuery = useDebounce(searchQuery, 300);
 
-	const { data: suggestedUsers } =
+	const { data: suggestedUsers, isLoading: isSuggestedLoading } =
 		trpc.onboarding.getSuggestedUsers.useQuery();
 
-	const { data: searchResults } = trpc.social.searchUsers.useQuery(
+	const { data: searchResults, isFetching: isSearchLoading } = trpc.social.searchUsers.useQuery(
 		{ query: debouncedQuery },
 		{ enabled: debouncedQuery.length > 0 },
 	);
@@ -71,12 +71,23 @@ export function FriendsStep({ onComplete }: FriendsStepProps) {
 	const usersToShow = debouncedQuery.length > 0 ? searchResults : suggestedUsers;
 
 	return (
-		<div className="space-y-6">
-			<div className="space-y-2 text-center">
-				<h2 className="font-display text-2xl font-bold tracking-tight">
+		<form
+			id="onboarding-friends-form"
+			onSubmit={(event) => {
+				event.preventDefault();
+				onComplete();
+			}}
+			className="space-y-6"
+		>
+			<div className="space-y-3 text-center">
+				<div className="inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-xs font-medium text-amber-200">
+					<Sparkles className="size-3.5" />
+					Social picks for you
+				</div>
+				<h2 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
 					Find friends
 				</h2>
-				<p className="text-sm text-muted-foreground">
+				<p className="text-sm text-muted-foreground sm:text-base">
 					Follow friends to discover movies you both want to watch.
 				</p>
 			</div>
@@ -87,7 +98,7 @@ export function FriendsStep({ onComplete }: FriendsStepProps) {
 					placeholder="Search by name..."
 					value={searchQuery}
 					onChange={(e) => setSearchQuery(e.target.value)}
-					className="pl-9"
+					className="h-11 pl-9"
 				/>
 			</div>
 
@@ -97,12 +108,23 @@ export function FriendsStep({ onComplete }: FriendsStepProps) {
 						Suggested
 					</p>
 				)}
-				<div className="max-h-64 space-y-1 overflow-y-auto rounded-xl border bg-card p-2">
+				<div className="max-h-72 space-y-1 overflow-y-auto rounded-xl border border-border/70 bg-card/40 p-2">
+					{(isSuggestedLoading || isSearchLoading) && (
+						<div className="space-y-2 p-1">
+							{Array.from({ length: 4 }, (_, i) => (
+								<div
+									key={`friend-skeleton-${i}`}
+									className="h-14 animate-pulse rounded-lg bg-muted"
+								/>
+							))}
+						</div>
+					)}
+
 					{usersToShow && usersToShow.length > 0 ? (
 						usersToShow.map((user) => (
 							<div
 								key={user.id}
-								className="flex items-center gap-3 rounded-lg p-2"
+								className="flex items-center gap-3 rounded-lg border border-transparent p-2 transition-colors hover:border-border/60 hover:bg-card"
 							>
 								<UserAvatar
 									name={user.name ?? "?"}
@@ -118,11 +140,11 @@ export function FriendsStep({ onComplete }: FriendsStepProps) {
 								/>
 							</div>
 						))
-					) : (
+					) : !isSuggestedLoading && !isSearchLoading ? (
 						<p className="py-6 text-center text-sm text-muted-foreground">
 							{debouncedQuery ? "No users found" : "No suggestions yet"}
 						</p>
-					)}
+					) : null}
 				</div>
 			</div>
 
@@ -131,9 +153,10 @@ export function FriendsStep({ onComplete }: FriendsStepProps) {
 					Or invite friends to join
 				</p>
 				<Button
+					type="button"
 					variant="outline"
 					onClick={handleShare}
-					className="w-full gap-2"
+					className="h-11 w-full gap-2"
 				>
 					{copied ? (
 						<Check className="size-4" />
@@ -144,9 +167,6 @@ export function FriendsStep({ onComplete }: FriendsStepProps) {
 				</Button>
 			</div>
 
-			<Button onClick={onComplete} className="w-full" size="lg">
-				Finish
-			</Button>
-		</div>
+		</form>
 	);
 }

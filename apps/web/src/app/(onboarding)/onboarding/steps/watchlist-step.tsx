@@ -2,9 +2,8 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { Check, Plus } from "lucide-react";
+import { Check, Plus, Sparkles } from "lucide-react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc/client";
 import { cn } from "@/lib/utils";
 
@@ -30,34 +29,39 @@ export function WatchlistStep({ genreIds, onComplete }: WatchlistStepProps) {
 	});
 
 	return (
-		<div className="space-y-6">
-			<div className="space-y-2 text-center">
-				<h2 className="font-display text-2xl font-bold tracking-tight">
+		<form
+			id="onboarding-watchlist-form"
+			onSubmit={(event) => {
+				event.preventDefault();
+				onComplete();
+			}}
+			className="space-y-6"
+		>
+			<div className="space-y-3 text-center">
+				<div className="inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-xs font-medium text-amber-200">
+					<Sparkles className="size-3.5" />
+					Build your starter list
+				</div>
+				<h2 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
 					Build your watchlist
 				</h2>
-				<p className="text-sm text-muted-foreground">
+				<p className="text-sm text-muted-foreground sm:text-base">
 					Tap movies to add them to your watchlist. This helps us find
 					matches with your friends.
 				</p>
-				{addedIds.size > 0 && (
-					<p className="text-sm font-medium text-primary">
-						{addedIds.size} movie{addedIds.size !== 1 ? "s" : ""} added
-						{addedIds.size >= 5 && " — nice collection!"}
-					</p>
-				)}
 			</div>
 
 			{isLoading ? (
-				<div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
+				<div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
 					{Array.from({ length: 12 }, (_, i) => (
 						<div
 							key={i}
-							className="aspect-[2/3] animate-pulse rounded-lg bg-muted"
+							className="aspect-[2/3] animate-pulse rounded-xl bg-muted"
 						/>
 					))}
 				</div>
 			) : (
-				<div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
+				<div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
 					{movies?.map((movie) => {
 						const isAdded = addedIds.has(movie.id);
 						return (
@@ -71,7 +75,7 @@ export function WatchlistStep({ genreIds, onComplete }: WatchlistStepProps) {
 								}}
 								disabled={isAdded}
 								className={cn(
-									"group relative overflow-hidden rounded-lg transition-all",
+									"group relative overflow-hidden rounded-xl transition-all",
 									isAdded && "ring-2 ring-primary",
 								)}
 							>
@@ -110,9 +114,12 @@ export function WatchlistStep({ genreIds, onComplete }: WatchlistStepProps) {
 				</div>
 			)}
 
-			<Button onClick={onComplete} className="w-full" size="lg">
-				{addedIds.size === 0 ? "Skip" : "Next"}
-			</Button>
-		</div>
+			{!isLoading && (movies?.length ?? 0) === 0 && (
+				<div className="rounded-2xl border border-border/70 bg-card/40 px-4 py-8 text-center text-sm text-muted-foreground">
+					No recommendations yet. Continue and we&apos;ll refine suggestions as you use Miru.
+				</div>
+			)}
+
+		</form>
 	);
 }

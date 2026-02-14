@@ -1,5 +1,5 @@
 import { schema } from "@miru/db";
-import { and, count, desc, eq, inArray, notInArray } from "drizzle-orm";
+import { and, count, desc, eq, inArray, ne, notInArray } from "drizzle-orm";
 import { z } from "zod";
 import { annotateFollowStatus } from "../helpers";
 import { protectedProcedure, router } from "../trpc";
@@ -112,6 +112,7 @@ export const onboardingRouter = router({
 			)
 			.where(
 				and(
+					ne(schema.users.id, userId),
 					notInArray(
 						schema.users.id,
 						ctx.db
@@ -125,8 +126,7 @@ export const onboardingRouter = router({
 			.orderBy(desc(count(schema.watchlistEntries.movieId)))
 			.limit(20);
 
-		const filtered = users.filter((u) => u.id !== userId);
-		return annotateFollowStatus(ctx, filtered);
+		return annotateFollowStatus(ctx, users);
 	}),
 
 	setCountry: protectedProcedure
