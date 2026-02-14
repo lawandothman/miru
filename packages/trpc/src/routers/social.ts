@@ -36,15 +36,46 @@ export const socialRouter = router({
 				),
 			);
 
-		// Get my watchlist movie IDs to filter for actual matches
-		const myWatchlist = await ctx.db
-			.select({ movieId: schema.watchlistEntries.movieId })
-			.from(schema.watchlistEntries)
-			.where(eq(schema.watchlistEntries.userId, userId));
+		// Get my watchlist and watched movie IDs
+		const [myWatchlist, myWatched, friendWatched] = await Promise.all([
+			ctx.db
+				.select({ movieId: schema.watchlistEntries.movieId })
+				.from(schema.watchlistEntries)
+				.where(eq(schema.watchlistEntries.userId, userId)),
+			ctx.db
+				.select({ movieId: schema.watchedEntries.movieId })
+				.from(schema.watchedEntries)
+				.where(eq(schema.watchedEntries.userId, userId)),
+			ctx.db
+				.select({
+					userId: schema.watchedEntries.userId,
+					movieId: schema.watchedEntries.movieId,
+				})
+				.from(schema.watchedEntries)
+				.innerJoin(
+					schema.follows,
+					and(
+						eq(schema.follows.followerId, userId),
+						eq(schema.follows.followingId, schema.watchedEntries.userId),
+					),
+				),
+		]);
 
 		const myMovieIds = new Set(myWatchlist.map((w) => w.movieId));
+		const myWatchedIds = new Set(myWatched.map((w) => w.movieId));
 
-		// Group by friend, only keep movies that are also in my watchlist
+		// Build map of friend -> watched movie IDs
+		const friendWatchedMap = new Map<string, Set<number>>();
+		for (const fw of friendWatched) {
+			let set = friendWatchedMap.get(fw.userId);
+			if (!set) {
+				set = new Set();
+				friendWatchedMap.set(fw.userId, set);
+			}
+			set.add(fw.movieId);
+		}
+
+		// Group by friend, only keep unwatched movies that are in both watchlists
 		const friendMap = new Map<
 			string,
 			{
@@ -56,7 +87,11 @@ export const socialRouter = router({
 		>();
 
 		for (const row of rows) {
-			if (myMovieIds.has(row.movieId)) {
+			if (
+				myMovieIds.has(row.movieId) &&
+				!myWatchedIds.has(row.movieId) &&
+				!friendWatchedMap.get(row.friendId)?.has(row.movieId)
+			) {
 				let friend = friendMap.get(row.friendId);
 				if (!friend) {
 					friend = {
@@ -145,23 +180,43 @@ export const socialRouter = router({
 				.where(eq(schema.watchlistEntries.userId, ctx.session.user.id))
 				.as("my_watchlist");
 
-			const matches = await ctx.db
-				.select({
-					id: schema.movies.id,
-					title: schema.movies.title,
-					posterPath: schema.movies.posterPath,
-					releaseDate: schema.movies.releaseDate,
-					overview: schema.movies.overview,
-				})
-				.from(schema.watchlistEntries)
-				.innerJoin(
-					schema.movies,
-					eq(schema.movies.id, schema.watchlistEntries.movieId),
-				)
-				.innerJoin(myWatchlist, eq(myWatchlist.movieId, schema.movies.id))
-				.where(eq(schema.watchlistEntries.userId, input.friendId));
+			const [matches, myWatchedEntries, friendWatchedEntries] =
+				await Promise.all([
+					ctx.db
+						.select({
+							id: schema.movies.id,
+							title: schema.movies.title,
+							posterPath: schema.movies.posterPath,
+							releaseDate: schema.movies.releaseDate,
+							overview: schema.movies.overview,
+						})
+						.from(schema.watchlistEntries)
+						.innerJoin(
+							schema.movies,
+							eq(schema.movies.id, schema.watchlistEntries.movieId),
+						)
+						.innerJoin(myWatchlist, eq(myWatchlist.movieId, schema.movies.id))
+						.where(eq(schema.watchlistEntries.userId, input.friendId)),
+					ctx.db
+						.select({ movieId: schema.watchedEntries.movieId })
+						.from(schema.watchedEntries)
+						.where(eq(schema.watchedEntries.userId, ctx.session.user.id)),
+					ctx.db
+						.select({ movieId: schema.watchedEntries.movieId })
+						.from(schema.watchedEntries)
+						.where(eq(schema.watchedEntries.userId, input.friendId)),
+				]);
 
-			return matches.map((m) => ({ ...m, inWatchlist: true }));
+			const myWatchedSet = new Set(myWatchedEntries.map((e) => e.movieId));
+			const friendWatchedSet = new Set(
+				friendWatchedEntries.map((e) => e.movieId),
+			);
+
+			return matches
+				.filter(
+					(m) => !myWatchedSet.has(m.id) && !friendWatchedSet.has(m.id),
+				)
+				.map((m) => ({ ...m, inWatchlist: true }));
 		}),
 
 	searchUsers: publicProcedure

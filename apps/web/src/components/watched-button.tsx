@@ -1,49 +1,50 @@
 "use client";
 
-import { Bookmark, Loader2 } from "lucide-react";
+import { Eye, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc/client";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 
-interface WatchlistButtonProps {
+interface WatchedButtonProps {
 	movieId: number;
-	inWatchlist: boolean;
+	isWatched: boolean;
 	variant?: "default" | "icon";
 	className?: string;
 }
 
-export function WatchlistButton({
+export function WatchedButton({
 	movieId,
-	inWatchlist,
+	isWatched,
 	variant = "default",
 	className,
-}: WatchlistButtonProps) {
+}: WatchedButtonProps) {
 	const router = useRouter();
 	const utils = trpc.useUtils();
 
 	const onSuccess = () => {
-		utils.watchlist.invalidate();
 		utils.watched.invalidate();
+		utils.watchlist.invalidate();
 		utils.movie.getById.invalidate({ tmdbId: movieId });
 		utils.movie.getPopular.invalidate();
+		utils.social.getDashboardMatches.invalidate();
 		router.refresh();
 	};
 
-	const add = trpc.watchlist.add.useMutation({
+	const add = trpc.watched.add.useMutation({
 		onSuccess,
-		onError: () => toast.error("Failed to add to watchlist"),
+		onError: () => toast.error("Failed to mark as watched"),
 	});
-	const remove = trpc.watchlist.remove.useMutation({
+	const remove = trpc.watched.remove.useMutation({
 		onSuccess,
-		onError: () => toast.error("Failed to remove from watchlist"),
+		onError: () => toast.error("Failed to remove from watched"),
 	});
 
 	const isLoading = add.isPending || remove.isPending;
 
 	const handleClick = () => {
-		if (inWatchlist) {
+		if (isWatched) {
 			remove.mutate({ movieId });
 		} else {
 			add.mutate({ movieId });
@@ -58,7 +59,7 @@ export function WatchlistButton({
 				disabled={isLoading}
 				className={cn(
 					"flex size-9 items-center justify-center rounded-full transition-colors",
-					inWatchlist
+					isWatched
 						? "bg-primary text-primary-foreground"
 						: "bg-white/10 text-white backdrop-blur-sm hover:bg-white/20",
 					className,
@@ -67,7 +68,7 @@ export function WatchlistButton({
 				{isLoading ? (
 					<Loader2 className="size-4 animate-spin" />
 				) : (
-					<Bookmark className={cn("size-4", inWatchlist && "fill-current")} />
+					<Eye className={cn("size-4", isWatched && "fill-current")} />
 				)}
 			</button>
 		);
@@ -77,16 +78,16 @@ export function WatchlistButton({
 		<Button
 			onClick={handleClick}
 			disabled={isLoading}
-			variant={inWatchlist ? "secondary" : "default"}
+			variant={isWatched ? "secondary" : "outline"}
 			size="sm"
 			className={cn("gap-1.5", className)}
 		>
 			{isLoading ? (
 				<Loader2 className="size-3.5 animate-spin" />
 			) : (
-				<Bookmark className={cn("size-3.5", inWatchlist && "fill-current")} />
+				<Eye className={cn("size-3.5", isWatched && "fill-current")} />
 			)}
-			{inWatchlist ? "In Watchlist" : "Watchlist"}
+			{isWatched ? "Watched" : "Mark Watched"}
 		</Button>
 	);
 }

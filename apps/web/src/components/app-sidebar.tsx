@@ -2,7 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Bookmark, Home, Search, Sparkles, TrendingUp } from "lucide-react";
+import {
+	Bookmark,
+	Eye,
+	Home,
+	Search,
+	Sparkles,
+	TrendingUp,
+} from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
 	Sidebar,
@@ -20,6 +27,7 @@ const navItems = [
 	{ href: "/dashboard", icon: Home, label: "Home" },
 	{ href: "/explore", icon: Search, label: "Explore" },
 	{ href: "/watchlist", icon: Bookmark, label: "Watchlist" },
+	{ href: "/watched", icon: Eye, label: "Watched" },
 	{ href: "/for-you", icon: Sparkles, label: "For You" },
 	{ href: "/popular", icon: TrendingUp, label: "Popular" },
 ];

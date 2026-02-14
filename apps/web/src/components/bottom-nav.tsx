@@ -4,9 +4,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
 	Bookmark,
+	Eye,
 	Home,
 	Search,
-	Sparkles,
 	User as UserIcon,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -16,7 +16,7 @@ const navItems = [
 	{ href: "/dashboard", icon: Home, label: "Home" },
 	{ href: "/explore", icon: Search, label: "Explore" },
 	{ href: "/watchlist", icon: Bookmark, label: "Watchlist" },
-	{ href: "/for-you", icon: Sparkles, label: "For You" },
+	{ href: "/watched", icon: Eye, label: "Watched" },
 ];
 
 interface BottomNavProps {

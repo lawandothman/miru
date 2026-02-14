@@ -1,6 +1,7 @@
 import { relations } from "drizzle-orm";
 import { accounts, sessions, users } from "./users";
 import { follows } from "./social";
+import { watchedEntries } from "./watched";
 import { watchlistEntries } from "./watchlist";
 import {
 	genres,
@@ -17,6 +18,7 @@ export const usersRelations = relations(users, ({ many }) => ({
 	followers: many(follows, { relationName: "following" }),
 	following: many(follows, { relationName: "follower" }),
 	sessions: many(sessions),
+	watchedEntries: many(watchedEntries),
 	watchlistEntries: many(watchlistEntries),
 }));
 
@@ -41,6 +43,20 @@ export const followsRelations = relations(follows, ({ one }) => ({
 	}),
 }));
 
+export const watchedEntriesRelations = relations(
+	watchedEntries,
+	({ one }) => ({
+		movie: one(movies, {
+			fields: [watchedEntries.movieId],
+			references: [movies.id],
+		}),
+		user: one(users, {
+			fields: [watchedEntries.userId],
+			references: [users.id],
+		}),
+	}),
+);
+
 export const watchlistEntriesRelations = relations(
 	watchlistEntries,
 	({ one }) => ({
@@ -60,6 +76,7 @@ export const moviesRelations = relations(movies, ({ many }) => ({
 	genres: many(movieGenres),
 	rentProviders: many(movieRentProviders),
 	streamProviders: many(movieStreamProviders),
+	watchedEntries: many(watchedEntries),
 	watchlistEntries: many(watchlistEntries),
 }));
 

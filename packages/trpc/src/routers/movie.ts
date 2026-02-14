@@ -47,14 +47,16 @@ export const movieRouter = router({
 				.limit(20)
 				.offset((page - 1) * 20);
 
-			const watchlistSet = await getWatchlistSet(
-				ctx,
-				movies.map((m) => m.id),
-			);
+			const movieIds = movies.map((m) => m.id);
+			const [watchlistSet, watchedSet] = await Promise.all([
+				getWatchlistSet(ctx, movieIds),
+				getWatchedSet(ctx, movieIds),
+			]);
 
 			return movies.map((m) => ({
 				...m,
 				inWatchlist: watchlistSet.has(m.id),
+				isWatched: watchedSet.has(m.id),
 			}));
 		}),
 
@@ -76,45 +78,66 @@ export const movieRouter = router({
 			}
 
 			let inWatchlist = false;
+			let isWatched = false;
 			let matches: { id: string; name: string | null; image: string | null }[] =
 				[];
 
 			if (ctx.session?.user) {
 				const userId = ctx.session.user.id;
 
-				const [entry, friendMatches] = await Promise.all([
-					ctx.db.query.watchlistEntries.findFirst({
-						where: and(
-							eq(schema.watchlistEntries.userId, userId),
-							eq(schema.watchlistEntries.movieId, movie.id),
-						),
-					}),
-					ctx.db
-						.select({
-							id: schema.users.id,
-							name: schema.users.name,
-							image: schema.users.image,
-						})
-						.from(schema.watchlistEntries)
-						.innerJoin(
-							schema.follows,
-							and(
-								eq(schema.follows.followerId, userId),
-								eq(schema.follows.followingId, schema.watchlistEntries.userId),
+				const [entry, watchedEntry, friendMatches, friendsWhoWatched] =
+					await Promise.all([
+						ctx.db.query.watchlistEntries.findFirst({
+							where: and(
+								eq(schema.watchlistEntries.userId, userId),
+								eq(schema.watchlistEntries.movieId, movie.id),
 							),
-						)
-						.innerJoin(
-							schema.users,
-							eq(schema.users.id, schema.watchlistEntries.userId),
-						)
-						.where(eq(schema.watchlistEntries.movieId, movie.id)),
-				]);
+						}),
+						ctx.db.query.watchedEntries.findFirst({
+							where: and(
+								eq(schema.watchedEntries.userId, userId),
+								eq(schema.watchedEntries.movieId, movie.id),
+							),
+						}),
+						ctx.db
+							.select({
+								id: schema.users.id,
+								name: schema.users.name,
+								image: schema.users.image,
+							})
+							.from(schema.watchlistEntries)
+							.innerJoin(
+								schema.follows,
+								and(
+									eq(schema.follows.followerId, userId),
+									eq(
+										schema.follows.followingId,
+										schema.watchlistEntries.userId,
+									),
+								),
+							)
+							.innerJoin(
+								schema.users,
+								eq(schema.users.id, schema.watchlistEntries.userId),
+							)
+							.where(eq(schema.watchlistEntries.movieId, movie.id)),
+						ctx.db
+							.select({ userId: schema.watchedEntries.userId })
+							.from(schema.watchedEntries)
+							.where(eq(schema.watchedEntries.movieId, movie.id)),
+					]);
 
 				inWatchlist = Boolean(entry);
-				matches = friendMatches;
+				isWatched = Boolean(watchedEntry);
+
+				// Only show friends who haven't watched this movie yet
+				const watchedByFriendSet = new Set(
+					friendsWhoWatched.map((f) => f.userId),
+				);
+				matches = friendMatches.filter((f) => !watchedByFriendSet.has(f.id));
 			}
 
-			return { ...movie, inWatchlist, matches };
+			return { ...movie, inWatchlist, isWatched, matches };
 		}),
 
 	getForYou: protectedProcedure
@@ -156,17 +179,19 @@ export const movieRouter = router({
 				.limit(input.limit)
 				.offset(offset);
 
-			// Exclude movies already in user's watchlist
-			const watchlistSet = await getWatchlistSet(
-				ctx,
-				movies.map((m) => m.id),
-			);
+			// Exclude movies already in user's watchlist or watched
+			const movieIds = movies.map((m) => m.id);
+			const [watchlistSet, watchedSet] = await Promise.all([
+				getWatchlistSet(ctx, movieIds),
+				getWatchedSet(ctx, movieIds),
+			]);
 
 			return movies
-				.filter((m) => !watchlistSet.has(m.id))
+				.filter((m) => !watchlistSet.has(m.id) && !watchedSet.has(m.id))
 				.map((m) => ({
 					...m,
 					inWatchlist: false,
+					isWatched: false,
 				}));
 		}),
 
@@ -217,14 +242,16 @@ export const movieRouter = router({
 				.limit(input.limit)
 				.offset(offset);
 
-			const watchlistSet = await getWatchlistSet(
-				ctx,
-				movies.map((m) => m.id),
-			);
+			const popularMovieIds = movies.map((m) => m.id);
+			const [watchlistSet, watchedSet] = await Promise.all([
+				getWatchlistSet(ctx, popularMovieIds),
+				getWatchedSet(ctx, popularMovieIds),
+			]);
 
 			return movies.map((m) => ({
 				...m,
 				inWatchlist: watchlistSet.has(m.id),
+				isWatched: watchedSet.has(m.id),
 			}));
 		}),
 
@@ -259,7 +286,10 @@ export const movieRouter = router({
 					.onConflictDoNothing();
 			}
 
-			const watchlistSet = await getWatchlistSet(ctx, movieIds);
+			const [watchlistSet, watchedSet] = await Promise.all([
+				getWatchlistSet(ctx, movieIds),
+				getWatchedSet(ctx, movieIds),
+			]);
 
 			return {
 				results: safeResults.map((r) => ({
@@ -269,6 +299,7 @@ export const movieRouter = router({
 					releaseDate: r.release_date,
 					overview: r.overview,
 					inWatchlist: watchlistSet.has(r.id),
+					isWatched: watchedSet.has(r.id),
 				})),
 				page: tmdbResults.page,
 				totalPages: tmdbResults.total_pages,
@@ -427,6 +458,27 @@ async function getWatchlistSet(
 			and(
 				eq(schema.watchlistEntries.userId, ctx.session.user.id),
 				inArray(schema.watchlistEntries.movieId, movieIds),
+			),
+		);
+
+	return new Set(entries.map((e) => e.movieId));
+}
+
+async function getWatchedSet(
+	ctx: { db: Database; session: { user: { id: string } } | null },
+	movieIds: number[],
+): Promise<Set<number>> {
+	if (!ctx.session?.user || movieIds.length === 0) {
+		return new Set();
+	}
+
+	const entries = await ctx.db
+		.select({ movieId: schema.watchedEntries.movieId })
+		.from(schema.watchedEntries)
+		.where(
+			and(
+				eq(schema.watchedEntries.userId, ctx.session.user.id),
+				inArray(schema.watchedEntries.movieId, movieIds),
 			),
 		);
 

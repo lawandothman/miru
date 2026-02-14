@@ -42,10 +42,10 @@ export default async function UserPage({ params }: UserPageProps) {
 	}
 
 	const isOwnProfile = session?.user.id === id;
-	const watchlist = await api.watchlist.getUserWatchlist({
-		limit: 30,
-		userId: id,
-	});
+	const [watchlist, watched] = await Promise.all([
+		api.watchlist.getUserWatchlist({ limit: 30, userId: id }),
+		api.watched.getUserWatched({ limit: 30, userId: id }),
+	]);
 
 	let matches: {
 		id: number;
@@ -126,6 +126,23 @@ export default async function UserPage({ params }: UserPageProps) {
 						title: m.title,
 					}))}
 					emptyMessage="No movies in watchlist"
+				/>
+			</div>
+
+			{/* Watched */}
+			<div className="space-y-4">
+				<h2 className="font-display text-lg font-semibold">
+					{isOwnProfile
+						? "Your Watched"
+						: `${user.name?.split(" ")[0]}'s Watched`}
+				</h2>
+				<MovieGrid
+					movies={watched.map((m) => ({
+						id: m.id,
+						posterPath: m.posterPath,
+						title: m.title,
+					}))}
+					emptyMessage="No watched movies"
 				/>
 			</div>
 		</div>

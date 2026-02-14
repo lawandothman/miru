@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { trpc } from "@/lib/trpc/server";
+import { WatchedButton } from "@/components/watched-button";
 import { WatchlistButton } from "@/components/watchlist-button";
 import { UserAvatar } from "@/components/user-avatar";
 import { Badge } from "@/components/ui/badge";
@@ -114,10 +115,14 @@ export default async function MoviePage({ params }: MoviePageProps) {
 										</>
 									)}
 							</div>
-							<div className="mt-4">
+							<div className="mt-4 flex gap-2">
 								<WatchlistButton
 									movieId={movie.id}
 									inWatchlist={movie.inWatchlist}
+								/>
+								<WatchedButton
+									movieId={movie.id}
+									isWatched={movie.isWatched}
 								/>
 							</div>
 						</div>
