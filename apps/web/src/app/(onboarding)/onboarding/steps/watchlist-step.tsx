@@ -28,6 +28,25 @@ export function WatchlistStep({ genreIds, onComplete }: WatchlistStepProps) {
 		onError: () => toast.error("Failed to add movie"),
 	});
 
+	const removeFromWatchlist = trpc.watchlist.remove.useMutation({
+		onSuccess: (_data, variables) => {
+			setAddedIds((prev) => {
+				const next = new Set(prev);
+				next.delete(variables.movieId);
+				return next;
+			});
+		},
+		onError: () => toast.error("Failed to remove movie"),
+	});
+
+	const toggleMovie = (movieId: number) => {
+		if (addedIds.has(movieId)) {
+			removeFromWatchlist.mutate({ movieId });
+		} else {
+			addToWatchlist.mutate({ movieId });
+		}
+	};
+
 	return (
 		<form
 			id="onboarding-watchlist-form"
@@ -40,14 +59,14 @@ export function WatchlistStep({ genreIds, onComplete }: WatchlistStepProps) {
 			<div className="space-y-3 text-center">
 				<div className="inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-xs font-medium text-amber-200">
 					<Sparkles className="size-3.5" />
-					Build your starter list
+					Your watchlist
 				</div>
 				<h2 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
-					Build your watchlist
+					Pick some movies
 				</h2>
 				<p className="text-sm text-muted-foreground sm:text-base">
-					Tap movies to add them to your watchlist. This helps us find
-					matches with your friends.
+					Save anything that catches your eye. When a friend saves the same
+					thing, you&apos;ll both know.
 				</p>
 			</div>
 
@@ -62,20 +81,16 @@ export function WatchlistStep({ genreIds, onComplete }: WatchlistStepProps) {
 				</div>
 			) : (
 				<div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-					{movies?.map((movie) => {
+					{movies?.map((movie, i) => {
 						const isAdded = addedIds.has(movie.id);
 						return (
 							<button
 								key={movie.id}
 								type="button"
-								onClick={() => {
-									if (!isAdded) {
-										addToWatchlist.mutate({ movieId: movie.id });
-									}
-								}}
-								disabled={isAdded}
+								onClick={() => toggleMovie(movie.id)}
+								style={{ animationDelay: `${Math.min(i * 40, 600)}ms` }}
 								className={cn(
-									"group relative overflow-hidden rounded-xl transition-all",
+									"group animate-scale-in relative overflow-hidden rounded-xl transition-all",
 									isAdded && "ring-2 ring-primary",
 								)}
 							>
@@ -94,20 +109,15 @@ export function WatchlistStep({ genreIds, onComplete }: WatchlistStepProps) {
 										</div>
 									)}
 								</div>
-								<div
-									className={cn(
-										"absolute inset-0 flex items-center justify-center transition-all",
-										isAdded
-											? "bg-primary/40"
-											: "bg-black/0 group-hover:bg-black/30",
-									)}
-								>
-									{isAdded ? (
+								{isAdded ? (
+									<div className="absolute inset-0 z-10 flex items-center justify-center bg-primary/40">
 										<Check className="size-8 text-white drop-shadow-md" />
-									) : (
-										<Plus className="size-8 text-white opacity-0 drop-shadow-md transition-opacity group-hover:opacity-100" />
-									)}
-								</div>
+									</div>
+								) : (
+									<div className="absolute inset-0 z-10 flex items-center justify-center bg-black/40 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+										<Plus className="size-8 text-white drop-shadow-md" />
+									</div>
+								)}
 							</button>
 						);
 					})}
@@ -116,10 +126,10 @@ export function WatchlistStep({ genreIds, onComplete }: WatchlistStepProps) {
 
 			{!isLoading && (movies?.length ?? 0) === 0 && (
 				<div className="rounded-2xl border border-border/70 bg-card/40 px-4 py-8 text-center text-sm text-muted-foreground">
-					No recommendations yet. Continue and we&apos;ll refine suggestions as you use Miru.
+					No recommendations yet. Continue and we&apos;ll refine suggestions as
+					you use Miru.
 				</div>
 			)}
-
 		</form>
 	);
 }

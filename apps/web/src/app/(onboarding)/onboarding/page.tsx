@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc/client";
@@ -21,19 +21,8 @@ export default function OnboardingPage() {
 	const [selectedGenres, setSelectedGenres] = useState<number[]>([]);
 	const [selectedProviders, setSelectedProviders] = useState<number[]>([]);
 	const [country, setCountry] = useState<string | null>(null);
-	const [canSubmitGenres, setCanSubmitGenres] = useState(
-		selectedGenres.length > 0,
-	);
-	const [canSubmitStreaming, setCanSubmitStreaming] = useState(
-		selectedProviders.length > 0,
-	);
 
 	const complete = trpc.onboarding.complete.useMutation({
-		onSuccess: () => router.push("/dashboard"),
-		onError: () => toast.error("Something went wrong"),
-	});
-
-	const skip = trpc.onboarding.skip.useMutation({
 		onSuccess: () => router.push("/dashboard"),
 		onError: () => toast.error("Something went wrong"),
 	});
@@ -43,12 +32,12 @@ export default function OnboardingPage() {
 		2: {
 			form: "onboarding-genre-form",
 			label: "Next",
-			disabled: !canSubmitGenres,
+			disabled: selectedGenres.length === 0,
 		},
 		3: {
 			form: "onboarding-streaming-form",
 			label: "Next",
-			disabled: !canSubmitStreaming,
+			disabled: false,
 		},
 		4: { form: "onboarding-watchlist-form", label: "Next", disabled: false },
 		5: {
@@ -63,25 +52,35 @@ export default function OnboardingPage() {
 	return (
 		<div className="space-y-8">
 			<div className="flex items-center justify-between">
-				<Button
-					variant="ghost"
-					size="sm"
-					onClick={() => skip.mutate()}
-					disabled={skip.isPending}
-					className="text-muted-foreground"
-				>
-					Skip
-				</Button>
+				<div className="w-20">
+					{step > 1 && (
+						<Button
+							variant="ghost"
+							size="sm"
+							onClick={() => setStep((s) => s - 1)}
+							className="text-muted-foreground"
+						>
+							<ArrowLeft className="size-4" />
+							Back
+						</Button>
+					)}
+				</div>
 
-				<Button
-					size="sm"
-					type="submit"
-					form={currentAction.form}
-					disabled={currentAction.disabled}
-				>
-					{currentAction.label}
-					{step < 5 && <ArrowRight className="size-4" />}
-				</Button>
+				<span className="text-xs text-muted-foreground">
+					Step {step} of {TOTAL_STEPS}
+				</span>
+
+				<div className="flex w-20 justify-end">
+					<Button
+						size="sm"
+						type="submit"
+						form={currentAction.form}
+						disabled={currentAction.disabled}
+					>
+						{currentAction.label}
+						{step < TOTAL_STEPS && <ArrowRight className="size-4" />}
+					</Button>
+				</div>
 			</div>
 
 			<OnboardingProgress currentStep={step} totalSteps={TOTAL_STEPS} />
@@ -100,10 +99,8 @@ export default function OnboardingPage() {
 				{step === 2 && (
 					<GenreStep
 						selectedGenres={selectedGenres}
-						onSelectionStateChange={setCanSubmitGenres}
 						onComplete={(genreIds) => {
 							setSelectedGenres(genreIds);
-							setCanSubmitGenres(genreIds.length > 0);
 							setStep(3);
 						}}
 					/>
@@ -113,10 +110,8 @@ export default function OnboardingPage() {
 					<StreamingStep
 						selectedProviders={selectedProviders}
 						country={country}
-						onSelectionStateChange={setCanSubmitStreaming}
 						onComplete={(providerIds) => {
 							setSelectedProviders(providerIds);
-							setCanSubmitStreaming(providerIds.length > 0);
 							setStep(4);
 						}}
 					/>
@@ -129,12 +124,10 @@ export default function OnboardingPage() {
 					/>
 				)}
 
-				{step === 5 && (
-					<FriendsStep
-						onComplete={() => complete.mutate()}
-					/>
-				)}
+				{step === 5 && <FriendsStep onComplete={() => complete.mutate()} />}
 			</div>
+
+			<div className="h-16 sm:h-24" aria-hidden="true" />
 		</div>
 	);
 }

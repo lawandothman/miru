@@ -20,8 +20,8 @@ export default async function OnboardingLayout({
 	}
 
 	return (
-		<div className="flex min-h-svh items-center justify-center px-4 py-8">
-			<div className="w-full max-w-2xl">{children}</div>
+		<div className="min-h-svh px-4 pt-12 sm:pt-20">
+			<div className="mx-auto w-full max-w-2xl">{children}</div>
 		</div>
 	);
 }

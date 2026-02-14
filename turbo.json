@@ -17,8 +17,11 @@
 			"persistent": true,
 			"cache": false
 		},
-		"lint": {},
-		"typecheck": {},
+		"//#lint": {},
+		"//#format:check": {},
+		"typecheck": {
+			"dependsOn": ["^typecheck"]
+		},
 		"db:generate": {
 			"cache": false
 		},

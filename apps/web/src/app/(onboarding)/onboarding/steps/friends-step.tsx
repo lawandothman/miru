@@ -31,10 +31,11 @@ export function FriendsStep({ onComplete }: FriendsStepProps) {
 	const { data: suggestedUsers, isLoading: isSuggestedLoading } =
 		trpc.onboarding.getSuggestedUsers.useQuery();
 
-	const { data: searchResults, isFetching: isSearchLoading } = trpc.social.searchUsers.useQuery(
-		{ query: debouncedQuery },
-		{ enabled: debouncedQuery.length > 0 },
-	);
+	const { data: searchResults, isFetching: isSearchLoading } =
+		trpc.social.searchUsers.useQuery(
+			{ query: debouncedQuery },
+			{ enabled: debouncedQuery.length > 0 },
+		);
 
 	const handleShare = async () => {
 		const url = `${window.location.origin}/dashboard`;
@@ -47,7 +48,9 @@ export function FriendsStep({ onComplete }: FriendsStepProps) {
 				});
 				return;
 			} catch (error) {
-				if (error instanceof Error && error.name === "AbortError") return;
+				if (error instanceof Error && error.name === "AbortError") {
+					return;
+				}
 			}
 		}
 
@@ -55,7 +58,9 @@ export function FriendsStep({ onComplete }: FriendsStepProps) {
 			await navigator.clipboard.writeText(url);
 			setCopied(true);
 			toast("Link copied");
-			if (copiedTimeoutRef.current) clearTimeout(copiedTimeoutRef.current);
+			if (copiedTimeoutRef.current) {
+				clearTimeout(copiedTimeoutRef.current);
+			}
 			copiedTimeoutRef.current = setTimeout(() => setCopied(false), 2000);
 		} catch {
 			toast.error("Unable to copy link");
@@ -64,11 +69,14 @@ export function FriendsStep({ onComplete }: FriendsStepProps) {
 
 	useEffect(() => {
 		return () => {
-			if (copiedTimeoutRef.current) clearTimeout(copiedTimeoutRef.current);
+			if (copiedTimeoutRef.current) {
+				clearTimeout(copiedTimeoutRef.current);
+			}
 		};
 	}, []);
 
-	const usersToShow = debouncedQuery.length > 0 ? searchResults : suggestedUsers;
+	const usersToShow =
+		debouncedQuery.length > 0 ? searchResults : suggestedUsers;
 
 	return (
 		<form
@@ -82,13 +90,14 @@ export function FriendsStep({ onComplete }: FriendsStepProps) {
 			<div className="space-y-3 text-center">
 				<div className="inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-xs font-medium text-amber-200">
 					<Sparkles className="size-3.5" />
-					Social picks for you
+					Better together
 				</div>
 				<h2 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
-					Find friends
+					Find your friends
 				</h2>
 				<p className="text-sm text-muted-foreground sm:text-base">
-					Follow friends to discover movies you both want to watch.
+					Follow friends to see their watchlists. When you both save the same
+					movie, we&apos;ll let you know.
 				</p>
 			</div>
 
@@ -134,10 +143,7 @@ export function FriendsStep({ onComplete }: FriendsStepProps) {
 								<span className="flex-1 truncate text-sm font-medium">
 									{user.name}
 								</span>
-								<FollowButton
-									userId={user.id}
-									isFollowing={user.isFollowing}
-								/>
+								<FollowButton userId={user.id} isFollowing={user.isFollowing} />
 							</div>
 						))
 					) : !isSuggestedLoading && !isSearchLoading ? (
@@ -150,7 +156,7 @@ export function FriendsStep({ onComplete }: FriendsStepProps) {
 
 			<div className="space-y-2">
 				<p className="text-center text-xs text-muted-foreground">
-					Or invite friends to join
+					Know someone who&apos;d like Miru?
 				</p>
 				<Button
 					type="button"
@@ -158,15 +164,10 @@ export function FriendsStep({ onComplete }: FriendsStepProps) {
 					onClick={handleShare}
 					className="h-11 w-full gap-2"
 				>
-					{copied ? (
-						<Check className="size-4" />
-					) : (
-						<Copy className="size-4" />
-					)}
+					{copied ? <Check className="size-4" /> : <Copy className="size-4" />}
 					{copied ? "Copied!" : "Copy invite link"}
 				</Button>
 			</div>
-
 		</form>
 	);
 }

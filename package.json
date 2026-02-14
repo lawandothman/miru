@@ -11,6 +11,7 @@
 		"lint:fix": "oxlint --config .oxlintrc.json --fix apps/ packages/",
 		"format": "oxfmt apps/web/src/ packages/db/src/ packages/trpc/src/ packages/db/drizzle.config.ts",
 		"format:check": "oxfmt --check apps/web/src/ packages/db/src/ packages/trpc/src/ packages/db/drizzle.config.ts",
+		"check": "turbo run lint format:check typecheck",
 		"typecheck": "turbo typecheck",
 		"db:generate": "turbo db:generate",
 		"db:migrate": "turbo db:migrate",

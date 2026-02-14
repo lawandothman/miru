@@ -166,7 +166,10 @@ export function SessionsList({ currentSessionId }: SessionsListProps) {
 								</p>
 							</div>
 							{isCurrent ? (
-								<Badge variant="secondary" className="bg-primary/10 text-primary">
+								<Badge
+									variant="secondary"
+									className="bg-primary/10 text-primary"
+								>
 									Current
 								</Badge>
 							) : (
