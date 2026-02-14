@@ -25,7 +25,9 @@ export default function ExplorePage() {
 		{ enabled: debouncedQuery.length > 0 },
 	);
 
-	const genres = trpc.movie.getGenres.useQuery();
+	const genres = trpc.movie.getGenres.useQuery(undefined, {
+		staleTime: Infinity,
+	});
 	const isSearching = debouncedQuery.length > 0;
 
 	return (

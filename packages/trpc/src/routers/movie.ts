@@ -7,6 +7,10 @@ import { protectedProcedure, publicProcedure, router } from "../trpc";
 
 const STALE_AFTER_MS = 24 * 60 * 60 * 1000; // 24 hours
 
+let genresCache: { data: { id: number; name: string }[]; ts: number } | null =
+	null;
+const GENRES_CACHE_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+
 const movieWithProvidersQuery = {
 	buyProviders: { with: { provider: true } },
 	genres: { with: { genre: true } },
@@ -207,9 +211,14 @@ export const movieRouter = router({
 			return genre;
 		}),
 
-	getGenres: publicProcedure.query(({ ctx }) =>
-		ctx.db.select().from(schema.genres),
-	),
+	getGenres: publicProcedure.query(async ({ ctx }) => {
+		if (genresCache && Date.now() - genresCache.ts < GENRES_CACHE_MS) {
+			return genresCache.data;
+		}
+		const genres = await ctx.db.select().from(schema.genres);
+		genresCache = { data: genres, ts: Date.now() };
+		return genres;
+	}),
 
 	getPopular: publicProcedure
 		.input(

@@ -1,6 +1,6 @@
 "use client";
 
-import { Eye, Loader2 } from "lucide-react";
+import { CircleCheck, Eye, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc/client";
@@ -51,6 +51,8 @@ export function WatchedButton({
 		}
 	};
 
+	const WatchedIcon = isWatched ? CircleCheck : Eye;
+
 	if (variant === "icon") {
 		return (
 			<button
@@ -68,7 +70,7 @@ export function WatchedButton({
 				{isLoading ? (
 					<Loader2 className="size-4 animate-spin" />
 				) : (
-					<Eye className={cn("size-4", isWatched && "fill-current")} />
+					<WatchedIcon className="size-4" />
 				)}
 			</button>
 		);
@@ -85,7 +87,7 @@ export function WatchedButton({
 			{isLoading ? (
 				<Loader2 className="size-3.5 animate-spin" />
 			) : (
-				<Eye className={cn("size-3.5", isWatched && "fill-current")} />
+				<WatchedIcon className="size-3.5" />
 			)}
 			{isWatched ? "Watched" : "Mark Watched"}
 		</Button>
