@@ -2,13 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-	Bookmark,
-	Eye,
-	Home,
-	Search,
-	User as UserIcon,
-} from "lucide-react";
+import { Bookmark, Eye, Home, Search, User as UserIcon } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 

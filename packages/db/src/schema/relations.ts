@@ -43,19 +43,16 @@ export const followsRelations = relations(follows, ({ one }) => ({
 	}),
 }));
 
-export const watchedEntriesRelations = relations(
-	watchedEntries,
-	({ one }) => ({
-		movie: one(movies, {
-			fields: [watchedEntries.movieId],
-			references: [movies.id],
-		}),
-		user: one(users, {
-			fields: [watchedEntries.userId],
-			references: [users.id],
-		}),
+export const watchedEntriesRelations = relations(watchedEntries, ({ one }) => ({
+	movie: one(movies, {
+		fields: [watchedEntries.movieId],
+		references: [movies.id],
 	}),
-);
+	user: one(users, {
+		fields: [watchedEntries.userId],
+		references: [users.id],
+	}),
+}));
 
 export const watchlistEntriesRelations = relations(
 	watchlistEntries,

@@ -120,10 +120,7 @@ export default async function MoviePage({ params }: MoviePageProps) {
 									movieId={movie.id}
 									inWatchlist={movie.inWatchlist}
 								/>
-								<WatchedButton
-									movieId={movie.id}
-									isWatched={movie.isWatched}
-								/>
+								<WatchedButton movieId={movie.id} isWatched={movie.isWatched} />
 							</div>
 						</div>
 					</div>

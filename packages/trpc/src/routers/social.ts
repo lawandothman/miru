@@ -213,9 +213,7 @@ export const socialRouter = router({
 			);
 
 			return matches
-				.filter(
-					(m) => !myWatchedSet.has(m.id) && !friendWatchedSet.has(m.id),
-				)
+				.filter((m) => !myWatchedSet.has(m.id) && !friendWatchedSet.has(m.id))
 				.map((m) => ({ ...m, inWatchlist: true }));
 		}),
 

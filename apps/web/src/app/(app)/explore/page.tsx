@@ -108,9 +108,11 @@ export default function ExplorePage() {
 					</h2>
 					{genres.isLoading ? (
 						<div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
-							{Array.from({ length: 12 }, (_, i) => `genre-skeleton-${i}`).map((id) => (
-								<Skeleton key={id} className="h-14 rounded-xl" />
-							))}
+							{Array.from({ length: 12 }, (_, i) => `genre-skeleton-${i}`).map(
+								(id) => (
+									<Skeleton key={id} className="h-14 rounded-xl" />
+								),
+							)}
 						</div>
 					) : (
 						<div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">

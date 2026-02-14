@@ -284,12 +284,12 @@ export default async function Home() {
 						{/* Decorative film frames */}
 						<div className="mb-8 flex items-center gap-1.5">
 							{[
-									{ id: "a", opacity: 0.06 },
-									{ id: "b", opacity: 0.06 },
-									{ id: "c", opacity: 0.15 },
-									{ id: "d", opacity: 0.06 },
-									{ id: "e", opacity: 0.06 },
-								].map((dot) => (
+								{ id: "a", opacity: 0.06 },
+								{ id: "b", opacity: 0.06 },
+								{ id: "c", opacity: 0.15 },
+								{ id: "d", opacity: 0.06 },
+								{ id: "e", opacity: 0.06 },
+							].map((dot) => (
 								<div
 									key={dot.id}
 									className="size-2 rounded-[3px] border border-foreground/[0.08]"
