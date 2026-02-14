@@ -7,6 +7,14 @@ import { auth } from "@/lib/auth";
 import { trpc } from "@/lib/trpc/server";
 import { ForYouMovies } from "@/components/for-you-movies";
 import { MovieGridSkeleton } from "@/components/movie-grid";
+import { Button } from "@/components/ui/button";
+import {
+	Empty,
+	EmptyContent,
+	EmptyDescription,
+	EmptyHeader,
+	EmptyTitle,
+} from "@/components/ui/empty";
 
 export const metadata: Metadata = {
 	title: "For You",
@@ -45,18 +53,19 @@ async function ForYouContent() {
 
 	if (initialMovies.length === 0) {
 		return (
-			<div className="rounded-xl border border-border/50 bg-card p-10 text-center">
-				<h2 className="font-display text-lg font-semibold">Nothing here yet</h2>
-				<p className="mt-2 text-sm text-muted-foreground">
-					Follow friends to see their movie recommendations.
-				</p>
-				<Link
-					href="/explore"
-					className="mt-6 inline-flex h-9 items-center rounded-lg bg-primary px-5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-				>
-					Find Friends
-				</Link>
-			</div>
+			<Empty>
+				<EmptyHeader>
+					<EmptyTitle>Nothing here yet</EmptyTitle>
+					<EmptyDescription>
+						Follow friends to see their movie recommendations.
+					</EmptyDescription>
+				</EmptyHeader>
+				<EmptyContent>
+					<Button asChild>
+						<Link href="/explore">Find Friends</Link>
+					</Button>
+				</EmptyContent>
+			</Empty>
 		);
 	}
 

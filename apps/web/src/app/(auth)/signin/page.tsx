@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { signIn } from "@/lib/auth-client";
+import { Button } from "@/components/ui/button";
 
 export default function SignInPage() {
 	return (
@@ -17,15 +18,15 @@ export default function SignInPage() {
 					<p className="text-sm text-muted-foreground">Sign in to continue</p>
 				</div>
 
-				<button
-					type="button"
+				<Button
+					variant="outline"
 					onClick={() =>
 						signIn.social({
 							callbackURL: "/dashboard",
 							provider: "google",
 						})
 					}
-					className="flex h-12 w-full items-center justify-center gap-3 rounded-full border border-border bg-card text-sm font-medium transition-colors hover:bg-accent"
+					className="h-12 w-full gap-3 rounded-full"
 				>
 					<svg className="size-5" viewBox="0 0 24 24">
 						<path
@@ -46,7 +47,7 @@ export default function SignInPage() {
 						/>
 					</svg>
 					Continue with Google
-				</button>
+				</Button>
 
 				<p className="text-center text-xs text-muted-foreground">
 					By signing in, you agree to our{" "}

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { trpc } from "@/lib/trpc/server";
+import { ShareButton } from "@/components/share-button";
 import { WatchedButton } from "@/components/watched-button";
 import { WatchlistButton } from "@/components/watchlist-button";
 import { UserAvatar } from "@/components/user-avatar";
@@ -121,6 +122,10 @@ export default async function MoviePage({ params }: MoviePageProps) {
 									inWatchlist={movie.inWatchlist}
 								/>
 								<WatchedButton movieId={movie.id} isWatched={movie.isWatched} />
+								<ShareButton
+									title={movie.title}
+									text={`Check out ${movie.title} on Miru`}
+								/>
 							</div>
 						</div>
 					</div>

@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { Bookmark } from "lucide-react";
 import { RevealOnScroll } from "@/components/reveal-on-scroll";
+import { cn } from "@/lib/utils";
 
 /* ── Verified poster paths from the database ── */
 const posters = {
@@ -394,7 +395,7 @@ function SectionDivider() {
 function ConnectorSvg({ flip }: { flip?: boolean }) {
 	return (
 		<div
-			className={`-my-10 hidden items-center justify-center lg:flex ${flip ? "scale-x-[-1]" : ""}`}
+			className={cn("-my-10 hidden items-center justify-center lg:flex", flip && "scale-x-[-1]")}
 		>
 			<svg
 				width="200"
@@ -430,7 +431,7 @@ function PosterThumb({
 }) {
 	return (
 		<div
-			className={`relative overflow-hidden rounded-md bg-foreground/5 ${className ?? ""}`}
+			className={cn("relative overflow-hidden rounded-md bg-foreground/5", className)}
 		>
 			<Image
 				src={tmdb(path, "w185")}
@@ -446,7 +447,7 @@ function PosterThumb({
 function UserPill({ name, color }: { name: string; color: string }) {
 	return (
 		<div
-			className={`flex size-7 items-center justify-center rounded-full text-[10px] font-bold ring-2 ring-background ${color}`}
+			className={cn("flex size-7 items-center justify-center rounded-full text-[10px] font-bold ring-2 ring-background", color)}
 		>
 			{name.charAt(0)}
 		</div>
@@ -579,7 +580,7 @@ function MockForYou() {
 							{m.friends.map((f, i) => (
 								<div
 									key={f}
-									className={`flex size-5 items-center justify-center rounded-full text-[8px] font-bold ring-1 ring-background ${m.friendColors[i]}`}
+									className={cn("flex size-5 items-center justify-center rounded-full text-[8px] font-bold ring-1 ring-background", m.friendColors[i])}
 								>
 									{f}
 								</div>

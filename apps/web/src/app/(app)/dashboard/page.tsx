@@ -6,6 +6,14 @@ import { auth } from "@/lib/auth";
 import { trpc } from "@/lib/trpc/server";
 import { MoviePoster } from "@/components/movie-poster";
 import { UserAvatar } from "@/components/user-avatar";
+import { Button } from "@/components/ui/button";
+import {
+	Empty,
+	EmptyContent,
+	EmptyDescription,
+	EmptyHeader,
+	EmptyTitle,
+} from "@/components/ui/empty";
 import { Skeleton } from "@/components/ui/skeleton";
 
 function getGreeting() {
@@ -52,18 +60,19 @@ async function DashboardMatches() {
 
 	if (friendsWithMatches.length === 0) {
 		return (
-			<div className="rounded-xl border border-border/50 bg-card p-10 text-center">
-				<h2 className="font-display text-lg font-semibold">No matches yet</h2>
-				<p className="mt-2 text-sm text-muted-foreground">
-					Follow friends and add movies to your watchlist to find matches.
-				</p>
-				<Link
-					href="/explore"
-					className="mt-6 inline-flex h-9 items-center rounded-lg bg-primary px-5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-				>
-					Find Friends
-				</Link>
-			</div>
+			<Empty>
+				<EmptyHeader>
+					<EmptyTitle>No matches yet</EmptyTitle>
+					<EmptyDescription>
+						Follow friends and add movies to your watchlist to find matches.
+					</EmptyDescription>
+				</EmptyHeader>
+				<EmptyContent>
+					<Button asChild>
+						<Link href="/explore">Find Friends</Link>
+					</Button>
+				</EmptyContent>
+			</Empty>
 		);
 	}
 

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Loader2, Monitor, Smartphone, X } from "lucide-react";
 import { toast } from "sonner";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { authClient } from "@/lib/auth-client";
 
@@ -165,9 +166,9 @@ export function SessionsList({ currentSessionId }: SessionsListProps) {
 								</p>
 							</div>
 							{isCurrent ? (
-								<span className="shrink-0 rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
+								<Badge variant="secondary" className="bg-primary/10 text-primary">
 									Current
-								</span>
+								</Badge>
 							) : (
 								<Button
 									variant="ghost"

@@ -7,6 +7,14 @@ import { auth } from "@/lib/auth";
 import { trpc } from "@/lib/trpc/server";
 import { WatchedMovies } from "@/components/watched-movies";
 import { MovieGridSkeleton } from "@/components/movie-grid";
+import { Button } from "@/components/ui/button";
+import {
+	Empty,
+	EmptyContent,
+	EmptyDescription,
+	EmptyHeader,
+	EmptyTitle,
+} from "@/components/ui/empty";
 
 export const metadata: Metadata = {
 	title: "Watched",
@@ -42,20 +50,19 @@ async function WatchedContent() {
 
 	if (initialMovies.length === 0) {
 		return (
-			<div className="rounded-xl border border-border/50 bg-card p-10 text-center">
-				<h2 className="font-display text-lg font-semibold">
-					No watched movies yet
-				</h2>
-				<p className="mt-2 text-sm text-muted-foreground">
-					Mark movies as watched to build your viewing history.
-				</p>
-				<Link
-					href="/explore"
-					className="mt-6 inline-flex h-9 items-center rounded-lg bg-primary px-5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-				>
-					Find Movies
-				</Link>
-			</div>
+			<Empty>
+				<EmptyHeader>
+					<EmptyTitle>No watched movies yet</EmptyTitle>
+					<EmptyDescription>
+						Mark movies as watched to build your viewing history.
+					</EmptyDescription>
+				</EmptyHeader>
+				<EmptyContent>
+					<Button asChild>
+						<Link href="/explore">Find Movies</Link>
+					</Button>
+				</EmptyContent>
+			</Empty>
 		);
 	}
 

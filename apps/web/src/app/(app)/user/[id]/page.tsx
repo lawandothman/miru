@@ -4,10 +4,13 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { Settings } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { auth } from "@/lib/auth";
 import { trpc } from "@/lib/trpc/server";
 import { UserAvatar } from "@/components/user-avatar";
 import { FollowButton } from "@/components/follow-button";
+import { FollowersDialog } from "@/components/followers-dialog";
+import { ShareButton } from "@/components/share-button";
 import { MovieGrid, MovieGridSkeleton } from "@/components/movie-grid";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -57,9 +60,9 @@ export default async function UserPage({ params }: UserPageProps) {
 							{user.name}
 						</h1>
 						{user.isBot && (
-							<span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
+							<Badge variant="secondary" className="bg-primary/10 text-primary">
 								Bot
-							</span>
+							</Badge>
 						)}
 					</div>
 					<Suspense
@@ -74,6 +77,8 @@ export default async function UserPage({ params }: UserPageProps) {
 							userId={id}
 							isOwnProfile={isOwnProfile}
 							hasSession={Boolean(session)}
+							followerCount={user.followerCount}
+							followingCount={user.followingCount}
 						/>
 					</Suspense>
 					{!isOwnProfile && session && (
@@ -82,18 +87,25 @@ export default async function UserPage({ params }: UserPageProps) {
 						</div>
 					)}
 				</div>
-				{isOwnProfile && (
-					<Button
+				<div className="flex shrink-0 gap-1">
+					<ShareButton
+						title={`${user.name} on Miru`}
+						text={`Check out ${user.name}'s profile on Miru`}
 						variant="ghost"
-						size="icon"
-						asChild
-						className="shrink-0 text-muted-foreground"
-					>
-						<Link href="/settings" aria-label="Settings">
-							<Settings className="size-5" />
-						</Link>
-					</Button>
-				)}
+					/>
+					{isOwnProfile && (
+						<Button
+							variant="ghost"
+							size="icon"
+							asChild
+							className="text-muted-foreground"
+						>
+							<Link href="/settings" aria-label="Settings">
+								<Settings className="size-5" />
+							</Link>
+						</Button>
+					)}
+				</div>
 			</div>
 
 			{!isOwnProfile && session && (
@@ -145,10 +157,14 @@ async function UserStats({
 	userId,
 	isOwnProfile,
 	hasSession,
+	followerCount,
+	followingCount,
 }: {
 	userId: string;
 	isOwnProfile: boolean;
 	hasSession: boolean;
+	followerCount: number;
+	followingCount: number;
 }) {
 	const api = await trpc();
 
@@ -158,8 +174,6 @@ async function UserStats({
 		matchCount = matches.length;
 	}
 
-	const user = await api.user.getById({ id: userId });
-
 	return (
 		<div className="mt-2 flex gap-4 text-sm text-muted-foreground">
 			{!isOwnProfile && matchCount > 0 && (
@@ -167,14 +181,11 @@ async function UserStats({
 					<strong className="text-foreground">{matchCount}</strong> matches
 				</span>
 			)}
-			<span>
-				<strong className="text-foreground">{user.followerCount}</strong>{" "}
-				followers
-			</span>
-			<span>
-				<strong className="text-foreground">{user.followingCount}</strong>{" "}
-				following
-			</span>
+			<FollowersDialog
+				userId={userId}
+				followerCount={followerCount}
+				followingCount={followingCount}
+			/>
 		</div>
 	);
 }
