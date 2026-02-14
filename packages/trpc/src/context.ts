@@ -2,7 +2,10 @@ import type { Database, User } from "@miru/db";
 import type { TMDB } from "@lorenzopant/tmdb";
 
 export interface Session {
-	user: Pick<User, "id" | "email" | "name" | "image">;
+	user: Pick<User, "id" | "email" | "name" | "image"> & {
+		onboardingCompletedAt: Date | null;
+		country: string | null;
+	};
 }
 
 export interface CreateContextOptions {

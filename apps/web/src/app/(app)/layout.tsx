@@ -1,4 +1,5 @@
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { AppSidebar } from "@/components/app-sidebar";
 import { BottomNav } from "@/components/bottom-nav";
@@ -12,6 +13,10 @@ export default async function AppLayout({
 	const session = await auth.api.getSession({
 		headers: await headers(),
 	});
+
+	if (session?.user && !session.user.onboardingCompletedAt) {
+		redirect("/onboarding");
+	}
 
 	const user = session?.user
 		? {

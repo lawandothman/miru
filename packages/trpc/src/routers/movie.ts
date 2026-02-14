@@ -1,7 +1,7 @@
 import { type Database, schema } from "@miru/db";
 import type { TMDB } from "@lorenzopant/tmdb";
 import { TRPCError } from "@trpc/server";
-import { and, count, desc, eq, inArray } from "drizzle-orm";
+import { and, count, desc, eq, inArray, notInArray } from "drizzle-orm";
 import { z } from "zod";
 import { protectedProcedure, publicProcedure, router } from "../trpc";
 
@@ -75,7 +75,9 @@ export const movieRouter = router({
 			const isStale =
 				!existing || Date.now() - existing.updatedAt.getTime() > STALE_AFTER_MS;
 
-			const movie = isStale ? await refreshMovie(ctx, input.tmdbId) : existing;
+			const movie = isStale
+				? await refreshMovie(ctx, input.tmdbId, ctx.session?.user?.country ?? undefined)
+				: existing;
 
 			if (!movie) {
 				throw new TRPCError({ code: "NOT_FOUND", message: "Movie not found" });
@@ -154,8 +156,30 @@ export const movieRouter = router({
 		.query(async ({ ctx, input }) => {
 			const userId = ctx.session.user.id;
 			const offset = input.cursor ?? 0;
+			// Get user's existing watchlist and watched to exclude
+			const [existingWatchlist, existingWatched] = await Promise.all([
+				ctx.db
+					.select({ movieId: schema.watchlistEntries.movieId })
+					.from(schema.watchlistEntries)
+					.where(eq(schema.watchlistEntries.userId, userId)),
+				ctx.db
+					.select({ movieId: schema.watchedEntries.movieId })
+					.from(schema.watchedEntries)
+					.where(eq(schema.watchedEntries.userId, userId)),
+			]);
 
-			const movies = await ctx.db
+			const excludeIds = [
+				...existingWatchlist.map((e) => e.movieId),
+				...existingWatched.map((e) => e.movieId),
+			];
+
+			const excludeCondition =
+				excludeIds.length > 0
+					? notInArray(schema.movies.id, excludeIds)
+					: undefined;
+
+			// Friend-recommended movies (original logic)
+			const friendMovies = await ctx.db
 				.select({
 					id: schema.movies.id,
 					title: schema.movies.title,
@@ -176,6 +200,7 @@ export const movieRouter = router({
 					and(
 						eq(schema.follows.followerId, userId),
 						eq(schema.movies.adult, false),
+						excludeCondition,
 					),
 				)
 				.groupBy(schema.movies.id)
@@ -183,20 +208,62 @@ export const movieRouter = router({
 				.limit(input.limit)
 				.offset(offset);
 
-			// Exclude movies already in user's watchlist or watched
-			const movieIds = movies.map((m) => m.id);
-			const [watchlistSet, watchedSet] = await Promise.all([
-				getWatchlistSet(ctx, movieIds),
-				getWatchedSet(ctx, movieIds),
-			]);
-
-			return movies
-				.filter((m) => !watchlistSet.has(m.id) && !watchedSet.has(m.id))
-				.map((m) => ({
+			// If we have enough friend movies, return them
+			if (friendMovies.length >= input.limit) {
+				return friendMovies.map((m) => ({
 					...m,
 					inWatchlist: false,
 					isWatched: false,
 				}));
+			}
+
+			// Fill remaining slots with genre-based recommendations
+			const genrePrefs = await ctx.db
+				.select({ genreId: schema.userGenrePreferences.genreId })
+				.from(schema.userGenrePreferences)
+				.where(eq(schema.userGenrePreferences.userId, userId));
+
+			const friendMovieIds = new Set(friendMovies.map((m) => m.id));
+			const remaining = input.limit - friendMovies.length;
+
+			let genreMovies: typeof friendMovies = [];
+			if (genrePrefs.length > 0) {
+				const genreIds = genrePrefs.map((p) => p.genreId);
+				const allExcludeIds = [...excludeIds, ...friendMovieIds];
+
+				genreMovies = (
+					await ctx.db
+						.select({
+							id: schema.movies.id,
+							title: schema.movies.title,
+							posterPath: schema.movies.posterPath,
+							releaseDate: schema.movies.releaseDate,
+						})
+						.from(schema.movieGenres)
+						.innerJoin(
+							schema.movies,
+							eq(schema.movies.id, schema.movieGenres.movieId),
+						)
+						.where(
+							and(
+								inArray(schema.movieGenres.genreId, genreIds),
+								eq(schema.movies.adult, false),
+								allExcludeIds.length > 0
+									? notInArray(schema.movies.id, allExcludeIds)
+									: undefined,
+							),
+						)
+						.groupBy(schema.movies.id)
+						.orderBy(desc(schema.movies.tmdbVoteCount))
+						.limit(remaining)
+				).map((m) => ({ ...m, friendCount: 0 }));
+			}
+
+			return [...friendMovies, ...genreMovies].map((m) => ({
+				...m,
+				inWatchlist: false,
+				isWatched: false,
+			}));
 		}),
 
 	getGenreById: publicProcedure
@@ -220,16 +287,25 @@ export const movieRouter = router({
 		return genres;
 	}),
 
+	getWatchProviders: publicProcedure.query(async ({ ctx }) => {
+		return ctx.db
+			.select()
+			.from(schema.watchProviders)
+			.orderBy(schema.watchProviders.displayPriority);
+	}),
+
 	getPopular: publicProcedure
 		.input(
 			z.object({
 				cursor: z.number().nullish(),
 				limit: z.number().default(20),
+				providerIds: z.array(z.number()).optional(),
 			}),
 		)
 		.query(async ({ ctx, input }) => {
 			const offset = input.cursor ?? 0;
-			const movies = await ctx.db
+
+			let query = ctx.db
 				.select({
 					id: schema.movies.id,
 					title: schema.movies.title,
@@ -241,7 +317,19 @@ export const movieRouter = router({
 				.innerJoin(
 					schema.watchlistEntries,
 					eq(schema.watchlistEntries.movieId, schema.movies.id),
-				)
+				);
+
+			if (input.providerIds && input.providerIds.length > 0) {
+				query = query.innerJoin(
+					schema.movieStreamProviders,
+					and(
+						eq(schema.movieStreamProviders.movieId, schema.movies.id),
+						inArray(schema.movieStreamProviders.providerId, input.providerIds),
+					),
+				) as typeof query;
+			}
+
+			const movies = await query
 				.where(eq(schema.movies.adult, false))
 				.groupBy(schema.movies.id)
 				.orderBy(
@@ -337,7 +425,7 @@ interface TMDBRegionProviders {
 	rent?: TMDBProvider[];
 }
 
-async function refreshMovie(ctx: { db: Database; tmdb: TMDB }, tmdbId: number) {
+async function refreshMovie(ctx: { db: Database; tmdb: TMDB }, tmdbId: number, country?: string) {
 	try {
 		const [details, videos, watchProviders] = await Promise.all([
 			ctx.tmdb.movies.details({ movie_id: tmdbId }),
@@ -395,19 +483,20 @@ async function refreshMovie(ctx: { db: Database; tmdb: TMDB }, tmdbId: number) {
 				.onConflictDoNothing();
 		}
 
-		const gbProviders = (
+		const region = country ?? "GB";
+		const regionProviders = (
 			watchProviders.results as Record<string, TMDBRegionProviders>
-		)?.["GB"];
+		)?.[region];
 
-		if (gbProviders) {
+		if (regionProviders) {
 			await upsertProviders(
 				ctx.db,
 				details.id,
-				gbProviders.flatrate ?? [],
+				regionProviders.flatrate ?? [],
 				"stream",
 			);
-			await upsertProviders(ctx.db, details.id, gbProviders.buy ?? [], "buy");
-			await upsertProviders(ctx.db, details.id, gbProviders.rent ?? [], "rent");
+			await upsertProviders(ctx.db, details.id, regionProviders.buy ?? [], "buy");
+			await upsertProviders(ctx.db, details.id, regionProviders.rent ?? [], "rent");
 		}
 
 		return findMovieWithProviders(ctx.db, tmdbId);

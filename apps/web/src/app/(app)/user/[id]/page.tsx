@@ -4,7 +4,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { Settings } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { auth } from "@/lib/auth";
 import { trpc } from "@/lib/trpc/server";
 import { UserAvatar } from "@/components/user-avatar";
@@ -59,11 +58,6 @@ export default async function UserPage({ params }: UserPageProps) {
 						<h1 className="font-display text-2xl font-semibold tracking-tight">
 							{user.name}
 						</h1>
-						{user.isBot && (
-							<Badge variant="secondary" className="bg-primary/10 text-primary">
-								Bot
-							</Badge>
-						)}
 					</div>
 					<Suspense
 						fallback={

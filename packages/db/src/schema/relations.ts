@@ -3,6 +3,7 @@ import { accounts, sessions, users } from "./users";
 import { follows } from "./social";
 import { watchedEntries } from "./watched";
 import { watchlistEntries } from "./watchlist";
+import { userGenrePreferences, userStreamingServices } from "./preferences";
 import {
 	genres,
 	movieBuyProviders,
@@ -17,7 +18,9 @@ export const usersRelations = relations(users, ({ many }) => ({
 	accounts: many(accounts),
 	followers: many(follows, { relationName: "following" }),
 	following: many(follows, { relationName: "follower" }),
+	genrePreferences: many(userGenrePreferences),
 	sessions: many(sessions),
+	streamingServices: many(userStreamingServices),
 	watchedEntries: many(watchedEntries),
 	watchlistEntries: many(watchlistEntries),
 }));
@@ -79,6 +82,7 @@ export const moviesRelations = relations(movies, ({ many }) => ({
 
 export const genresRelations = relations(genres, ({ many }) => ({
 	movies: many(movieGenres),
+	userPreferences: many(userGenrePreferences),
 }));
 
 export const movieGenresRelations = relations(movieGenres, ({ one }) => ({
@@ -98,6 +102,7 @@ export const watchProvidersRelations = relations(
 		buyMovies: many(movieBuyProviders),
 		rentMovies: many(movieRentProviders),
 		streamMovies: many(movieStreamProviders),
+		userServices: many(userStreamingServices),
 	}),
 );
 
@@ -139,6 +144,34 @@ export const movieRentProvidersRelations = relations(
 		provider: one(watchProviders, {
 			fields: [movieRentProviders.providerId],
 			references: [watchProviders.id],
+		}),
+	}),
+);
+
+export const userGenrePreferencesRelations = relations(
+	userGenrePreferences,
+	({ one }) => ({
+		genre: one(genres, {
+			fields: [userGenrePreferences.genreId],
+			references: [genres.id],
+		}),
+		user: one(users, {
+			fields: [userGenrePreferences.userId],
+			references: [users.id],
+		}),
+	}),
+);
+
+export const userStreamingServicesRelations = relations(
+	userStreamingServices,
+	({ one }) => ({
+		provider: one(watchProviders, {
+			fields: [userStreamingServices.providerId],
+			references: [watchProviders.id],
+		}),
+		user: one(users, {
+			fields: [userStreamingServices.userId],
+			references: [users.id],
 		}),
 	}),
 );

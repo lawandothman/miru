@@ -1,6 +1,7 @@
 import { boolean, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
+	country: text("country"),
 	createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
 	email: text("email").unique().notNull(),
 	emailVerified: boolean("email_verified").default(false).notNull(),
@@ -8,8 +9,8 @@ export const users = pgTable("users", {
 		.primaryKey()
 		.$defaultFn(() => crypto.randomUUID()),
 	image: text("image"),
-	isBot: boolean("is_bot").default(false).notNull(),
 	name: text("name").notNull(),
+	onboardingCompletedAt: timestamp("onboarding_completed_at", { mode: "date" }),
 	updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow().notNull(),
 });
 

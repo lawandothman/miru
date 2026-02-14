@@ -29,9 +29,12 @@ export const auth = betterAuth({
 	},
 	user: {
 		additionalFields: {
-			isBot: {
-				type: "boolean",
-				defaultValue: false,
+			country: {
+				type: "string",
+				input: false,
+			},
+			onboardingCompletedAt: {
+				type: "date",
 				input: false,
 			},
 		},

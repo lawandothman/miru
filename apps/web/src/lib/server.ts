@@ -24,6 +24,8 @@ export async function getServerSession(): Promise<Session | null> {
 			email: session.user.email,
 			name: session.user.name,
 			image: session.user.image ?? null,
+			onboardingCompletedAt: session.user.onboardingCompletedAt ?? null,
+			country: session.user.country ?? null,
 		},
 	};
 }

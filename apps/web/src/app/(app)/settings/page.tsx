@@ -4,6 +4,9 @@ import type { Metadata } from "next";
 import { auth } from "@/lib/auth";
 import { UserAvatar } from "@/components/user-avatar";
 import { EditProfileForm } from "./edit-profile-form";
+import { GenrePreferencesForm } from "./genre-preferences-form";
+import { StreamingServicesForm } from "./streaming-services-form";
+import { RegionForm } from "./region-form";
 import { ThemeSwitcher } from "./theme-switcher";
 import { SessionsList } from "./sessions-list";
 import { DangerZone } from "./danger-zone";
@@ -52,6 +55,18 @@ export default async function SettingsPage() {
 
 			<SettingsSection title="Profile">
 				<EditProfileForm currentName={user.name} />
+			</SettingsSection>
+
+			<SettingsSection title="Genre Preferences">
+				<GenrePreferencesForm />
+			</SettingsSection>
+
+			<SettingsSection title="Streaming Services">
+				<StreamingServicesForm />
+			</SettingsSection>
+
+			<SettingsSection title="Region">
+				<RegionForm />
 			</SettingsSection>
 
 			<SettingsSection title="Appearance">
