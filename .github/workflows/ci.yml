@@ -1,4 +1,4 @@
-name: ✅ CI
+name: CI
 
 on:
   push:
@@ -16,23 +16,17 @@ env:
 
 jobs:
   check:
-    name: 🔍 Lint · Format · Typecheck
     runs-on: ubuntu-latest
     steps:
-      - name: 📥 Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: 📦 Setup pnpm
-        uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v4
 
-      - name: 🟢 Setup Node
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 24
           cache: pnpm
 
-      - name: 📥 Install dependencies
-        run: pnpm install --frozen-lockfile
+      - run: pnpm install --frozen-lockfile
 
-      - name: 🔍 Check
-        run: pnpm check
+      - run: pnpm check
