@@ -29,7 +29,13 @@ export function InfiniteMovieGrid({
 	emptyMessage = "No movies found",
 }: InfiniteMovieGridProps) {
 	const sentinelRef = useRef<HTMLDivElement>(null);
+	const isFetchingRef = useRef(isFetching);
+	const onLoadMoreRef = useRef(onLoadMore);
 
+	isFetchingRef.current = isFetching;
+	onLoadMoreRef.current = onLoadMore;
+
+	// Stable observer — only recreate when hasMore changes
 	useEffect(() => {
 		const el = sentinelRef.current;
 		if (!el || !hasMore) {
@@ -38,8 +44,8 @@ export function InfiniteMovieGrid({
 
 		const observer = new IntersectionObserver(
 			(entries) => {
-				if (entries[0]?.isIntersecting && !isFetching) {
-					onLoadMore();
+				if (entries[0]?.isIntersecting && !isFetchingRef.current) {
+					onLoadMoreRef.current();
 				}
 			},
 			{ rootMargin: "400px" },
@@ -47,7 +53,17 @@ export function InfiniteMovieGrid({
 
 		observer.observe(el);
 		return () => observer.disconnect();
-	}, [hasMore, isFetching, onLoadMore]);
+	}, [hasMore]);
+
+	// When fetching completes, check if sentinel is still visible to continue loading
+	useEffect(() => {
+		if (!isFetching && hasMore && sentinelRef.current) {
+			const rect = sentinelRef.current.getBoundingClientRect();
+			if (rect.top < window.innerHeight + 400) {
+				onLoadMore();
+			}
+		}
+	}, [isFetching, hasMore, onLoadMore]);
 
 	if (isLoading) {
 		return <MovieGridSkeleton />;

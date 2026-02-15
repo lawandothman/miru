@@ -99,6 +99,7 @@ export default function OnboardingPage() {
 				{step === 2 && (
 					<GenreStep
 						selectedGenres={selectedGenres}
+						onSelectionChange={setSelectedGenres}
 						onComplete={(genreIds) => {
 							setSelectedGenres(genreIds);
 							setStep(3);

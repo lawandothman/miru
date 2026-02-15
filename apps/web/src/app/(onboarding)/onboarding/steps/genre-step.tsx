@@ -52,10 +52,15 @@ const genreIcons: Record<string, LucideIcon> = {
 
 interface GenreStepProps {
 	selectedGenres: number[];
+	onSelectionChange: (genreIds: number[]) => void;
 	onComplete: (genreIds: number[]) => void;
 }
 
-export function GenreStep({ selectedGenres, onComplete }: GenreStepProps) {
+export function GenreStep({
+	selectedGenres,
+	onSelectionChange,
+	onComplete,
+}: GenreStepProps) {
 	const [selected, setSelected] = useState<Set<number>>(
 		new Set(selectedGenres),
 	);
@@ -82,6 +87,7 @@ export function GenreStep({ selectedGenres, onComplete }: GenreStepProps) {
 			} else {
 				next.add(id);
 			}
+			onSelectionChange(Array.from(next));
 			return next;
 		});
 	};
