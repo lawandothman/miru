@@ -9,8 +9,10 @@ const db = createDb(env.DATABASE_URL);
 
 const isDev = process.env.NODE_ENV !== "production";
 
+const vercelUrl = env.VERCEL_URL ? `https://${env.VERCEL_URL}` : undefined;
+
 export const auth = betterAuth({
-	baseURL: env.BETTER_AUTH_URL,
+	baseURL: vercelUrl ?? env.BETTER_AUTH_URL,
 	trustedOrigins: ["https://*.vercel.app"],
 	database: drizzleAdapter(db, {
 		provider: "pg",
@@ -23,11 +25,17 @@ export const auth = betterAuth({
 		},
 	}),
 	emailAndPassword: { enabled: isDev },
-	plugins: [nextCookies(), oAuthProxy()],
+	plugins: [
+		nextCookies(),
+		oAuthProxy({
+			productionURL: env.BETTER_AUTH_URL,
+		}),
+	],
 	socialProviders: {
 		google: {
 			clientId: env.GOOGLE_CLIENT_ID ?? "",
 			clientSecret: env.GOOGLE_CLIENT_SECRET ?? "",
+			redirectURI: `${env.BETTER_AUTH_URL}/api/auth/callback/google`,
 		},
 	},
 	user: {
