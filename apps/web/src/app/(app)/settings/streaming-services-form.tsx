@@ -21,14 +21,15 @@ import {
 } from "@/components/ui/drawer";
 import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
+import { StreamingPicker } from "@/components/streaming-picker";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { trpc } from "@/lib/trpc/client";
-import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
 export function StreamingServicesForm() {
 	const [open, setOpen] = useState(false);
 	const [selected, setSelected] = useState<Set<number>>(new Set());
+	const [search, setSearch] = useState("");
 	const isMobile = useIsMobile();
 
 	const { data: providers } = trpc.movie.getWatchProviders.useQuery();
@@ -47,6 +48,13 @@ export function StreamingServicesForm() {
 			setSelected(new Set(state.providerIds));
 		}
 	}, [state?.providerIds]);
+
+	const handleOpenChange = (value: boolean) => {
+		setOpen(value);
+		if (!value) {
+			setSearch("");
+		}
+	};
 
 	const toggle = (id: number) => {
 		setSelected((prev) => {
@@ -68,8 +76,7 @@ export function StreamingServicesForm() {
 		);
 	}
 
-	const selectedProviders =
-		providers?.filter((p) => selected.has(p.id)) ?? [];
+	const selectedProviders = providers?.filter((p) => selected.has(p.id)) ?? [];
 
 	const summary =
 		selectedProviders.length === 0
@@ -81,43 +88,9 @@ export function StreamingServicesForm() {
 						.map((p) => p.name)
 						.join(", ")} + ${selectedProviders.length - 3} more`;
 
-	const picker = (
-		<div className="flex flex-wrap gap-2">
-			{providers?.map((provider) => {
-				const isSelected = selected.has(provider.id);
-				return (
-					<button
-						key={provider.id}
-						type="button"
-						onClick={() => toggle(provider.id)}
-						className={cn(
-							"flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-medium transition-all",
-							isSelected
-								? "border-primary bg-primary/10 text-primary"
-								: "border-border hover:border-primary/50",
-						)}
-					>
-						{provider.logoPath && (
-							<Image
-								src={`https://image.tmdb.org/t/p/w45${provider.logoPath}`}
-								alt=""
-								width={20}
-								height={20}
-								className="rounded"
-							/>
-						)}
-						{provider.name}
-					</button>
-				);
-			})}
-		</div>
-	);
-
 	const footer = (
 		<Button
-			onClick={() =>
-				setServices.mutate({ providerIds: Array.from(selected) })
-			}
+			onClick={() => setServices.mutate({ providerIds: Array.from(selected) })}
 			disabled={setServices.isPending}
 		>
 			{setServices.isPending ? "Saving..." : "Save services"}
@@ -153,7 +126,7 @@ export function StreamingServicesForm() {
 			</button>
 
 			{isMobile ? (
-				<Drawer open={open} onOpenChange={setOpen}>
+				<Drawer open={open} onOpenChange={handleOpenChange}>
 					<DrawerContent>
 						<DrawerHeader>
 							<DrawerTitle>Streaming Services</DrawerTitle>
@@ -161,20 +134,42 @@ export function StreamingServicesForm() {
 								Select your streaming services
 							</DrawerDescription>
 						</DrawerHeader>
-						<div className="overflow-y-auto px-4 pb-2">{picker}</div>
+						<div className="px-4 pb-2">
+							{providers && (
+								<StreamingPicker
+									providers={providers}
+									selected={selected}
+									onToggle={toggle}
+									search={search}
+									onSearchChange={setSearch}
+									compact
+									gridClassName="overflow-y-auto"
+								/>
+							)}
+						</div>
 						<DrawerFooter>{footer}</DrawerFooter>
 					</DrawerContent>
 				</Drawer>
 			) : (
-				<Dialog open={open} onOpenChange={setOpen}>
-					<DialogContent showCloseButton>
+				<Dialog open={open} onOpenChange={handleOpenChange}>
+					<DialogContent showCloseButton className="sm:max-w-lg">
 						<DialogHeader>
 							<DialogTitle>Streaming Services</DialogTitle>
 							<DialogDescription className="sr-only">
 								Select your streaming services
 							</DialogDescription>
 						</DialogHeader>
-						{picker}
+						{providers && (
+							<StreamingPicker
+								providers={providers}
+								selected={selected}
+								onToggle={toggle}
+								search={search}
+								onSearchChange={setSearch}
+								compact
+								gridClassName="-mr-6 max-h-[50vh] overflow-y-auto pr-6"
+							/>
+						)}
 						<DialogFooter>{footer}</DialogFooter>
 					</DialogContent>
 				</Dialog>

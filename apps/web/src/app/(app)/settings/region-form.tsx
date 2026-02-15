@@ -46,15 +46,10 @@ export function RegionForm() {
 
 	return (
 		<div className="space-y-4">
-			<div className="flex items-center justify-between gap-4">
-				<div className="space-y-1">
-					<Label htmlFor="settings-country">Your region</Label>
-					<p className="text-xs text-muted-foreground">
-						Affects which streaming services are shown.
-					</p>
-				</div>
+			<div className="space-y-2">
+				<Label htmlFor="settings-country">Your region</Label>
 				<Select value={country} onValueChange={setCountry}>
-					<SelectTrigger id="settings-country" className="w-48">
+					<SelectTrigger id="settings-country" className="w-full">
 						<SelectValue placeholder="Select a region" />
 					</SelectTrigger>
 					<SelectContent>
@@ -66,16 +61,20 @@ export function RegionForm() {
 						))}
 					</SelectContent>
 				</Select>
+				<p className="text-xs text-muted-foreground">
+					This affects which streaming services are shown for movies.
+				</p>
 			</div>
 			{hasChanged && (
-				<Button
-					size="sm"
-					className="w-full"
-					onClick={() => setCountryMut.mutate({ country })}
-					disabled={!country || setCountryMut.isPending}
-				>
-					{setCountryMut.isPending ? "Saving..." : "Save region"}
-				</Button>
+				<div className="flex justify-end">
+					<Button
+						size="sm"
+						onClick={() => setCountryMut.mutate({ country })}
+						disabled={!country || setCountryMut.isPending}
+					>
+						{setCountryMut.isPending ? "Saving..." : "Save region"}
+					</Button>
+				</div>
 			)}
 		</div>
 	);

@@ -1,54 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import {
-	Bomb,
-	Camera,
-	Drama,
-	Film,
-	Ghost,
-	Heart,
-	Landmark,
-	Laugh,
-	Map,
-	Music,
-	Puzzle,
-	Rocket,
-	Search,
-	Shield,
-	Sparkles,
-	Sword,
-	Tv,
-	Users,
-	Wand2,
-	type LucideIcon,
-} from "lucide-react";
+import { Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { GenrePicker } from "@/components/genre-picker";
 import { trpc } from "@/lib/trpc/client";
-import { cn } from "@/lib/utils";
-
-const genreIcons: Record<string, LucideIcon> = {
-	Action: Sword,
-	Adventure: Map,
-	Animation: Film,
-	Comedy: Laugh,
-	Crime: Search,
-	Documentary: Camera,
-	Drama: Drama,
-	Family: Users,
-	Fantasy: Wand2,
-	History: Landmark,
-	Horror: Ghost,
-	Music: Music,
-	Mystery: Puzzle,
-	Romance: Heart,
-	"Science Fiction": Rocket,
-	"TV Movie": Tv,
-	Thriller: Shield,
-	War: Bomb,
-	Western: Map,
-};
 
 interface GenreStepProps {
 	selectedGenres: number[];
@@ -145,40 +102,12 @@ export function GenreStep({
 					</p>
 				</div>
 			) : (
-				<div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
-					{genres?.map((genre, i) => {
-						const Icon = genreIcons[genre.name] ?? Film;
-						const isSelected = selected.has(genre.id);
-						return (
-							<button
-								key={genre.id}
-								type="button"
-								onClick={() => toggle(genre.id)}
-								style={{ animationDelay: `${Math.min(i * 30, 500)}ms` }}
-								className={cn(
-									"animate-scale-in group relative flex min-h-24 flex-col items-center justify-center gap-2.5 overflow-hidden rounded-2xl border px-4 py-4 text-center transition-all",
-									isSelected
-										? "border-amber-500/70 bg-amber-500/15 text-amber-100"
-										: "border-border/60 bg-card/40 hover:border-amber-500/40 hover:bg-card",
-								)}
-							>
-								<div
-									className={cn(
-										"flex size-9 shrink-0 items-center justify-center rounded-xl",
-										isSelected
-											? "bg-amber-400/15"
-											: "border border-border/60 bg-background/60",
-									)}
-								>
-									<Icon className="size-4" />
-								</div>
-								<span className="w-full text-sm font-medium leading-tight">
-									{genre.name}
-								</span>
-							</button>
-						);
-					})}
-				</div>
+				<GenrePicker
+					genres={genres ?? []}
+					selected={selected}
+					onToggle={toggle}
+					animated
+				/>
 			)}
 		</form>
 	);

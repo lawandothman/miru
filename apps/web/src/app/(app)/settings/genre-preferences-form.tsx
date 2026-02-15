@@ -20,9 +20,9 @@ import {
 } from "@/components/ui/drawer";
 import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
+import { GenrePicker } from "@/components/genre-picker";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { trpc } from "@/lib/trpc/client";
-import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
 export function GenrePreferencesForm() {
@@ -77,28 +77,14 @@ export function GenrePreferencesForm() {
 				? selectedGenres.join(", ")
 				: `${selectedGenres.slice(0, 3).join(", ")} + ${selectedGenres.length - 3} more`;
 
-	const picker = (
-		<div className="flex flex-wrap gap-2">
-			{genres?.map((genre) => {
-				const isSelected = selected.has(genre.id);
-				return (
-					<button
-						key={genre.id}
-						type="button"
-						onClick={() => toggle(genre.id)}
-						className={cn(
-							"rounded-full border px-3 py-1.5 text-sm font-medium transition-all",
-							isSelected
-								? "border-primary bg-primary/10 text-primary"
-								: "border-border hover:border-primary/50",
-						)}
-					>
-						{genre.name}
-					</button>
-				);
-			})}
-		</div>
-	);
+	const picker = genres ? (
+		<GenrePicker
+			genres={genres}
+			selected={selected}
+			onToggle={toggle}
+			compact
+		/>
+	) : null;
 
 	const footer = (
 		<Button
