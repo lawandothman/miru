@@ -81,4 +81,3 @@ export const movieStreamProviders = pgTable(
 		index("movie_stream_providers_provider_idx").on(table.providerId),
 	],
 );
-

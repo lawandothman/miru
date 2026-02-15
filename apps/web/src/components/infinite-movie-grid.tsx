@@ -35,7 +35,8 @@ export function InfiniteMovieGrid({
 	isFetchingRef.current = isFetching;
 	onLoadMoreRef.current = onLoadMore;
 
-	// Stable observer — only recreate when hasMore changes
+	// Stable observer — recreate when hasMore or isLoading changes
+	// isLoading is needed because the sentinel isn't mounted during the loading state
 	useEffect(() => {
 		const el = sentinelRef.current;
 		if (!el || !hasMore) {
@@ -53,7 +54,7 @@ export function InfiniteMovieGrid({
 
 		observer.observe(el);
 		return () => observer.disconnect();
-	}, [hasMore]);
+	}, [hasMore, isLoading]);
 
 	// When fetching completes, check if sentinel is still visible to continue loading
 	useEffect(() => {
