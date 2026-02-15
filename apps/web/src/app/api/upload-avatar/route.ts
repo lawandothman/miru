@@ -53,26 +53,34 @@ export async function POST(request: Request) {
 		);
 	}
 
-	const ext = EXT_MAP[file.type] ?? "jpg";
-	const blob = await put(
-		`avatars/${session.user.id}/${Date.now()}.${ext}`,
-		file,
-		{ access: "public" },
-	);
+	try {
+		const ext = EXT_MAP[file.type] ?? "jpg";
+		const blob = await put(
+			`avatars/${session.user.id}/${Date.now()}.${ext}`,
+			file,
+			{ access: "public" },
+		);
 
-	const oldImage = session.user.image;
-	if (oldImage && isVercelBlobUrl(oldImage)) {
-		try {
-			await del(oldImage);
-		} catch {
-			// Non-fatal: old blob becomes orphaned
+		const oldImage = session.user.image;
+
+		await auth.api.updateUser({
+			headers: await headers(),
+			body: { image: blob.url },
+		});
+
+		if (oldImage && isVercelBlobUrl(oldImage)) {
+			try {
+				await del(oldImage);
+			} catch {
+				// Non-fatal: old blob becomes orphaned
+			}
 		}
+
+		return NextResponse.json({ url: blob.url });
+	} catch {
+		return NextResponse.json(
+			{ error: "Failed to upload photo" },
+			{ status: 500 },
+		);
 	}
-
-	await auth.api.updateUser({
-		headers: await headers(),
-		body: { image: blob.url },
-	});
-
-	return NextResponse.json({ url: blob.url });
 }
