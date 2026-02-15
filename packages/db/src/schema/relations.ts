@@ -6,9 +6,7 @@ import { watchlistEntries } from "./watchlist";
 import { userGenrePreferences, userStreamingServices } from "./preferences";
 import {
 	genres,
-	movieBuyProviders,
 	movieGenres,
-	movieRentProviders,
 	movieStreamProviders,
 	movies,
 	watchProviders,
@@ -72,9 +70,7 @@ export const watchlistEntriesRelations = relations(
 );
 
 export const moviesRelations = relations(movies, ({ many }) => ({
-	buyProviders: many(movieBuyProviders),
 	genres: many(movieGenres),
-	rentProviders: many(movieRentProviders),
 	streamProviders: many(movieStreamProviders),
 	watchedEntries: many(watchedEntries),
 	watchlistEntries: many(watchlistEntries),
@@ -99,8 +95,6 @@ export const movieGenresRelations = relations(movieGenres, ({ one }) => ({
 export const watchProvidersRelations = relations(
 	watchProviders,
 	({ many }) => ({
-		buyMovies: many(movieBuyProviders),
-		rentMovies: many(movieRentProviders),
 		streamMovies: many(movieStreamProviders),
 		userServices: many(userStreamingServices),
 	}),
@@ -115,34 +109,6 @@ export const movieStreamProvidersRelations = relations(
 		}),
 		provider: one(watchProviders, {
 			fields: [movieStreamProviders.providerId],
-			references: [watchProviders.id],
-		}),
-	}),
-);
-
-export const movieBuyProvidersRelations = relations(
-	movieBuyProviders,
-	({ one }) => ({
-		movie: one(movies, {
-			fields: [movieBuyProviders.movieId],
-			references: [movies.id],
-		}),
-		provider: one(watchProviders, {
-			fields: [movieBuyProviders.providerId],
-			references: [watchProviders.id],
-		}),
-	}),
-);
-
-export const movieRentProvidersRelations = relations(
-	movieRentProviders,
-	({ one }) => ({
-		movie: one(movies, {
-			fields: [movieRentProviders.movieId],
-			references: [movies.id],
-		}),
-		provider: one(watchProviders, {
-			fields: [movieRentProviders.providerId],
 			references: [watchProviders.id],
 		}),
 	}),

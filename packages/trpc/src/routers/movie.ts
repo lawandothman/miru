@@ -16,9 +16,7 @@ let genresCache: { data: { id: number; name: string }[]; ts: number } | null =
 	null;
 
 const movieWithProvidersQuery = {
-	buyProviders: { with: { provider: true } },
 	genres: { with: { genre: true } },
-	rentProviders: { with: { provider: true } },
 	streamProviders: { with: { provider: true } },
 } as const;
 
@@ -523,16 +521,7 @@ async function refreshMovie(
 		)?.[region];
 
 		if (regionProviders) {
-			await Promise.all([
-				upsertProviders(
-					ctx.db,
-					details.id,
-					regionProviders.flatrate ?? [],
-					"stream",
-				),
-				upsertProviders(ctx.db, details.id, regionProviders.buy ?? [], "buy"),
-				upsertProviders(ctx.db, details.id, regionProviders.rent ?? [], "rent"),
-			]);
+			await upsertProviders(ctx.db, details.id, regionProviders.flatrate ?? []);
 		}
 
 		return findMovieWithProviders(ctx.db, tmdbId);
@@ -546,15 +535,7 @@ async function upsertProviders(
 	db: Database,
 	movieId: number,
 	providers: TMDBProvider[],
-	type: "stream" | "buy" | "rent",
 ) {
-	const junctionTables = {
-		stream: schema.movieStreamProviders,
-		buy: schema.movieBuyProviders,
-		rent: schema.movieRentProviders,
-	} as const;
-	const junctionTable = junctionTables[type];
-
 	if (providers.length === 0) {
 		return;
 	}
@@ -572,7 +553,7 @@ async function upsertProviders(
 		.onConflictDoNothing();
 
 	await db
-		.insert(junctionTable)
+		.insert(schema.movieStreamProviders)
 		.values(providers.map((p) => ({ movieId, providerId: p.provider_id })))
 		.onConflictDoNothing();
 }

@@ -15,6 +15,13 @@
       "when": 1771108835368,
       "tag": "0001_pink_franklin_storm",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1771193572332,
+      "tag": "0002_nervous_next_avengers",
+      "breakpoints": true
     }
   ]
 }

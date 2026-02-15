@@ -154,8 +154,6 @@ async function main() {
 			.map((movie) => movie.id);
 
 		const streamRows = [];
-		const buyRows = [];
-		const rentRows = [];
 
 		for (const movieId of providerSeedMovieIds) {
 			const watchProvidersResponse = await tmdbRequest(
@@ -174,26 +172,6 @@ async function main() {
 						name: provider.provider_name,
 					});
 					streamRows.push({ movie_id: movieId, provider_id: provider.provider_id });
-				}
-
-				for (const provider of regional.buy ?? []) {
-					providerMap.set(provider.provider_id, {
-						display_priority: provider.display_priority ?? null,
-						id: provider.provider_id,
-						logo_path: provider.logo_path ?? null,
-						name: provider.provider_name,
-					});
-					buyRows.push({ movie_id: movieId, provider_id: provider.provider_id });
-				}
-
-				for (const provider of regional.rent ?? []) {
-					providerMap.set(provider.provider_id, {
-						display_priority: provider.display_priority ?? null,
-						id: provider.provider_id,
-						logo_path: provider.logo_path ?? null,
-						name: provider.provider_name,
-					});
-					rentRows.push({ movie_id: movieId, provider_id: provider.provider_id });
 				}
 			}
 		}
@@ -222,20 +200,6 @@ async function main() {
 			`;
 		}
 
-		if (buyRows.length > 0) {
-			await sql`
-				insert into movie_buy_providers ${sql(buyRows, "movie_id", "provider_id")}
-				on conflict do nothing
-			`;
-		}
-
-		if (rentRows.length > 0) {
-			await sql`
-				insert into movie_rent_providers ${sql(rentRows, "movie_id", "provider_id")}
-				on conflict do nothing
-			`;
-		}
-
 		writeOut(
 			`${[
 				`Seed complete for ${DEFAULT_REGION}`,
@@ -244,8 +208,6 @@ async function main() {
 				`providers=${providers.length}`,
 				`movieGenres=${movieGenreRows.length}`,
 				`streamLinks=${streamRows.length}`,
-				`buyLinks=${buyRows.length}`,
-				`rentLinks=${rentRows.length}`,
 			].join(" | ")}\n`,
 		);
 	} finally {

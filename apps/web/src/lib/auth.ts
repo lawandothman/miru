@@ -7,8 +7,6 @@ import { env } from "@/env";
 
 const db = createDb(env.DATABASE_URL);
 
-const isDev = process.env.NODE_ENV !== "production";
-
 const vercelUrl = env.VERCEL_URL ? `https://${env.VERCEL_URL}` : undefined;
 
 export const auth = betterAuth({
@@ -24,7 +22,6 @@ export const auth = betterAuth({
 			verification: schema.verifications,
 		},
 	}),
-	emailAndPassword: { enabled: isDev },
 	plugins: [
 		nextCookies(),
 		oAuthProxy({
