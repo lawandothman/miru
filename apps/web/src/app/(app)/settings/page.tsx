@@ -2,7 +2,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { auth } from "@/lib/auth";
-import { UserAvatar } from "@/components/user-avatar";
+import { AvatarUpload } from "./avatar-upload";
 import { EditProfileForm } from "./edit-profile-form";
 import { GenrePreferencesForm } from "./genre-preferences-form";
 import { StreamingServicesForm } from "./streaming-services-form";
@@ -34,13 +34,10 @@ export default async function SettingsPage() {
 				<div className="h-24 bg-gradient-to-br from-primary/15 via-primary/5 to-transparent" />
 				<div className="px-6 pb-6">
 					<div className="-mt-10 flex items-end gap-4">
-						<div className="shrink-0 rounded-full bg-card p-1">
-							<UserAvatar
-								name={user.name}
-								image={user.image ?? null}
-								size="xl"
-							/>
-						</div>
+						<AvatarUpload
+							name={user.name}
+							image={user.image ?? null}
+						/>
 						<div className="min-w-0 pb-1">
 							<h2 className="truncate font-display text-lg font-semibold">
 								{user.name}
