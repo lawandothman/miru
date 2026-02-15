@@ -71,14 +71,16 @@ export function FollowersDialog({
 
 			{isMobile && (
 				<Drawer open={open} onOpenChange={setOpen}>
-					<DrawerContent className="inset-x-0 bottom-0 mt-24 max-h-[80vh] rounded-t-lg border-t">
+					<DrawerContent className="inset-x-0 bottom-0 mt-10 max-h-[96vh] rounded-t-lg border-t">
 						<DrawerHeader>
 							<DrawerTitle>{title}</DrawerTitle>
 							<DrawerDescription className="sr-only">
 								View {title.toLowerCase()}
 							</DrawerDescription>
 						</DrawerHeader>
-						<div className="px-4 pb-4">{content}</div>
+						<div className="flex-1 overflow-y-auto px-4 pb-4">
+							{content}
+						</div>
 					</DrawerContent>
 				</Drawer>
 			)}
@@ -116,7 +118,7 @@ function UserList({ userId, mode }: { userId: string; mode: Mode }) {
 	const users = data.data ?? [];
 
 	return (
-		<div className="max-h-80 overflow-y-auto">
+		<div className="overflow-y-auto">
 			{data.isLoading ? (
 				<div className="space-y-3">
 					{Array.from(
