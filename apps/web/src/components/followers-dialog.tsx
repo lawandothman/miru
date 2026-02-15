@@ -71,7 +71,7 @@ export function FollowersDialog({
 
 			{isMobile && (
 				<Drawer open={open} onOpenChange={setOpen}>
-					<DrawerContent className="inset-x-0 bottom-0 mt-10 max-h-[96vh] rounded-t-lg border-t">
+					<DrawerContent className="inset-x-0 bottom-0 mt-10 min-h-[85vh] max-h-[96vh] rounded-t-lg border-t">
 						<DrawerHeader>
 							<DrawerTitle>{title}</DrawerTitle>
 							<DrawerDescription className="sr-only">
