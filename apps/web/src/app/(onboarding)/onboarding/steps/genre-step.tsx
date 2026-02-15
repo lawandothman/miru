@@ -56,7 +56,11 @@ interface GenreStepProps {
 	onComplete: (genreIds: number[]) => void;
 }
 
-export function GenreStep({ selectedGenres, onSelectionChange, onComplete }: GenreStepProps) {
+export function GenreStep({
+	selectedGenres,
+	onSelectionChange,
+	onComplete,
+}: GenreStepProps) {
 	const [selected, setSelected] = useState<Set<number>>(
 		new Set(selectedGenres),
 	);
