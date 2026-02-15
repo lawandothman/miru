@@ -1,6 +1,6 @@
 import { type Database, schema } from "@miru/db";
 import { TRPCError } from "@trpc/server";
-import { and, eq, ilike, ne } from "drizzle-orm";
+import { and, eq, ilike, inArray, ne } from "drizzle-orm";
 import { z } from "zod";
 import { annotateFollowStatus } from "../helpers";
 import { protectedProcedure, publicProcedure, router } from "../trpc";
@@ -54,6 +54,15 @@ function fetchUserMovieSets(db: Database, userId: string) {
 				and(
 					eq(schema.follows.followerId, userId),
 					eq(schema.follows.followingId, schema.watchedEntries.userId),
+				),
+			)
+			.where(
+				inArray(
+					schema.watchedEntries.movieId,
+					db
+						.select({ movieId: schema.watchlistEntries.movieId })
+						.from(schema.watchlistEntries)
+						.where(eq(schema.watchlistEntries.userId, userId)),
 				),
 			),
 	]);
