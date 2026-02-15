@@ -21,7 +21,7 @@ export function BottomNav({ user }: BottomNavProps) {
 	const pathname = usePathname();
 
 	return (
-		<nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border/50 bg-background/80 pb-[calc(env(safe-area-inset-bottom,0px)+0.75rem)] backdrop-blur-lg md:hidden">
+		<nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border/50 bg-background/80 pb-[calc(env(safe-area-inset-bottom,0px)+0.25rem)] backdrop-blur-lg md:hidden">
 			<div className="flex items-stretch justify-around">
 				{navItems.map((item) => {
 					const isActive =
@@ -36,7 +36,7 @@ export function BottomNav({ user }: BottomNavProps) {
 							)}
 						>
 							<item.icon
-								className="size-5"
+								className="size-6"
 								strokeWidth={isActive ? 2.5 : 1.5}
 							/>
 							<span>{item.label}</span>
@@ -54,7 +54,7 @@ export function BottomNav({ user }: BottomNavProps) {
 								: "text-muted-foreground",
 						)}
 					>
-						<Avatar className="size-5">
+						<Avatar className="size-6">
 							{user.image && <AvatarImage src={user.image} alt={user.name} />}
 							<AvatarFallback className="bg-primary/10 text-[8px] text-primary">
 								{user.name.charAt(0).toUpperCase()}
@@ -72,7 +72,7 @@ export function BottomNav({ user }: BottomNavProps) {
 								: "text-muted-foreground",
 						)}
 					>
-						<UserIcon className="size-5" strokeWidth={1.5} />
+						<UserIcon className="size-6" strokeWidth={1.5} />
 						<span>Sign In</span>
 					</Link>
 				)}
