@@ -78,9 +78,7 @@ export function FollowersDialog({
 								View {title.toLowerCase()}
 							</DrawerDescription>
 						</DrawerHeader>
-						<div className="flex-1 overflow-y-auto px-4 pb-4">
-							{content}
-						</div>
+						<div className="flex-1 overflow-y-auto px-4 pb-4">{content}</div>
 					</DrawerContent>
 				</Drawer>
 			)}

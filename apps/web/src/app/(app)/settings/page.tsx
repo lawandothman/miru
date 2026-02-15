@@ -34,10 +34,7 @@ export default async function SettingsPage() {
 				<div className="h-24 bg-gradient-to-br from-primary/15 via-primary/5 to-transparent" />
 				<div className="px-6 pb-6">
 					<div className="-mt-10 flex items-end gap-4">
-						<AvatarUpload
-							name={user.name}
-							image={user.image ?? null}
-						/>
+						<AvatarUpload name={user.name} image={user.image ?? null} />
 						<div className="min-w-0 pb-1">
 							<h2 className="truncate font-display text-lg font-semibold">
 								{user.name}

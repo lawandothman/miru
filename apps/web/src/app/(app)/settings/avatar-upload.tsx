@@ -1,8 +1,8 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { useRouter } from "next/navigation";
 import { Camera } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { Spinner } from "@/components/ui/spinner";
 import { UserAvatar } from "@/components/user-avatar";
@@ -28,7 +28,9 @@ export function AvatarUpload({ name, image }: AvatarUploadProps) {
 
 	async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
 		const file = e.target.files?.[0];
-		if (!file) return;
+		if (!file) {
+			return;
+		}
 
 		if (!ALLOWED_TYPES.has(file.type)) {
 			toast.error("Please select a JPEG, PNG, WebP, or GIF image");
