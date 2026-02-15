@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/nextjs";
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
 import { appRouter, createContext } from "@miru/trpc";
 import { db, getServerSession, tmdb } from "@/lib/server";
@@ -8,6 +9,13 @@ async function handler(req: Request) {
 	return fetchRequestHandler({
 		createContext: () => createContext({ db, session, tmdb }),
 		endpoint: "/api/trpc",
+		onError: ({ error, path }) => {
+			if (error.code === "INTERNAL_SERVER_ERROR") {
+				Sentry.captureException(error.cause ?? error, {
+					extra: { path },
+				});
+			}
+		},
 		req,
 		router: appRouter,
 	});
