@@ -1,9 +1,9 @@
 import type { MetadataRoute } from "next";
+import { env } from "@/env";
 import { trpc } from "@/lib/trpc/server";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-	const baseUrl =
-		process.env["BETTER_AUTH_URL"] ?? "https://miru-chi.vercel.app";
+	const baseUrl = env.BETTER_AUTH_URL;
 
 	const api = await trpc();
 	const genres = await api.movie.getGenres();

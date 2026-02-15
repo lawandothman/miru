@@ -3,6 +3,7 @@ import { DM_Sans, Syne } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Providers } from "@/components/providers";
 import { Toaster } from "@/components/ui/sonner";
+import { env } from "@/env";
 import "./globals.css";
 
 const syne = Syne({
@@ -28,9 +29,7 @@ export const metadata: Metadata = {
 		"watch together",
 		"film",
 	],
-	metadataBase: new URL(
-		process.env["BETTER_AUTH_URL"] ?? "https://miru-chi.vercel.app",
-	),
+	metadataBase: new URL(env.BETTER_AUTH_URL),
 	openGraph: {
 		description:
 			"Build your watchlist, follow friends, and instantly see which movies you both want to watch.",

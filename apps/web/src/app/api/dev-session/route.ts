@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
 import { createDb, schema, eq } from "@miru/db";
+import { env } from "@/env";
+import { auth } from "@/lib/auth";
 
 const DEV_EMAIL = "dev@localhost.test";
 const DEV_PASSWORD = "dev-password-local-only";
@@ -32,7 +33,7 @@ export async function GET(request: Request) {
 		// Sign-in failed
 	}
 
-	const db = createDb(process.env["DATABASE_URL"] ?? "");
+	const db = createDb(env.DATABASE_URL);
 	const existing = await db.query.users.findFirst({
 		where: eq(schema.users.email, DEV_EMAIL),
 	});

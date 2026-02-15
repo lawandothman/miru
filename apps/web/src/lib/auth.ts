@@ -2,13 +2,14 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
 import { createDb, schema } from "@miru/db";
+import { env } from "@/env";
 
-const db = createDb(process.env["DATABASE_URL"] ?? "");
+const db = createDb(env.DATABASE_URL);
 
 const isDev = process.env.NODE_ENV !== "production";
 
 export const auth = betterAuth({
-	baseURL: process.env["BETTER_AUTH_URL"],
+	baseURL: env.BETTER_AUTH_URL,
 	database: drizzleAdapter(db, {
 		provider: "pg",
 		schema: {
@@ -23,8 +24,8 @@ export const auth = betterAuth({
 	plugins: [nextCookies()],
 	socialProviders: {
 		google: {
-			clientId: process.env["GOOGLE_CLIENT_ID"] ?? "",
-			clientSecret: process.env["GOOGLE_CLIENT_SECRET"] ?? "",
+			clientId: env.GOOGLE_CLIENT_ID ?? "",
+			clientSecret: env.GOOGLE_CLIENT_SECRET ?? "",
 		},
 	},
 	user: {
