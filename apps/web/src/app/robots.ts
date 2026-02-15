@@ -1,8 +1,8 @@
 import type { MetadataRoute } from "next";
+import { env } from "@/env";
 
 export default function robots(): MetadataRoute.Robots {
-	const baseUrl =
-		process.env["BETTER_AUTH_URL"] ?? "https://miru-chi.vercel.app";
+	const baseUrl = env.BETTER_AUTH_URL;
 
 	return {
 		rules: {

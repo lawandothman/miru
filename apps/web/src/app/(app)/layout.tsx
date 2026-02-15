@@ -1,9 +1,10 @@
+import * as Sentry from "@sentry/nextjs";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
 import { AppSidebar } from "@/components/app-sidebar";
 import { BottomNav } from "@/components/bottom-nav";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { auth } from "@/lib/auth";
 
 export default async function AppLayout({
 	children,
@@ -16,6 +17,10 @@ export default async function AppLayout({
 
 	if (session?.user && !session.user.onboardingCompletedAt) {
 		redirect("/onboarding");
+	}
+
+	if (session?.user) {
+		Sentry.setUser({ id: session.user.id, email: session.user.email });
 	}
 
 	const user = session?.user

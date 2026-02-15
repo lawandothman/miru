@@ -4,14 +4,15 @@ import { useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { httpBatchLink } from "@trpc/client";
 import superjson from "superjson";
+import { env } from "@/env";
 import { trpc } from "./client";
 
 function getBaseUrl() {
 	if (typeof window !== "undefined") {
 		return "";
 	}
-	if (process.env["VERCEL_URL"]) {
-		return `https://${process.env["VERCEL_URL"]}`;
+	if (env.VERCEL_URL) {
+		return `https://${env.VERCEL_URL}`;
 	}
 	return `http://localhost:3000`;
 }
