@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect } from "react";
+import * as Sentry from "@sentry/nextjs";
 import { RotateCcw } from "lucide-react";
 
 export default function AppError({
@@ -9,6 +11,9 @@ export default function AppError({
 	error: Error & { digest?: string };
 	reset: () => void;
 }) {
+	useEffect(() => {
+		Sentry.captureException(error);
+	}, [error]);
 	return (
 		<div className="relative flex flex-col items-center justify-center py-32 text-center">
 			{/* Background glow */}

@@ -1,6 +1,7 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
+import { oAuthProxy } from "better-auth/plugins";
 import { createDb, schema } from "@miru/db";
 import { env } from "@/env";
 
@@ -10,6 +11,9 @@ const isDev = process.env.NODE_ENV !== "production";
 
 export const auth = betterAuth({
 	baseURL: env.BETTER_AUTH_URL,
+	trustedOrigins: process.env["VERCEL_URL"]
+		? [`https://${process.env["VERCEL_URL"]}`]
+		: [],
 	database: drizzleAdapter(db, {
 		provider: "pg",
 		schema: {
@@ -21,7 +25,7 @@ export const auth = betterAuth({
 		},
 	}),
 	emailAndPassword: { enabled: isDev },
-	plugins: [nextCookies()],
+	plugins: [nextCookies(), oAuthProxy()],
 	socialProviders: {
 		google: {
 			clientId: env.GOOGLE_CLIENT_ID ?? "",
