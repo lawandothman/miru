@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -19,20 +19,14 @@ import {
 } from "@/app/(onboarding)/onboarding/steps/region-data";
 
 export function RegionForm() {
-	const [country, setCountry] = useState("");
-
 	const { data: state, isLoading } = trpc.onboarding.getState.useQuery();
+
+	const [country, setCountry] = useState(state?.country ?? "");
 
 	const setCountryMut = trpc.onboarding.setCountry.useMutation({
 		onSuccess: () => toast.success("Region saved"),
 		onError: () => toast.error("Failed to save region"),
 	});
-
-	useEffect(() => {
-		if (state?.country) {
-			setCountry(state.country);
-		}
-	}, [state?.country]);
 
 	if (isLoading) {
 		return (

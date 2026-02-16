@@ -1,6 +1,12 @@
 {
 	"$schema": "./node_modules/oxlint/configuration_schema.json",
 	"plugins": ["react", "nextjs", "typescript"],
+	"jsPlugins": [
+		{
+			"name": "react-compiler",
+			"specifier": "eslint-plugin-react-hooks"
+		}
+	],
 	"categories": {
 		"correctness": "error",
 		"suspicious": "error",
@@ -58,7 +64,16 @@
 		"typescript/explicit-function-return-type": "off",
 		"typescript/explicit-module-boundary-types": "off",
 		"typescript/consistent-type-imports": "off",
-		"react/iframe-missing-sandbox": "off"
+		"react/iframe-missing-sandbox": "off",
+
+		"react-compiler/purity": "error",
+		"react-compiler/hooks": "error",
+		"react-compiler/refs": "error",
+		"react-compiler/set-state-in-render": "error",
+		"react-compiler/set-state-in-effect": "warn",
+		"react-compiler/incompatible-library": "error",
+		"react-compiler/immutability": "error",
+		"react-compiler/unsupported-syntax": "warn"
 	},
 	"ignorePatterns": ["node_modules", ".next", "dist", "drizzle"]
 }

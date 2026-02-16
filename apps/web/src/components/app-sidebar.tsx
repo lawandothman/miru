@@ -30,7 +30,7 @@ const navItems = [
 	{ href: "/watched", icon: Eye, label: "Watched" },
 	{ href: "/for-you", icon: Sparkles, label: "For You" },
 	{ href: "/popular", icon: TrendingUp, label: "Popular" },
-];
+] as const;
 
 interface AppSidebarProps {
 	user: { id: string; name: string; image: string | null } | null;

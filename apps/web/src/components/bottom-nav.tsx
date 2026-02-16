@@ -11,7 +11,7 @@ const navItems = [
 	{ href: "/explore", icon: Search, label: "Explore" },
 	{ href: "/watchlist", icon: Bookmark, label: "Watchlist" },
 	{ href: "/watched", icon: Eye, label: "Watched" },
-];
+] as const;
 
 interface BottomNavProps {
 	user: { id: string; name: string; image: string | null } | null;

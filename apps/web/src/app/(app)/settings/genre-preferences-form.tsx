@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Pencil } from "lucide-react";
 import {
 	Dialog,
@@ -26,12 +26,15 @@ import { trpc } from "@/lib/trpc/client";
 import { toast } from "sonner";
 
 export function GenrePreferencesForm() {
-	const [open, setOpen] = useState(false);
-	const [selected, setSelected] = useState<Set<number>>(new Set());
 	const isMobile = useIsMobile();
 
 	const { data: genres } = trpc.movie.getGenres.useQuery();
 	const { data: state, isLoading } = trpc.onboarding.getState.useQuery();
+
+	const [open, setOpen] = useState(false);
+	const [selected, setSelected] = useState(
+		() => new Set(state?.genreIds ?? []),
+	);
 
 	const setPrefs = trpc.onboarding.setGenrePreferences.useMutation({
 		onSuccess: () => {
@@ -40,12 +43,6 @@ export function GenrePreferencesForm() {
 		},
 		onError: () => toast.error("Failed to save preferences"),
 	});
-
-	useEffect(() => {
-		if (state?.genreIds) {
-			setSelected(new Set(state.genreIds));
-		}
-	}, [state?.genreIds]);
 
 	const toggle = (id: number) => {
 		setSelected((prev) => {
