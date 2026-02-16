@@ -6,3 +6,4 @@ export {
 	type CreateContextOptions,
 } from "./context";
 export { createCallerFactory } from "./trpc";
+export { TMDBClient } from "./tmdb";

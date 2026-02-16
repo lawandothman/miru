@@ -1,5 +1,5 @@
 import { type Database, schema } from "@miru/db";
-import type { TMDB } from "@lorenzopant/tmdb";
+import type { TMDBClient } from "../tmdb";
 import { TRPCError } from "@trpc/server";
 import { and, count, desc, eq, inArray, notInArray } from "drizzle-orm";
 import { z } from "zod";
@@ -75,7 +75,9 @@ export const movieRouter = router({
 			});
 
 			const isStale =
-				!existing || Date.now() - existing.updatedAt.getTime() > STALE_AFTER_MS;
+				!existing ||
+				Date.now() - existing.updatedAt.getTime() > STALE_AFTER_MS ||
+				existing.runtime === null;
 
 			const movie = isStale
 				? await refreshMovie(
@@ -381,15 +383,32 @@ export const movieRouter = router({
 		}),
 
 	search: publicProcedure
-		.input(z.object({ query: z.string().min(1), page: z.number().default(1) }))
+		.input(
+			z.object({
+				query: z.string().min(1),
+				cursor: z.number().nullish(),
+				year: z.number().optional(),
+				genres: z.array(z.number()).optional(),
+			}),
+		)
 		.query(async ({ ctx, input }) => {
+			const page = input.cursor ?? 1;
 			const tmdbResults = await ctx.tmdb.search.movies({
 				query: input.query,
-				page: input.page,
+				page,
 				include_adult: false,
+				...(input.year ? { year: String(input.year) } : {}),
 			});
 
-			const safeResults = tmdbResults.results.filter((r) => !r.adult);
+			let safeResults = tmdbResults.results.filter((r) => !r.adult);
+
+			if (input.genres?.length) {
+				const genreSet = new Set(input.genres);
+				safeResults = safeResults.filter((r) =>
+					r.genre_ids.some((gid: number) => genreSet.has(gid)),
+				);
+			}
+
 			const movieIds = safeResults.map((r) => r.id);
 
 			if (movieIds.length > 0) {
@@ -431,6 +450,98 @@ export const movieRouter = router({
 				totalResults: tmdbResults.total_results,
 			};
 		}),
+
+	searchAutocomplete: publicProcedure
+		.input(z.object({ query: z.string().min(1) }))
+		.query(async ({ ctx, input }) => {
+			const tmdbResults = await ctx.tmdb.search.movies({
+				query: input.query,
+				page: 1,
+				include_adult: false,
+			});
+
+			return tmdbResults.results
+				.filter((r) => !r.adult)
+				.sort((a, b) => (b.popularity ?? 0) - (a.popularity ?? 0))
+				.slice(0, 5)
+				.map((r) => ({
+					id: r.id,
+					title: r.title,
+					posterPath: r.poster_path,
+					releaseDate: r.release_date,
+				}));
+		}),
+
+	discover: publicProcedure
+		.input(
+			z.object({
+				cursor: z.number().nullish(),
+				genres: z.array(z.number()).optional(),
+				yearGte: z.number().min(1900).max(2100).optional(),
+				yearLte: z.number().min(1900).max(2100).optional(),
+				sortBy: z
+					.enum([
+						"popularity.desc",
+						"popularity.asc",
+						"primary_release_date.desc",
+						"primary_release_date.asc",
+					])
+					.default("popularity.desc"),
+			}),
+		)
+		.query(async ({ ctx, input }) => {
+			const page = input.cursor ?? 1;
+
+			const data = await ctx.tmdb.discoverMovies({
+				genres: input.genres,
+				yearGte: input.yearGte,
+				yearLte: input.yearLte,
+				sortBy: input.sortBy,
+				page,
+			});
+
+			const safeResults = data.results.filter((r) => !r.adult);
+			const movieIds = safeResults.map((r) => r.id);
+
+			if (movieIds.length > 0) {
+				await ctx.db
+					.insert(schema.movies)
+					.values(
+						safeResults.map((result) => ({
+							id: result.id,
+							title: result.title,
+							originalTitle: result.original_title ?? null,
+							overview: result.overview ?? null,
+							posterPath: result.poster_path ?? null,
+							backdropPath: result.backdrop_path ?? null,
+							releaseDate: result.release_date ?? null,
+							adult: false,
+							popularity: result.popularity ?? null,
+						})),
+					)
+					.onConflictDoNothing();
+			}
+
+			const [watchlistSet, watchedSet] = await Promise.all([
+				getMovieIdSet(ctx, schema.watchlistEntries, movieIds),
+				getMovieIdSet(ctx, schema.watchedEntries, movieIds),
+			]);
+
+			return {
+				results: safeResults.map((r) => ({
+					id: r.id,
+					title: r.title,
+					posterPath: r.poster_path,
+					releaseDate: r.release_date,
+					overview: r.overview,
+					inWatchlist: watchlistSet.has(r.id),
+					isWatched: watchedSet.has(r.id),
+				})),
+				page: data.page,
+				totalPages: data.total_pages,
+				totalResults: data.total_results,
+			};
+		}),
 });
 
 function findMovieWithProviders(db: Database, tmdbId: number) {
@@ -454,7 +565,7 @@ interface TMDBRegionProviders {
 }
 
 async function refreshMovie(
-	ctx: { db: Database; tmdb: TMDB },
+	ctx: { db: Database; tmdb: TMDBClient },
 	tmdbId: number,
 	country?: string,
 ) {

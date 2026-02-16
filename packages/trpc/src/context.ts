@@ -1,5 +1,5 @@
 import type { Database, User } from "@miru/db";
-import type { TMDB } from "@lorenzopant/tmdb";
+import type { TMDBClient } from "./tmdb";
 
 export interface Session {
 	user: Pick<User, "id" | "email" | "name" | "image"> & {
@@ -10,7 +10,7 @@ export interface Session {
 
 export interface CreateContextOptions {
 	db: Database;
-	tmdb: TMDB;
+	tmdb: TMDBClient;
 	session: Session | null;
 }
 
