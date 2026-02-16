@@ -1,5 +1,6 @@
 import { ImageResponse } from "next/og";
 import { trpc } from "@/lib/trpc/server";
+import { movieIdFromSlug } from "@/lib/movie-slug";
 
 export const alt = "Movie on Miru";
 export const size = { width: 1200, height: 630 };
@@ -8,10 +9,10 @@ export const contentType = "image/png";
 export default async function MovieOGImage({
 	params,
 }: {
-	params: Promise<{ id: string }>;
+	params: Promise<{ slug: string }>;
 }) {
-	const { id } = await params;
-	const tmdbId = parseInt(id, 10);
+	const { slug } = await params;
+	const tmdbId = movieIdFromSlug(slug);
 
 	let movie: {
 		overview: string | null;
