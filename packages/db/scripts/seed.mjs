@@ -17,7 +17,10 @@ async function main() {
 
 	const tmdbToken =
 		process.env.TMDB_API_READ_ACCESS_TOKEN ??
-		readEnvValue(resolve(process.cwd(), ".env"), "TMDB_API_READ_ACCESS_TOKEN") ??
+		readEnvValue(
+			resolve(process.cwd(), ".env"),
+			"TMDB_API_READ_ACCESS_TOKEN",
+		) ??
 		readEnvValue(
 			resolve(process.cwd(), "../../apps/web/.env"),
 			"TMDB_API_READ_ACCESS_TOKEN",
@@ -35,13 +38,21 @@ async function main() {
 		writeOut(`Seeding minimal TMDB catalog for region ${DEFAULT_REGION}...\n`);
 
 		const [genresResponse, providersResponse] = await Promise.all([
-			tmdbRequest("/genre/movie/list", {
-				language: "en-US",
-			}, tmdbToken),
-			tmdbRequest("/watch/providers/movie", {
-				language: "en-US",
-				watch_region: DEFAULT_REGION,
-			}, tmdbToken),
+			tmdbRequest(
+				"/genre/movie/list",
+				{
+					language: "en-US",
+				},
+				tmdbToken,
+			),
+			tmdbRequest(
+				"/watch/providers/movie",
+				{
+					language: "en-US",
+					watch_region: DEFAULT_REGION,
+				},
+				tmdbToken,
+			),
 		]);
 
 		const genres = (genresResponse.genres ?? []).map((genre) => ({
@@ -58,20 +69,26 @@ async function main() {
 
 		const discoveredMovies = [];
 		for (let page = 1; page <= DISCOVER_PAGES; page += 1) {
-			const discoverResponse = await tmdbRequest("/discover/movie", {
-				include_adult: "false",
-				include_video: "false",
-				language: "en-US",
-				page: String(page),
-				sort_by: "popularity.desc",
-				watch_region: DEFAULT_REGION,
-				with_original_language: "en",
-			}, tmdbToken);
+			const discoverResponse = await tmdbRequest(
+				"/discover/movie",
+				{
+					include_adult: "false",
+					include_video: "false",
+					language: "en-US",
+					page: String(page),
+					sort_by: "popularity.desc",
+					watch_region: DEFAULT_REGION,
+					with_original_language: "en",
+				},
+				tmdbToken,
+			);
 
 			discoveredMovies.push(...(discoverResponse.results ?? []));
 		}
 
-		const uniqueMovieMap = new Map(discoveredMovies.map((movie) => [movie.id, movie]));
+		const uniqueMovieMap = new Map(
+			discoveredMovies.map((movie) => [movie.id, movie]),
+		);
 		const uniqueMovies = [...uniqueMovieMap.values()];
 
 		if (uniqueMovies.length === 0) {
@@ -82,12 +99,15 @@ async function main() {
 		}
 
 		const providerMap = new Map(
-			(providersResponse.results ?? []).map((provider) => [provider.provider_id, {
-				display_priority: provider.display_priority ?? null,
-				id: provider.provider_id,
-				logo_path: provider.logo_path ?? null,
-				name: provider.provider_name,
-			}]),
+			(providersResponse.results ?? []).map((provider) => [
+				provider.provider_id,
+				{
+					display_priority: provider.display_priority ?? null,
+					id: provider.provider_id,
+					logo_path: provider.logo_path ?? null,
+					name: provider.provider_name,
+				},
+			]),
 		);
 
 		const movieRows = uniqueMovies.map((movie) => ({
@@ -136,10 +156,12 @@ async function main() {
 		`;
 
 		const movieGenreRows = uniqueMovies
-			.flatMap((movie) => (movie.genre_ids ?? []).map((genreId) => ({
-				genre_id: genreId,
-				movie_id: movie.id,
-			})))
+			.flatMap((movie) =>
+				(movie.genre_ids ?? []).map((genreId) => ({
+					genre_id: genreId,
+					movie_id: movie.id,
+				})),
+			)
 			.filter((entry) => genres.some((genre) => genre.id === entry.genre_id));
 
 		if (movieGenreRows.length > 0) {
@@ -171,7 +193,10 @@ async function main() {
 						logo_path: provider.logo_path ?? null,
 						name: provider.provider_name,
 					});
-					streamRows.push({ movie_id: movieId, provider_id: provider.provider_id });
+					streamRows.push({
+						movie_id: movieId,
+						provider_id: provider.provider_id,
+					});
 				}
 			}
 		}
