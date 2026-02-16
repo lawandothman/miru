@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { MoviePoster } from "./movie-poster";
 import { MovieGridSkeleton } from "./movie-grid";
 import { Spinner } from "@/components/ui/spinner";
@@ -29,13 +29,17 @@ export function InfiniteMovieGrid({
 	emptyMessage = "No movies found",
 }: InfiniteMovieGridProps) {
 	const sentinelRef = useRef<HTMLDivElement>(null);
-	const isFetchingRef = useRef(isFetching);
-	const onLoadMoreRef = useRef(onLoadMore);
 
-	isFetchingRef.current = isFetching;
-	onLoadMoreRef.current = onLoadMore;
+	const handleIntersect = useCallback(
+		(entries: IntersectionObserverEntry[]) => {
+			if (entries[0]?.isIntersecting && !isFetching) {
+				onLoadMore();
+			}
+		},
+		[isFetching, onLoadMore],
+	);
 
-	// Stable observer — recreate when hasMore or isLoading changes
+	// Stable observer — recreate when hasMore, isLoading, or callback identity changes
 	// isLoading is needed because the sentinel isn't mounted during the loading state
 	useEffect(() => {
 		const el = sentinelRef.current;
@@ -43,18 +47,13 @@ export function InfiniteMovieGrid({
 			return;
 		}
 
-		const observer = new IntersectionObserver(
-			(entries) => {
-				if (entries[0]?.isIntersecting && !isFetchingRef.current) {
-					onLoadMoreRef.current();
-				}
-			},
-			{ rootMargin: "400px" },
-		);
+		const observer = new IntersectionObserver(handleIntersect, {
+			rootMargin: "400px",
+		});
 
 		observer.observe(el);
 		return () => observer.disconnect();
-	}, [hasMore, isLoading]);
+	}, [hasMore, isLoading, handleIntersect]);
 
 	// When fetching completes, check if sentinel is still visible to continue loading
 	useEffect(() => {

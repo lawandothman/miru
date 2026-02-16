@@ -19,6 +19,7 @@
 		"db:push": "turbo db:push"
 	},
 	"devDependencies": {
+		"eslint-plugin-react-hooks": "^7.0.1",
 		"oxfmt": "0.32.0",
 		"oxlint": "1.47.0",
 		"turbo": "2.8.8"

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import {
 	Dialog,
@@ -40,10 +40,6 @@ export function FollowersDialog({
 	const [mode, setMode] = useState<Mode>("followers");
 	const isMobile = useIsMobile();
 
-	useEffect(() => {
-		setOpen(false);
-	}, [isMobile]);
-
 	const openWith = (m: Mode) => {
 		setMode(m);
 		setOpen(true);
@@ -69,33 +65,29 @@ export function FollowersDialog({
 				<strong className="text-foreground">{followingCount}</strong> following
 			</button>
 
-			{isMobile && (
-				<Drawer open={open} onOpenChange={setOpen}>
-					<DrawerContent className="inset-x-0 bottom-0 mt-10 min-h-[85vh] max-h-[96vh] rounded-t-lg border-t">
-						<DrawerHeader>
-							<DrawerTitle>{title}</DrawerTitle>
-							<DrawerDescription className="sr-only">
-								View {title.toLowerCase()}
-							</DrawerDescription>
-						</DrawerHeader>
-						<div className="flex-1 overflow-y-auto px-4 pb-4">{content}</div>
-					</DrawerContent>
-				</Drawer>
-			)}
+			<Drawer open={isMobile && open} onOpenChange={setOpen}>
+				<DrawerContent className="inset-x-0 bottom-0 mt-10 min-h-[85vh] max-h-[96vh] rounded-t-lg border-t">
+					<DrawerHeader>
+						<DrawerTitle>{title}</DrawerTitle>
+						<DrawerDescription className="sr-only">
+							View {title.toLowerCase()}
+						</DrawerDescription>
+					</DrawerHeader>
+					<div className="flex-1 overflow-y-auto px-4 pb-4">{content}</div>
+				</DrawerContent>
+			</Drawer>
 
-			{!isMobile && (
-				<Dialog open={open} onOpenChange={setOpen}>
-					<DialogContent showCloseButton>
-						<DialogHeader>
-							<DialogTitle>{title}</DialogTitle>
-							<DialogDescription className="sr-only">
-								View {title.toLowerCase()}
-							</DialogDescription>
-						</DialogHeader>
-						{content}
-					</DialogContent>
-				</Dialog>
-			)}
+			<Dialog open={!isMobile && open} onOpenChange={setOpen}>
+				<DialogContent showCloseButton>
+					<DialogHeader>
+						<DialogTitle>{title}</DialogTitle>
+						<DialogDescription className="sr-only">
+							View {title.toLowerCase()}
+						</DialogDescription>
+					</DialogHeader>
+					{content}
+				</DialogContent>
+			</Dialog>
 		</>
 	);
 }

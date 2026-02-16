@@ -3,6 +3,8 @@ import type { NextConfig } from "next";
 import { withSentryConfig } from "@sentry/nextjs";
 
 const nextConfig: NextConfig = {
+	reactCompiler: true,
+	typedRoutes: true,
 	images: {
 		remotePatterns: [
 			{

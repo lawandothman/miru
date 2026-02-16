@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import { Pencil } from "lucide-react";
 import {
@@ -27,13 +27,16 @@ import { trpc } from "@/lib/trpc/client";
 import { toast } from "sonner";
 
 export function StreamingServicesForm() {
-	const [open, setOpen] = useState(false);
-	const [selected, setSelected] = useState<Set<number>>(new Set());
-	const [search, setSearch] = useState("");
 	const isMobile = useIsMobile();
 
 	const { data: providers } = trpc.movie.getWatchProviders.useQuery();
 	const { data: state, isLoading } = trpc.onboarding.getState.useQuery();
+
+	const [open, setOpen] = useState(false);
+	const [selected, setSelected] = useState(
+		() => new Set(state?.providerIds ?? []),
+	);
+	const [search, setSearch] = useState("");
 
 	const setServices = trpc.onboarding.setStreamingServices.useMutation({
 		onSuccess: () => {
@@ -42,12 +45,6 @@ export function StreamingServicesForm() {
 		},
 		onError: () => toast.error("Failed to save streaming services"),
 	});
-
-	useEffect(() => {
-		if (state?.providerIds) {
-			setSelected(new Set(state.providerIds));
-		}
-	}, [state?.providerIds]);
 
 	const handleOpenChange = (value: boolean) => {
 		setOpen(value);
