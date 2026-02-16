@@ -1,11 +1,11 @@
-import type { TMDB } from "@lorenzopant/tmdb";
 import { type Database, schema } from "@miru/db";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
+import type { TMDBClient } from "../tmdb";
 
 export async function ensureMovieExists(
 	db: Database,
-	tmdb: TMDB,
+	tmdb: TMDBClient,
 	movieId: number,
 ) {
 	const existing = await db.query.movies.findFirst({

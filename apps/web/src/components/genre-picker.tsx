@@ -23,7 +23,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const genreIcons: Record<string, LucideIcon> = {
+export const genreIcons: Record<string, LucideIcon> = {
 	Action: Sword,
 	Adventure: Map,
 	Animation: Film,

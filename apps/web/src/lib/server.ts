@@ -1,14 +1,13 @@
 import "server-only";
 
 import { headers } from "next/headers";
-import { TMDB } from "@lorenzopant/tmdb";
 import { createDb } from "@miru/db";
-import type { Session } from "@miru/trpc";
+import { type Session, TMDBClient } from "@miru/trpc";
 import { env } from "@/env";
 import { auth } from "@/lib/auth";
 
 export const db = createDb(env.DATABASE_URL);
-export const tmdb = new TMDB(env.TMDB_API_READ_ACCESS_TOKEN);
+export const tmdb = new TMDBClient(env.TMDB_API_READ_ACCESS_TOKEN);
 
 export async function getServerSession(): Promise<Session | null> {
 	const session = await auth.api.getSession({
