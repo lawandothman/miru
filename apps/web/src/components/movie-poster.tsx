@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { movieSlug } from "@/lib/movie-slug";
 
 interface MoviePosterProps {
 	id: number;
@@ -19,7 +20,7 @@ export function MoviePoster({
 }: MoviePosterProps) {
 	return (
 		<Link
-			href={`/movie/${id}`}
+			href={`/movie/${movieSlug(title, id)}`}
 			className={cn(
 				"group relative block overflow-hidden rounded-lg [content-visibility:auto] [contain-intrinsic-size:auto_300px]",
 				className,

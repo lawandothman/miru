@@ -1,8 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { trpc } from "@/lib/trpc/server";
+import { movieIdFromSlug, movieSlug } from "@/lib/movie-slug";
 import { ShareButton } from "@/components/share-button";
 import { WatchedButton } from "@/components/watched-button";
 import { WatchlistButton } from "@/components/watchlist-button";
@@ -10,19 +11,27 @@ import { UserAvatar } from "@/components/user-avatar";
 import { Badge } from "@/components/ui/badge";
 
 interface MoviePageProps {
-	params: Promise<{ id: string }>;
+	params: Promise<{ slug: string }>;
 }
 
 export async function generateMetadata({
 	params,
 }: MoviePageProps): Promise<Metadata> {
-	const { id } = await params;
+	const { slug } = await params;
+	const tmdbId = movieIdFromSlug(slug);
+	if (isNaN(tmdbId)) {
+		return { title: "Movie" };
+	}
+
 	const api = await trpc();
 	try {
-		const movie = await api.movie.getById({ tmdbId: parseInt(id, 10) });
+		const movie = await api.movie.getById({ tmdbId });
 		const year = movie.releaseDate?.split("-")[0];
 		const title = year ? `${movie.title} (${year})` : movie.title;
 		return {
+			alternates: {
+				canonical: `/movie/${movieSlug(movie.title, tmdbId)}`,
+			},
 			description: movie.overview ?? undefined,
 			openGraph: {
 				description: movie.overview ?? undefined,
@@ -37,8 +46,8 @@ export async function generateMetadata({
 }
 
 export default async function MoviePage({ params }: MoviePageProps) {
-	const { id } = await params;
-	const tmdbId = parseInt(id, 10);
+	const { slug } = await params;
+	const tmdbId = movieIdFromSlug(slug);
 	if (isNaN(tmdbId)) {
 		notFound();
 	}
@@ -50,6 +59,12 @@ export default async function MoviePage({ params }: MoviePageProps) {
 		movie = await api.movie.getById({ tmdbId });
 	} catch {
 		notFound();
+	}
+
+	// Redirect to canonical slug if the URL doesn't match
+	const canonical = movieSlug(movie.title, tmdbId);
+	if (slug !== canonical) {
+		redirect(`/movie/${canonical}`);
 	}
 
 	const year = movie.releaseDate?.split("-")[0];
@@ -213,11 +228,10 @@ export default async function MoviePage({ params }: MoviePageProps) {
 					</h2>
 					<div className="aspect-video overflow-hidden rounded-xl">
 						<iframe
-							src={`https://www.youtube.com/embed/${movie.trailerKey}`}
+							src={`https://www.youtube-nocookie.com/embed/${movie.trailerKey}`}
 							title={`${movie.title} trailer`}
 							allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
 							allowFullScreen
-							sandbox="allow-scripts allow-same-origin allow-presentation"
 							loading="lazy"
 							className="h-full w-full"
 						/>
