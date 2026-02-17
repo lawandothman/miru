@@ -11,8 +11,6 @@ export const env = createEnv({
 		TMDB_API_READ_ACCESS_TOKEN: z.string().min(1),
 		BLOB_READ_WRITE_TOKEN: z.string().optional(),
 		SENTRY_AUTH_TOKEN: z.string().optional(),
-		VERCEL_URL: z.string().optional(),
-		VERCEL_BRANCH_URL: z.string().optional(),
 	},
 	client: {
 		NEXT_PUBLIC_SENTRY_DSN: z.string().url().optional(),

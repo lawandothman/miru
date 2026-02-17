@@ -1,23 +1,13 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
-import { oAuthProxy } from "better-auth/plugins";
 import { createDb, schema } from "@miru/db";
 import { env } from "@/env";
 
 const db = createDb(env.DATABASE_URL);
 
-const isPreview = process.env["VERCEL_ENV"] === "preview";
-const vercelUrl = isPreview
-	? env.VERCEL_BRANCH_URL
-		? `https://${env.VERCEL_BRANCH_URL}`
-		: env.VERCEL_URL
-			? `https://${env.VERCEL_URL}`
-			: undefined
-	: undefined;
-
 export const auth = betterAuth({
-	baseURL: vercelUrl ?? env.BETTER_AUTH_URL,
+	baseURL: env.BETTER_AUTH_URL,
 	trustedOrigins: ["https://*.vercel.app"],
 	database: drizzleAdapter(db, {
 		provider: "pg",
@@ -29,18 +19,11 @@ export const auth = betterAuth({
 			verification: schema.verifications,
 		},
 	}),
-	plugins: [
-		nextCookies(),
-		oAuthProxy({
-			currentURL: vercelUrl ?? env.BETTER_AUTH_URL,
-			productionURL: env.BETTER_AUTH_URL,
-		}),
-	],
+	plugins: [nextCookies()],
 	socialProviders: {
 		google: {
 			clientId: env.GOOGLE_CLIENT_ID ?? "",
 			clientSecret: env.GOOGLE_CLIENT_SECRET ?? "",
-			redirectURI: `${env.BETTER_AUTH_URL}/api/auth/callback/google`,
 		},
 	},
 	user: {
