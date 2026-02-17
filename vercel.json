@@ -1,0 +1,8 @@
+{
+	"crons": [
+		{
+			"path": "/api/cron/seed-trending",
+			"schedule": "0 4 * * *"
+		}
+	]
+}
