@@ -69,7 +69,7 @@ async function DashboardMatches() {
 				</EmptyHeader>
 				<EmptyContent>
 					<Button asChild>
-						<Link href="/explore">Find Friends</Link>
+						<Link href="/discover">Find Friends</Link>
 					</Button>
 				</EmptyContent>
 			</Empty>

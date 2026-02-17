@@ -59,7 +59,7 @@ async function WatchedContent() {
 				</EmptyHeader>
 				<EmptyContent>
 					<Button asChild>
-						<Link href="/explore">Find Movies</Link>
+						<Link href="/discover">Find Movies</Link>
 					</Button>
 				</EmptyContent>
 			</Empty>

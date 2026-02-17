@@ -2,15 +2,21 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Bookmark, Eye, Home, Search, User as UserIcon } from "lucide-react";
+import {
+	Bookmark,
+	Compass,
+	Home,
+	Sparkles,
+	User as UserIcon,
+} from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 
 const navItems = [
 	{ href: "/dashboard", icon: Home, label: "Home" },
-	{ href: "/explore", icon: Search, label: "Explore" },
+	{ href: "/discover", icon: Compass, label: "Discover" },
 	{ href: "/watchlist", icon: Bookmark, label: "Watchlist" },
-	{ href: "/watched", icon: Eye, label: "Watched" },
+	{ href: "/for-you", icon: Sparkles, label: "For You" },
 ] as const;
 
 interface BottomNavProps {
@@ -21,7 +27,7 @@ export function BottomNav({ user }: BottomNavProps) {
 	const pathname = usePathname();
 
 	return (
-		<nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border/50 bg-background/80 pb-[calc(env(safe-area-inset-bottom,0px)+0.25rem)] backdrop-blur-lg md:hidden">
+		<nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border/20 bg-background/60 pb-[calc(env(safe-area-inset-bottom,0px))] backdrop-blur-2xl backdrop-saturate-150 md:hidden">
 			<div className="flex items-stretch justify-around">
 				{navItems.map((item) => {
 					const isActive =
@@ -31,15 +37,24 @@ export function BottomNav({ user }: BottomNavProps) {
 							key={item.href}
 							href={item.href}
 							className={cn(
-								"flex min-h-16 flex-1 flex-col items-center justify-center gap-0.5 text-[10px] transition-colors active:bg-muted/50",
-								isActive ? "text-foreground" : "text-muted-foreground",
+								"relative flex min-h-[52px] flex-1 flex-col items-center justify-center gap-0.5 text-[10px] font-medium transition-colors duration-200",
+								isActive
+									? "text-foreground"
+									: "text-muted-foreground active:text-foreground",
 							)}
 						>
 							<item.icon
-								className="size-6"
-								strokeWidth={isActive ? 2.5 : 1.5}
+								className="size-[22px]"
+								strokeWidth={isActive ? 2.4 : 1.5}
 							/>
 							<span>{item.label}</span>
+							{/* Active dot indicator */}
+							<span
+								className={cn(
+									"absolute bottom-1.5 size-1 rounded-full bg-primary transition-all duration-300",
+									isActive ? "scale-100 opacity-100" : "scale-0 opacity-0",
+								)}
+							/>
 						</Link>
 					);
 				})}
@@ -48,31 +63,45 @@ export function BottomNav({ user }: BottomNavProps) {
 					<Link
 						href={`/user/${user.id}`}
 						className={cn(
-							"flex min-h-16 flex-1 flex-col items-center justify-center gap-0.5 text-[10px] transition-colors active:bg-muted/50",
+							"relative flex min-h-[52px] flex-1 flex-col items-center justify-center gap-0.5 text-[10px] font-medium transition-colors duration-200",
 							pathname === `/user/${user.id}`
 								? "text-foreground"
-								: "text-muted-foreground",
+								: "text-muted-foreground active:text-foreground",
 						)}
 					>
-						<Avatar className="size-6">
+						<Avatar
+							className={cn(
+								"size-[22px] transition-all duration-200",
+								pathname === `/user/${user.id}` &&
+									"ring-[1.5px] ring-primary ring-offset-1 ring-offset-background",
+							)}
+						>
 							{user.image && <AvatarImage src={user.image} alt={user.name} />}
-							<AvatarFallback className="bg-primary/10 text-[8px] text-primary">
+							<AvatarFallback className="bg-primary/15 text-[7px] font-bold text-primary">
 								{user.name.charAt(0).toUpperCase()}
 							</AvatarFallback>
 						</Avatar>
 						<span>Profile</span>
+						<span
+							className={cn(
+								"absolute bottom-1.5 size-1 rounded-full bg-primary transition-all duration-300",
+								pathname === `/user/${user.id}`
+									? "scale-100 opacity-100"
+									: "scale-0 opacity-0",
+							)}
+						/>
 					</Link>
 				) : (
 					<Link
 						href="/signin"
 						className={cn(
-							"flex min-h-16 flex-1 flex-col items-center justify-center gap-0.5 text-[10px] transition-colors active:bg-muted/50",
+							"relative flex min-h-[52px] flex-1 flex-col items-center justify-center gap-0.5 text-[10px] font-medium transition-colors duration-200",
 							pathname === "/signin"
 								? "text-foreground"
-								: "text-muted-foreground",
+								: "text-muted-foreground active:text-foreground",
 						)}
 					>
-						<UserIcon className="size-6" strokeWidth={1.5} />
+						<UserIcon className="size-[22px]" strokeWidth={1.5} />
 						<span>Sign In</span>
 					</Link>
 				)}
