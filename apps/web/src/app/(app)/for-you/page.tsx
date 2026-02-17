@@ -69,7 +69,7 @@ async function ForYouContent() {
 				</EmptyHeader>
 				<EmptyContent>
 					<Button asChild>
-						<Link href="/discover">Discover Movies</Link>
+						<Link href="/explore">Discover Movies</Link>
 					</Button>
 				</EmptyContent>
 			</Empty>
