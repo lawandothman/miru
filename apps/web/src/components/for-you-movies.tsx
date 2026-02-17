@@ -30,6 +30,7 @@ export function ForYouMovies() {
 				id: m.id,
 				posterPath: m.posterPath,
 				title: m.title,
+				reason: m.reason,
 			}))}
 			hasMore={(query.data?.pages.at(-1)?.length ?? PAGE_SIZE) >= PAGE_SIZE}
 			isFetching={query.isFetchingNextPage}

@@ -1,9 +1,17 @@
 import { type Database, schema } from "@miru/db";
 import type { TMDBClient } from "../tmdb";
 import { TRPCError } from "@trpc/server";
-import { and, count, desc, eq, inArray, notInArray } from "drizzle-orm";
+import { and, count, desc, eq, inArray } from "drizzle-orm";
 import { z } from "zod";
 import { protectedProcedure, publicProcedure, router } from "../trpc";
+import {
+	computeUserGenreWeights,
+	diversityRerank,
+	enrichExplanations,
+	findSimilarUsers,
+	getRecommendedMovies,
+	selectExplanation,
+} from "./recommendation-engine";
 
 const STALE_AFTER_MS = 24 * 60 * 60 * 1000; // 24 hours
 const GENRES_CACHE_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
@@ -164,8 +172,14 @@ export const movieRouter = router({
 		.query(async ({ ctx, input }) => {
 			const userId = ctx.session.user.id;
 			const offset = input.cursor ?? 0;
-			// Get user's existing watchlist and watched to exclude
-			const [existingWatchlist, existingWatched] = await Promise.all([
+
+			// Gather user context in parallel
+			const [
+				existingWatchlist,
+				existingWatched,
+				genreWeights,
+				userStreamingServices,
+			] = await Promise.all([
 				ctx.db
 					.select({ movieId: schema.watchlistEntries.movieId })
 					.from(schema.watchlistEntries)
@@ -174,104 +188,81 @@ export const movieRouter = router({
 					.select({ movieId: schema.watchedEntries.movieId })
 					.from(schema.watchedEntries)
 					.where(eq(schema.watchedEntries.userId, userId)),
+				computeUserGenreWeights(ctx.db, userId),
+				ctx.db
+					.select({ providerId: schema.userStreamingServices.providerId })
+					.from(schema.userStreamingServices)
+					.where(eq(schema.userStreamingServices.userId, userId)),
 			]);
 
-			const excludeIds = [
+			const userMovieIds = [
 				...existingWatchlist.map((e) => e.movieId),
 				...existingWatched.map((e) => e.movieId),
 			];
+			const excludeIds = [...userMovieIds];
+			const userStreamingProviderIds = userStreamingServices.map(
+				(s) => s.providerId,
+			);
 
-			const excludeCondition =
-				excludeIds.length > 0
-					? notInArray(schema.movies.id, excludeIds)
-					: undefined;
+			// Find similar users for collaborative filtering
+			const similarUsers = await findSimilarUsers(ctx.db, userId, userMovieIds);
 
-			// Friend-recommended movies (original logic)
-			const friendMovies = await ctx.db
-				.select({
-					id: schema.movies.id,
-					title: schema.movies.title,
-					posterPath: schema.movies.posterPath,
-					releaseDate: schema.movies.releaseDate,
-					friendCount: count(schema.follows.followingId),
-				})
-				.from(schema.follows)
-				.innerJoin(
-					schema.watchlistEntries,
-					eq(schema.watchlistEntries.userId, schema.follows.followingId),
-				)
-				.innerJoin(
-					schema.movies,
-					eq(schema.movies.id, schema.watchlistEntries.movieId),
-				)
-				.where(
-					and(
-						eq(schema.follows.followerId, userId),
-						eq(schema.movies.adult, false),
-						excludeCondition,
-					),
-				)
-				.groupBy(schema.movies.id)
-				.orderBy(desc(count(schema.follows.followingId)))
-				.limit(input.limit)
-				.offset(offset);
+			// Get all scored candidates
+			const scoredMovies = await getRecommendedMovies(
+				ctx.db,
+				userId,
+				genreWeights,
+				similarUsers,
+				excludeIds,
+				userStreamingProviderIds,
+			);
 
-			// If we have enough friend movies, return them
-			if (friendMovies.length >= input.limit) {
-				return friendMovies.map((m) => ({
-					...m,
-					inWatchlist: false,
-					isWatched: false,
-				}));
+			// Fetch genres for diversity reranking
+			const candidateIds = scoredMovies.map((m) => m.id);
+			const movieGenreRows =
+				candidateIds.length > 0
+					? await ctx.db
+							.select({
+								movieId: schema.movieGenres.movieId,
+								genreId: schema.movieGenres.genreId,
+							})
+							.from(schema.movieGenres)
+							.where(inArray(schema.movieGenres.movieId, candidateIds))
+					: [];
+
+			const movieGenreMap = new Map<number, number[]>();
+			for (const row of movieGenreRows) {
+				const existing = movieGenreMap.get(row.movieId) ?? [];
+				existing.push(row.genreId);
+				movieGenreMap.set(row.movieId, existing);
 			}
 
-			// Fill remaining slots with genre-based recommendations
-			const genrePrefs = await ctx.db
-				.select({ genreId: schema.userGenrePreferences.genreId })
-				.from(schema.userGenrePreferences)
-				.where(eq(schema.userGenrePreferences.userId, userId));
+			// Diversity re-rank the full list, then paginate
+			const reranked = diversityRerank(
+				scoredMovies,
+				movieGenreMap,
+				genreWeights,
+				scoredMovies.length,
+			);
 
-			const friendMovieIds = new Set(friendMovies.map((m) => m.id));
-			const remaining = input.limit - friendMovies.length;
+			const page = reranked.slice(offset, offset + input.limit);
 
-			let genreMovies: typeof friendMovies = [];
-			if (genrePrefs.length > 0) {
-				const genreIds = genrePrefs.map((p) => p.genreId);
-				const allExcludeIds = [...excludeIds, ...friendMovieIds];
-
-				genreMovies = (
-					await ctx.db
-						.select({
-							id: schema.movies.id,
-							title: schema.movies.title,
-							posterPath: schema.movies.posterPath,
-							releaseDate: schema.movies.releaseDate,
-						})
-						.from(schema.movieGenres)
-						.innerJoin(
-							schema.movies,
-							eq(schema.movies.id, schema.movieGenres.movieId),
-						)
-						.where(
-							and(
-								inArray(schema.movieGenres.genreId, genreIds),
-								eq(schema.movies.adult, false),
-								allExcludeIds.length > 0
-									? notInArray(schema.movies.id, allExcludeIds)
-									: undefined,
-							),
-						)
-						.groupBy(schema.movies.id)
-						.orderBy(desc(schema.movies.tmdbVoteCount))
-						.limit(remaining)
-				).map((m) => ({ ...m, friendCount: 0 }));
-			}
-
-			return [...friendMovies, ...genreMovies].map((m) => ({
-				...m,
-				inWatchlist: false,
-				isWatched: false,
+			// Select explanations
+			const results = page.map((m) => ({
+				id: m.id,
+				title: m.title,
+				posterPath: m.posterPath,
+				releaseDate: m.releaseDate,
+				friendCount: m.friendCount,
+				inWatchlist: false as const,
+				isWatched: false as const,
+				reason: selectExplanation(m),
 			}));
+
+			// Enrich explanations (fills in "because you watched X" titles, provider names)
+			await enrichExplanations(ctx.db, userId, results);
+
+			return results;
 		}),
 
 	getGenreById: publicProcedure
