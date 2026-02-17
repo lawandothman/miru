@@ -3,12 +3,17 @@
 import { useCallback, useEffect, useRef } from "react";
 import { MoviePoster } from "./movie-poster";
 import { MovieGridSkeleton } from "./movie-grid";
+import {
+	type RecommendationReason,
+	RecommendationBadge,
+} from "./recommendation-badge";
 import { Spinner } from "@/components/ui/spinner";
 
 interface Movie {
 	id: number;
 	title: string;
 	posterPath: string | null;
+	reason?: RecommendationReason;
 }
 
 interface InfiniteMovieGridProps {
@@ -87,6 +92,11 @@ export function InfiniteMovieGrid({
 						title={movie.title}
 						posterPath={movie.posterPath}
 						priority={i < 10}
+						badge={
+							movie.reason ? (
+								<RecommendationBadge reason={movie.reason} />
+							) : undefined
+						}
 					/>
 				))}
 			</div>

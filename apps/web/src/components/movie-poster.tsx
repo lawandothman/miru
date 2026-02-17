@@ -9,6 +9,7 @@ interface MoviePosterProps {
 	posterPath: string | null;
 	className?: string;
 	priority?: boolean;
+	badge?: React.ReactNode;
 }
 
 export function MoviePoster({
@@ -17,6 +18,7 @@ export function MoviePoster({
 	posterPath,
 	className,
 	priority,
+	badge,
 }: MoviePosterProps) {
 	return (
 		<Link
@@ -42,6 +44,11 @@ export function MoviePoster({
 					</div>
 				)}
 			</div>
+			{badge && (
+				<div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-2.5 pb-2 pt-6 transition-opacity duration-200 group-hover:opacity-0">
+					{badge}
+				</div>
+			)}
 			<div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-3 pt-8 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
 				<p className="text-sm font-medium text-white line-clamp-2">{title}</p>
 			</div>

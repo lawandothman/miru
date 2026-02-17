@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
+import { Sparkles } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { trpc } from "@/lib/trpc/server";
 import { ForYouMovies } from "@/components/for-you-movies";
@@ -13,6 +14,7 @@ import {
 	EmptyContent,
 	EmptyDescription,
 	EmptyHeader,
+	EmptyMedia,
 	EmptyTitle,
 } from "@/components/ui/empty";
 
@@ -31,12 +33,13 @@ export default async function ForYouPage() {
 
 	return (
 		<div className="space-y-8">
-			<div>
-				<h1 className="font-display text-2xl font-semibold tracking-tight">
+			<div className="relative">
+				<div className="pointer-events-none absolute -left-12 -top-10 h-36 w-72 rounded-full bg-primary/[0.06] blur-3xl" />
+				<h1 className="relative font-display text-2xl font-semibold tracking-tight">
 					For You
 				</h1>
-				<p className="mt-1 text-sm text-muted-foreground">
-					Movies your friends are watching
+				<p className="relative mt-1 text-sm text-muted-foreground">
+					Personalized picks based on your taste
 				</p>
 			</div>
 
@@ -55,14 +58,18 @@ async function ForYouContent() {
 		return (
 			<Empty>
 				<EmptyHeader>
+					<EmptyMedia variant="icon">
+						<Sparkles />
+					</EmptyMedia>
 					<EmptyTitle>Nothing here yet</EmptyTitle>
 					<EmptyDescription>
-						Follow friends to see their movie recommendations.
+						Add genres you like, follow friends, or explore movies to get
+						personalized recommendations.
 					</EmptyDescription>
 				</EmptyHeader>
 				<EmptyContent>
 					<Button asChild>
-						<Link href="/explore">Find Friends</Link>
+						<Link href="/discover">Discover Movies</Link>
 					</Button>
 				</EmptyContent>
 			</Empty>
