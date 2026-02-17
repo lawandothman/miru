@@ -60,6 +60,12 @@ export async function GET(request: Request) {
 				.onConflictDoUpdate({
 					target: schema.movies.id,
 					set: {
+						title: sql`excluded.title`,
+						originalTitle: sql`excluded.original_title`,
+						overview: sql`excluded.overview`,
+						posterPath: sql`excluded.poster_path`,
+						backdropPath: sql`excluded.backdrop_path`,
+						releaseDate: sql`excluded.release_date`,
 						popularity: sql`excluded.popularity`,
 						tmdbVoteAverage: sql`excluded.tmdb_vote_average`,
 						tmdbVoteCount: sql`excluded.tmdb_vote_count`,

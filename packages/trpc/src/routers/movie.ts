@@ -1,6 +1,15 @@
 import { type Database, schema } from "@miru/db";
 import { TRPCError } from "@trpc/server";
-import { and, count, desc, eq, gte, inArray, lte } from "drizzle-orm";
+import {
+	and,
+	count,
+	desc,
+	eq,
+	gte,
+	inArray,
+	isNotNull,
+	lte,
+} from "drizzle-orm";
 import { z } from "zod";
 import type { TMDBClient } from "../tmdb";
 import { protectedProcedure, publicProcedure, router } from "../trpc";
@@ -482,7 +491,12 @@ export const movieRouter = router({
 			ctx.db
 				.select(movieSelect)
 				.from(schema.movies)
-				.where(eq(schema.movies.adult, false))
+				.where(
+					and(
+						eq(schema.movies.adult, false),
+						isNotNull(schema.movies.posterPath),
+					),
+				)
 				.orderBy(desc(schema.movies.popularity))
 				.limit(DISCOVER_SECTION_LIMIT),
 			ctx.db
@@ -491,6 +505,7 @@ export const movieRouter = router({
 				.where(
 					and(
 						eq(schema.movies.adult, false),
+						isNotNull(schema.movies.posterPath),
 						gte(schema.movies.releaseDate, threeMonthsAgoStr),
 						lte(schema.movies.releaseDate, todayStr),
 					),
