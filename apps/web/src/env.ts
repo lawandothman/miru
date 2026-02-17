@@ -12,6 +12,7 @@ export const env = createEnv({
 		BLOB_READ_WRITE_TOKEN: z.string().optional(),
 		SENTRY_AUTH_TOKEN: z.string().optional(),
 		CRON_SECRET: z.string().optional(),
+		VERCEL_URL: z.string().optional(),
 	},
 	client: {
 		NEXT_PUBLIC_SENTRY_DSN: z.string().url().optional(),
