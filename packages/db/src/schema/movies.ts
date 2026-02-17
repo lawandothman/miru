@@ -34,7 +34,11 @@ export const movies = pgTable(
 		trailerSite: text("trailer_site"),
 		updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow().notNull(),
 	},
-	(table) => [index("movies_title_idx").on(table.title)],
+	(table) => [
+		index("movies_title_idx").on(table.title),
+		index("movies_vote_idx").on(table.tmdbVoteCount, table.tmdbVoteAverage),
+		index("movies_release_idx").on(table.releaseDate),
+	],
 );
 
 export const genres = pgTable("genres", {

@@ -14,4 +14,4 @@ export type User = InferSelectModel<typeof schema.users>;
 
 export { schema };
 
-export { eq } from "drizzle-orm";
+export { eq, sql } from "drizzle-orm";

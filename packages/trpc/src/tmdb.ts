@@ -40,6 +40,42 @@ export class TMDBClient extends TMDB {
 		this.accessToken = accessToken;
 	}
 
+	async fetchPopular(page = 1): Promise<TMDBDiscoverResponse> {
+		const response = await fetch(
+			`${TMDB_BASE_URL}/movie/popular?language=en-US&page=${page}`,
+			{
+				headers: {
+					Authorization: `Bearer ${this.accessToken}`,
+					"Content-Type": "application/json",
+				},
+			},
+		);
+
+		if (!response.ok) {
+			throw new Error(`TMDB popular failed: ${response.statusText}`);
+		}
+
+		return response.json() as Promise<TMDBDiscoverResponse>;
+	}
+
+	async fetchNowPlaying(page = 1): Promise<TMDBDiscoverResponse> {
+		const response = await fetch(
+			`${TMDB_BASE_URL}/movie/now_playing?language=en-US&page=${page}`,
+			{
+				headers: {
+					Authorization: `Bearer ${this.accessToken}`,
+					"Content-Type": "application/json",
+				},
+			},
+		);
+
+		if (!response.ok) {
+			throw new Error(`TMDB now_playing failed: ${response.statusText}`);
+		}
+
+		return response.json() as Promise<TMDBDiscoverResponse>;
+	}
+
 	async discoverMovies(
 		params: DiscoverMoviesParams,
 	): Promise<TMDBDiscoverResponse> {
