@@ -7,11 +7,14 @@ import { env } from "@/env";
 
 const db = createDb(env.DATABASE_URL);
 
-const vercelUrl = env.VERCEL_BRANCH_URL
-	? `https://${env.VERCEL_BRANCH_URL}`
-	: env.VERCEL_URL
-		? `https://${env.VERCEL_URL}`
-		: undefined;
+const isPreview = process.env.VERCEL_ENV === "preview";
+const vercelUrl = isPreview
+	? env.VERCEL_BRANCH_URL
+		? `https://${env.VERCEL_BRANCH_URL}`
+		: env.VERCEL_URL
+			? `https://${env.VERCEL_URL}`
+			: undefined
+	: undefined;
 
 export const auth = betterAuth({
 	baseURL: vercelUrl ?? env.BETTER_AUTH_URL,
