@@ -32,6 +32,7 @@ export const auth = betterAuth({
 	plugins: [
 		nextCookies(),
 		oAuthProxy({
+			currentURL: vercelUrl ?? env.BETTER_AUTH_URL,
 			productionURL: env.BETTER_AUTH_URL,
 		}),
 	],
