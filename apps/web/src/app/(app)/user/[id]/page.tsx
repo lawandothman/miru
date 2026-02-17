@@ -11,6 +11,7 @@ import { FollowButton } from "@/components/follow-button";
 import { FollowersDialog } from "@/components/followers-dialog";
 import { ShareButton } from "@/components/share-button";
 import { MovieGrid, MovieGridSkeleton } from "@/components/movie-grid";
+import { ProfileTabs } from "@/components/profile-tabs";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -107,36 +108,8 @@ export default async function UserPage({ params }: UserPageProps) {
 				</Suspense>
 			)}
 
-			<Suspense
-				fallback={
-					<MovieSectionSkeleton
-						title={
-							isOwnProfile
-								? "Your Watchlist"
-								: `${user.name?.split(" ")[0]}'s Watchlist`
-						}
-					/>
-				}
-			>
-				<UserWatchlist
-					userId={id}
-					isOwnProfile={isOwnProfile}
-					userName={user.name}
-				/>
-			</Suspense>
-
-			<Suspense
-				fallback={
-					<MovieSectionSkeleton
-						title={
-							isOwnProfile
-								? "Your Watched"
-								: `${user.name?.split(" ")[0]}'s Watched`
-						}
-					/>
-				}
-			>
-				<UserWatched
+			<Suspense fallback={<MovieSectionSkeleton title="Watchlist" />}>
+				<UserMovieTabs
 					userId={id}
 					isOwnProfile={isOwnProfile}
 					userName={user.name}
@@ -205,7 +178,7 @@ async function UserMatches({ userId }: { userId: string }) {
 	);
 }
 
-async function UserWatchlist({
+async function UserMovieTabs({
 	userId,
 	isOwnProfile,
 	userName,
@@ -215,56 +188,28 @@ async function UserWatchlist({
 	userName: string | null;
 }) {
 	const api = await trpc();
-	const watchlist = await api.watchlist.getUserWatchlist({
-		limit: 30,
-		userId,
-	});
+	const [watchlist, watched] = await Promise.all([
+		api.watchlist.getUserWatchlist({ limit: 30, userId }),
+		api.watched.getUserWatched({ limit: 30, userId }),
+	]);
+
+	const firstName = userName?.split(" ")[0];
 
 	return (
-		<div className="space-y-4">
-			<h2 className="font-display text-lg font-semibold">
-				{isOwnProfile
-					? "Your Watchlist"
-					: `${userName?.split(" ")[0]}'s Watchlist`}
-			</h2>
-			<MovieGrid
-				movies={watchlist.map((m) => ({
-					id: m.id,
-					posterPath: m.posterPath,
-					title: m.title,
-				}))}
-				emptyMessage="No movies in watchlist"
-			/>
-		</div>
-	);
-}
-
-async function UserWatched({
-	userId,
-	isOwnProfile,
-	userName,
-}: {
-	userId: string;
-	isOwnProfile: boolean;
-	userName: string | null;
-}) {
-	const api = await trpc();
-	const watched = await api.watched.getUserWatched({ limit: 30, userId });
-
-	return (
-		<div className="space-y-4">
-			<h2 className="font-display text-lg font-semibold">
-				{isOwnProfile ? "Your Watched" : `${userName?.split(" ")[0]}'s Watched`}
-			</h2>
-			<MovieGrid
-				movies={watched.map((m) => ({
-					id: m.id,
-					posterPath: m.posterPath,
-					title: m.title,
-				}))}
-				emptyMessage="No watched movies"
-			/>
-		</div>
+		<ProfileTabs
+			watchlist={watchlist.map((m) => ({
+				id: m.id,
+				posterPath: m.posterPath,
+				title: m.title,
+			}))}
+			watched={watched.map((m) => ({
+				id: m.id,
+				posterPath: m.posterPath,
+				title: m.title,
+			}))}
+			watchlistLabel={isOwnProfile ? "Watchlist" : `${firstName}'s Watchlist`}
+			watchedLabel={isOwnProfile ? "Watched" : `${firstName}'s Watched`}
+		/>
 	);
 }
 
