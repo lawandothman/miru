@@ -22,6 +22,20 @@ const nextConfig: NextConfig = {
 		],
 	},
 	transpilePackages: ["@miru/db", "@miru/trpc"],
+	redirects() {
+		return [
+			{
+				source: "/explore",
+				destination: "/discover",
+				permanent: true,
+			},
+			{
+				source: "/popular",
+				destination: "/discover",
+				permanent: true,
+			},
+		];
+	},
 };
 
 export default withSentryConfig(nextConfig, {

@@ -1,8 +1,8 @@
 import { type Database, schema } from "@miru/db";
-import type { TMDBClient } from "../tmdb";
 import { TRPCError } from "@trpc/server";
-import { and, count, desc, eq, inArray } from "drizzle-orm";
+import { and, count, desc, eq, gte, inArray, lte } from "drizzle-orm";
 import { z } from "zod";
+import type { TMDBClient } from "../tmdb";
 import { protectedProcedure, publicProcedure, router } from "../trpc";
 import {
 	computeUserGenreWeights,
@@ -19,6 +19,7 @@ const DEFAULT_PAGE_SIZE = 20;
 const DEFAULT_REGION = "GB";
 const TRAILER_SITE = "YouTube";
 const TRAILER_TYPE = "Trailer";
+const DISCOVER_SECTION_LIMIT = 15;
 
 let genresCache: { data: { id: number; name: string }[]; ts: number } | null =
 	null;
@@ -463,6 +464,66 @@ export const movieRouter = router({
 				}));
 		}),
 
+	getDiscoverSections: publicProcedure.query(async ({ ctx }) => {
+		const userId = ctx.session?.user?.id ?? null;
+		const now = new Date();
+		const threeMonthsAgo = new Date(now);
+		threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+		const todayStr = now.toISOString().slice(0, 10);
+		const threeMonthsAgoStr = threeMonthsAgo.toISOString().slice(0, 10);
+
+		const movieSelect = {
+			id: schema.movies.id,
+			title: schema.movies.title,
+			posterPath: schema.movies.posterPath,
+		} as const;
+
+		const [trending, newReleases, popularOnMiruRaw] = await Promise.all([
+			ctx.db
+				.select(movieSelect)
+				.from(schema.movies)
+				.where(eq(schema.movies.adult, false))
+				.orderBy(desc(schema.movies.popularity))
+				.limit(DISCOVER_SECTION_LIMIT),
+			ctx.db
+				.select(movieSelect)
+				.from(schema.movies)
+				.where(
+					and(
+						eq(schema.movies.adult, false),
+						gte(schema.movies.releaseDate, threeMonthsAgoStr),
+						lte(schema.movies.releaseDate, todayStr),
+					),
+				)
+				.orderBy(desc(schema.movies.popularity))
+				.limit(DISCOVER_SECTION_LIMIT),
+			ctx.db
+				.select({
+					...movieSelect,
+					watchlistCount: count(schema.watchlistEntries.userId),
+				})
+				.from(schema.movies)
+				.innerJoin(
+					schema.watchlistEntries,
+					eq(schema.watchlistEntries.movieId, schema.movies.id),
+				)
+				.where(eq(schema.movies.adult, false))
+				.groupBy(schema.movies.id)
+				.orderBy(desc(count(schema.watchlistEntries.userId)))
+				.limit(DISCOVER_SECTION_LIMIT),
+		]);
+
+		const popularOnMiru = popularOnMiruRaw.map(
+			({ watchlistCount: _, ...m }) => m,
+		);
+
+		const friendsWatching = userId
+			? await getFriendsWatchingMovies(ctx.db, userId)
+			: [];
+
+		return { trending, newReleases, popularOnMiru, friendsWatching };
+	}),
+
 	discover: publicProcedure
 		.input(
 			z.object({
@@ -680,4 +741,53 @@ async function getMovieIdSet(
 		);
 
 	return new Set(entries.map((e) => e.movieId));
+}
+
+async function getFriendsWatchingMovies(db: Database, userId: string) {
+	const [ownWatchlist, ownWatched] = await Promise.all([
+		db
+			.select({ movieId: schema.watchlistEntries.movieId })
+			.from(schema.watchlistEntries)
+			.where(eq(schema.watchlistEntries.userId, userId)),
+		db
+			.select({ movieId: schema.watchedEntries.movieId })
+			.from(schema.watchedEntries)
+			.where(eq(schema.watchedEntries.userId, userId)),
+	]);
+
+	const excludeIds = new Set([
+		...ownWatchlist.map((e) => e.movieId),
+		...ownWatched.map((e) => e.movieId),
+	]);
+
+	const friendMovies = await db
+		.select({
+			id: schema.movies.id,
+			title: schema.movies.title,
+			posterPath: schema.movies.posterPath,
+			friendCount: count(schema.watchlistEntries.userId),
+		})
+		.from(schema.follows)
+		.innerJoin(
+			schema.watchlistEntries,
+			eq(schema.watchlistEntries.userId, schema.follows.followingId),
+		)
+		.innerJoin(
+			schema.movies,
+			eq(schema.movies.id, schema.watchlistEntries.movieId),
+		)
+		.where(
+			and(
+				eq(schema.follows.followerId, userId),
+				eq(schema.movies.adult, false),
+			),
+		)
+		.groupBy(schema.movies.id)
+		.orderBy(desc(count(schema.watchlistEntries.userId)))
+		.limit(DISCOVER_SECTION_LIMIT * 3);
+
+	return friendMovies
+		.filter((m) => !excludeIds.has(m.id))
+		.slice(0, DISCOVER_SECTION_LIMIT)
+		.map(({ friendCount: _, ...m }) => m);
 }

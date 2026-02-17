@@ -1,10 +1,18 @@
 "use client";
 
-import { Check, Film, PlusCircle, X } from "lucide-react";
+import { useState } from "react";
+import {
+	Calendar,
+	Check,
+	ChevronDown,
+	Film,
+	PlusCircle,
+	X,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { genreIcons, GenrePicker } from "@/components/genre-picker";
+import { genreIcons } from "@/components/genre-picker";
 import {
 	Popover,
 	PopoverContent,
@@ -26,16 +34,6 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import {
-	Drawer,
-	DrawerClose,
-	DrawerContent,
-	DrawerDescription,
-	DrawerFooter,
-	DrawerHeader,
-	DrawerTitle,
-	DrawerTrigger,
-} from "@/components/ui/drawer";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 
@@ -316,6 +314,65 @@ function YearFilter({
 	);
 }
 
+function FilterTrigger({
+	isExpanded,
+	isActive,
+	onClick,
+	icon: Icon,
+	children,
+}: {
+	isExpanded: boolean;
+	isActive: boolean;
+	onClick: () => void;
+	icon: React.ComponentType<{ className?: string }>;
+	children: React.ReactNode;
+}) {
+	return (
+		<button
+			type="button"
+			onClick={onClick}
+			className={cn(
+				"flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-all active:scale-[0.97]",
+				isExpanded
+					? "border-primary/50 bg-primary/10 text-foreground"
+					: isActive
+						? "border-primary/40 bg-primary/[0.07] text-foreground"
+						: "border-border bg-background text-muted-foreground",
+			)}
+		>
+			<Icon className="size-3" />
+			{children}
+			<ChevronDown
+				className={cn(
+					"size-3 transition-transform duration-200",
+					isExpanded && "rotate-180",
+				)}
+			/>
+		</button>
+	);
+}
+
+function ExpandablePanel({
+	isOpen,
+	children,
+}: {
+	isOpen: boolean;
+	children: React.ReactNode;
+}) {
+	return (
+		<div
+			className={cn(
+				"grid transition-all duration-200 ease-out",
+				isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0",
+			)}
+		>
+			<div className={cn(isOpen ? "overflow-visible" : "overflow-hidden")}>
+				<div className="pb-1 pt-0.5">{children}</div>
+			</div>
+		</div>
+	);
+}
+
 function MobileFilters({
 	genres,
 	selectedGenres,
@@ -325,110 +382,157 @@ function MobileFilters({
 	onClearAll,
 	activeFilterCount,
 }: ExploreFiltersProps & { activeFilterCount: number }) {
+	const [expanded, setExpanded] = useState<"genre" | "year" | null>(null);
+	const hasYear = yearRange.from !== undefined || yearRange.to !== undefined;
+
+	function togglePanel(panel: "genre" | "year") {
+		setExpanded(expanded === panel ? null : panel);
+	}
+
 	return (
-		<Drawer>
-			<div className="flex items-center gap-2">
-				<DrawerTrigger asChild>
-					<Button variant="outline" size="sm" className="gap-1.5">
-						<PlusCircle className="size-3.5" />
-						Filters
-						{activeFilterCount > 0 && (
-							<Badge variant="default" className="ml-0.5 size-5 p-0">
-								{activeFilterCount}
-							</Badge>
-						)}
-					</Button>
-				</DrawerTrigger>
+		<div className="space-y-2">
+			<div className="scrollbar-hide flex items-center gap-2 overflow-x-auto">
+				<FilterTrigger
+					isExpanded={expanded === "genre"}
+					isActive={selectedGenres.size > 0}
+					onClick={() => togglePanel("genre")}
+					icon={Film}
+				>
+					Genre
+					{selectedGenres.size > 0 && (
+						<span className="flex size-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
+							{selectedGenres.size}
+						</span>
+					)}
+				</FilterTrigger>
+
+				<FilterTrigger
+					isExpanded={expanded === "year"}
+					isActive={hasYear}
+					onClick={() => togglePanel("year")}
+					icon={Calendar}
+				>
+					{hasYear
+						? `${yearRange.from ?? "..."} – ${yearRange.to ?? "..."}`
+						: "Year"}
+				</FilterTrigger>
+
+				{selectedGenres.size > 0 && expanded !== "genre" && (
+					<>
+						<div className="mx-0.5 h-4 w-px shrink-0 bg-border" />
+						{genres
+							.filter((g) => selectedGenres.has(g.id))
+							.map((g) => (
+								<button
+									key={g.id}
+									type="button"
+									onClick={() => onToggleGenre(g.id)}
+									className="flex shrink-0 items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-medium text-foreground transition-all active:scale-95"
+								>
+									{g.name}
+									<X className="size-2.5 text-muted-foreground" />
+								</button>
+							))}
+					</>
+				)}
+
 				{activeFilterCount > 0 && (
-					<Button
-						variant="ghost"
-						size="sm"
+					<button
+						type="button"
 						onClick={onClearAll}
-						className="text-muted-foreground"
+						className="shrink-0 px-2 text-xs text-muted-foreground transition-colors active:text-foreground"
 					>
 						Reset
-						<X className="ml-1 size-3.5" />
-					</Button>
+					</button>
 				)}
 			</div>
-			<DrawerContent>
-				<DrawerHeader>
-					<DrawerTitle>Filters</DrawerTitle>
-					<DrawerDescription className="sr-only">
-						Filter movies by genre and year
-					</DrawerDescription>
-				</DrawerHeader>
-				<div className="space-y-5 overflow-y-auto px-4 pb-2">
-					<div className="space-y-2">
-						<h3 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-							Genres
-						</h3>
-						<GenrePicker
-							genres={genres}
-							selected={selectedGenres}
-							onToggle={onToggleGenre}
-							compact
-						/>
-					</div>
-					<div className="space-y-2">
-						<h3 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-							Year Range
-						</h3>
-						<div className="flex items-center gap-2">
-							<Select
-								value={yearRange.from?.toString() ?? ""}
-								onValueChange={(v) =>
-									onYearRangeChange({
-										from: v ? Number(v) : undefined,
-										to: yearRange.to,
-									})
-								}
+
+			<ExpandablePanel isOpen={expanded === "genre"}>
+				<div className="flex flex-wrap gap-1.5">
+					{genres.map((genre) => {
+						const Icon = genreIcons[genre.name] ?? Film;
+						const isSelected = selectedGenres.has(genre.id);
+						return (
+							<button
+								key={genre.id}
+								type="button"
+								onClick={() => onToggleGenre(genre.id)}
+								className={cn(
+									"flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-all active:scale-[0.96]",
+									isSelected
+										? "border-primary/50 bg-primary/15 text-foreground"
+										: "border-border/60 bg-card/40 text-muted-foreground",
+								)}
 							>
-								<SelectTrigger className="w-full">
-									<SelectValue placeholder="From" />
-								</SelectTrigger>
-								<SelectContent>
-									{YEAR_OPTIONS.filter(
-										(y) => yearRange.to === undefined || y <= yearRange.to,
-									).map((y) => (
-										<SelectItem key={y} value={y.toString()}>
-											{y}
-										</SelectItem>
-									))}
-								</SelectContent>
-							</Select>
-							<span className="text-sm text-muted-foreground">–</span>
-							<Select
-								value={yearRange.to?.toString() ?? ""}
-								onValueChange={(v) =>
-									onYearRangeChange({
-										from: yearRange.from,
-										to: v ? Number(v) : undefined,
-									})
-								}
-							>
-								<SelectTrigger className="w-full">
-									<SelectValue placeholder="To" />
-								</SelectTrigger>
-								<SelectContent>
-									{YEAR_OPTIONS.filter(
-										(y) => yearRange.from === undefined || y >= yearRange.from,
-									).map((y) => (
-										<SelectItem key={y} value={y.toString()}>
-											{y}
-										</SelectItem>
-									))}
-								</SelectContent>
-							</Select>
-						</div>
-					</div>
+								<Icon className="size-3" />
+								{genre.name}
+								{isSelected && <Check className="size-3 text-primary" />}
+							</button>
+						);
+					})}
 				</div>
-				<DrawerFooter>
-					<DrawerClose asChild>
-						<Button>Done</Button>
-					</DrawerClose>
-				</DrawerFooter>
-			</DrawerContent>
-		</Drawer>
+			</ExpandablePanel>
+
+			<ExpandablePanel isOpen={expanded === "year"}>
+				<div className="flex items-center gap-2">
+					<Select
+						value={yearRange.from?.toString() ?? ""}
+						onValueChange={(v) =>
+							onYearRangeChange({
+								from: v ? Number(v) : undefined,
+								to: yearRange.to,
+							})
+						}
+					>
+						<SelectTrigger className="h-9 w-full text-xs">
+							<SelectValue placeholder="From year" />
+						</SelectTrigger>
+						<SelectContent>
+							{YEAR_OPTIONS.filter(
+								(y) => yearRange.to === undefined || y <= yearRange.to,
+							).map((y) => (
+								<SelectItem key={y} value={y.toString()}>
+									{y}
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
+					<span className="shrink-0 text-xs text-muted-foreground">–</span>
+					<Select
+						value={yearRange.to?.toString() ?? ""}
+						onValueChange={(v) =>
+							onYearRangeChange({
+								from: yearRange.from,
+								to: v ? Number(v) : undefined,
+							})
+						}
+					>
+						<SelectTrigger className="h-9 w-full text-xs">
+							<SelectValue placeholder="To year" />
+						</SelectTrigger>
+						<SelectContent>
+							{YEAR_OPTIONS.filter(
+								(y) => yearRange.from === undefined || y >= yearRange.from,
+							).map((y) => (
+								<SelectItem key={y} value={y.toString()}>
+									{y}
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
+					{hasYear && (
+						<button
+							type="button"
+							onClick={() =>
+								onYearRangeChange({ from: undefined, to: undefined })
+							}
+							className="shrink-0 rounded-full p-1.5 text-muted-foreground transition-colors hover:bg-muted active:bg-muted"
+						>
+							<X className="size-3.5" />
+						</button>
+					)}
+				</div>
+			</ExpandablePanel>
+		</div>
 	);
 }

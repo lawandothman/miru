@@ -50,7 +50,7 @@ async function WatchlistContent() {
 					Start adding movies you want to watch.
 				</p>
 				<Link
-					href="/explore"
+					href="/discover"
 					className="mt-6 inline-flex h-9 items-center rounded-lg bg-primary px-5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
 				>
 					Find Movies

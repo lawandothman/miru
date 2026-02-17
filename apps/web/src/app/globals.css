@@ -261,3 +261,9 @@
 @utility animate-scale-in {
 	animation: scale-in 0.6s ease-out both;
 }
+
+@utility sidebar-glow {
+	box-shadow:
+		0 0 10px oklch(0.78 0.115 80 / 35%),
+		0 0 4px oklch(0.78 0.115 80 / 20%);
+}

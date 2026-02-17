@@ -28,10 +28,10 @@ export function MarketingShell({ children }: { children: React.ReactNode }) {
 						</span>
 						<div className="flex gap-8 text-[13px] text-foreground/25">
 							<Link
-								href="/explore"
+								href="/discover"
 								className="transition-colors hover:text-foreground/50"
 							>
-								Explore
+								Discover
 							</Link>
 							<Link
 								href="/about"

@@ -73,10 +73,10 @@ export default async function Home() {
 									Join for free
 								</Link>
 								<Link
-									href="/explore"
+									href="/discover"
 									className="inline-flex h-12 items-center rounded-full border border-foreground/10 px-8 text-[13px] font-medium text-foreground/60 transition-colors hover:border-foreground/20 hover:text-foreground/80"
 								>
-									Explore
+									Discover
 								</Link>
 							</div>
 							<p
@@ -330,10 +330,10 @@ export default async function Home() {
 							</span>
 							<div className="flex gap-8 text-[13px] text-foreground/25">
 								<Link
-									href="/explore"
+									href="/discover"
 									className="transition-colors hover:text-foreground/50"
 								>
-									Explore
+									Discover
 								</Link>
 								<Link
 									href="/about"

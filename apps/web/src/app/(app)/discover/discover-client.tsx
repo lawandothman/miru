@@ -10,12 +10,13 @@ import {
 import { SearchAutocomplete } from "@/components/search-autocomplete";
 import { ExploreFilters } from "@/components/explore-filters";
 import { ExploreResults } from "@/components/explore-results";
+import { DiscoverSections } from "@/components/discover-sections";
 
-interface ExploreClientProps {
+interface DiscoverClientProps {
 	genres: { id: number; name: string }[];
 }
 
-export function ExploreClient({ genres }: ExploreClientProps) {
+export function DiscoverClient({ genres }: DiscoverClientProps) {
 	const [committedQuery, setCommittedQuery] = useQueryState(
 		"q",
 		parseAsString.withDefault(""),
@@ -92,6 +93,12 @@ export function ExploreClient({ genres }: ExploreClientProps) {
 		[genreIds, yearFrom, yearTo],
 	);
 
+	const hasActiveSearch =
+		committedQuery.length > 0 ||
+		genreIds.length > 0 ||
+		yearFrom !== null ||
+		yearTo !== null;
+
 	return (
 		<>
 			<SearchAutocomplete
@@ -109,11 +116,15 @@ export function ExploreClient({ genres }: ExploreClientProps) {
 				onClearAll={handleClearFilters}
 			/>
 
-			<ExploreResults
-				query={committedQuery}
-				filters={filters}
-				genreList={genres}
-			/>
+			{hasActiveSearch ? (
+				<ExploreResults
+					query={committedQuery}
+					filters={filters}
+					genreList={genres}
+				/>
+			) : (
+				<DiscoverSections />
+			)}
 		</>
 	);
 }
