@@ -7,6 +7,7 @@ import {
 	TrendingUp,
 	Users,
 } from "lucide-react";
+import { match } from "ts-pattern";
 
 interface FriendsReason {
 	type: "friends";
@@ -47,55 +48,36 @@ function getReasonContent(reason: RecommendationReason): {
 	icon: React.ReactNode;
 	text: string;
 } {
-	switch (reason.type) {
-		case "friends":
-			return {
-				icon: <Users className="size-3 shrink-0" />,
-				text:
-					reason.count === 1
-						? "1 friend watching"
-						: `${reason.count} friends watching`,
-			};
-		case "trending":
-			return {
-				icon: <Flame className="size-3 shrink-0" />,
-				text: "Trending now",
-			};
-		case "because_you_watched":
-			return {
-				icon: <Sparkles className="size-3 shrink-0" />,
-				text: reason.title
-					? `Because you watched ${reason.title}`
-					: "Based on your taste",
-			};
-		case "popular_on_miru":
-			return {
-				icon: <TrendingUp className="size-3 shrink-0" />,
-				text: "Popular on Miru",
-			};
-		case "available_on":
-			return {
-				icon: <Tv className="size-3 shrink-0" />,
-				text: reason.provider
-					? `On ${reason.provider}`
-					: "On your services",
-			};
-		case "top_rated":
-			return {
-				icon: <Star className="size-3 shrink-0" />,
-				text: "Highly rated",
-			};
-		case "genre_match":
-			return {
-				icon: <Heart className="size-3 shrink-0" />,
-				text: "Matches your taste",
-			};
-		default:
-			return {
-				icon: <Sparkles className="size-3 shrink-0" />,
-				text: "Recommended for you",
-			};
-	}
+	return match(reason)
+		.with({ type: "friends" }, (r) => ({
+			icon: <Users className="size-3 shrink-0" />,
+			text: r.count === 1 ? "1 friend watching" : `${r.count} friends watching`,
+		}))
+		.with({ type: "trending" }, () => ({
+			icon: <Flame className="size-3 shrink-0" />,
+			text: "Trending now",
+		}))
+		.with({ type: "because_you_watched" }, (r) => ({
+			icon: <Sparkles className="size-3 shrink-0" />,
+			text: r.title ? `Because you watched ${r.title}` : "Based on your taste",
+		}))
+		.with({ type: "popular_on_miru" }, () => ({
+			icon: <TrendingUp className="size-3 shrink-0" />,
+			text: "Popular on Miru",
+		}))
+		.with({ type: "available_on" }, (r) => ({
+			icon: <Tv className="size-3 shrink-0" />,
+			text: r.provider ? `On ${r.provider}` : "On your services",
+		}))
+		.with({ type: "top_rated" }, () => ({
+			icon: <Star className="size-3 shrink-0" />,
+			text: "Highly rated",
+		}))
+		.with({ type: "genre_match" }, () => ({
+			icon: <Heart className="size-3 shrink-0" />,
+			text: "Matches your taste",
+		}))
+		.exhaustive();
 }
 
 export function RecommendationBadge({

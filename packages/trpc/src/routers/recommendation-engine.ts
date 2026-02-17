@@ -1,5 +1,6 @@
 import { type Database, schema } from "@miru/db";
 import { and, count, eq, inArray, sql } from "drizzle-orm";
+import { match } from "ts-pattern";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -90,10 +91,7 @@ export async function computeUserGenreWeights(
 
 	const genreCounts = new Map<number, number>();
 	for (const row of [...implicitCounts, ...watchedCounts]) {
-		genreCounts.set(
-			row.genreId,
-			(genreCounts.get(row.genreId) ?? 0) + row.cnt,
-		);
+		genreCounts.set(row.genreId, (genreCounts.get(row.genreId) ?? 0) + row.cnt);
 	}
 
 	const maxCount = Math.max(...genreCounts.values(), 1);
@@ -208,7 +206,7 @@ export async function findSimilarUsers(
 		const otherTotal = totalCountMap.get(otherUserId) ?? 0;
 		if (otherTotal < COLLAB_MIN_MOVIES) {
 			// biome-ignore format: control flow
-			/* skip */;
+			/* skip */
 		} else {
 			const union = userSetSize + otherTotal - overlap;
 			const similarity = union > 0 ? overlap / union : 0;
@@ -253,77 +251,82 @@ export async function getRecommendedMovies(
 	const preferredGenreIds = [...genreWeights.keys()];
 
 	// Batch 1: All candidate source queries run in parallel
-	const [friendMovies, collabCandidates, genreMovies, platformPopular, trendingMovies] =
-		await Promise.all([
-			// Source A: Friend watchlist movies
-			db
-				.select({
-					movieId: schema.watchlistEntries.movieId,
-					friendCount: count(),
-				})
-				.from(schema.follows)
-				.innerJoin(
-					schema.watchlistEntries,
-					eq(schema.watchlistEntries.userId, schema.follows.followingId),
-				)
-				.where(eq(schema.follows.followerId, userId))
-				.groupBy(schema.watchlistEntries.movieId),
+	const [
+		friendMovies,
+		collabCandidates,
+		genreMovies,
+		platformPopular,
+		trendingMovies,
+	] = await Promise.all([
+		// Source A: Friend watchlist movies
+		db
+			.select({
+				movieId: schema.watchlistEntries.movieId,
+				friendCount: count(),
+			})
+			.from(schema.follows)
+			.innerJoin(
+				schema.watchlistEntries,
+				eq(schema.watchlistEntries.userId, schema.follows.followingId),
+			)
+			.where(eq(schema.follows.followerId, userId))
+			.groupBy(schema.watchlistEntries.movieId),
 
-			// Source B: Collaborative filtering candidates
-			similarUsers.length > 0
-				? db
-						.select({
-							movieId: schema.watchlistEntries.movieId,
-							userId: schema.watchlistEntries.userId,
-						})
-						.from(schema.watchlistEntries)
-						.where(
-							inArray(
-								schema.watchlistEntries.userId,
-								similarUsers.map((u) => u.userId),
-							),
-						)
-				: Promise.resolve([] as { movieId: number; userId: string }[]),
+		// Source B: Collaborative filtering candidates
+		similarUsers.length > 0
+			? db
+					.select({
+						movieId: schema.watchlistEntries.movieId,
+						userId: schema.watchlistEntries.userId,
+					})
+					.from(schema.watchlistEntries)
+					.where(
+						inArray(
+							schema.watchlistEntries.userId,
+							similarUsers.map((u) => u.userId),
+						),
+					)
+			: Promise.resolve([] as { movieId: number; userId: string }[]),
 
-			// Source C: Genre-matching movies
-			preferredGenreIds.length > 0
-				? db
-						.select({ movieId: schema.movieGenres.movieId })
-						.from(schema.movieGenres)
-						.innerJoin(
-							schema.movies,
-							eq(schema.movies.id, schema.movieGenres.movieId),
-						)
-						.where(
-							and(
-								inArray(schema.movieGenres.genreId, preferredGenreIds),
-								eq(schema.movies.adult, false),
-							),
-						)
-						.groupBy(schema.movieGenres.movieId)
-						.orderBy(sql`MAX(${schema.movies.popularity}) DESC NULLS LAST`)
-						.limit(200)
-				: Promise.resolve([] as { movieId: number }[]),
+		// Source C: Genre-matching movies
+		preferredGenreIds.length > 0
+			? db
+					.select({ movieId: schema.movieGenres.movieId })
+					.from(schema.movieGenres)
+					.innerJoin(
+						schema.movies,
+						eq(schema.movies.id, schema.movieGenres.movieId),
+					)
+					.where(
+						and(
+							inArray(schema.movieGenres.genreId, preferredGenreIds),
+							eq(schema.movies.adult, false),
+						),
+					)
+					.groupBy(schema.movieGenres.movieId)
+					.orderBy(sql`MAX(${schema.movies.popularity}) DESC NULLS LAST`)
+					.limit(200)
+			: Promise.resolve([] as { movieId: number }[]),
 
-			// Source D: Platform popular movies
-			db
-				.select({
-					movieId: schema.watchlistEntries.movieId,
-					cnt: count(),
-				})
-				.from(schema.watchlistEntries)
-				.groupBy(schema.watchlistEntries.movieId)
-				.orderBy(sql`count(*) DESC`)
-				.limit(100),
+		// Source D: Platform popular movies
+		db
+			.select({
+				movieId: schema.watchlistEntries.movieId,
+				cnt: count(),
+			})
+			.from(schema.watchlistEntries)
+			.groupBy(schema.watchlistEntries.movieId)
+			.orderBy(sql`count(*) DESC`)
+			.limit(100),
 
-			// Source E: Trending / high quality
-			db
-				.select({ id: schema.movies.id })
-				.from(schema.movies)
-				.where(eq(schema.movies.adult, false))
-				.orderBy(sql`${schema.movies.popularity} DESC NULLS LAST`)
-				.limit(200),
-		]);
+		// Source E: Trending / high quality
+		db
+			.select({ id: schema.movies.id })
+			.from(schema.movies)
+			.where(eq(schema.movies.adult, false))
+			.orderBy(sql`${schema.movies.popularity} DESC NULLS LAST`)
+			.limit(200),
+	]);
 
 	// Build candidate set + signal maps from batch 1 results
 	const candidateMovieIds = new Set<number>();
@@ -471,11 +474,8 @@ export async function getRecommendedMovies(
 		const movieGenres = movieGenreMap.get(movie.id) ?? [];
 		let genreSignal = 0;
 		if (movieGenres.length > 0 && genreWeights.size > 0) {
-			const genreScores = movieGenres.map(
-				(gid) => genreWeights.get(gid) ?? 0,
-			);
-			genreSignal =
-				genreScores.reduce((a, b) => a + b, 0) / genreScores.length;
+			const genreScores = movieGenres.map((gid) => genreWeights.get(gid) ?? 0);
+			genreSignal = genreScores.reduce((a, b) => a + b, 0) / genreScores.length;
 		}
 
 		const collabRaw = collabScoreMap.get(movie.id) ?? 0;
@@ -560,9 +560,7 @@ export function diversityRerank(
 			return null;
 		}
 		return genres.reduce((best, gid) =>
-			(genreWeights.get(gid) ?? 0) > (genreWeights.get(best) ?? 0)
-				? gid
-				: best,
+			(genreWeights.get(gid) ?? 0) > (genreWeights.get(best) ?? 0) ? gid : best,
 		);
 	};
 
@@ -639,34 +637,37 @@ export function selectExplanation(movie: ScoredMovie): RecommendationReason {
 		return { type: "trending" };
 	}
 
-	switch (dominant.type) {
-		case "friends":
-			return { type: "friends", count: movie.friendCount };
-		case "popular_on_miru":
-			return {
-				type: "popular_on_miru",
-				count: movie.platformWatchlistCount,
-			};
-		case "because_you_watched":
-			return { type: "because_you_watched", title: "" };
-		case "available_on":
-			return { type: "available_on", provider: "" };
-		case "top_rated": {
+	return match(dominant.type)
+		.with("friends", () => ({
+			type: "friends" as const,
+			count: movie.friendCount,
+		}))
+		.with("popular_on_miru", () => ({
+			type: "popular_on_miru" as const,
+			count: movie.platformWatchlistCount,
+		}))
+		.with("because_you_watched", () => ({
+			type: "because_you_watched" as const,
+			title: "",
+		}))
+		.with("available_on", () => ({
+			type: "available_on" as const,
+			provider: "",
+		}))
+		.with("top_rated", () => {
 			if (movie.releaseDate) {
 				const monthsAgo =
 					(Date.now() - new Date(movie.releaseDate).getTime()) /
 					(1000 * 60 * 60 * 24 * 30);
 				if (monthsAgo < 3) {
-					return { type: "trending" };
+					return { type: "trending" as const };
 				}
 			}
-			return { type: "top_rated" };
-		}
-		case "genre_match":
-			return { type: "genre_match" };
-		default:
-			return { type: "trending" };
-	}
+			return { type: "top_rated" as const };
+		})
+		.with("genre_match", () => ({ type: "genre_match" as const }))
+		.with("trending", () => ({ type: "trending" as const }))
+		.exhaustive();
 }
 
 // ---------------------------------------------------------------------------

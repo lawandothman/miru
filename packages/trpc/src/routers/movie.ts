@@ -205,11 +205,7 @@ export const movieRouter = router({
 			);
 
 			// Find similar users for collaborative filtering
-			const similarUsers = await findSimilarUsers(
-				ctx.db,
-				userId,
-				userMovieIds,
-			);
+			const similarUsers = await findSimilarUsers(ctx.db, userId, userMovieIds);
 
 			// Get all scored candidates
 			const scoredMovies = await getRecommendedMovies(
@@ -232,7 +228,7 @@ export const movieRouter = router({
 							})
 							.from(schema.movieGenres)
 							.where(inArray(schema.movieGenres.movieId, candidateIds))
-						: [];
+					: [];
 
 			const movieGenreMap = new Map<number, number[]>();
 			for (const row of movieGenreRows) {
