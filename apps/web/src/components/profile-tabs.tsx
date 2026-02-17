@@ -45,16 +45,10 @@ export function ProfileTabs({
 				</TabsTrigger>
 			</TabsList>
 			<TabsContent value="watchlist">
-				<MovieGrid
-					movies={watchlist}
-					emptyMessage="No movies in watchlist"
-				/>
+				<MovieGrid movies={watchlist} emptyMessage="No movies in watchlist" />
 			</TabsContent>
 			<TabsContent value="watched">
-				<MovieGrid
-					movies={watched}
-					emptyMessage="No watched movies"
-				/>
+				<MovieGrid movies={watched} emptyMessage="No watched movies" />
 			</TabsContent>
 		</Tabs>
 	);
