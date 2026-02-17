@@ -7,7 +7,7 @@ import { env } from "@/env";
 
 const db = createDb(env.DATABASE_URL);
 
-const isPreview = process.env.VERCEL_ENV === "preview";
+const isPreview = process.env["VERCEL_ENV"] === "preview";
 const vercelUrl = isPreview
 	? env.VERCEL_BRANCH_URL
 		? `https://${env.VERCEL_BRANCH_URL}`
