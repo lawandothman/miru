@@ -16,7 +16,7 @@
 		"@trpc/server": "11.10.0",
 		"drizzle-orm": "0.45.1",
 		"superjson": "2.2.6",
-		"ts-pattern": "^5.9.0",
+		"ts-pattern": "5.9.0",
 		"zod": "4.3.6"
 	},
 	"devDependencies": {

@@ -102,7 +102,7 @@ importers:
         specifier: 3.4.0
         version: 3.4.0
       ts-pattern:
-        specifier: ^5.9.0
+        specifier: 5.9.0
         version: 5.9.0
       vaul:
         specifier: 1.1.2
@@ -185,7 +185,7 @@ importers:
         specifier: 2.2.6
         version: 2.2.6
       ts-pattern:
-        specifier: ^5.9.0
+        specifier: 5.9.0
         version: 5.9.0
       zod:
         specifier: 4.3.6
