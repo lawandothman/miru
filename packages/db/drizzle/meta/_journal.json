@@ -1,34 +1,34 @@
 {
-  "version": "7",
-  "dialect": "postgresql",
-  "entries": [
-    {
-      "idx": 0,
-      "version": "7",
-      "when": 1771093819555,
-      "tag": "0000_furry_boomerang",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1771108835368,
-      "tag": "0001_pink_franklin_storm",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1771193572332,
-      "tag": "0002_nervous_next_avengers",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1771267192651,
-      "tag": "0003_organic_roughhouse",
-      "breakpoints": true
-    }
-  ]
+	"version": "7",
+	"dialect": "postgresql",
+	"entries": [
+		{
+			"idx": 0,
+			"version": "7",
+			"when": 1771093819555,
+			"tag": "0000_furry_boomerang",
+			"breakpoints": true
+		},
+		{
+			"idx": 1,
+			"version": "7",
+			"when": 1771108835368,
+			"tag": "0001_pink_franklin_storm",
+			"breakpoints": true
+		},
+		{
+			"idx": 2,
+			"version": "7",
+			"when": 1771193572332,
+			"tag": "0002_nervous_next_avengers",
+			"breakpoints": true
+		},
+		{
+			"idx": 3,
+			"version": "7",
+			"when": 1771267192651,
+			"tag": "0003_organic_roughhouse",
+			"breakpoints": true
+		}
+	]
 }

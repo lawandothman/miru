@@ -26,10 +26,7 @@ export async function GET(request: Request) {
 		]);
 
 		// Deduplicate by ID
-		const movieMap = new Map<
-			number,
-			(typeof fetches)[0]["results"][number]
-		>();
+		const movieMap = new Map<number, (typeof fetches)[0]["results"][number]>();
 		for (const page of fetches) {
 			for (const movie of page.results) {
 				if (!movie.adult) {
