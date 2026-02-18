@@ -22,6 +22,7 @@ interface MovieGridProps {
 }
 
 const NUM_COLUMNS = 3;
+// oxlint-disable-next-line prefer-destructuring
 const ITEM_GAP = spacing[2];
 
 export function MovieGrid({

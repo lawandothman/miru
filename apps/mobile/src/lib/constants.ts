@@ -27,20 +27,26 @@ export const Colors = darkColors;
 export const TMDB_IMAGE_BASE = "https://image.tmdb.org/t/p";
 
 export function posterUrl(path: string | null | undefined): string | undefined {
-	if (!path) return undefined;
+	if (!path) {
+		return undefined;
+	}
 	return `${TMDB_IMAGE_BASE}/w342${path}`;
 }
 
 export function backdropUrl(
 	path: string | null | undefined,
 ): string | undefined {
-	if (!path) return undefined;
+	if (!path) {
+		return undefined;
+	}
 	return `${TMDB_IMAGE_BASE}/w780${path}`;
 }
 
 export function providerLogoUrl(
 	path: string | null | undefined,
 ): string | undefined {
-	if (!path) return undefined;
+	if (!path) {
+		return undefined;
+	}
 	return `${TMDB_IMAGE_BASE}/w92${path}`;
 }

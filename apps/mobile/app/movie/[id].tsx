@@ -116,7 +116,7 @@ export default function MovieDetailScreen() {
 						) : null}
 						<View style={styles.metaRow}>
 							{year && <Text style={styles.metaText}>{year}</Text>}
-							{hours != null && (
+							{hours !== null && (
 								<>
 									<Text style={styles.metaDot}>·</Text>
 									<Text style={styles.metaText}>

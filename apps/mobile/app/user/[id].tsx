@@ -16,23 +16,25 @@ export default function UserProfileScreen() {
 	const { data: session } = useSession();
 	const isOwnProfile = session?.user?.id === id;
 
+	const userId = id ?? "";
+
 	const { data: profile, isLoading } = trpc.user.getById.useQuery(
-		{ id: id! },
+		{ id: userId },
 		{ enabled: Boolean(id) },
 	);
 
 	const { data: watchlist } = trpc.watchlist.getUserWatchlist.useQuery(
-		{ userId: id!, limit: 15 },
+		{ userId, limit: 15 },
 		{ enabled: Boolean(id) },
 	);
 
 	const { data: watched } = trpc.watched.getUserWatched.useQuery(
-		{ userId: id!, limit: 15 },
+		{ userId, limit: 15 },
 		{ enabled: Boolean(id) },
 	);
 
 	const { data: matches } = trpc.social.getMatchesWith.useQuery(
-		{ friendId: id! },
+		{ friendId: userId },
 		{ enabled: Boolean(id) && !isOwnProfile },
 	);
 
@@ -69,7 +71,7 @@ export default function UserProfileScreen() {
 						/>
 
 						{!isOwnProfile && (
-							<FollowButton userId={id!} isFollowing={profile.isFollowing} />
+							<FollowButton userId={userId} isFollowing={profile.isFollowing} />
 						)}
 					</View>
 

@@ -1,3 +1,4 @@
+// oxlint-disable no-require-imports
 const { getDefaultConfig } = require("expo/metro-config");
 const path = require("node:path");
 

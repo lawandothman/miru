@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
 	View,
 	Text,
@@ -80,7 +80,7 @@ function countryFlag(code: string): string {
 
 export default function SettingsScreen() {
 	const { data: session } = useSession();
-	const router = useRouter();
+
 	const queryClient = useQueryClient();
 
 	return (
@@ -362,11 +362,10 @@ function RegionPicker() {
 	const [country, setCountry] = useState("");
 	const [expanded, setExpanded] = useState(false);
 
-	useEffect(() => {
-		if (state?.country) {
-			setCountry(state.country);
-		}
-	}, [state?.country]);
+	const stateCountry = state?.country;
+	if (stateCountry && country !== stateCountry && country === "") {
+		setCountry(stateCountry);
+	}
 
 	const setCountryMut = trpc.onboarding.setCountry.useMutation({
 		onSuccess: () => Alert.alert("Region saved"),
@@ -558,7 +557,7 @@ const styles = StyleSheet.create({
 		paddingHorizontal: spacing[2],
 		paddingVertical: spacing[1],
 		borderRadius: radius.full,
-		backgroundColor: Colors.primary + "20",
+		backgroundColor: `${Colors.primary}20`,
 	},
 	chipSmallText: {
 		fontSize: fontSize.xs,
@@ -615,7 +614,7 @@ const styles = StyleSheet.create({
 		borderBottomColor: Colors.border,
 	},
 	regionItemSelected: {
-		backgroundColor: Colors.primary + "15",
+		backgroundColor: `${Colors.primary}15`,
 	},
 	regionItemText: {
 		fontSize: fontSize.base,

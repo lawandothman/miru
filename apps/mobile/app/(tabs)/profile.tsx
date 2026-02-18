@@ -21,7 +21,7 @@ export default function ProfileScreen() {
 	const [activeTab, setActiveTab] = useState<Tab>("watchlist");
 
 	const { data: profile } = trpc.user.getById.useQuery(
-		{ id: userId! },
+		{ id: userId ?? "" },
 		{ enabled: Boolean(userId) },
 	);
 
@@ -52,7 +52,7 @@ export default function ProfileScreen() {
 				hasNextPage={activeQuery.hasNextPage}
 				fetchNextPage={activeQuery.fetchNextPage}
 				isFetchingNextPage={activeQuery.isFetchingNextPage}
-				onRefresh={activeQuery.refetch}
+				onRefresh={() => activeQuery.refetch()}
 				isRefetching={activeQuery.isRefetching}
 				ListHeaderComponent={
 					<View style={styles.headerWrapper}>

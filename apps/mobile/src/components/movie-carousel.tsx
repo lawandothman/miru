@@ -9,7 +9,9 @@ interface MovieCarouselProps {
 }
 
 export function MovieCarousel({ title, movies }: MovieCarouselProps) {
-	if (movies.length === 0) return null;
+	if (movies.length === 0) {
+		return null;
+	}
 
 	return (
 		<View style={styles.container}>

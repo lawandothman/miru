@@ -64,7 +64,8 @@ export default function SettingsGenresScreen() {
 				showsVerticalScrollIndicator={false}
 			>
 				<Text style={styles.description}>
-					Select genres you enjoy. This helps us recommend movies you'll love.
+					Select genres you enjoy. This helps us recommend movies you&apos;ll
+					love.
 				</Text>
 
 				{isLoading ? (
