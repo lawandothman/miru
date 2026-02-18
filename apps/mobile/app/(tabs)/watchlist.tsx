@@ -11,56 +11,51 @@ import { offsetPageParam } from "@/lib/pagination";
 const PAGE_SIZE = 30;
 
 export default function WatchlistScreen() {
-  const router = useRouter();
-  const {
-    data,
-    fetchNextPage,
-    hasNextPage,
-    refetch,
-    isRefetching,
-  } = trpc.watchlist.getMyWatchlist.useInfiniteQuery(
-    { limit: PAGE_SIZE },
-    {
-      getNextPageParam: offsetPageParam(PAGE_SIZE),
-    },
-  );
+	const router = useRouter();
+	const { data, fetchNextPage, hasNextPage, refetch, isRefetching } =
+		trpc.watchlist.getMyWatchlist.useInfiniteQuery(
+			{ limit: PAGE_SIZE },
+			{
+				getNextPageParam: offsetPageParam(PAGE_SIZE),
+			},
+		);
 
-  const movies = data?.pages.flat() ?? [];
+	const movies = data?.pages.flat() ?? [];
 
-  return (
-    <SafeAreaView style={styles.container} edges={["top"]}>
-      <Text style={styles.title}>Watchlist</Text>
-      <MovieGrid
-        movies={movies}
-        hasNextPage={hasNextPage}
-        fetchNextPage={fetchNextPage}
-        onRefresh={refetch}
-        isRefetching={isRefetching}
-        ListEmptyComponent={
-          <EmptyState
-            icon={Bookmark}
-            title="Your watchlist is empty"
-            description="Movies you want to watch will appear here."
-            actionLabel="Browse movies"
-            onAction={() => router.push("/(tabs)/discover")}
-          />
-        }
-      />
-    </SafeAreaView>
-  );
+	return (
+		<SafeAreaView style={styles.container} edges={["top"]}>
+			<Text style={styles.title}>Watchlist</Text>
+			<MovieGrid
+				movies={movies}
+				hasNextPage={hasNextPage}
+				fetchNextPage={fetchNextPage}
+				onRefresh={refetch}
+				isRefetching={isRefetching}
+				ListEmptyComponent={
+					<EmptyState
+						icon={Bookmark}
+						title="Your watchlist is empty"
+						description="Movies you want to watch will appear here."
+						actionLabel="Browse movies"
+						onAction={() => router.push("/(tabs)/discover")}
+					/>
+				}
+			/>
+		</SafeAreaView>
+	);
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  title: {
-    fontSize: fontSize["2xl"],
-    fontFamily: fontFamily.displayBold,
-    color: Colors.foreground,
-    paddingHorizontal: spacing[4],
-    paddingTop: spacing[2],
-    paddingBottom: spacing[3],
-  },
+	container: {
+		flex: 1,
+		backgroundColor: Colors.background,
+	},
+	title: {
+		fontSize: fontSize["2xl"],
+		fontFamily: fontFamily.displayBold,
+		color: Colors.foreground,
+		paddingHorizontal: spacing[4],
+		paddingTop: spacing[2],
+		paddingBottom: spacing[3],
+	},
 });

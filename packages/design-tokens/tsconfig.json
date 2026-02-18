@@ -1,7 +1,7 @@
 {
-  "extends": "@miru/typescript-config/base.json",
-  "compilerOptions": {
-    "outDir": "dist"
-  },
-  "include": ["src"]
+	"extends": "@miru/typescript-config/base.json",
+	"compilerOptions": {
+		"outDir": "dist"
+	},
+	"include": ["src"]
 }

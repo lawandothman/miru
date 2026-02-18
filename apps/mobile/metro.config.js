@@ -11,14 +11,14 @@ config.watchFolders = [monorepoRoot];
 
 // Resolve node_modules from both mobile and root
 config.resolver.nodeModulesPaths = [
-  path.resolve(projectRoot, "node_modules"),
-  path.resolve(monorepoRoot, "node_modules"),
+	path.resolve(projectRoot, "node_modules"),
+	path.resolve(monorepoRoot, "node_modules"),
 ];
 
 // Prevent Metro from trying to bundle server-side code
 config.resolver.blockList = [
-  /packages\/db\/src\/.*/,
-  /packages\/trpc\/src\/.*/,
+	/packages\/db\/src\/.*/,
+	/packages\/trpc\/src\/.*/,
 ];
 
 // Required for Better Auth ESM exports to resolve correctly
