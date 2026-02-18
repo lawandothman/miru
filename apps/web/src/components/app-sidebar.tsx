@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Bookmark, Compass, Eye, Home, Sparkles } from "lucide-react";
+import { Bookmark, Compass, Home, Sparkles } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
 	Sidebar,
@@ -16,7 +16,6 @@ const navItems = [
 	{ href: "/dashboard", icon: Home, label: "Home" },
 	{ href: "/discover", icon: Compass, label: "Discover" },
 	{ href: "/watchlist", icon: Bookmark, label: "Watchlist" },
-	{ href: "/watched", icon: Eye, label: "Watched" },
 	{ href: "/for-you", icon: Sparkles, label: "For You" },
 ] as const;
 

@@ -1,6 +1,7 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
+import { expo } from "@better-auth/expo";
 import { createDb, schema } from "@miru/db";
 import { env } from "@/env";
 
@@ -8,7 +9,7 @@ const db = createDb(env.DATABASE_URL);
 
 export const auth = betterAuth({
 	baseURL: env.BETTER_AUTH_URL,
-	trustedOrigins: ["https://*.vercel.app"],
+	trustedOrigins: ["https://*.vercel.app", "miru://", "http://localhost:3000"],
 	database: drizzleAdapter(db, {
 		provider: "pg",
 		schema: {
@@ -19,7 +20,7 @@ export const auth = betterAuth({
 			verification: schema.verifications,
 		},
 	}),
-	plugins: [nextCookies()],
+	plugins: [nextCookies(), expo()],
 	socialProviders: {
 		google: {
 			clientId: env.GOOGLE_CLIENT_ID ?? "",

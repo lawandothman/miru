@@ -6,6 +6,8 @@
 	"repository": "https://github.com/lawandothman/miru.git",
 	"scripts": {
 		"dev": "turbo dev",
+		"dev:web": "turbo dev --filter=@miru/web",
+		"dev:mobile": "turbo dev --filter=@miru/mobile",
 		"build": "turbo build",
 		"lint": "oxlint .",
 		"lint:fix": "oxlint --fix .",
@@ -19,7 +21,7 @@
 		"db:push": "turbo db:push"
 	},
 	"devDependencies": {
-		"eslint-plugin-react-hooks": "^7.0.1",
+		"eslint-plugin-react-hooks": "catalog:",
 		"oxfmt": "0.32.0",
 		"oxlint": "1.47.0",
 		"turbo": "2.8.8"

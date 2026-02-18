@@ -21,6 +21,13 @@ const dmSans = DM_Sans({
 export const metadata: Metadata = {
 	description:
 		"Build your watchlist, follow friends, and instantly see which movies you both want to watch. The social way to pick your next movie.",
+	icons: {
+		apple: "/apple-touch-icon.png",
+		icon: [
+			{ sizes: "16x16", type: "image/png", url: "/favicon-16x16.png" },
+			{ sizes: "32x32", type: "image/png", url: "/favicon-32x32.png" },
+		],
+	},
 	keywords: [
 		"movies",
 		"watchlist",
@@ -29,6 +36,7 @@ export const metadata: Metadata = {
 		"watch together",
 		"film",
 	],
+	manifest: "/site.webmanifest",
 	metadataBase: new URL(env.BETTER_AUTH_URL),
 	openGraph: {
 		description:

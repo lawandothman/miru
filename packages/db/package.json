@@ -16,13 +16,13 @@
 		"typecheck": "tsc --noEmit"
 	},
 	"dependencies": {
-		"drizzle-orm": "0.45.1",
+		"drizzle-orm": "catalog:",
 		"postgres": "3.4.7"
 	},
 	"devDependencies": {
 		"@miru/typescript-config": "workspace:*",
-		"@types/node": "^25.2.3",
+		"@types/node": "catalog:",
 		"drizzle-kit": "0.31.9",
-		"typescript": "5.9.3"
+		"typescript": "catalog:"
 	}
 }

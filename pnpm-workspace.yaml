@@ -1,3 +1,27 @@
 packages:
   - "apps/*"
   - "packages/*"
+
+catalog:
+  # Auth
+  "@better-auth/expo": "1.4.18"
+  "better-auth": "1.4.18"
+
+  # tRPC
+  "@tanstack/react-query": "5.90.21"
+  "@trpc/client": "11.10.0"
+  "@trpc/react-query": "11.10.0"
+  "@trpc/server": "11.10.0"
+  "superjson": "2.2.6"
+
+  # Shared libraries
+  "@lorenzopant/tmdb": "1.1.1"
+  "drizzle-orm": "0.45.1"
+  "ts-pattern": "5.9.0"
+  "zod": "4.3.6"
+
+  # Dev tooling
+  "@types/node": "25.2.3"
+  "@types/react": "19.2.14"
+  "eslint-plugin-react-hooks": "7.0.1"
+  "typescript": "5.9.3"
