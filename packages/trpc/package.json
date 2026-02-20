@@ -8,6 +8,7 @@
 		"./context": "./src/context.ts"
 	},
 	"scripts": {
+		"test": "vitest run",
 		"typecheck": "tsc --noEmit"
 	},
 	"dependencies": {

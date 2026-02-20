@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
 	View,
 	Text,
@@ -359,13 +359,9 @@ function StreamingSummary() {
 
 function RegionPicker() {
 	const { data: state, isLoading } = trpc.onboarding.getState.useQuery();
-	const [country, setCountry] = useState("");
+	const [editedCountry, setEditedCountry] = useState<string | null>(null);
+	const country = editedCountry ?? state?.country ?? "";
 	const [expanded, setExpanded] = useState(false);
-
-	const stateCountry = state?.country;
-	if (stateCountry && country !== stateCountry && country === "") {
-		setCountry(stateCountry);
-	}
 
 	const setCountryMut = trpc.onboarding.setCountry.useMutation({
 		onSuccess: () => Alert.alert("Region saved"),
@@ -410,7 +406,7 @@ function RegionPicker() {
 									isSelected && styles.regionItemSelected,
 								]}
 								onPress={() => {
-									setCountry(c.code);
+									setEditedCountry(c.code);
 									setExpanded(false);
 									if (c.code !== (state?.country ?? "")) {
 										setCountryMut.mutate({ country: c.code });

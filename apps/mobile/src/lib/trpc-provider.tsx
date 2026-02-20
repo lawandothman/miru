@@ -4,8 +4,7 @@ import { httpBatchLink } from "@trpc/client";
 import superjson from "superjson";
 import { trpc } from "./trpc";
 import { authClient } from "./auth";
-
-const API_URL = process.env.EXPO_PUBLIC_API_URL;
+import { API_URL } from "./api-url";
 
 export function TRPCProvider({ children }: { children: React.ReactNode }) {
 	const [queryClient] = useState(

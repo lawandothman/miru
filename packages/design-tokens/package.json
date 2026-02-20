@@ -9,6 +9,9 @@
 		"./typography": "./src/typography.ts",
 		"./radius": "./src/radius.ts"
 	},
+	"scripts": {
+		"test": "vitest run"
+	},
 	"devDependencies": {
 		"@miru/typescript-config": "workspace:*",
 		"typescript": "catalog:"

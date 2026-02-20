@@ -9,7 +9,15 @@ const db = createDb(env.DATABASE_URL);
 
 export const auth = betterAuth({
 	baseURL: env.BETTER_AUTH_URL,
-	trustedOrigins: ["https://*.vercel.app", "miru://", "http://localhost:3000"],
+	trustedOrigins: [
+		"https://*.vercel.app",
+		"https://*.ngrok-free.app",
+		"miru://",
+		"http://localhost:3000",
+		"http://192.168.*",
+		"http://10.*",
+		"http://172.16.*",
+	],
 	database: drizzleAdapter(db, {
 		provider: "pg",
 		schema: {

@@ -132,6 +132,19 @@ function groupMatchesByFriend(
 	);
 }
 
+async function assertUserExists(db: Database, userId: string) {
+	const user = await db.query.users.findFirst({
+		where: eq(schema.users.id, userId),
+		columns: { id: true },
+	});
+	if (!user) {
+		throw new TRPCError({
+			code: "NOT_FOUND",
+			message: "User not found",
+		});
+	}
+}
+
 export const socialRouter = router({
 	getDashboardMatches: protectedProcedure.query(async ({ ctx }) => {
 		const userId = ctx.session.user.id;
@@ -150,7 +163,7 @@ export const socialRouter = router({
 	}),
 
 	follow: protectedProcedure
-		.input(z.object({ friendId: z.string() }))
+		.input(z.object({ friendId: z.string().min(1) }))
 		.mutation(async ({ ctx, input }) => {
 			if (input.friendId === ctx.session.user.id) {
 				throw new TRPCError({
@@ -158,6 +171,8 @@ export const socialRouter = router({
 					message: "Cannot follow yourself",
 				});
 			}
+
+			await assertUserExists(ctx.db, input.friendId);
 
 			await ctx.db
 				.insert(schema.follows)
@@ -171,7 +186,7 @@ export const socialRouter = router({
 		}),
 
 	getFollowers: publicProcedure
-		.input(z.object({ userId: z.string() }))
+		.input(z.object({ userId: z.string().min(1) }))
 		.query(async ({ ctx, input }) => {
 			const followers = await ctx.db
 				.select({
@@ -187,7 +202,7 @@ export const socialRouter = router({
 		}),
 
 	getFollowing: publicProcedure
-		.input(z.object({ userId: z.string() }))
+		.input(z.object({ userId: z.string().min(1) }))
 		.query(async ({ ctx, input }) => {
 			const following = await ctx.db
 				.select({
@@ -206,8 +221,10 @@ export const socialRouter = router({
 		}),
 
 	getMatchesWith: protectedProcedure
-		.input(z.object({ friendId: z.string() }))
+		.input(z.object({ friendId: z.string().min(1) }))
 		.query(async ({ ctx, input }) => {
+			await assertUserExists(ctx.db, input.friendId);
+
 			const myWatchlist = ctx.db
 				.select({ movieId: schema.watchlistEntries.movieId })
 				.from(schema.watchlistEntries)
@@ -252,16 +269,15 @@ export const socialRouter = router({
 		}),
 
 	searchUsers: publicProcedure
-		.input(z.object({ query: z.string().min(1) }))
+		.input(z.object({ query: z.string().min(1).max(100) }))
 		.query(async ({ ctx, input }) => {
 			const escaped = input.query.replace(/[%_\\]/g, "\\$&");
-			const currentUserId = ctx.session?.user.id;
+			const currentUserId = ctx.session?.user?.id;
 			const users = await ctx.db
 				.select({
 					id: schema.users.id,
 					name: schema.users.name,
 					image: schema.users.image,
-					email: schema.users.email,
 				})
 				.from(schema.users)
 				.where(
@@ -276,7 +292,7 @@ export const socialRouter = router({
 		}),
 
 	unfollow: protectedProcedure
-		.input(z.object({ friendId: z.string() }))
+		.input(z.object({ friendId: z.string().min(1) }))
 		.mutation(async ({ ctx, input }) => {
 			await ctx.db
 				.delete(schema.follows)

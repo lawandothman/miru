@@ -7,6 +7,7 @@ export {
 export { spacing, type SpacingKey } from "./spacing";
 export {
 	fontFamily,
+	mobileFontFamily,
 	fontSize,
 	lineHeight,
 	fontWeight,

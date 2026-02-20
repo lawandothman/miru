@@ -19,6 +19,9 @@
 		},
 		"//#lint": {},
 		"//#format:check": {},
+		"test": {
+			"dependsOn": ["^build"]
+		},
 		"typecheck": {
 			"dependsOn": ["^typecheck"]
 		},

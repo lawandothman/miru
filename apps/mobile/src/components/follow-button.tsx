@@ -1,4 +1,5 @@
 import { Pressable, Text, StyleSheet, ActivityIndicator } from "react-native";
+import { UserPlus, UserMinus } from "lucide-react-native";
 import { trpc } from "@/lib/trpc";
 import { Colors, fontSize, fontFamily, spacing, radius } from "@/lib/constants";
 
@@ -29,6 +30,9 @@ export function FollowButton({ userId, isFollowing }: FollowButtonProps) {
 		}
 	}
 
+	const Icon = isFollowing ? UserMinus : UserPlus;
+	const iconColor = isFollowing ? Colors.foreground : Colors.primaryForeground;
+
 	return (
 		<Pressable
 			style={({ pressed }) => [
@@ -40,19 +44,19 @@ export function FollowButton({ userId, isFollowing }: FollowButtonProps) {
 			disabled={loading}
 		>
 			{loading ? (
-				<ActivityIndicator
-					size="small"
-					color={isFollowing ? Colors.foreground : Colors.primaryForeground}
-				/>
+				<ActivityIndicator size="small" color={iconColor} />
 			) : (
-				<Text
-					style={[
-						styles.text,
-						isFollowing ? styles.followingText : styles.notFollowingText,
-					]}
-				>
-					{isFollowing ? "Following" : "Follow"}
-				</Text>
+				<>
+					<Icon size={14} color={iconColor} />
+					<Text
+						style={[
+							styles.text,
+							isFollowing ? styles.followingText : styles.notFollowingText,
+						]}
+					>
+						{isFollowing ? "Following" : "Follow"}
+					</Text>
+				</>
 			)}
 		</Pressable>
 	);
@@ -60,11 +64,13 @@ export function FollowButton({ userId, isFollowing }: FollowButtonProps) {
 
 const styles = StyleSheet.create({
 	button: {
+		flexDirection: "row",
 		paddingHorizontal: spacing[5],
 		paddingVertical: spacing[2],
 		borderRadius: radius.full,
 		alignItems: "center",
 		justifyContent: "center",
+		gap: spacing[1.5],
 		minWidth: 100,
 	},
 	notFollowing: {

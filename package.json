@@ -13,7 +13,8 @@
 		"lint:fix": "oxlint --fix .",
 		"format": "oxfmt .",
 		"format:check": "oxfmt --check",
-		"check": "turbo run lint format:check typecheck",
+		"test": "turbo test",
+		"check": "turbo run lint format:check typecheck test",
 		"typecheck": "turbo typecheck",
 		"db:generate": "turbo db:generate",
 		"db:migrate": "turbo db:migrate",
@@ -24,7 +25,8 @@
 		"eslint-plugin-react-hooks": "catalog:",
 		"oxfmt": "0.32.0",
 		"oxlint": "1.47.0",
-		"turbo": "2.8.8"
+		"turbo": "2.8.8",
+		"vitest": "^4.0.18"
 	},
 	"packageManager": "pnpm@10.29.3"
 }

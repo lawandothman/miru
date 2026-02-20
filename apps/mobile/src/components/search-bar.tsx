@@ -47,6 +47,15 @@ export function SearchBar() {
 		router.push(`/movie/${id}`);
 	}
 
+	function handleSubmit() {
+		const trimmed = query.trim();
+		if (trimmed.length === 0) {
+			return;
+		}
+		inputRef.current?.blur();
+		router.push(`/discover/search?q=${encodeURIComponent(trimmed)}`);
+	}
+
 	return (
 		<View style={styles.container}>
 			<View style={styles.inputContainer}>
@@ -61,6 +70,7 @@ export function SearchBar() {
 					onFocus={() => setFocused(true)}
 					onBlur={() => setTimeout(() => setFocused(false), 200)}
 					returnKeyType="search"
+					onSubmitEditing={handleSubmit}
 				/>
 				{query.length > 0 && (
 					<Pressable onPress={handleClear}>

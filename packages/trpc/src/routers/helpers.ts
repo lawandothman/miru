@@ -1,4 +1,5 @@
 import { type Database, schema } from "@miru/db";
+import { TMDBError } from "@lorenzopant/tmdb";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import type { TMDBClient } from "../tmdb";
@@ -32,10 +33,18 @@ export async function ensureMovieExists(
 				popularity: details.popularity ?? null,
 			})
 			.onConflictDoNothing();
-	} catch {
+	} catch (error) {
+		if (error instanceof TMDBError && error.http_status_code === 404) {
+			throw new TRPCError({
+				code: "NOT_FOUND",
+				message: "Movie not found on TMDB",
+			});
+		}
+
 		throw new TRPCError({
-			code: "NOT_FOUND",
-			message: "Movie not found on TMDB",
+			code: "INTERNAL_SERVER_ERROR",
+			message: "Failed to verify movie. Please try again.",
+			cause: error,
 		});
 	}
 }

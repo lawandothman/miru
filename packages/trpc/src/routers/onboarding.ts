@@ -1,4 +1,5 @@
 import { schema } from "@miru/db";
+import { TRPCError } from "@trpc/server";
 import { and, count, desc, eq, inArray, ne, notInArray } from "drizzle-orm";
 import { z } from "zod";
 import { annotateFollowStatus } from "../helpers";
@@ -16,8 +17,8 @@ export const onboardingRouter = router({
 	getRecommendedMovies: protectedProcedure
 		.input(
 			z.object({
-				genreIds: z.array(z.number()).min(1),
-				limit: z.number().default(20),
+				genreIds: z.array(z.number().int().positive()).min(1),
+				limit: z.number().int().min(1).max(100).default(20),
 			}),
 		)
 		.query(async ({ ctx, input }) => {
@@ -62,7 +63,7 @@ export const onboardingRouter = router({
 	getState: protectedProcedure.query(async ({ ctx }) => {
 		const userId = ctx.session.user.id;
 
-		const [user, genrePrefs, streamingPrefs, [watchlistCount], [followCount]] =
+		const [user, genrePrefs, streamingPrefs, watchlistRows, followRows] =
 			await Promise.all([
 				ctx.db.query.users.findFirst({
 					where: eq(schema.users.id, userId),
@@ -85,13 +86,20 @@ export const onboardingRouter = router({
 					.where(eq(schema.follows.followerId, userId)),
 			]);
 
+		if (!user) {
+			throw new TRPCError({
+				code: "NOT_FOUND",
+				message: "User account not found",
+			});
+		}
+
 		return {
-			isCompleted: Boolean(user?.onboardingCompletedAt),
-			country: user?.country ?? null,
+			isCompleted: Boolean(user.onboardingCompletedAt),
+			country: user.country ?? null,
 			genreIds: genrePrefs.map((p) => p.genreId),
 			providerIds: streamingPrefs.map((p) => p.providerId),
-			watchlistCount: watchlistCount?.count ?? 0,
-			followCount: followCount?.count ?? 0,
+			watchlistCount: watchlistRows[0]?.count ?? 0,
+			followCount: followRows[0]?.count ?? 0,
 		};
 	}),
 
@@ -140,41 +148,45 @@ export const onboardingRouter = router({
 		}),
 
 	setGenrePreferences: protectedProcedure
-		.input(z.object({ genreIds: z.array(z.number()).min(1) }))
+		.input(z.object({ genreIds: z.array(z.number().int().positive()).min(1) }))
 		.mutation(async ({ ctx, input }) => {
 			const userId = ctx.session.user.id;
 
-			await ctx.db
-				.delete(schema.userGenrePreferences)
-				.where(eq(schema.userGenrePreferences.userId, userId));
+			await ctx.db.transaction(async (tx) => {
+				await tx
+					.delete(schema.userGenrePreferences)
+					.where(eq(schema.userGenrePreferences.userId, userId));
 
-			await ctx.db.insert(schema.userGenrePreferences).values(
-				input.genreIds.map((genreId) => ({
-					userId,
-					genreId,
-				})),
-			);
+				await tx.insert(schema.userGenrePreferences).values(
+					input.genreIds.map((genreId) => ({
+						userId,
+						genreId,
+					})),
+				);
+			});
 
 			return { success: true };
 		}),
 
 	setStreamingServices: protectedProcedure
-		.input(z.object({ providerIds: z.array(z.number()) }))
+		.input(z.object({ providerIds: z.array(z.number().int().positive()) }))
 		.mutation(async ({ ctx, input }) => {
 			const userId = ctx.session.user.id;
 
-			await ctx.db
-				.delete(schema.userStreamingServices)
-				.where(eq(schema.userStreamingServices.userId, userId));
+			await ctx.db.transaction(async (tx) => {
+				await tx
+					.delete(schema.userStreamingServices)
+					.where(eq(schema.userStreamingServices.userId, userId));
 
-			if (input.providerIds.length > 0) {
-				await ctx.db.insert(schema.userStreamingServices).values(
-					input.providerIds.map((providerId) => ({
-						userId,
-						providerId,
-					})),
-				);
-			}
+				if (input.providerIds.length > 0) {
+					await tx.insert(schema.userStreamingServices).values(
+						input.providerIds.map((providerId) => ({
+							userId,
+							providerId,
+						})),
+					);
+				}
+			});
 
 			return { success: true };
 		}),
