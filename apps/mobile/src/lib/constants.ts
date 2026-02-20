@@ -2,6 +2,7 @@ import { darkColors } from "@miru/design-tokens/colors";
 import { spacing } from "@miru/design-tokens/spacing";
 import { radius } from "@miru/design-tokens/radius";
 import {
+	mobileFontFamily,
 	fontSize,
 	lineHeight,
 	fontWeight,
@@ -9,16 +10,7 @@ import {
 
 export { spacing, radius, fontSize, lineHeight, fontWeight };
 
-// Font family names matching the loaded @expo-google-fonts
-export const fontFamily = {
-	sans: "DMSans_400Regular",
-	sansMedium: "DMSans_500Medium",
-	sansSemibold: "DMSans_600SemiBold",
-	sansBold: "DMSans_700Bold",
-	display: "Syne_400Regular",
-	displaySemibold: "Syne_600SemiBold",
-	displayBold: "Syne_700Bold",
-} as const;
+export const fontFamily = mobileFontFamily;
 
 // Mobile is dark-mode only for v1
 export const Colors = darkColors;

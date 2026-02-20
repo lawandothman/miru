@@ -1,12 +1,13 @@
 import { schema } from "@miru/db";
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { z } from "zod";
+import { getMovieIdSet } from "../helpers";
 import { protectedProcedure, publicProcedure, router } from "../trpc";
 import { ensureMovieExists } from "./helpers";
 
 export const watchlistRouter = router({
 	add: protectedProcedure
-		.input(z.object({ movieId: z.number() }))
+		.input(z.object({ movieId: z.number().int().positive() }))
 		.mutation(async ({ ctx, input }) => {
 			await ensureMovieExists(ctx.db, ctx.tmdb, input.movieId);
 
@@ -24,8 +25,8 @@ export const watchlistRouter = router({
 	getMyWatchlist: protectedProcedure
 		.input(
 			z.object({
-				cursor: z.number().nullish(),
-				limit: z.number().default(20),
+				cursor: z.number().int().min(0).nullish(),
+				limit: z.number().int().min(1).max(100).default(20),
 			}),
 		)
 		.query(async ({ ctx, input }) => {
@@ -46,7 +47,12 @@ export const watchlistRouter = router({
 		}),
 
 	getUserWatchlist: publicProcedure
-		.input(z.object({ userId: z.string(), limit: z.number().default(30) }))
+		.input(
+			z.object({
+				userId: z.string().min(1),
+				limit: z.number().int().min(1).max(100).default(30),
+			}),
+		)
 		.query(async ({ ctx, input }) => {
 			const entries = await ctx.db.query.watchlistEntries.findMany({
 				where: eq(schema.watchlistEntries.userId, input.userId),
@@ -56,19 +62,11 @@ export const watchlistRouter = router({
 			});
 
 			const movieIds = entries.map((e) => e.movie.id);
-			let watchlistSet = new Set<number>();
-			if (ctx.session?.user && movieIds.length > 0) {
-				const myEntries = await ctx.db
-					.select({ movieId: schema.watchlistEntries.movieId })
-					.from(schema.watchlistEntries)
-					.where(
-						and(
-							eq(schema.watchlistEntries.userId, ctx.session.user.id),
-							inArray(schema.watchlistEntries.movieId, movieIds),
-						),
-					);
-				watchlistSet = new Set(myEntries.map((e) => e.movieId));
-			}
+			const watchlistSet = await getMovieIdSet(
+				ctx,
+				schema.watchlistEntries,
+				movieIds,
+			);
 
 			return entries.map((e) => ({
 				...e.movie,
@@ -77,7 +75,7 @@ export const watchlistRouter = router({
 		}),
 
 	remove: protectedProcedure
-		.input(z.object({ movieId: z.number() }))
+		.input(z.object({ movieId: z.number().int().positive() }))
 		.mutation(async ({ ctx, input }) => {
 			await ctx.db
 				.delete(schema.watchlistEntries)

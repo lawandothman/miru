@@ -3,7 +3,7 @@
  *
  * Font families:
  * - Web uses DM Sans (body) and Syne (display) via Google Fonts / CSS variables.
- * - Mobile uses system fonts by default; can load custom fonts via expo-font.
+ * - Mobile loads custom fonts via expo-font with weight-specific names.
  *
  * Size and weight values are shared across both platforms.
  */
@@ -12,6 +12,20 @@ export const fontFamily = {
 	sans: "DM Sans",
 	display: "Syne",
 	mono: "monospace",
+} as const;
+
+/**
+ * React Native requires weight-specific font family names.
+ * These map to @expo-google-fonts loaded fonts.
+ */
+export const mobileFontFamily = {
+	sans: "DMSans_400Regular",
+	sansMedium: "DMSans_500Medium",
+	sansSemibold: "DMSans_600SemiBold",
+	sansBold: "DMSans_700Bold",
+	display: "Syne_400Regular",
+	displaySemibold: "Syne_600SemiBold",
+	displayBold: "Syne_700Bold",
 } as const;
 
 export const fontSize = {

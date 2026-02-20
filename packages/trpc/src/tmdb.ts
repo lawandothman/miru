@@ -52,7 +52,10 @@ export class TMDBClient extends TMDB {
 		);
 
 		if (!response.ok) {
-			throw new Error(`TMDB popular failed: ${response.statusText}`);
+			const body = await response.text().catch(() => "");
+			throw new Error(
+				`TMDB popular failed (${response.status}): ${response.statusText} ${body}`.trim(),
+			);
 		}
 
 		return response.json() as Promise<TMDBDiscoverResponse>;
@@ -70,7 +73,10 @@ export class TMDBClient extends TMDB {
 		);
 
 		if (!response.ok) {
-			throw new Error(`TMDB now_playing failed: ${response.statusText}`);
+			const body = await response.text().catch(() => "");
+			throw new Error(
+				`TMDB now_playing failed (${response.status}): ${response.statusText} ${body}`.trim(),
+			);
 		}
 
 		return response.json() as Promise<TMDBDiscoverResponse>;
@@ -107,7 +113,10 @@ export class TMDBClient extends TMDB {
 		);
 
 		if (!response.ok) {
-			throw new Error(`TMDB discover failed: ${response.statusText}`);
+			const body = await response.text().catch(() => "");
+			throw new Error(
+				`TMDB discover failed (${response.status}): ${response.statusText} ${body}`.trim(),
+			);
 		}
 
 		return response.json() as Promise<TMDBDiscoverResponse>;

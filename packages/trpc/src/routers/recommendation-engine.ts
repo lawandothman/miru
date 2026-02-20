@@ -1,6 +1,7 @@
 import { type Database, schema } from "@miru/db";
 import { and, count, eq, inArray, sql } from "drizzle-orm";
 import { match } from "ts-pattern";
+import { buildGenreMap } from "../helpers";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -204,10 +205,7 @@ export async function findSimilarUsers(
 
 	for (const [otherUserId, overlap] of overlapMap.entries()) {
 		const otherTotal = totalCountMap.get(otherUserId) ?? 0;
-		if (otherTotal < COLLAB_MIN_MOVIES) {
-			// biome-ignore format: control flow
-			/* skip */
-		} else {
+		if (otherTotal >= COLLAB_MIN_MOVIES) {
 			const union = userSetSize + otherTotal - overlap;
 			const similarity = union > 0 ? overlap / union : 0;
 			if (similarity > 0) {
@@ -441,17 +439,9 @@ export async function getRecommendedMovies(
 				),
 		]);
 
-	const movieGenreMap = new Map<number, number[]>();
-	for (const row of movieGenreRows) {
-		const existing = movieGenreMap.get(row.movieId) ?? [];
-		existing.push(row.genreId);
-		movieGenreMap.set(row.movieId, existing);
-	}
+	const movieGenreMap = buildGenreMap(movieGenreRows);
 
-	const streamingSet = new Set<number>();
-	for (const row of streamRows) {
-		streamingSet.add(row.movieId);
-	}
+	const streamingSet = new Set(streamRows.map((r) => r.movieId));
 
 	const now = Date.now();
 	const decayedFriendCount = new Map<number, number>();
@@ -569,19 +559,16 @@ export function diversityRerank(
 		if (result.length >= limit) {
 			break;
 		}
-		if (used.has(movie.id)) {
-			// already picked
-		} else {
+		if (!used.has(movie.id)) {
 			const pg = primaryGenreFor(movie.id);
-			let skip = false;
-			if (pg !== null) {
-				const last2 = recentGenres.slice(-2);
-				if (last2.length === 2 && last2[0] === pg && last2[1] === pg) {
-					skip = true;
-				}
-			}
+			const last2 = recentGenres.slice(-2);
+			const isRepeatGenre =
+				pg !== null &&
+				last2.length === 2 &&
+				last2[0] === pg &&
+				last2[1] === pg;
 
-			if (!skip) {
+			if (!isRepeatGenre) {
 				result.push(movie);
 				used.add(movie.id);
 				if (pg !== null) {

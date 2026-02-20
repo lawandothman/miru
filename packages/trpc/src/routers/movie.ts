@@ -1,4 +1,5 @@
 import { type Database, schema } from "@miru/db";
+import { TMDBError } from "@lorenzopant/tmdb";
 import { TRPCError } from "@trpc/server";
 import {
 	and,
@@ -11,6 +12,7 @@ import {
 	lte,
 } from "drizzle-orm";
 import { z } from "zod";
+import { buildGenreMap, getMovieStatuses } from "../helpers";
 import type { TMDBClient } from "../tmdb";
 import { protectedProcedure, publicProcedure, router } from "../trpc";
 import {
@@ -42,8 +44,8 @@ export const movieRouter = router({
 	getByGenre: publicProcedure
 		.input(
 			z.object({
-				cursor: z.number().nullish(),
-				genreId: z.number(),
+				cursor: z.number().int().min(0).nullish(),
+				genreId: z.number().int().positive(),
 			}),
 		)
 		.query(async ({ ctx, input }) => {
@@ -72,10 +74,7 @@ export const movieRouter = router({
 				.offset(offset);
 
 			const movieIds = movies.map((m) => m.id);
-			const [watchlistSet, watchedSet] = await Promise.all([
-				getMovieIdSet(ctx, schema.watchlistEntries, movieIds),
-				getMovieIdSet(ctx, schema.watchedEntries, movieIds),
-			]);
+			const { watchlistSet, watchedSet } = await getMovieStatuses(ctx, movieIds);
 
 			return movies.map((m) => ({
 				...m,
@@ -85,7 +84,7 @@ export const movieRouter = router({
 		}),
 
 	getById: publicProcedure
-		.input(z.object({ tmdbId: z.number() }))
+		.input(z.object({ tmdbId: z.number().int().positive() }))
 		.query(async ({ ctx, input }) => {
 			const existing = await ctx.db.query.movies.findFirst({
 				where: eq(schema.movies.id, input.tmdbId),
@@ -175,8 +174,8 @@ export const movieRouter = router({
 	getForYou: protectedProcedure
 		.input(
 			z.object({
-				cursor: z.number().nullish(),
-				limit: z.number().default(DEFAULT_PAGE_SIZE),
+				cursor: z.number().int().min(0).nullish(),
+				limit: z.number().int().min(1).max(100).default(DEFAULT_PAGE_SIZE),
 			}),
 		)
 		.query(async ({ ctx, input }) => {
@@ -209,7 +208,6 @@ export const movieRouter = router({
 				...existingWatchlist.map((e) => e.movieId),
 				...existingWatched.map((e) => e.movieId),
 			];
-			const excludeIds = [...userMovieIds];
 			const userStreamingProviderIds = userStreamingServices.map(
 				(s) => s.providerId,
 			);
@@ -223,7 +221,7 @@ export const movieRouter = router({
 				userId,
 				genreWeights,
 				similarUsers,
-				excludeIds,
+				userMovieIds,
 				userStreamingProviderIds,
 			);
 
@@ -240,12 +238,7 @@ export const movieRouter = router({
 							.where(inArray(schema.movieGenres.movieId, candidateIds))
 					: [];
 
-			const movieGenreMap = new Map<number, number[]>();
-			for (const row of movieGenreRows) {
-				const existing = movieGenreMap.get(row.movieId) ?? [];
-				existing.push(row.genreId);
-				movieGenreMap.set(row.movieId, existing);
-			}
+			const movieGenreMap = buildGenreMap(movieGenreRows);
 
 			// Diversity re-rank the full list, then paginate
 			const reranked = diversityRerank(
@@ -276,7 +269,7 @@ export const movieRouter = router({
 		}),
 
 	getGenreById: publicProcedure
-		.input(z.object({ id: z.number() }))
+		.input(z.object({ id: z.number().int().positive() }))
 		.query(async ({ ctx, input }) => {
 			const genre = await ctx.db.query.genres.findFirst({
 				where: eq(schema.genres.id, input.id),
@@ -308,13 +301,21 @@ export const movieRouter = router({
 						.onConflictDoNothing();
 					genres = await ctx.db.select().from(schema.genres);
 				}
-			} catch {
-				// Ignore TMDB errors and return whatever is currently in the DB.
+			} catch (error) {
+				// eslint-disable-next-line no-console
+				console.error("[getGenres] Failed to fetch genres from TMDB:", error);
+				throw new TRPCError({
+					code: "INTERNAL_SERVER_ERROR",
+					message: "Unable to load genres. Please try again later.",
+					cause: error,
+				});
 			}
 		}
 
 		genres.sort((a, b) => a.name.localeCompare(b.name));
-		genresCache = { data: genres, ts: Date.now() };
+		if (genres.length > 0) {
+			genresCache = { data: genres, ts: Date.now() };
+		}
 		return genres;
 	}),
 
@@ -328,9 +329,9 @@ export const movieRouter = router({
 	getPopular: publicProcedure
 		.input(
 			z.object({
-				cursor: z.number().nullish(),
-				limit: z.number().default(DEFAULT_PAGE_SIZE),
-				providerIds: z.array(z.number()).optional(),
+				cursor: z.number().int().min(0).nullish(),
+				limit: z.number().int().min(1).max(100).default(DEFAULT_PAGE_SIZE),
+				providerIds: z.array(z.number().int().positive()).optional(),
 			}),
 		)
 		.query(async ({ ctx, input }) => {
@@ -371,10 +372,10 @@ export const movieRouter = router({
 				.offset(offset);
 
 			const popularMovieIds = movies.map((m) => m.id);
-			const [watchlistSet, watchedSet] = await Promise.all([
-				getMovieIdSet(ctx, schema.watchlistEntries, popularMovieIds),
-				getMovieIdSet(ctx, schema.watchedEntries, popularMovieIds),
-			]);
+			const { watchlistSet, watchedSet } = await getMovieStatuses(
+				ctx,
+				popularMovieIds,
+			);
 
 			return movies.map((m) => ({
 				...m,
@@ -386,20 +387,29 @@ export const movieRouter = router({
 	search: publicProcedure
 		.input(
 			z.object({
-				query: z.string().min(1),
-				cursor: z.number().nullish(),
-				year: z.number().optional(),
-				genres: z.array(z.number()).optional(),
+				query: z.string().min(1).max(200),
+				cursor: z.number().int().min(1).max(500).nullish(),
+				year: z.number().int().min(1900).max(2100).optional(),
+				genres: z.array(z.number().int().positive()).optional(),
 			}),
 		)
 		.query(async ({ ctx, input }) => {
 			const page = input.cursor ?? 1;
-			const tmdbResults = await ctx.tmdb.search.movies({
-				query: input.query,
-				page,
-				include_adult: false,
-				...(input.year ? { year: String(input.year) } : {}),
-			});
+			let tmdbResults;
+			try {
+				tmdbResults = await ctx.tmdb.search.movies({
+					query: input.query,
+					page,
+					include_adult: false,
+					...(input.year ? { year: String(input.year) } : {}),
+				});
+			} catch (error) {
+				throw new TRPCError({
+					code: "INTERNAL_SERVER_ERROR",
+					message: "Search is temporarily unavailable. Please try again later.",
+					cause: error,
+				});
+			}
 
 			let safeResults = tmdbResults.results.filter((r) => !r.adult);
 
@@ -413,28 +423,29 @@ export const movieRouter = router({
 			const movieIds = safeResults.map((r) => r.id);
 
 			if (movieIds.length > 0) {
-				await ctx.db
-					.insert(schema.movies)
-					.values(
-						safeResults.map((result) => ({
-							id: result.id,
-							title: result.title,
-							originalTitle: result.original_title ?? null,
-							overview: result.overview ?? null,
-							posterPath: result.poster_path ?? null,
-							backdropPath: result.backdrop_path ?? null,
-							releaseDate: result.release_date ?? null,
-							adult: false,
-							popularity: result.popularity ?? null,
-						})),
-					)
-					.onConflictDoNothing();
+				try {
+					await ctx.db
+						.insert(schema.movies)
+						.values(
+							safeResults.map((result) => ({
+								id: result.id,
+								title: result.title,
+								originalTitle: result.original_title ?? null,
+								overview: result.overview ?? null,
+								posterPath: result.poster_path ?? null,
+								backdropPath: result.backdrop_path ?? null,
+								releaseDate: result.release_date ?? null,
+								adult: false,
+								popularity: result.popularity ?? null,
+							})),
+						)
+						.onConflictDoNothing();
+				} catch {
+					// Best-effort cache; search results are still valid from TMDB
+				}
 			}
 
-			const [watchlistSet, watchedSet] = await Promise.all([
-				getMovieIdSet(ctx, schema.watchlistEntries, movieIds),
-				getMovieIdSet(ctx, schema.watchedEntries, movieIds),
-			]);
+			const { watchlistSet, watchedSet } = await getMovieStatuses(ctx, movieIds);
 
 			return {
 				results: safeResults.map((r) => ({
@@ -455,11 +466,20 @@ export const movieRouter = router({
 	searchAutocomplete: publicProcedure
 		.input(z.object({ query: z.string().min(1) }))
 		.query(async ({ ctx, input }) => {
-			const tmdbResults = await ctx.tmdb.search.movies({
-				query: input.query,
-				page: 1,
-				include_adult: false,
-			});
+			let tmdbResults;
+			try {
+				tmdbResults = await ctx.tmdb.search.movies({
+					query: input.query,
+					page: 1,
+					include_adult: false,
+				});
+			} catch (error) {
+				throw new TRPCError({
+					code: "INTERNAL_SERVER_ERROR",
+					message: "Search is temporarily unavailable. Please try again later.",
+					cause: error,
+				});
+			}
 
 			return tmdbResults.results
 				.filter((r) => !r.adult)
@@ -542,10 +562,10 @@ export const movieRouter = router({
 	discover: publicProcedure
 		.input(
 			z.object({
-				cursor: z.number().nullish(),
-				genres: z.array(z.number()).optional(),
-				yearGte: z.number().min(1900).max(2100).optional(),
-				yearLte: z.number().min(1900).max(2100).optional(),
+				cursor: z.number().int().min(1).max(500).nullish(),
+				genres: z.array(z.number().int().positive()).optional(),
+				yearGte: z.number().int().min(1900).max(2100).optional(),
+				yearLte: z.number().int().min(1900).max(2100).optional(),
 				sortBy: z
 					.enum([
 						"popularity.desc",
@@ -559,40 +579,51 @@ export const movieRouter = router({
 		.query(async ({ ctx, input }) => {
 			const page = input.cursor ?? 1;
 
-			const data = await ctx.tmdb.discoverMovies({
-				genres: input.genres,
-				yearGte: input.yearGte,
-				yearLte: input.yearLte,
-				sortBy: input.sortBy,
-				page,
-			});
+			let data;
+			try {
+				data = await ctx.tmdb.discoverMovies({
+					genres: input.genres,
+					yearGte: input.yearGte,
+					yearLte: input.yearLte,
+					sortBy: input.sortBy,
+					page,
+				});
+			} catch (error) {
+				throw new TRPCError({
+					code: "INTERNAL_SERVER_ERROR",
+					message:
+						"Discover is temporarily unavailable. Please try again later.",
+					cause: error,
+				});
+			}
 
 			const safeResults = data.results.filter((r) => !r.adult);
 			const movieIds = safeResults.map((r) => r.id);
 
 			if (movieIds.length > 0) {
-				await ctx.db
-					.insert(schema.movies)
-					.values(
-						safeResults.map((result) => ({
-							id: result.id,
-							title: result.title,
-							originalTitle: result.original_title ?? null,
-							overview: result.overview ?? null,
-							posterPath: result.poster_path ?? null,
-							backdropPath: result.backdrop_path ?? null,
-							releaseDate: result.release_date ?? null,
-							adult: false,
-							popularity: result.popularity ?? null,
-						})),
-					)
-					.onConflictDoNothing();
+				try {
+					await ctx.db
+						.insert(schema.movies)
+						.values(
+							safeResults.map((result) => ({
+								id: result.id,
+								title: result.title,
+								originalTitle: result.original_title ?? null,
+								overview: result.overview ?? null,
+								posterPath: result.poster_path ?? null,
+								backdropPath: result.backdrop_path ?? null,
+								releaseDate: result.release_date ?? null,
+								adult: false,
+								popularity: result.popularity ?? null,
+							})),
+						)
+						.onConflictDoNothing();
+				} catch {
+					// Best-effort cache; discover results are still valid from TMDB
+				}
 			}
 
-			const [watchlistSet, watchedSet] = await Promise.all([
-				getMovieIdSet(ctx, schema.watchlistEntries, movieIds),
-				getMovieIdSet(ctx, schema.watchedEntries, movieIds),
-			]);
+			const { watchlistSet, watchedSet } = await getMovieStatuses(ctx, movieIds);
 
 			return {
 				results: safeResults.map((r) => ({
@@ -703,9 +734,27 @@ async function refreshMovie(
 		}
 
 		return findMovieWithProviders(ctx.db, tmdbId);
-	} catch {
-		// If TMDB is down, return stale data from DB
-		return findMovieWithProviders(ctx.db, tmdbId);
+	} catch (error) {
+		// Only fall back to stale data for TMDB API errors, not database errors
+		const isTmdbError =
+			error instanceof TMDBError ||
+			error instanceof TypeError ||
+			(error instanceof Error && error.message.startsWith("TMDB"));
+
+		if (!isTmdbError) {
+			throw error;
+		}
+
+		// eslint-disable-next-line no-console
+		console.error(`[TMDB] Failed to refresh movie ${tmdbId}:`, error);
+		const staleMovie = await findMovieWithProviders(ctx.db, tmdbId);
+		if (!staleMovie) {
+			throw new TRPCError({
+				code: "INTERNAL_SERVER_ERROR",
+				message: "Movie data unavailable. Please try again later.",
+			});
+		}
+		return staleMovie;
 	}
 }
 
@@ -734,28 +783,6 @@ async function upsertProviders(
 		.insert(schema.movieStreamProviders)
 		.values(providers.map((p) => ({ movieId, providerId: p.provider_id })))
 		.onConflictDoNothing();
-}
-
-async function getMovieIdSet(
-	ctx: { db: Database; session: { user: { id: string } } | null },
-	table: typeof schema.watchlistEntries | typeof schema.watchedEntries,
-	movieIds: number[],
-): Promise<Set<number>> {
-	if (!ctx.session?.user || movieIds.length === 0) {
-		return new Set();
-	}
-
-	const entries = await ctx.db
-		.select({ movieId: table.movieId })
-		.from(table)
-		.where(
-			and(
-				eq(table.userId, ctx.session.user.id),
-				inArray(table.movieId, movieIds),
-			),
-		);
-
-	return new Set(entries.map((e) => e.movieId));
 }
 
 async function getFriendsWatchingMovies(db: Database, userId: string) {
