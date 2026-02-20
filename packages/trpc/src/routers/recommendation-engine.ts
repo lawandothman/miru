@@ -563,10 +563,7 @@ export function diversityRerank(
 			const pg = primaryGenreFor(movie.id);
 			const last2 = recentGenres.slice(-2);
 			const isRepeatGenre =
-				pg !== null &&
-				last2.length === 2 &&
-				last2[0] === pg &&
-				last2[1] === pg;
+				pg !== null && last2.length === 2 && last2[0] === pg && last2[1] === pg;
 
 			if (!isRepeatGenre) {
 				result.push(movie);

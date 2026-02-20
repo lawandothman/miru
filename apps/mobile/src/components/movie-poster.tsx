@@ -16,6 +16,7 @@ interface MoviePosterProps {
 	title?: string;
 	width?: number | "100%";
 	height?: number;
+	aspectRatio?: number;
 }
 
 export function MoviePoster({
@@ -23,8 +24,12 @@ export function MoviePoster({
 	posterPath,
 	title,
 	width = 120,
-	height = 180,
+	height,
+	aspectRatio,
 }: MoviePosterProps) {
+	const sizeStyle = aspectRatio
+		? { width, aspectRatio }
+		: { width, height: height ?? 180 };
 	const router = useRouter();
 	const uri = posterUrl(posterPath);
 
@@ -36,13 +41,13 @@ export function MoviePoster({
 			{uri ? (
 				<Image
 					source={{ uri }}
-					style={[styles.image, { width, height }]}
+					style={[styles.image, sizeStyle]}
 					contentFit="cover"
 					recyclingKey={`poster-${id}`}
 					transition={200}
 				/>
 			) : (
-				<View style={[styles.placeholder, { width, height }]}>
+				<View style={[styles.placeholder, sizeStyle]}>
 					<Text style={styles.placeholderText} numberOfLines={2}>
 						{title ?? ""}
 					</Text>

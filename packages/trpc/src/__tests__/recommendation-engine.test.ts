@@ -194,12 +194,7 @@ describe("diversityRerank", () => {
 	});
 
 	it("handles empty input", () => {
-		const result = diversityRerank(
-			[],
-			new Map(),
-			new Map(),
-			10,
-		);
+		const result = diversityRerank([], new Map(), new Map(), 10);
 		expect(result).toHaveLength(0);
 	});
 

@@ -85,7 +85,7 @@ export function MovieGrid({
 						posterPath={item.posterPath}
 						title={item.title}
 						width="100%"
-						height={170}
+						aspectRatio={2 / 3}
 					/>
 				</View>
 			)}
@@ -104,6 +104,7 @@ const styles = StyleSheet.create({
 	},
 	item: {
 		flex: 1,
+		maxWidth: `${100 / NUM_COLUMNS}%`,
 		marginBottom: ITEM_GAP,
 	},
 	loadingContainer: {

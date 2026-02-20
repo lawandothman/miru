@@ -74,7 +74,10 @@ export const movieRouter = router({
 				.offset(offset);
 
 			const movieIds = movies.map((m) => m.id);
-			const { watchlistSet, watchedSet } = await getMovieStatuses(ctx, movieIds);
+			const { watchlistSet, watchedSet } = await getMovieStatuses(
+				ctx,
+				movieIds,
+			);
 
 			return movies.map((m) => ({
 				...m,
@@ -445,7 +448,10 @@ export const movieRouter = router({
 				}
 			}
 
-			const { watchlistSet, watchedSet } = await getMovieStatuses(ctx, movieIds);
+			const { watchlistSet, watchedSet } = await getMovieStatuses(
+				ctx,
+				movieIds,
+			);
 
 			return {
 				results: safeResults.map((r) => ({
@@ -623,7 +629,10 @@ export const movieRouter = router({
 				}
 			}
 
-			const { watchlistSet, watchedSet } = await getMovieStatuses(ctx, movieIds);
+			const { watchlistSet, watchedSet } = await getMovieStatuses(
+				ctx,
+				movieIds,
+			);
 
 			return {
 				results: safeResults.map((r) => ({

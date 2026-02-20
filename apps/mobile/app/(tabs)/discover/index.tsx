@@ -33,6 +33,7 @@ export default function DiscoverScreen() {
 		<SafeAreaView style={styles.container} edges={["top"]}>
 			<ScrollView
 				contentContainerStyle={styles.scroll}
+				keyboardShouldPersistTaps="handled"
 				refreshControl={
 					<RefreshControl
 						refreshing={isRefetching}

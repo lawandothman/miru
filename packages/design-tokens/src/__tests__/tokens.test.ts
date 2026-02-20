@@ -137,7 +137,17 @@ describe("typography tokens", () => {
 	});
 
 	it("font weights are valid CSS weight strings", () => {
-		const validWeights = ["100", "200", "300", "400", "500", "600", "700", "800", "900"];
+		const validWeights = [
+			"100",
+			"200",
+			"300",
+			"400",
+			"500",
+			"600",
+			"700",
+			"800",
+			"900",
+		];
 		for (const [key, value] of Object.entries(fontWeight)) {
 			expect(validWeights, `fontWeight.${key}`).toContain(value);
 		}

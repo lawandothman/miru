@@ -31,9 +31,7 @@ export function FollowButton({ userId, isFollowing }: FollowButtonProps) {
 	}
 
 	const Icon = isFollowing ? UserMinus : UserPlus;
-	const iconColor = isFollowing
-		? Colors.foreground
-		: Colors.primaryForeground;
+	const iconColor = isFollowing ? Colors.foreground : Colors.primaryForeground;
 
 	return (
 		<Pressable
