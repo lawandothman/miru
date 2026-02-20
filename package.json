@@ -14,7 +14,7 @@
 		"format": "oxfmt .",
 		"format:check": "oxfmt --check",
 		"test": "turbo test",
-		"check": "turbo run lint format:check typecheck",
+		"check": "turbo run lint format:check typecheck test",
 		"typecheck": "turbo typecheck",
 		"db:generate": "turbo db:generate",
 		"db:migrate": "turbo db:migrate",
