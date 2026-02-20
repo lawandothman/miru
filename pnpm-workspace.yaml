@@ -21,6 +21,7 @@ catalog:
   "zod": "4.3.6"
 
   # Dev tooling
+  "vitest": "4.0.18"
   "@types/node": "25.3.0"
   "@types/react": "19.2.14"
   "eslint-plugin-react-hooks": "7.0.1"
