@@ -77,7 +77,7 @@ export function WatchedButton({
 		<Button
 			onClick={handleClick}
 			disabled={isLoading}
-			variant={isWatched ? "secondary" : "outline"}
+			variant={isWatched ? "default" : "secondary"}
 			size="sm"
 			className={cn("gap-1.5", className)}
 		>

@@ -67,12 +67,10 @@ export function WatchlistButton({
 			>
 				{isLoading ? (
 					<Spinner />
+				) : inWatchlist ? (
+					<Bookmark className="size-4 fill-current" />
 				) : (
-					{inWatchlist ? (
-						<Bookmark className="size-4 fill-current" />
-					) : (
-						<BookmarkPlus className="size-4" />
-					)}
+					<BookmarkPlus className="size-4" />
 				)}
 			</button>
 		);
@@ -88,12 +86,10 @@ export function WatchlistButton({
 		>
 			{isLoading ? (
 				<Spinner className="size-3.5" />
+			) : inWatchlist ? (
+				<Bookmark className="size-3.5 fill-current" />
 			) : (
-				{inWatchlist ? (
-					<Bookmark className="size-3.5 fill-current" />
-				) : (
-					<BookmarkPlus className="size-3.5" />
-				)}
+				<BookmarkPlus className="size-3.5" />
 			)}
 			{inWatchlist ? "In Watchlist" : "Add to Watchlist"}
 		</Button>

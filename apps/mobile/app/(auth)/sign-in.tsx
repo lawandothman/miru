@@ -73,9 +73,11 @@ export default function SignInScreen() {
 							<ActivityIndicator color={Colors.background} />
 						) : (
 							<View style={styles.googleButtonContent}>
-							<GoogleIcon />
-							<Text style={styles.googleButtonText}>Continue with Google</Text>
-						</View>
+								<GoogleIcon />
+								<Text style={styles.googleButtonText}>
+									Continue with Google
+								</Text>
+							</View>
 						)}
 					</Pressable>
 				</View>
