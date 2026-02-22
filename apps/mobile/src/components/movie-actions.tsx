@@ -1,5 +1,5 @@
 import { View, Pressable, Text, StyleSheet } from "react-native";
-import { Bookmark, Eye } from "lucide-react-native";
+import { Bookmark, BookmarkPlus, Eye } from "lucide-react-native";
 import { trpc } from "@/lib/trpc";
 import { Colors, fontSize, fontFamily, spacing, radius } from "@/lib/constants";
 
@@ -61,15 +61,19 @@ export function MovieActions({
 				]}
 				onPress={handleWatchlistToggle}
 			>
-				<Bookmark
-					size={18}
-					color={inWatchlist ? Colors.primaryForeground : Colors.foreground}
-					fill={inWatchlist ? Colors.primaryForeground : "none"}
-				/>
+				{inWatchlist ? (
+					<Bookmark
+						size={18}
+						color={Colors.primaryForeground}
+						fill={Colors.primaryForeground}
+					/>
+				) : (
+					<BookmarkPlus size={18} color={Colors.foreground} />
+				)}
 				<Text
 					style={[styles.buttonText, inWatchlist && styles.buttonTextActive]}
 				>
-					Watchlist
+					{inWatchlist ? "In Watchlist" : "Add to Watchlist"}
 				</Text>
 			</Pressable>
 

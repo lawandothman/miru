@@ -1,6 +1,6 @@
 "use client";
 
-import { Bookmark } from "lucide-react";
+import { Bookmark, BookmarkPlus } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -68,7 +68,11 @@ export function WatchlistButton({
 				{isLoading ? (
 					<Spinner />
 				) : (
-					<Bookmark className={cn("size-4", inWatchlist && "fill-current")} />
+					{inWatchlist ? (
+						<Bookmark className="size-4 fill-current" />
+					) : (
+						<BookmarkPlus className="size-4" />
+					)}
 				)}
 			</button>
 		);
@@ -78,16 +82,20 @@ export function WatchlistButton({
 		<Button
 			onClick={handleClick}
 			disabled={isLoading}
-			variant={inWatchlist ? "secondary" : "default"}
+			variant={inWatchlist ? "default" : "secondary"}
 			size="sm"
 			className={cn("gap-1.5", className)}
 		>
 			{isLoading ? (
 				<Spinner className="size-3.5" />
 			) : (
-				<Bookmark className={cn("size-3.5", inWatchlist && "fill-current")} />
+				{inWatchlist ? (
+					<Bookmark className="size-3.5 fill-current" />
+				) : (
+					<BookmarkPlus className="size-3.5" />
+				)}
 			)}
-			{inWatchlist ? "In Watchlist" : "Watchlist"}
+			{inWatchlist ? "In Watchlist" : "Add to Watchlist"}
 		</Button>
 	);
 }
