@@ -26,7 +26,7 @@ import {
 import { authClient, useSession, signOut } from "@/lib/auth";
 import { trpc } from "@/lib/trpc";
 import { defaultHeaderOptions } from "@/lib/navigation";
-import { UserAvatar } from "@/components/user-avatar";
+import { AvatarUpload } from "@/components/avatar-upload";
 import {
 	Colors,
 	fontSize,
@@ -98,7 +98,7 @@ export default function SettingsScreen() {
 			>
 				{/* Profile header */}
 				<View style={styles.profileHeader}>
-					<UserAvatar
+					<AvatarUpload
 						imageUrl={session?.user?.image}
 						name={session?.user?.name}
 						size={64}
