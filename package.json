@@ -6,6 +6,8 @@
 	"repository": "https://github.com/lawandothman/miru.git",
 	"scripts": {
 		"dev": "turbo dev",
+		"dev:up": "bash scripts/dev.sh",
+		"dev:tunnel": "bash scripts/dev-tunnel.sh",
 		"dev:web": "turbo dev --filter=@miru/web",
 		"dev:mobile": "turbo dev --filter=@miru/mobile",
 		"build": "turbo build",

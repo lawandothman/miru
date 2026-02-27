@@ -9,13 +9,16 @@ const db = createDb(env.DATABASE_URL);
 
 export const auth = betterAuth({
 	baseURL: env.BETTER_AUTH_URL,
-	trustedOrigins: [
-		"https://miru-chi.vercel.app",
-		"miru://",
-		...(process.env.NODE_ENV === "development"
-			? ["https://*.ngrok-free.app", "http://localhost:3000"]
-			: []),
-	],
+	trustedOrigins:
+		process.env.NODE_ENV === "development"
+			? [
+					"https://miru-chi.vercel.app",
+					"miru://",
+					"http://localhost:3000",
+					"https://*.trycloudflare.com",
+					"https://*.ngrok-free.app",
+				]
+			: ["https://miru-chi.vercel.app", "miru://"],
 	database: drizzleAdapter(db, {
 		provider: "pg",
 		schema: {
