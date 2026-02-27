@@ -44,6 +44,7 @@ export const auth = betterAuth({
 		apple: {
 			clientId: env.APPLE_CLIENT_ID ?? "",
 			clientSecret: env.APPLE_CLIENT_SECRET ?? "",
+			appBundleIdentifier: "com.miru.app",
 		},
 	},
 	user: {

@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Svg, { Path } from "react-native-svg";
+import * as AppleAuthentication from "expo-apple-authentication";
 import { signIn } from "@/lib/auth";
 import { Colors, fontSize, fontFamily, spacing, radius } from "@/lib/constants";
 
@@ -68,11 +69,33 @@ export default function SignInScreen() {
 	async function handleAppleSignIn() {
 		setLoading("apple");
 		try {
+			const credential = await AppleAuthentication.signInAsync({
+				requestedScopes: [
+					AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+					AppleAuthentication.AppleAuthenticationScope.EMAIL,
+				],
+			});
+
+			if (!credential.identityToken) {
+				throw new Error("No identity token returned");
+			}
+
 			await signIn.social({
 				provider: "apple",
+				idToken: {
+					token: credential.identityToken,
+				},
 				callbackURL: "/(tabs)",
 			});
-		} catch {
+		} catch (error) {
+			if (
+				error instanceof Error &&
+				"code" in error &&
+				(error as { code: string }).code === "ERR_REQUEST_CANCELED"
+			) {
+				// User cancelled — do nothing
+				return;
+			}
 			Alert.alert("Sign in failed", "Something went wrong. Please try again.");
 		} finally {
 			setLoading(null);
