@@ -34,8 +34,6 @@
 		"react/jsx-no-target-blank": "error",
 		"react/no-array-index-key": "warn",
 
-		"no-use-before-define": "off",
-		"no-shadow": "off",
 		"no-undef": "off",
 		"no-undefined": "off",
 		"no-magic-numbers": "off",
