@@ -19,7 +19,12 @@ export const auth = betterAuth({
 					"https://*.trycloudflare.com",
 					"https://*.ngrok-free.app",
 				]
-			: ["https://miru-chi.vercel.app", "https://appleid.apple.com", "miru://"],
+			: [
+					"https://miru-chi.vercel.app",
+					"https://appleid.apple.com",
+					"miru://",
+					"exp://",
+				],
 	database: drizzleAdapter(db, {
 		provider: "pg",
 		schema: {
