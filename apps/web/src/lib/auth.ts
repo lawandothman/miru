@@ -13,12 +13,13 @@ export const auth = betterAuth({
 		process.env.NODE_ENV === "development"
 			? [
 					"https://miru-chi.vercel.app",
+					"https://appleid.apple.com",
 					"miru://",
 					"http://localhost:3000",
 					"https://*.trycloudflare.com",
 					"https://*.ngrok-free.app",
 				]
-			: ["https://miru-chi.vercel.app", "miru://"],
+			: ["https://miru-chi.vercel.app", "https://appleid.apple.com", "miru://"],
 	database: drizzleAdapter(db, {
 		provider: "pg",
 		schema: {
@@ -34,6 +35,10 @@ export const auth = betterAuth({
 		google: {
 			clientId: env.GOOGLE_CLIENT_ID ?? "",
 			clientSecret: env.GOOGLE_CLIENT_SECRET ?? "",
+		},
+		apple: {
+			clientId: env.APPLE_CLIENT_ID ?? "",
+			clientSecret: env.APPLE_CLIENT_SECRET ?? "",
 		},
 	},
 	user: {
