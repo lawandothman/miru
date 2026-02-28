@@ -4,8 +4,8 @@ packages:
 
 catalog:
   # Auth
-  "@better-auth/expo": "1.4.18"
-  "better-auth": "1.4.18"
+  "@better-auth/expo": "1.4.20"
+  "better-auth": "1.4.20"
 
   # tRPC
   "@tanstack/react-query": "5.90.21"
