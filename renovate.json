@@ -7,5 +7,6 @@
 			"matchPackageNames": ["better-auth", "@better-auth/**"],
 			"groupName": "better-auth"
 		}
-	]
+	],
+	"postUpdateOptions": ["pnpmDedupe"]
 }
