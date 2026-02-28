@@ -70,17 +70,13 @@ jobs:
           fetch-depth: 0
 
       - name: Generate changelog
-        id: changelog
         run: |
           PREV_TAG=$(git tag --sort=-v:refname | grep '^v' | sed -n '2p')
           if [ -n "$PREV_TAG" ]; then
-            LOG=$(git log "$PREV_TAG"..HEAD --pretty=format:"- %s (%h)" --no-merges)
+            git log "$PREV_TAG"..HEAD --pretty=format:"- %s (%h)" --no-merges > changelog.md
           else
-            LOG=$(git log --pretty=format:"- %s (%h)" --no-merges)
+            git log --pretty=format:"- %s (%h)" --no-merges > changelog.md
           fi
-          echo "changelog<<EOF" >> "$GITHUB_OUTPUT"
-          echo "$LOG" >> "$GITHUB_OUTPUT"
-          echo "EOF" >> "$GITHUB_OUTPUT"
 
       - name: Create GitHub Release
         env:
@@ -88,4 +84,4 @@ jobs:
         run: |
           gh release create "$GITHUB_REF_NAME" \
             --title "$GITHUB_REF_NAME" \
-            --notes "${{ steps.changelog.outputs.changelog }}"
+            --notes-file changelog.md
