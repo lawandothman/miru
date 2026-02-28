@@ -19,6 +19,7 @@ import {
 } from "@expo-google-fonts/syne";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { TRPCProvider } from "@/lib/trpc-provider";
+import { trpc } from "@/lib/trpc";
 import { useSession } from "@/lib/auth";
 
 if (!isRunningInExpoGo()) {
@@ -33,9 +34,16 @@ focusManager.setEventListener((handleFocus) => {
 });
 
 function AuthGuard({ children }: { children: React.ReactNode }) {
-	const { data: session, isPending } = useSession();
+	const { data: session, isPending: sessionPending } = useSession();
 	const segments = useSegments();
 	const router = useRouter();
+
+	const { data: onboardingState, isPending: onboardingPending } =
+		trpc.onboarding.getState.useQuery(undefined, {
+			enabled: Boolean(session),
+		});
+
+	const isPending = sessionPending || (Boolean(session) && onboardingPending);
 
 	useEffect(() => {
 		if (isPending) {
@@ -43,16 +51,24 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 		}
 
 		const inAuthGroup = segments[0] === "(auth)";
+		const inOnboardingGroup = segments[0] === "(onboarding)";
+
 		if (!session && !inAuthGroup) {
 			router.replace("/(auth)/sign-in");
-		} else if (session && inAuthGroup) {
+		} else if (session && !onboardingState?.isCompleted && !inOnboardingGroup) {
+			router.replace("/(onboarding)");
+		} else if (
+			session &&
+			onboardingState?.isCompleted &&
+			(inAuthGroup || inOnboardingGroup)
+		) {
 			router.replace("/(tabs)");
 		}
 
 		if (!isRunningInExpoGo()) {
 			SplashScreen.hideAsync();
 		}
-	}, [session, isPending, segments, router]);
+	}, [session, isPending, onboardingState, segments, router]);
 
 	if (isPending) {
 		return null;
