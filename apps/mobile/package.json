@@ -15,7 +15,7 @@
 		"@better-auth/expo": "catalog:",
 		"@expo-google-fonts/dm-sans": "0.4.2",
 		"@expo-google-fonts/syne": "0.4.2",
-		"@expo/ui": "0.2.0-beta.9",
+		"@expo/ui": "0.2.0-canary-20260121-a63c0dd",
 		"@expo/vector-icons": "15.0.3",
 		"@react-navigation/native": "7.1.28",
 		"@tanstack/react-query": "catalog:",
