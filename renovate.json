@@ -2,11 +2,71 @@
 	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
 	"extends": ["config:recommended"],
 	"rangeStrategy": "pin",
+	"labels": ["dependencies"],
+	"semanticCommits": "enabled",
+	"lockFileMaintenance": {
+		"enabled": true
+	},
+	"postUpdateOptions": ["pnpmDedupe"],
 	"packageRules": [
+		{
+			"matchDepTypes": ["devDependencies"],
+			"matchUpdateTypes": ["minor", "patch"]
+		},
+		{
+			"matchManagers": ["github-actions"],
+			"pinDigests": true
+		},
 		{
 			"matchPackageNames": ["better-auth", "@better-auth/**"],
 			"groupName": "better-auth"
+		},
+		{
+			"matchPackageNames": ["@trpc/**"],
+			"groupName": "tRPC"
+		},
+		{
+			"matchPackageNames": [
+				"react",
+				"react-dom",
+				"@types/react",
+				"@types/react-dom"
+			],
+			"groupName": "react"
+		},
+		{
+			"matchPackageNames": ["@tanstack/**"],
+			"groupName": "tanstack"
+		},
+		{
+			"matchPackageNames": ["tailwindcss", "@tailwindcss/**", "tw-animate-css"],
+			"groupName": "tailwindcss"
+		},
+		{
+			"matchPackageNames": ["drizzle-orm", "drizzle-kit"],
+			"groupName": "drizzle"
+		},
+		{
+			"matchPackageNames": ["@sentry/**"],
+			"groupName": "sentry"
+		},
+		{
+			"matchPackageNames": ["radix-ui", "@radix-ui/**"],
+			"groupName": "radix-ui"
+		},
+		{
+			"matchPackageNames": ["oxlint", "oxfmt"],
+			"groupName": "oxc"
+		},
+		{
+			"matchPackageNames": [
+				"expo",
+				"expo-**",
+				"@expo/**",
+				"react-native",
+				"react-native-**"
+			],
+			"groupName": "expo & react-native"
 		}
-	],
-	"postUpdateOptions": ["pnpmDedupe"]
+	]
 }
