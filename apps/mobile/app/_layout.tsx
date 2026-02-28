@@ -20,7 +20,7 @@ import { TRPCProvider } from "@/lib/trpc-provider";
 import { useSession } from "@/lib/auth";
 
 if (!isRunningInExpoGo()) {
-	void SplashScreen.preventAutoHideAsync();
+	SplashScreen.preventAutoHideAsync();
 }
 
 function AuthGuard({ children }: { children: React.ReactNode }) {
@@ -41,7 +41,7 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 		}
 
 		if (!isRunningInExpoGo()) {
-			void SplashScreen.hideAsync();
+			SplashScreen.hideAsync();
 		}
 	}, [session, isPending, segments, router]);
 
