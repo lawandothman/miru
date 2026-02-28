@@ -18,7 +18,7 @@
 			"bundleIdentifier": "com.miru.app",
 			"infoPlist": {
 				"ITSAppUsesNonExemptEncryption": false
-			},
+			}
 		},
 		"android": {
 			"adaptiveIcon": {
