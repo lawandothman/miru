@@ -1,5 +1,11 @@
 {
 	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
 	"extends": ["config:recommended"],
-	"rangeStrategy": "pin"
+	"rangeStrategy": "pin",
+	"packageRules": [
+		{
+			"matchPackageNames": ["better-auth", "@better-auth/**"],
+			"groupName": "better-auth"
+		}
+	]
 }
