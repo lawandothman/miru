@@ -11,6 +11,7 @@
 		"db:generate": "drizzle-kit generate",
 		"db:migrate": "drizzle-kit migrate",
 		"db:seed": "node --env-file=.env scripts/seed.mjs",
+		"db:seed-screenshots": "node --env-file=.env scripts/seed-screenshots.mjs",
 		"db:push": "drizzle-kit push",
 		"db:studio": "drizzle-kit studio",
 		"typecheck": "tsc --noEmit"

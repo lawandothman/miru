@@ -21,7 +21,8 @@
 		"db:generate": "turbo db:generate",
 		"db:migrate": "turbo db:migrate",
 		"db:seed": "turbo db:seed",
-		"db:push": "turbo db:push"
+		"db:push": "turbo db:push",
+		"db:seed-screenshots": "turbo db:seed-screenshots --"
 	},
 	"devDependencies": {
 		"eslint-plugin-react-hooks": "catalog:",

@@ -1,0 +1,27 @@
+{
+	"cli": {
+		"version": ">= 16.0.0",
+		"appVersionSource": "local"
+	},
+	"build": {
+		"development": {
+			"developmentClient": true,
+			"distribution": "internal",
+			"ios": {
+				"simulator": true
+			}
+		},
+		"preview": {
+			"distribution": "internal",
+			"env": {
+				"EXPO_PUBLIC_API_URL": "https://miru-chi.vercel.app"
+			}
+		},
+		"production": {
+			"autoIncrement": true,
+			"env": {
+				"EXPO_PUBLIC_API_URL": "https://miru-chi.vercel.app"
+			}
+		}
+	}
+}

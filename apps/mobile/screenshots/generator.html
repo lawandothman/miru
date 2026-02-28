@@ -1,0 +1,531 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<title>Miru — App Store Screenshots</title>
+		<style>
+			@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap");
+
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+
+			body {
+				background: #0a0a0a;
+				color: #fff;
+				font-family: "Inter", system-ui, sans-serif;
+				padding: 40px;
+			}
+
+			h1 {
+				font-size: 20px;
+				font-weight: 600;
+				margin-bottom: 8px;
+				letter-spacing: -0.02em;
+			}
+
+			.instructions {
+				color: #555;
+				font-size: 13px;
+				margin-bottom: 40px;
+				max-width: 500px;
+				line-height: 1.6;
+			}
+
+			.controls {
+				display: flex;
+				gap: 10px;
+				margin-bottom: 48px;
+				flex-wrap: wrap;
+			}
+
+			.controls button {
+				background: transparent;
+				border: 1px solid #222;
+				color: #888;
+				padding: 8px 16px;
+				border-radius: 100px;
+				cursor: pointer;
+				font-size: 13px;
+				font-family: "Inter", sans-serif;
+				transition: all 0.15s;
+			}
+
+			.controls button:hover {
+				border-color: #444;
+				color: #fff;
+			}
+
+			.slides-container {
+				display: flex;
+				gap: 32px;
+				flex-wrap: wrap;
+			}
+
+			.slide-wrapper {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: 10px;
+			}
+
+			.slide-wrapper .slide-label {
+				font-size: 11px;
+				color: #333;
+				letter-spacing: 0.05em;
+				text-transform: uppercase;
+			}
+
+			/* Preview: 1284x2778 scaled to ~1/3 */
+			.slide {
+				width: 428px;
+				height: 926px;
+				position: relative;
+				overflow: hidden;
+				border-radius: 20px;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				background: #000;
+			}
+
+			.slide .bg {
+				position: absolute;
+				inset: 0;
+				z-index: 0;
+				background: radial-gradient(ellipse at 50% 0%, #111 0%, #000 70%);
+			}
+
+			.slide .text-area {
+				position: relative;
+				z-index: 2;
+				text-align: center;
+				padding: 72px 40px 24px;
+				flex-shrink: 0;
+				min-height: 200px;
+				display: flex;
+				flex-direction: column;
+				justify-content: flex-end;
+			}
+
+			.slide .text-area h2 {
+				font-family: "Inter", sans-serif;
+				font-weight: 600;
+				font-size: 26px;
+				line-height: 1.15;
+				letter-spacing: -0.03em;
+				margin-bottom: 10px;
+				color: #fff;
+			}
+
+			.slide .text-area p {
+				font-size: 13px;
+				font-weight: 400;
+				color: rgba(255, 255, 255, 0.4);
+				line-height: 1.5;
+				letter-spacing: -0.01em;
+			}
+
+			.slide .phone-frame {
+				position: relative;
+				z-index: 2;
+				flex: 1;
+				width: 82%;
+				display: flex;
+				align-items: flex-end;
+				justify-content: center;
+				overflow: hidden;
+			}
+
+			.slide .phone-frame::after {
+				content: "";
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				height: 40px;
+				background: linear-gradient(to bottom, #000 0%, transparent 100%);
+				z-index: 3;
+				border-radius: 12px 12px 0 0;
+				pointer-events: none;
+			}
+
+			.slide .phone-frame img {
+				width: 100%;
+				height: 100%;
+				border-radius: 12px 12px 0 0;
+				object-fit: cover;
+				object-position: bottom;
+				box-shadow: 0 -2px 60px rgba(255, 255, 255, 0.03);
+			}
+
+			.slide .phone-frame .drop-zone {
+				width: 100%;
+				height: 100%;
+				background: #0d0d0d;
+				border-radius: 12px 12px 0 0;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				flex-direction: column;
+				gap: 8px;
+				color: #222;
+				font-size: 13px;
+				border: 1px dashed #1a1a1a;
+				border-bottom: none;
+				cursor: pointer;
+				transition: all 0.15s;
+			}
+
+			.slide .phone-frame .drop-zone:hover,
+			.slide .phone-frame .drop-zone.drag-over {
+				border-color: #333;
+				color: #444;
+				background: #111;
+			}
+
+			.slide .phone-frame .drop-zone input {
+				display: none;
+			}
+			.slide .phone-frame .drop-zone .drop-icon {
+				font-size: 20px;
+				opacity: 0.3;
+			}
+
+			.editable:focus {
+				outline: 1px dashed rgba(255, 255, 255, 0.15);
+				outline-offset: 4px;
+				border-radius: 4px;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>App Store Screenshots</h1>
+		<p class="instructions">
+			Drag and drop a screenshot into each slot, or click to browse. Edit
+			headlines inline. Click Export to download all as 1284x2778 PNGs.
+		</p>
+
+		<div class="controls">
+			<button onclick="exportIphone()">Export iPhone (1284x2778)</button>
+			<button onclick="exportIpad()">Export iPad 13" (2048x2732)</button>
+		</div>
+
+		<div class="slides-container" id="slides"></div>
+
+		<script>
+			const W = 1284;
+			const H = 2778;
+			const SCALE = 3; // preview is 1/3
+
+			const slideData = [
+				{
+					headline: "See what your\nfriends want\nto watch",
+					subtitle: "Find movies you'll love together",
+					label: "Home",
+				},
+				{
+					headline: "Discover\nyour next\nfavorite film",
+					subtitle: "Trending, curated, and personalized",
+					label: "Discover",
+				},
+				{
+					headline: "Everything\nyou need\nto know",
+					subtitle: "Ratings, trailers, and where to stream",
+					label: "Detail",
+				},
+				{
+					headline: "Your watchlist,\nalways ready",
+					subtitle: "Save it now, watch it later",
+					label: "Watchlist",
+				},
+				{
+					headline: "Watch movies\nwith friends",
+					subtitle: "Follow people, share taste, plan nights",
+					label: "Social",
+				},
+			];
+
+			const screenshots = {};
+			const screenshotImages = {};
+			const container = document.getElementById("slides");
+
+			function readFileAsDataURL(file) {
+				return new Promise((resolve) => {
+					const reader = new FileReader();
+					reader.onload = (ev) => resolve(ev.target.result);
+					reader.readAsDataURL(file);
+				});
+			}
+
+			function loadImage(src) {
+				return new Promise((resolve) => {
+					const img = new Image();
+					img.onload = () => resolve(img);
+					img.src = src;
+				});
+			}
+
+			function render() {
+				container.innerHTML = "";
+				slideData.forEach((s, i) => {
+					const wrapper = document.createElement("div");
+					wrapper.className = "slide-wrapper";
+
+					const label = document.createElement("div");
+					label.className = "slide-label";
+					label.textContent = s.label;
+
+					const slide = document.createElement("div");
+					slide.className = `slide slide-${i}`;
+					slide.id = `slide-${i}`;
+
+					const bg = document.createElement("div");
+					bg.className = "bg";
+
+					const textArea = document.createElement("div");
+					textArea.className = "text-area";
+
+					const h2 = document.createElement("h2");
+					h2.className = "editable";
+					h2.contentEditable = true;
+					h2.textContent = s.headline;
+					h2.style.whiteSpace = "pre-line";
+					h2.addEventListener("input", () => {
+						s.headline = h2.textContent;
+					});
+
+					const p = document.createElement("p");
+					p.className = "editable";
+					p.contentEditable = true;
+					p.textContent = s.subtitle;
+					p.addEventListener("input", () => {
+						s.subtitle = p.textContent;
+					});
+
+					textArea.appendChild(h2);
+					textArea.appendChild(p);
+
+					const phoneFrame = document.createElement("div");
+					phoneFrame.className = "phone-frame";
+
+					if (screenshots[i]) {
+						const img = document.createElement("img");
+						img.src = screenshots[i];
+						img.addEventListener("click", () => pickFile(i));
+						img.style.cursor = "pointer";
+						phoneFrame.appendChild(img);
+					} else {
+						const dropZone = document.createElement("div");
+						dropZone.className = "drop-zone";
+
+						const icon = document.createElement("div");
+						icon.className = "drop-icon";
+						icon.textContent = "+";
+
+						const text = document.createElement("div");
+						text.textContent = "Drop image";
+
+						const input = document.createElement("input");
+						input.type = "file";
+						input.accept = "image/*";
+						input.addEventListener("change", async (e) => {
+							if (e.target.files[0]) {
+								screenshots[i] = await readFileAsDataURL(e.target.files[0]);
+								screenshotImages[i] = await loadImage(screenshots[i]);
+								render();
+							}
+						});
+
+						dropZone.appendChild(icon);
+						dropZone.appendChild(text);
+						dropZone.appendChild(input);
+						dropZone.addEventListener("click", () => input.click());
+
+						dropZone.addEventListener("dragover", (e) => {
+							e.preventDefault();
+							dropZone.classList.add("drag-over");
+						});
+						dropZone.addEventListener("dragleave", () => {
+							dropZone.classList.remove("drag-over");
+						});
+						dropZone.addEventListener("drop", async (e) => {
+							e.preventDefault();
+							dropZone.classList.remove("drag-over");
+							const file = e.dataTransfer.files[0];
+							if (file && file.type.startsWith("image/")) {
+								screenshots[i] = await readFileAsDataURL(file);
+								screenshotImages[i] = await loadImage(screenshots[i]);
+								render();
+							}
+						});
+
+						phoneFrame.appendChild(dropZone);
+					}
+
+					slide.appendChild(bg);
+					slide.appendChild(textArea);
+					slide.appendChild(phoneFrame);
+					wrapper.appendChild(label);
+					wrapper.appendChild(slide);
+					container.appendChild(wrapper);
+				});
+			}
+
+			function pickFile(index) {
+				const input = document.createElement("input");
+				input.type = "file";
+				input.accept = "image/*";
+				input.addEventListener("change", async (e) => {
+					if (e.target.files[0]) {
+						screenshots[index] = await readFileAsDataURL(e.target.files[0]);
+						screenshotImages[index] = await loadImage(screenshots[index]);
+						render();
+					}
+				});
+				input.click();
+			}
+
+			function renderSlideToCanvas(slideIndex, w, h) {
+				const s = slideData[slideIndex];
+				const canvas = document.createElement("canvas");
+				canvas.width = w;
+				canvas.height = h;
+				const ctx = canvas.getContext("2d");
+
+				// Scale factor relative to base iPhone size
+				const sf = w / 1284;
+
+				// Background: radial gradient
+				const grad = ctx.createRadialGradient(w / 2, 0, 0, w / 2, 0, h * 0.7);
+				grad.addColorStop(0, "#111111");
+				grad.addColorStop(1, "#000000");
+				ctx.fillStyle = grad;
+				ctx.fillRect(0, 0, w, h);
+
+				// Text area
+				const textPadX = Math.round(120 * sf);
+				const maxTextWidth = w - textPadX * 2;
+
+				// Headline
+				ctx.fillStyle = "#ffffff";
+				ctx.font = `600 ${Math.round(78 * sf)}px Inter, sans-serif`;
+				ctx.textAlign = "center";
+				ctx.textBaseline = "top";
+
+				const headlineLines = s.headline.split("\n");
+				const headlineLineHeight = Math.round(90 * sf);
+				const totalHeadlineH = headlineLines.length * headlineLineHeight;
+
+				const textAreaBottom = Math.round(600 * sf);
+				let headlineY = textAreaBottom - totalHeadlineH - Math.round(90 * sf);
+
+				headlineLines.forEach((line) => {
+					ctx.fillText(line, w / 2, headlineY, maxTextWidth);
+					headlineY += headlineLineHeight;
+				});
+
+				// Subtitle
+				ctx.fillStyle = "rgba(255,255,255,0.4)";
+				ctx.font = `400 ${Math.round(39 * sf)}px Inter, sans-serif`;
+				ctx.fillText(
+					s.subtitle,
+					w / 2,
+					headlineY + Math.round(15 * sf),
+					maxTextWidth,
+				);
+
+				// Phone frame — narrower on iPad so the phone screenshot looks natural
+				const frameWidthRatio = w > 1500 ? 0.55 : 0.82;
+				const frameWidth = Math.round(w * frameWidthRatio);
+				const frameX = Math.round((w - frameWidth) / 2);
+				const frameTop = textAreaBottom + Math.round(24 * sf);
+				const frameHeight = h - frameTop;
+				const frameRadius = Math.round(36 * sf);
+
+				// Clip rounded top corners for phone frame
+				ctx.save();
+				ctx.beginPath();
+				ctx.moveTo(frameX + frameRadius, frameTop);
+				ctx.lineTo(frameX + frameWidth - frameRadius, frameTop);
+				ctx.arcTo(
+					frameX + frameWidth,
+					frameTop,
+					frameX + frameWidth,
+					frameTop + frameRadius,
+					frameRadius,
+				);
+				ctx.lineTo(frameX + frameWidth, h);
+				ctx.lineTo(frameX, h);
+				ctx.lineTo(frameX, frameTop + frameRadius);
+				ctx.arcTo(
+					frameX,
+					frameTop,
+					frameX + frameRadius,
+					frameTop,
+					frameRadius,
+				);
+				ctx.closePath();
+				ctx.clip();
+
+				// Draw screenshot if available
+				const img = screenshotImages[slideIndex];
+				if (img) {
+					// Cover: scale to fill both width and height, anchor to bottom
+					const scaleW = frameWidth / img.width;
+					const scaleH = frameHeight / img.height;
+					const imgScale = Math.max(scaleW, scaleH);
+					const drawW = img.width * imgScale;
+					const drawH = img.height * imgScale;
+					const drawX = frameX + (frameWidth - drawW) / 2;
+					const drawY = frameTop + (frameHeight - drawH);
+					ctx.drawImage(img, drawX, drawY, drawW, drawH);
+				} else {
+					ctx.fillStyle = "#0d0d0d";
+					ctx.fillRect(frameX, frameTop, frameWidth, frameHeight);
+				}
+
+				// Gradient overlay at top of phone frame to hide status bar
+				const fadeH = Math.round(120 * sf);
+				const fadeGrad = ctx.createLinearGradient(
+					0,
+					frameTop,
+					0,
+					frameTop + fadeH,
+				);
+				fadeGrad.addColorStop(0, "#000000");
+				fadeGrad.addColorStop(1, "rgba(0,0,0,0)");
+				ctx.fillStyle = fadeGrad;
+				ctx.fillRect(frameX, frameTop, frameWidth, fadeH);
+
+				ctx.restore();
+
+				return canvas;
+			}
+
+			async function exportSlides(w, h, prefix) {
+				await document.fonts.ready;
+				for (let i = 0; i < slideData.length; i++) {
+					const canvas = renderSlideToCanvas(i, w, h);
+					const link = document.createElement("a");
+					link.download = `miru-${prefix}-${i + 1}-${slideData[i].label.toLowerCase()}.png`;
+					link.href = canvas.toDataURL("image/png");
+					link.click();
+					await new Promise((r) => setTimeout(r, 300));
+				}
+			}
+
+			async function exportIphone() {
+				await exportSlides(1284, 2778, "iphone");
+			}
+
+			async function exportIpad() {
+				await exportSlides(2048, 2732, "ipad");
+			}
+
+			render();
+		</script>
+	</body>
+</html>

@@ -39,6 +39,10 @@
 		"db:push": {
 			"cache": false,
 			"env": ["DATABASE_URL"]
+		},
+		"db:seed-screenshots": {
+			"cache": false,
+			"env": ["DATABASE_URL"]
 		}
 	}
 }
