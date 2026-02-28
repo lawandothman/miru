@@ -17,7 +17,7 @@ export default function DiscoverLayout() {
 					headerStyle: { backgroundColor: Colors.background },
 					headerTintColor: Colors.foreground,
 					headerTitleStyle: { fontFamily: fontFamily.displayBold },
-					headerBackTitle: "Discover",
+					headerBackTitle: "",
 				}}
 			/>
 		</Stack>
