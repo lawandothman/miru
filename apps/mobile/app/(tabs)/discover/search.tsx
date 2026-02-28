@@ -7,13 +7,7 @@ import { MovieGrid } from "@/components/movie-grid";
 import { EmptyState } from "@/components/empty-state";
 import { UserAvatar } from "@/components/user-avatar";
 import { FollowButton } from "@/components/follow-button";
-import {
-	Colors,
-	fontSize,
-	fontFamily,
-	spacing,
-	radius,
-} from "@/lib/constants";
+import { Colors, fontSize, fontFamily, spacing, radius } from "@/lib/constants";
 
 export default function SearchResultsScreen() {
 	const { q } = useLocalSearchParams<{ q: string }>();
@@ -79,18 +73,11 @@ function PeopleSection({ people }: { people: UserResult[] }) {
 			{people.map((user) => (
 				<Pressable
 					key={user.id}
-					style={({ pressed }) => [
-						styles.userRow,
-						pressed && styles.pressed,
-					]}
+					style={({ pressed }) => [styles.userRow, pressed && styles.pressed]}
 					onPress={() => router.push(`/user/${user.id}`)}
 				>
 					<View style={styles.userInfo}>
-						<UserAvatar
-							imageUrl={user.image}
-							name={user.name}
-							size={40}
-						/>
+						<UserAvatar imageUrl={user.image} name={user.name} size={40} />
 						<Text style={styles.userName} numberOfLines={1}>
 							{user.name ?? "Unknown"}
 						</Text>
