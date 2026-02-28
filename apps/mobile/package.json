@@ -17,7 +17,7 @@
 		"@expo-google-fonts/syne": "0.4.2",
 		"@expo/ui": "0.2.0-beta.9",
 		"@expo/vector-icons": "15.0.3",
-		"@react-navigation/native": "7.1.28",
+		"@react-navigation/native": "7.1.31",
 		"@tanstack/react-query": "catalog:",
 		"@trpc/client": "catalog:",
 		"@trpc/react-query": "catalog:",
