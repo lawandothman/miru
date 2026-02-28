@@ -7,7 +7,7 @@ import { MovieGrid } from "@/components/movie-grid";
 import { EmptyState } from "@/components/empty-state";
 import { UserAvatar } from "@/components/user-avatar";
 import { FollowButton } from "@/components/follow-button";
-import { Colors, fontSize, fontFamily, spacing, radius } from "@/lib/constants";
+import { Colors, fontSize, fontFamily, spacing } from "@/lib/constants";
 
 export default function SearchResultsScreen() {
 	const { q } = useLocalSearchParams<{ q: string }>();
@@ -57,12 +57,12 @@ export default function SearchResultsScreen() {
 	);
 }
 
-type UserResult = {
+interface UserResult {
 	id: string;
 	name: string | null;
 	image: string | null;
 	isFollowing: boolean;
-};
+}
 
 function PeopleSection({ people }: { people: UserResult[] }) {
 	const router = useRouter();
