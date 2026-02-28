@@ -20,6 +20,8 @@ export function MovieActions({
 		utils.watchlist.getMyWatchlist.invalidate();
 		utils.watched.getMyWatched.invalidate();
 		utils.movie.getById.invalidate({ tmdbId: movieId });
+		utils.social.getDashboardMatches.invalidate();
+		utils.social.getMatchesWith.invalidate();
 	}
 
 	const addToWatchlist = trpc.watchlist.add.useMutation({

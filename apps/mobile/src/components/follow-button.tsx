@@ -1,6 +1,7 @@
 import { Pressable, Text, StyleSheet, ActivityIndicator } from "react-native";
 import { UserPlus, UserMinus } from "lucide-react-native";
 import { trpc } from "@/lib/trpc";
+import { useSession } from "@/lib/auth";
 import { Colors, fontSize, fontFamily, spacing, radius } from "@/lib/constants";
 
 interface FollowButtonProps {
@@ -10,11 +11,17 @@ interface FollowButtonProps {
 
 export function FollowButton({ userId, isFollowing }: FollowButtonProps) {
 	const utils = trpc.useUtils();
+	const { data: session } = useSession();
 
 	function invalidate() {
 		utils.user.getById.invalidate({ id: userId });
+		if (session?.user?.id) {
+			utils.user.getById.invalidate({ id: session.user.id });
+		}
 		utils.social.getFollowers.invalidate();
 		utils.social.getFollowing.invalidate();
+		utils.social.searchUsers.invalidate();
+		utils.social.getDashboardMatches.invalidate();
 	}
 
 	const follow = trpc.social.follow.useMutation({ onSuccess: invalidate });

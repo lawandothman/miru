@@ -23,5 +23,13 @@
 				"EXPO_PUBLIC_API_URL": "https://miru-chi.vercel.app"
 			}
 		}
+	},
+	"submit": {
+		"production": {
+			"ios": {
+				"ascAppId": "6759829491",
+				"appleTeamId": "LY9UXT2PY8"
+			}
+		}
 	}
 }
