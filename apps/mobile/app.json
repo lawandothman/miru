@@ -19,7 +19,6 @@
 			"infoPlist": {
 				"ITSAppUsesNonExemptEncryption": false
 			},
-			"buildNumber": "4"
 		},
 		"android": {
 			"adaptiveIcon": {
