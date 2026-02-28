@@ -20,8 +20,7 @@ import { TRPCProvider } from "@/lib/trpc-provider";
 import { useSession } from "@/lib/auth";
 
 if (!isRunningInExpoGo()) {
-	// oxlint-disable-next-line no-empty-function
-	SplashScreen.preventAutoHideAsync().catch(() => {});
+	void SplashScreen.preventAutoHideAsync();
 }
 
 function AuthGuard({ children }: { children: React.ReactNode }) {
@@ -40,9 +39,16 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 		} else if (session && inAuthGroup) {
 			router.replace("/(tabs)");
 		}
+
+		if (!isRunningInExpoGo()) {
+			void SplashScreen.hideAsync();
+		}
 	}, [session, isPending, segments, router]);
 
-	// oxlint-disable-next-line jsx-no-useless-fragment
+	if (isPending) {
+		return null;
+	}
+
 	return <>{children}</>;
 }
 
@@ -57,15 +63,6 @@ export default function RootLayout() {
 		Syne_700Bold,
 	});
 
-	const { isPending } = useSession();
-
-	useEffect(() => {
-		if (fontsLoaded && !isPending && !isRunningInExpoGo()) {
-			// oxlint-disable-next-line no-empty-function
-			SplashScreen.hideAsync().catch(() => {});
-		}
-	}, [fontsLoaded, isPending]);
-
 	if (!fontsLoaded) {
 		return null;
 	}
@@ -74,7 +71,6 @@ export default function RootLayout() {
 		<SafeAreaProvider>
 			<TRPCProvider>
 				<AuthGuard>
-					{/* oxlint-disable-next-line style-prop-object */}
 					<StatusBar style="light" />
 					<Stack
 						screenOptions={{
