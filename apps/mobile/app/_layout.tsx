@@ -49,6 +49,7 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 		return null;
 	}
 
+	// oxlint-disable-next-line jsx-no-useless-fragment
 	return <>{children}</>;
 }
 
@@ -71,6 +72,7 @@ export default function RootLayout() {
 		<SafeAreaProvider>
 			<TRPCProvider>
 				<AuthGuard>
+					{/* oxlint-disable-next-line style-prop-object */}
 					<StatusBar style="light" />
 					<Stack
 						screenOptions={{
