@@ -1,8 +1,10 @@
 import { useEffect } from "react";
+import { AppState } from "react-native";
 import { Stack, useRouter, useSegments } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import * as SplashScreen from "expo-splash-screen";
 import { isRunningInExpoGo } from "expo";
+import { focusManager } from "@tanstack/react-query";
 import { useFonts } from "expo-font";
 import {
 	DMSans_400Regular,
@@ -22,6 +24,13 @@ import { useSession } from "@/lib/auth";
 if (!isRunningInExpoGo()) {
 	SplashScreen.preventAutoHideAsync();
 }
+
+focusManager.setEventListener((handleFocus) => {
+	const subscription = AppState.addEventListener("change", (state) => {
+		handleFocus(state === "active");
+	});
+	return () => subscription.remove();
+});
 
 function AuthGuard({ children }: { children: React.ReactNode }) {
 	const { data: session, isPending } = useSession();
