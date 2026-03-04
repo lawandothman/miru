@@ -1,0 +1,47 @@
+name: OTA Update
+
+on:
+  workflow_dispatch:
+    inputs:
+      message:
+        description: Update message
+        required: false
+        default: ""
+
+concurrency:
+  group: ota-update
+  cancel-in-progress: false
+
+env:
+  EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+jobs:
+  update:
+    name: Publish OTA Update
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # v4
+
+      - uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6
+        with:
+          node-version: 24.14.0
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - uses: expo/expo-github-action@c7b66a9c327a43a8fa7c0158e7f30d6040d2481e # v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Publish update
+        run: |
+          MESSAGE="${{ github.event.inputs.message }}"
+          cd apps/mobile
+          if [ -n "$MESSAGE" ]; then
+            eas update --channel production --message "$MESSAGE" --non-interactive
+          else
+            eas update --channel production --non-interactive
+          fi

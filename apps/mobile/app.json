@@ -32,7 +32,8 @@
 			"expo-router",
 			"expo-secure-store",
 			"expo-image-picker",
-			"expo-apple-authentication"
+			"expo-apple-authentication",
+			"expo-updates"
 		],
 		"experiments": {
 			"typedRoutes": true

@@ -67,6 +67,36 @@ jobs:
       - name: Submit to App Store Connect
         run: cd apps/mobile && eas submit --profile production --platform ios --latest --non-interactive
 
+  ota-update:
+    name: Publish OTA Update
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # v4
+
+      - uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6
+        with:
+          node-version: 24.14.0
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - uses: expo/expo-github-action@c7b66a9c327a43a8fa7c0158e7f30d6040d2481e # v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Patch version from tag
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          cd apps/mobile
+          jq --arg v "$VERSION" '.expo.version = $v' app.json > app.tmp.json
+          mv app.tmp.json app.json
+
+      - name: Publish update
+        run: cd apps/mobile && eas update --channel production --message "Release ${{ github.ref_name }}" --non-interactive
+
   github-release:
     name: GitHub Release
     needs: build
