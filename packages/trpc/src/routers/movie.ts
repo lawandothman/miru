@@ -12,6 +12,7 @@ import {
 	lte,
 } from "drizzle-orm";
 import { z } from "zod";
+import { hasBlockedKeyword } from "../blocked-keywords";
 import { buildGenreMap, getMovieStatuses } from "../helpers";
 import type { TMDBClient } from "../tmdb";
 import { protectedProcedure, publicProcedure, router } from "../trpc";
@@ -678,7 +679,10 @@ async function refreshMovie(
 ) {
 	try {
 		const [details, videos, watchProviders] = await Promise.all([
-			ctx.tmdb.movies.details({ movie_id: tmdbId }),
+			ctx.tmdb.movies.details({
+				movie_id: tmdbId,
+				append_to_response: ["keywords"],
+			}),
 			ctx.tmdb.movies.videos({ movie_id: tmdbId }),
 			ctx.tmdb.movies.watch_providers({ movie_id: tmdbId }),
 		]);
@@ -687,8 +691,11 @@ async function refreshMovie(
 			(v) => v.site === TRAILER_SITE && v.type === TRAILER_TYPE,
 		);
 
+		const isAdult =
+			(details.adult ?? false) || hasBlockedKeyword(details.keywords.keywords);
+
 		const movieData = {
-			adult: details.adult ?? false,
+			adult: isAdult,
 			backdropPath: details.backdrop_path ?? null,
 			budget: details.budget ?? null,
 			homepage: details.homepage ?? null,

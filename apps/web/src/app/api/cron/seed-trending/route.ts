@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { schema, sql } from "@miru/db";
+import { schema, sql, inArray } from "@miru/db";
+import { hasBlockedKeyword } from "@miru/trpc/blocked-keywords";
 import { db, tmdb } from "@/lib/server";
 import { env } from "@/env";
 
@@ -88,6 +89,16 @@ export async function GET(request: Request) {
 					.onConflictDoNothing();
 			}
 
+			// Check keywords and mark NSFW movies as adult
+			const adultIds = await findAdultMovieIds(movies.map((m) => m.id));
+
+			if (adultIds.length > 0) {
+				await db
+					.update(schema.movies)
+					.set({ adult: true })
+					.where(inArray(schema.movies.id, adultIds));
+			}
+
 			seeded = movies.length;
 		}
 
@@ -98,4 +109,19 @@ export async function GET(request: Request) {
 			{ status: 500 },
 		);
 	}
+}
+
+async function findAdultMovieIds(movieIds: number[]): Promise<number[]> {
+	const adultIds: number[] = [];
+	for (const id of movieIds) {
+		try {
+			const kw = await tmdb.movies.keywords({ movie_id: id });
+			if (hasBlockedKeyword(kw.keywords)) {
+				adultIds.push(id);
+			}
+		} catch {
+			// Best-effort: skip keyword check if TMDB fails for a single movie
+		}
+	}
+	return adultIds;
 }

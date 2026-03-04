@@ -2,6 +2,7 @@ import { type Database, schema } from "@miru/db";
 import { TMDBError } from "@lorenzopant/tmdb";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
+import { hasBlockedKeyword } from "../blocked-keywords";
 import type { TMDBClient } from "../tmdb";
 
 export async function ensureMovieExists(
@@ -18,7 +19,12 @@ export async function ensureMovieExists(
 	}
 
 	try {
-		const details = await tmdb.movies.details({ movie_id: movieId });
+		const details = await tmdb.movies.details({
+			movie_id: movieId,
+			append_to_response: ["keywords"],
+		});
+		const isAdult =
+			(details.adult ?? false) || hasBlockedKeyword(details.keywords.keywords);
 		await db
 			.insert(schema.movies)
 			.values({
@@ -29,7 +35,7 @@ export async function ensureMovieExists(
 				posterPath: details.poster_path ?? null,
 				backdropPath: details.backdrop_path ?? null,
 				releaseDate: details.release_date ?? null,
-				adult: details.adult ?? false,
+				adult: isAdult,
 				popularity: details.popularity ?? null,
 			})
 			.onConflictDoNothing();

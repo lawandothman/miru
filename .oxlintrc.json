@@ -60,6 +60,7 @@
 		"no-nested-ternary": "off",
 		"capitalized-comments": "off",
 		"no-param-reassign": "off",
+		"no-use-before-define": "off",
 		"arrow-body-style": "off",
 		"typescript/explicit-function-return-type": "off",
 		"typescript/explicit-module-boundary-types": "off",

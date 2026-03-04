@@ -1,4 +1,5 @@
 import { TMDB } from "@lorenzopant/tmdb";
+import { BLOCKED_KEYWORDS_PARAM } from "./blocked-keywords";
 
 const TMDB_BASE_URL = "https://api.themoviedb.org/3";
 
@@ -42,7 +43,7 @@ export class TMDBClient extends TMDB {
 
 	async fetchPopular(page = 1): Promise<TMDBDiscoverResponse> {
 		const response = await fetch(
-			`${TMDB_BASE_URL}/movie/popular?language=en-US&page=${page}`,
+			`${TMDB_BASE_URL}/movie/popular?language=en-US&include_adult=false&page=${page}`,
 			{
 				headers: {
 					Authorization: `Bearer ${this.accessToken}`,
@@ -63,7 +64,7 @@ export class TMDBClient extends TMDB {
 
 	async fetchNowPlaying(page = 1): Promise<TMDBDiscoverResponse> {
 		const response = await fetch(
-			`${TMDB_BASE_URL}/movie/now_playing?language=en-US&page=${page}`,
+			`${TMDB_BASE_URL}/movie/now_playing?language=en-US&include_adult=false&page=${page}`,
 			{
 				headers: {
 					Authorization: `Bearer ${this.accessToken}`,
@@ -90,6 +91,7 @@ export class TMDBClient extends TMDB {
 			language: "en-US",
 			page: String(params.page ?? 1),
 			sort_by: params.sortBy ?? "popularity.desc",
+			without_keywords: BLOCKED_KEYWORDS_PARAM,
 		});
 
 		if (params.genres?.length) {

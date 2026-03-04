@@ -5,6 +5,7 @@
 	"type": "module",
 	"exports": {
 		".": "./src/index.ts",
+		"./blocked-keywords": "./src/blocked-keywords.ts",
 		"./context": "./src/context.ts"
 	},
 	"scripts": {
