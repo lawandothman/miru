@@ -24,7 +24,8 @@ export async function ensureMovieExists(
 			append_to_response: ["keywords"],
 		});
 		const isAdult =
-			(details.adult ?? false) || hasBlockedKeyword(details.keywords.keywords);
+			(details.adult ?? false) ||
+			hasBlockedKeyword(details.keywords.keywords, details.vote_count ?? 0);
 		await db
 			.insert(schema.movies)
 			.values({

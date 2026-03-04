@@ -692,7 +692,8 @@ async function refreshMovie(
 		);
 
 		const isAdult =
-			(details.adult ?? false) || hasBlockedKeyword(details.keywords.keywords);
+			(details.adult ?? false) ||
+			hasBlockedKeyword(details.keywords.keywords, details.vote_count ?? 0);
 
 		const movieData = {
 			adult: isAdult,

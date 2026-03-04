@@ -76,5 +76,5 @@
 		"react-compiler/immutability": "error",
 		"react-compiler/unsupported-syntax": "warn"
 	},
-	"ignorePatterns": ["node_modules", ".next", "dist", "drizzle"]
+	"ignorePatterns": ["node_modules", ".next", "dist", "drizzle", "scripts"]
 }

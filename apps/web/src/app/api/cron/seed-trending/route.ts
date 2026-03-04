@@ -90,7 +90,9 @@ export async function GET(request: Request) {
 			}
 
 			// Check keywords and mark NSFW movies as adult
-			const adultIds = await findAdultMovieIds(movies.map((m) => m.id));
+			const adultIds = await findAdultMovieIds(
+				movies.map((m) => ({ id: m.id, voteCount: m.vote_count ?? 0 })),
+			);
 
 			if (adultIds.length > 0) {
 				await db
@@ -111,13 +113,15 @@ export async function GET(request: Request) {
 	}
 }
 
-async function findAdultMovieIds(movieIds: number[]): Promise<number[]> {
+async function findAdultMovieIds(
+	movies: { id: number; voteCount: number }[],
+): Promise<number[]> {
 	const adultIds: number[] = [];
-	for (const id of movieIds) {
+	for (const movie of movies) {
 		try {
-			const kw = await tmdb.movies.keywords({ movie_id: id });
-			if (hasBlockedKeyword(kw.keywords)) {
-				adultIds.push(id);
+			const kw = await tmdb.movies.keywords({ movie_id: movie.id });
+			if (hasBlockedKeyword(kw.keywords, movie.voteCount)) {
+				adultIds.push(movie.id);
 			}
 		} catch {
 			// Best-effort: skip keyword check if TMDB fails for a single movie

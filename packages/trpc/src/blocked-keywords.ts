@@ -26,6 +26,18 @@ export const BLOCKED_KEYWORD_IDS = new Set<number>([
 /** Pipe-separated string for TMDB's `without_keywords` API param */
 export const BLOCKED_KEYWORDS_PARAM = [...BLOCKED_KEYWORD_IDS].join("|");
 
-export function hasBlockedKeyword(keywords: { id: number }[]): boolean {
-	return keywords.some((k) => BLOCKED_KEYWORD_IDS.has(k.id));
+/**
+ * Low vote count threshold — legitimate films about adult themes (Boogie Nights,
+ * Taxi Driver) have thousands of votes. Actual misclassified porn has very few.
+ */
+const VOTE_COUNT_THRESHOLD = 50;
+
+export function hasBlockedKeyword(
+	keywords: { id: number }[],
+	voteCount: number,
+): boolean {
+	return (
+		voteCount < VOTE_COUNT_THRESHOLD &&
+		keywords.some((k) => BLOCKED_KEYWORD_IDS.has(k.id))
+	);
 }
