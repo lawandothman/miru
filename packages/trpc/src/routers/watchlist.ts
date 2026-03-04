@@ -39,11 +39,13 @@ export const watchlistRouter = router({
 				orderBy: (we, { desc }) => [desc(we.createdAt)],
 			});
 
-			return entries.map((e) => ({
-				...e.movie,
-				inWatchlist: true,
-				addedAt: e.createdAt,
-			}));
+			return entries
+				.filter((e) => !e.movie.adult)
+				.map((e) => ({
+					...e.movie,
+					inWatchlist: true,
+					addedAt: e.createdAt,
+				}));
 		}),
 
 	getUserWatchlist: publicProcedure
@@ -61,14 +63,15 @@ export const watchlistRouter = router({
 				orderBy: (we, { desc }) => [desc(we.createdAt)],
 			});
 
-			const movieIds = entries.map((e) => e.movie.id);
+			const nonAdult = entries.filter((e) => !e.movie.adult);
+			const movieIds = nonAdult.map((e) => e.movie.id);
 			const watchlistSet = await getMovieIdSet(
 				ctx,
 				schema.watchlistEntries,
 				movieIds,
 			);
 
-			return entries.map((e) => ({
+			return nonAdult.map((e) => ({
 				...e.movie,
 				inWatchlist: watchlistSet.has(e.movie.id),
 			}));

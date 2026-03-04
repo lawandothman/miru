@@ -49,11 +49,13 @@ export const watchedRouter = router({
 				orderBy: (we, { desc }) => [desc(we.createdAt)],
 			});
 
-			return entries.map((e) => ({
-				...e.movie,
-				isWatched: true,
-				watchedAt: e.createdAt,
-			}));
+			return entries
+				.filter((e) => !e.movie.adult)
+				.map((e) => ({
+					...e.movie,
+					isWatched: true,
+					watchedAt: e.createdAt,
+				}));
 		}),
 
 	getUserWatched: publicProcedure
@@ -71,10 +73,12 @@ export const watchedRouter = router({
 				orderBy: (we, { desc }) => [desc(we.createdAt)],
 			});
 
-			return entries.map((e) => ({
-				...e.movie,
-				isWatched: true,
-			}));
+			return entries
+				.filter((e) => !e.movie.adult)
+				.map((e) => ({
+					...e.movie,
+					isWatched: true,
+				}));
 		}),
 
 	remove: protectedProcedure

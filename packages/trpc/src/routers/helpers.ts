@@ -15,6 +15,12 @@ export async function ensureMovieExists(
 	});
 
 	if (existing) {
+		if (existing.adult) {
+			throw new TRPCError({
+				code: "NOT_FOUND",
+				message: "Movie not found",
+			});
+		}
 		return;
 	}
 
@@ -40,6 +46,13 @@ export async function ensureMovieExists(
 				popularity: details.popularity ?? null,
 			})
 			.onConflictDoNothing();
+
+		if (isAdult) {
+			throw new TRPCError({
+				code: "NOT_FOUND",
+				message: "Movie not found",
+			});
+		}
 	} catch (error) {
 		if (error instanceof TMDBError && error.http_status_code === 404) {
 			throw new TRPCError({

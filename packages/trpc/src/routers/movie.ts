@@ -108,7 +108,7 @@ export const movieRouter = router({
 					)
 				: existing;
 
-			if (!movie) {
+			if (!movie || movie.adult) {
 				throw new TRPCError({ code: "NOT_FOUND", message: "Movie not found" });
 			}
 
