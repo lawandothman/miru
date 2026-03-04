@@ -54,6 +54,7 @@
 		"@miru/trpc": "workspace:*",
 		"@types/react": "catalog:",
 		"babel-plugin-module-resolver": "5.0.2",
+		"babel-preset-expo": "55.0.10",
 		"typescript": "catalog:"
 	}
 }
