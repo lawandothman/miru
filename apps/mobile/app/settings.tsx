@@ -35,48 +35,7 @@ import {
 	radius,
 	providerLogoUrl,
 } from "@/lib/constants";
-
-const COUNTRIES = [
-	{ code: "US", name: "United States" },
-	{ code: "GB", name: "United Kingdom" },
-	{ code: "CA", name: "Canada" },
-	{ code: "AU", name: "Australia" },
-	{ code: "DE", name: "Germany" },
-	{ code: "FR", name: "France" },
-	{ code: "ES", name: "Spain" },
-	{ code: "IT", name: "Italy" },
-	{ code: "NL", name: "Netherlands" },
-	{ code: "SE", name: "Sweden" },
-	{ code: "NO", name: "Norway" },
-	{ code: "DK", name: "Denmark" },
-	{ code: "FI", name: "Finland" },
-	{ code: "IE", name: "Ireland" },
-	{ code: "PT", name: "Portugal" },
-	{ code: "AT", name: "Austria" },
-	{ code: "CH", name: "Switzerland" },
-	{ code: "BE", name: "Belgium" },
-	{ code: "PL", name: "Poland" },
-	{ code: "BR", name: "Brazil" },
-	{ code: "MX", name: "Mexico" },
-	{ code: "AR", name: "Argentina" },
-	{ code: "JP", name: "Japan" },
-	{ code: "KR", name: "South Korea" },
-	{ code: "IN", name: "India" },
-	{ code: "NZ", name: "New Zealand" },
-	{ code: "ZA", name: "South Africa" },
-	{ code: "SG", name: "Singapore" },
-	{ code: "AE", name: "UAE" },
-	{ code: "HK", name: "Hong Kong" },
-] as const;
-
-function countryFlag(code: string): string {
-	return String.fromCodePoint(
-		...code
-			.toUpperCase()
-			.split("")
-			.map((char) => 127397 + char.charCodeAt(0)),
-	);
-}
+import { COUNTRIES, countryFlag } from "@/lib/region-data";
 
 export default function SettingsScreen() {
 	const { data: session } = useSession();
