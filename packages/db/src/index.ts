@@ -4,7 +4,11 @@ import type { InferSelectModel } from "drizzle-orm";
 import * as schema from "./schema/index";
 
 export function createDb(databaseUrl: string) {
-	const sql = postgres(databaseUrl, { prepare: false, max: 1, idle_timeout: 20 });
+	const sql = postgres(databaseUrl, {
+		prepare: false,
+		max: 1,
+		idle_timeout: 20,
+	});
 	return drizzle(sql, { schema });
 }
 
