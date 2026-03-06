@@ -1,4 +1,5 @@
 import { RefreshControl, ScrollView, StyleSheet, View } from "react-native";
+import { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { CarouselSkeleton } from "@/components/carousel-skeleton";
 import { MovieCarousel } from "@/components/movie-carousel";
@@ -22,12 +23,21 @@ const styles = StyleSheet.create({
 });
 
 export default function DiscoverScreen() {
+	const [refreshing, setRefreshing] = useState(false);
 	const {
 		data: sections,
 		isLoading,
 		refetch,
-		isRefetching,
 	} = trpc.movie.getDiscoverSections.useQuery();
+
+	async function handleRefresh() {
+		setRefreshing(true);
+		try {
+			await refetch();
+		} finally {
+			setRefreshing(false);
+		}
+	}
 
 	return (
 		<SafeAreaView style={styles.container} edges={["top"]}>
@@ -36,8 +46,8 @@ export default function DiscoverScreen() {
 				keyboardShouldPersistTaps="handled"
 				refreshControl={
 					<RefreshControl
-						refreshing={isRefetching}
-						onRefresh={refetch}
+						refreshing={refreshing}
+						onRefresh={handleRefresh}
 						tintColor={Colors.mutedForeground}
 					/>
 				}

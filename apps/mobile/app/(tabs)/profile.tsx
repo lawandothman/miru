@@ -53,7 +53,6 @@ export default function ProfileScreen() {
 				fetchNextPage={activeQuery.fetchNextPage}
 				isFetchingNextPage={activeQuery.isFetchingNextPage}
 				onRefresh={() => activeQuery.refetch()}
-				isRefetching={activeQuery.isRefetching}
 				ListHeaderComponent={
 					<View style={styles.headerWrapper}>
 						<View style={styles.settingsRow}>

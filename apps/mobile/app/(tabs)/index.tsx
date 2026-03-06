@@ -6,6 +6,7 @@ import {
 	Pressable,
 	StyleSheet,
 } from "react-native";
+import { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Film } from "lucide-react-native";
 import { useRouter } from "expo-router";
@@ -30,14 +31,23 @@ function getGreeting(): string {
 export default function HomeScreen() {
 	const { data: session } = useSession();
 	const router = useRouter();
+	const [refreshing, setRefreshing] = useState(false);
 	const firstName = session?.user?.name?.split(" ")[0] ?? "";
 
 	const {
 		data: matches,
 		isLoading,
 		refetch,
-		isRefetching,
 	} = trpc.social.getDashboardMatches.useQuery();
+
+	async function handleRefresh() {
+		setRefreshing(true);
+		try {
+			await refetch();
+		} finally {
+			setRefreshing(false);
+		}
+	}
 
 	return (
 		<SafeAreaView style={styles.container} edges={["top"]}>
@@ -45,8 +55,8 @@ export default function HomeScreen() {
 				contentContainerStyle={styles.scroll}
 				refreshControl={
 					<RefreshControl
-						refreshing={isRefetching}
-						onRefresh={refetch}
+						refreshing={refreshing}
+						onRefresh={handleRefresh}
 						tintColor={Colors.mutedForeground}
 					/>
 				}

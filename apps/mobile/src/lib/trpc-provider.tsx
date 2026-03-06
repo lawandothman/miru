@@ -11,12 +11,28 @@ import { trpc } from "./trpc";
 import { authClient } from "./auth";
 import { API_URL } from "./api-url";
 
+let unauthorizedRecovery: Promise<void> | null = null;
+
 function isUnauthorized(error: unknown): boolean {
 	return error instanceof TRPCClientError && error.data?.httpStatus === 401;
 }
 
 function handleUnauthorized() {
-	authClient.signOut();
+	if (unauthorizedRecovery) {
+		return unauthorizedRecovery;
+	}
+
+	unauthorizedRecovery = (async () => {
+		const { data: session } = await authClient.getSession();
+
+		if (!session) {
+			await authClient.signOut();
+		}
+	})().finally(() => {
+		unauthorizedRecovery = null;
+	});
+
+	return unauthorizedRecovery;
 }
 
 export function TRPCProvider({ children }: { children: React.ReactNode }) {
@@ -26,14 +42,14 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
 				queryCache: new QueryCache({
 					onError: (error) => {
 						if (isUnauthorized(error)) {
-							handleUnauthorized();
+							handleUnauthorized().catch(() => undefined);
 						}
 					},
 				}),
 				mutationCache: new MutationCache({
 					onError: (error) => {
 						if (isUnauthorized(error)) {
-							handleUnauthorized();
+							handleUnauthorized().catch(() => undefined);
 						}
 					},
 				}),

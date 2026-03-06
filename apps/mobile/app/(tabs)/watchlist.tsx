@@ -12,7 +12,7 @@ const PAGE_SIZE = 30;
 
 export default function WatchlistScreen() {
 	const router = useRouter();
-	const { data, fetchNextPage, hasNextPage, refetch, isRefetching } =
+	const { data, fetchNextPage, hasNextPage, refetch } =
 		trpc.watchlist.getMyWatchlist.useInfiniteQuery(
 			{ limit: PAGE_SIZE },
 			{
@@ -30,7 +30,6 @@ export default function WatchlistScreen() {
 				hasNextPage={hasNextPage}
 				fetchNextPage={fetchNextPage}
 				onRefresh={refetch}
-				isRefetching={isRefetching}
 				ListEmptyComponent={
 					<EmptyState
 						icon={Bookmark}

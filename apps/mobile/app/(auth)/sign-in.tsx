@@ -10,7 +10,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import Svg, { Path } from "react-native-svg";
 import * as AppleAuthentication from "expo-apple-authentication";
-import { signIn } from "@/lib/auth";
+import { signIn, useSession } from "@/lib/auth";
 import { Colors, fontSize, fontFamily, spacing, radius } from "@/lib/constants";
 
 function AppleIcon({ size = 20 }: { size?: number }) {
@@ -51,6 +51,8 @@ function GoogleIcon({ size = 20 }: { size?: number }) {
 
 export default function SignInScreen() {
 	const [loading, setLoading] = useState<"google" | "apple" | null>(null);
+	const { data: session } = useSession();
+	const isFinishingSignIn = loading !== null || Boolean(session);
 
 	async function handleGoogleSignIn() {
 		setLoading("google");
@@ -59,9 +61,8 @@ export default function SignInScreen() {
 				provider: "google",
 			});
 		} catch {
-			Alert.alert("Sign in failed", "Something went wrong. Please try again.");
-		} finally {
 			setLoading(null);
+			Alert.alert("Sign in failed", "Something went wrong. Please try again.");
 		}
 	}
 
@@ -86,6 +87,8 @@ export default function SignInScreen() {
 				},
 			});
 		} catch (error) {
+			setLoading(null);
+
 			if (
 				error instanceof Error &&
 				"code" in error &&
@@ -95,8 +98,6 @@ export default function SignInScreen() {
 				return;
 			}
 			Alert.alert("Sign in failed", "Something went wrong. Please try again.");
-		} finally {
-			setLoading(null);
 		}
 	}
 
@@ -105,48 +106,48 @@ export default function SignInScreen() {
 			<View style={styles.content}>
 				<View style={styles.branding}>
 					<Text style={styles.logo}>Miru</Text>
-					<Text style={styles.tagline}>Watch together</Text>
+					{!isFinishingSignIn ? (
+						<Text style={styles.tagline}>Watch together</Text>
+					) : null}
 				</View>
 
-				<View style={styles.actions}>
-					<Pressable
-						style={({ pressed }) => [
-							styles.socialButton,
-							pressed && styles.pressed,
-						]}
-						onPress={handleAppleSignIn}
-						disabled={loading !== null}
-					>
-						{loading === "apple" ? (
-							<ActivityIndicator color={Colors.background} />
-						) : (
+				{isFinishingSignIn ? (
+					<View style={styles.loadingContainer}>
+						<ActivityIndicator color={Colors.foreground} size="large" />
+					</View>
+				) : (
+					<View style={styles.actions}>
+						<Pressable
+							style={({ pressed }) => [
+								styles.socialButton,
+								pressed && styles.pressed,
+							]}
+							onPress={handleAppleSignIn}
+							disabled={loading !== null}
+						>
 							<View style={styles.socialButtonContent}>
 								<AppleIcon />
 								<Text style={styles.socialButtonText}>Continue with Apple</Text>
 							</View>
-						)}
-					</Pressable>
+						</Pressable>
 
-					<Pressable
-						style={({ pressed }) => [
-							styles.socialButton,
-							pressed && styles.pressed,
-						]}
-						onPress={handleGoogleSignIn}
-						disabled={loading !== null}
-					>
-						{loading === "google" ? (
-							<ActivityIndicator color={Colors.background} />
-						) : (
+						<Pressable
+							style={({ pressed }) => [
+								styles.socialButton,
+								pressed && styles.pressed,
+							]}
+							onPress={handleGoogleSignIn}
+							disabled={loading !== null}
+						>
 							<View style={styles.socialButtonContent}>
 								<GoogleIcon />
 								<Text style={styles.socialButtonText}>
 									Continue with Google
 								</Text>
 							</View>
-						)}
-					</Pressable>
-				</View>
+						</Pressable>
+					</View>
+				)}
 			</View>
 		</SafeAreaView>
 	);
@@ -182,6 +183,11 @@ const styles = StyleSheet.create({
 	},
 	actions: {
 		gap: spacing[3],
+	},
+	loadingContainer: {
+		alignItems: "center",
+		justifyContent: "center",
+		paddingVertical: spacing[8],
 	},
 	socialButton: {
 		backgroundColor: Colors.foreground,

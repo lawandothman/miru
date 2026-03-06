@@ -5,6 +5,7 @@ import {
 	RefreshControl,
 	ActivityIndicator,
 } from "react-native";
+import { useState } from "react";
 import { MoviePoster } from "./movie-poster";
 import { Colors, spacing } from "@/lib/constants";
 import type { MovieSummary } from "@/lib/types";
@@ -16,7 +17,6 @@ interface MovieGridProps {
 	fetchNextPage?: () => void;
 	isFetchingNextPage?: boolean;
 	onRefresh?: () => void;
-	isRefetching?: boolean;
 	ListEmptyComponent?: React.ReactElement;
 	ListHeaderComponent?: React.ReactElement;
 }
@@ -32,13 +32,27 @@ export function MovieGrid({
 	fetchNextPage,
 	isFetchingNextPage,
 	onRefresh,
-	isRefetching,
 	ListEmptyComponent,
 	ListHeaderComponent,
 }: MovieGridProps) {
+	const [refreshing, setRefreshing] = useState(false);
+
 	function handleEndReached() {
 		if (fetchNextPage && hasNextPage && !isFetchingNextPage) {
 			fetchNextPage();
+		}
+	}
+
+	async function handleRefresh() {
+		if (!onRefresh) {
+			return;
+		}
+
+		setRefreshing(true);
+		try {
+			await onRefresh();
+		} finally {
+			setRefreshing(false);
 		}
 	}
 
@@ -72,8 +86,8 @@ export function MovieGrid({
 			refreshControl={
 				onRefresh ? (
 					<RefreshControl
-						refreshing={isRefetching ?? false}
-						onRefresh={onRefresh}
+						refreshing={refreshing}
+						onRefresh={handleRefresh}
 						tintColor={Colors.mutedForeground}
 					/>
 				) : undefined
