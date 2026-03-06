@@ -57,7 +57,6 @@ export default function SignInScreen() {
 		try {
 			await signIn.social({
 				provider: "google",
-				callbackURL: "/(tabs)",
 			});
 		} catch {
 			Alert.alert("Sign in failed", "Something went wrong. Please try again.");
@@ -85,7 +84,6 @@ export default function SignInScreen() {
 				idToken: {
 					token: credential.identityToken,
 				},
-				callbackURL: "/(tabs)",
 			});
 		} catch (error) {
 			if (
