@@ -15,7 +15,7 @@
 		"@lorenzopant/tmdb": "catalog:",
 		"@miru/db": "workspace:*",
 		"@miru/trpc": "workspace:*",
-		"@sentry/nextjs": "10.40.0",
+		"@sentry/nextjs": "10.42.0",
 		"@t3-oss/env-nextjs": "0.13.10",
 		"@tanstack/react-query": "catalog:",
 		"@trpc/client": "catalog:",
