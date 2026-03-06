@@ -7,7 +7,7 @@ on:
 
 concurrency:
   group: release-${{ github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 env:
   EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
@@ -16,6 +16,8 @@ jobs:
   build:
     name: Build iOS
     runs-on: ubuntu-latest
+    outputs:
+      build-id: ${{ steps.eas-build.outputs.build-id }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
@@ -41,7 +43,12 @@ jobs:
           mv app.tmp.json app.json
 
       - name: Build on EAS
-        run: cd apps/mobile && eas build --profile production --platform ios --non-interactive --wait
+        id: eas-build
+        run: |
+          cd apps/mobile
+          BUILD_JSON=$(eas build --profile production --platform ios --non-interactive --wait --json)
+          BUILD_ID=$(echo "$BUILD_JSON" | jq -r '.[0].id')
+          echo "build-id=$BUILD_ID" >> "$GITHUB_OUTPUT"
 
   submit:
     name: Submit to TestFlight
@@ -65,10 +72,11 @@ jobs:
           token: ${{ secrets.EXPO_TOKEN }}
 
       - name: Submit to App Store Connect
-        run: cd apps/mobile && eas submit --profile production --platform ios --latest --non-interactive
+        run: cd apps/mobile && eas submit --profile production --platform ios --id ${{ needs.build.outputs.build-id }} --non-interactive
 
   ota-update:
     name: Publish OTA Update
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
@@ -97,6 +105,34 @@ jobs:
       - name: Publish update
         run: cd apps/mobile && eas update --channel production --message "Release ${{ github.ref_name }}" --non-interactive
 
+  sync-version:
+    name: Sync version to main
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          ref: main
+
+      - name: Update app.json version
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          cd apps/mobile
+          jq --arg v "$VERSION" '.expo.version = $v' app.json > app.tmp.json
+          mv app.tmp.json app.json
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add apps/mobile/app.json
+          git diff --cached --quiet && exit 0
+          git commit -m "chore(mobile): sync version to ${GITHUB_REF_NAME#v}"
+          git pull --rebase origin main
+          git push origin main
+
   github-release:
     name: GitHub Release
     needs: build
@@ -121,6 +157,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          gh release delete "$GITHUB_REF_NAME" --yes 2>/dev/null || true
           gh release create "$GITHUB_REF_NAME" \
             --title "$GITHUB_REF_NAME" \
             --notes-file changelog.md

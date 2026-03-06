@@ -21,6 +21,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          fetch-depth: 0
 
       - uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # v4
 
@@ -35,6 +37,15 @@ jobs:
         with:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Patch version from latest release tag
+        run: |
+          TAG=$(git tag --sort=-v:refname | grep '^v' | head -n 1)
+          VERSION="${TAG#v}"
+          echo "Resolved version: $VERSION (from tag $TAG)"
+          cd apps/mobile
+          jq --arg v "$VERSION" '.expo.version = $v' app.json > app.tmp.json
+          mv app.tmp.json app.json
 
       - name: Publish update
         run: |
