@@ -10,7 +10,7 @@ catalog:
   "zod": "4.3.6"
 
   # Dev tooling
-  "@types/node": "25.3.3"
+  "@types/node": "25.3.5"
   "eslint-plugin-react-hooks": "7.0.1"
   "typescript": "5.9.3"
 
