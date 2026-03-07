@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { Check, Plus, Sparkles } from "lucide-react";
+import { POSTER_BLUR_DATA_URL } from "@/lib/image-placeholder";
 import { toast } from "sonner";
 import { trpc } from "@/lib/trpc/client";
 import { cn } from "@/lib/utils";
@@ -102,6 +103,8 @@ export function WatchlistStep({ genreIds, onComplete }: WatchlistStepProps) {
 											fill
 											className="object-cover"
 											sizes="(max-width: 640px) 33vw, 25vw"
+											placeholder="blur"
+											blurDataURL={POSTER_BLUR_DATA_URL}
 										/>
 									) : (
 										<div className="flex h-full items-center justify-center p-2 text-center text-xs text-muted-foreground">

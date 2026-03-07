@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Film, Search } from "lucide-react";
+import { POSTER_BLUR_DATA_URL } from "@/lib/image-placeholder";
 import { Input } from "@/components/ui/input";
 import { useDebounce } from "@/hooks/use-debounce";
 import { trpc } from "@/lib/trpc/client";
@@ -120,6 +121,8 @@ export function SearchAutocomplete({
 									width={32}
 									height={48}
 									className="rounded-md object-cover"
+									placeholder="blur"
+									blurDataURL={POSTER_BLUR_DATA_URL}
 								/>
 							) : (
 								<div className="flex h-12 w-8 shrink-0 items-center justify-center rounded-md bg-muted">
