@@ -121,6 +121,7 @@ export function SearchAutocomplete({
 									width={32}
 									height={48}
 									className="rounded-md object-cover"
+									unoptimized
 									placeholder="blur"
 									blurDataURL={POSTER_BLUR_DATA_URL}
 								/>

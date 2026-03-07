@@ -90,6 +90,7 @@ export function StreamingPicker({
 										width={compact ? 32 : 40}
 										height={compact ? 32 : 40}
 										className="rounded-lg"
+										unoptimized
 									/>
 								) : (
 									<div

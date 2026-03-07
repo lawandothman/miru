@@ -78,12 +78,13 @@ export default async function MoviePage({ params }: MoviePageProps) {
 			<div className="relative -mx-4 -mt-6 overflow-hidden lg:-mx-8 lg:-mt-8">
 				{movie.backdropPath ? (
 					<Image
-						src={`https://image.tmdb.org/t/p/original${movie.backdropPath}`}
+						src={`https://image.tmdb.org/t/p/w1280${movie.backdropPath}`}
 						alt=""
 						width={1920}
 						height={1080}
 						className="h-[280px] w-full object-cover object-top opacity-40 sm:h-[380px]"
 						priority
+						unoptimized
 						placeholder="blur"
 						blurDataURL={POSTER_BLUR_DATA_URL}
 					/>
@@ -218,6 +219,7 @@ export default async function MoviePage({ params }: MoviePageProps) {
 										width={24}
 										height={24}
 										className="rounded"
+										unoptimized
 									/>
 								)}
 								<span className="text-sm">{sp.provider.name}</span>

@@ -103,6 +103,7 @@ export function WatchlistStep({ genreIds, onComplete }: WatchlistStepProps) {
 											fill
 											className="object-cover"
 											sizes="(max-width: 640px) 33vw, 25vw"
+											unoptimized
 											placeholder="blur"
 											blurDataURL={POSTER_BLUR_DATA_URL}
 										/>

@@ -112,6 +112,7 @@ export function StreamingServicesForm() {
 									width={28}
 									height={28}
 									className="rounded-md"
+									unoptimized
 								/>
 							) : null,
 						)}
