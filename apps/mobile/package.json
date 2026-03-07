@@ -40,8 +40,8 @@
 		"expo-updates": "55.0.12",
 		"expo-web-browser": "55.0.9",
 		"lucide-react-native": "0.577.0",
-		"react": "19.2.0",
-		"react-dom": "19.2.0",
+		"react": "catalog:",
+		"react-dom": "catalog:",
 		"react-native": "0.83.2",
 		"react-native-reanimated": "4.2.1",
 		"react-native-safe-area-context": "5.6.2",
@@ -54,7 +54,7 @@
 	"devDependencies": {
 		"@miru/design-tokens": "workspace:*",
 		"@miru/trpc": "workspace:*",
-		"@types/react": "~19.2.14",
+		"@types/react": "catalog:",
 		"babel-plugin-module-resolver": "5.0.2",
 		"babel-preset-expo": "55.0.10",
 		"typescript": "catalog:"
