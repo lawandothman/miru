@@ -1,33 +1,41 @@
 {
-  "$schema": "https://opencode.ai/config.json",
-  "mcp": {
-    "chrome-devtools": {
-      "type": "local",
-      "command": ["npx", "-y", "chrome-devtools-mcp@latest"],
-      "timeout": 15000
-    },
-    "playwright": {
-      "type": "local",
-      "command": ["npx", "-y", "@playwright/mcp@latest"],
-      "timeout": 15000
-    },
-    "better-auth": {
-      "type": "local",
-      "command": ["npx", "-y", "@better-auth/mcp@latest"]
-    },
-    "context7": {
-      "type": "local",
-      "command": ["npx", "-y", "@upstash/context7-mcp@latest"],
-      "timeout": 10000
-    },
-    "sequential-thinking": {
-      "type": "local",
-      "command": ["npx", "-y", "@modelcontextprotocol/server-sequential-thinking@latest"]
-    },
-    "postgres": {
-      "type": "local",
-      "command": ["sh", "-lc", "npx -y @modelcontextprotocol/server-postgres@latest \"$DATABASE_URL\""],
-      "enabled": false
-    }
-  }
+	"$schema": "https://opencode.ai/config.json",
+	"mcp": {
+		"chrome-devtools": {
+			"type": "local",
+			"command": ["npx", "-y", "chrome-devtools-mcp@latest"],
+			"timeout": 15000
+		},
+		"playwright": {
+			"type": "local",
+			"command": ["npx", "-y", "@playwright/mcp@latest"],
+			"timeout": 15000
+		},
+		"better-auth": {
+			"type": "local",
+			"command": ["npx", "-y", "@better-auth/mcp@latest"]
+		},
+		"context7": {
+			"type": "local",
+			"command": ["npx", "-y", "@upstash/context7-mcp@latest"],
+			"timeout": 10000
+		},
+		"sequential-thinking": {
+			"type": "local",
+			"command": [
+				"npx",
+				"-y",
+				"@modelcontextprotocol/server-sequential-thinking@latest"
+			]
+		},
+		"postgres": {
+			"type": "local",
+			"command": [
+				"sh",
+				"-lc",
+				"npx -y @modelcontextprotocol/server-postgres@latest \"$DATABASE_URL\""
+			],
+			"enabled": false
+		}
+	}
 }

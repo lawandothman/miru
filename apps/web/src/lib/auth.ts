@@ -6,25 +6,42 @@ import { createDb, schema } from "@miru/db";
 import { env } from "@/env";
 
 const db = createDb(env.DATABASE_URL);
+const isDevelopment = process.env.NODE_ENV === "development";
+const configuredHost = new URL(env.BETTER_AUTH_URL).host;
+
+const sharedTrustedOrigins = [
+	"https://miru-chi.vercel.app",
+	"https://appleid.apple.com",
+	"miru://",
+];
+
+const trustedOrigins = isDevelopment
+	? [
+			...sharedTrustedOrigins,
+			"http://localhost:3000",
+			"https://*.trycloudflare.com",
+			"https://*.ngrok-free.app",
+		]
+	: [...sharedTrustedOrigins, "exp://"];
+
+const allowedHosts = isDevelopment
+	? [
+			configuredHost,
+			"localhost:3000",
+			"127.0.0.1:3000",
+			"*.vercel.app",
+			"*.trycloudflare.com",
+			"*.ngrok-free.app",
+		]
+	: [configuredHost, "*.vercel.app"];
 
 export const auth = betterAuth({
-	baseURL: env.BETTER_AUTH_URL,
-	trustedOrigins:
-		process.env.NODE_ENV === "development"
-			? [
-					"https://miru-chi.vercel.app",
-					"https://appleid.apple.com",
-					"miru://",
-					"http://localhost:3000",
-					"https://*.trycloudflare.com",
-					"https://*.ngrok-free.app",
-				]
-			: [
-					"https://miru-chi.vercel.app",
-					"https://appleid.apple.com",
-					"miru://",
-					"exp://",
-				],
+	baseURL: {
+		allowedHosts,
+		fallback: env.BETTER_AUTH_URL,
+		protocol: "auto",
+	},
+	trustedOrigins,
 	database: drizzleAdapter(db, {
 		provider: "pg",
 		schema: {
