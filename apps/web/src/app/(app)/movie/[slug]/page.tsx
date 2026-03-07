@@ -76,7 +76,7 @@ export default async function MoviePage({ params }: MoviePageProps) {
 		<div className="space-y-8">
 			{/* Hero */}
 			<div className="relative -mx-4 -mt-6 overflow-hidden lg:-mx-8 lg:-mt-8">
-				{movie.backdropPath && (
+				{movie.backdropPath ? (
 					<Image
 						src={`https://image.tmdb.org/t/p/original${movie.backdropPath}`}
 						alt=""
@@ -87,6 +87,8 @@ export default async function MoviePage({ params }: MoviePageProps) {
 						placeholder="blur"
 						blurDataURL={POSTER_BLUR_DATA_URL}
 					/>
+				) : (
+					<div className="h-[280px] sm:h-[380px]" />
 				)}
 				<div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent" />
 
