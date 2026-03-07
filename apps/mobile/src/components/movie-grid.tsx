@@ -8,6 +8,7 @@ import {
 import { useState } from "react";
 import { MoviePoster } from "./movie-poster";
 import { Colors, spacing } from "@/lib/constants";
+import { triggerRefreshHaptic } from "@/lib/haptics";
 import type { MovieSummary } from "@/lib/types";
 
 interface MovieGridProps {
@@ -48,6 +49,7 @@ export function MovieGrid({
 			return;
 		}
 
+		triggerRefreshHaptic();
 		setRefreshing(true);
 		try {
 			await onRefresh();

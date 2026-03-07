@@ -3,6 +3,7 @@ import { UserPlus, UserMinus } from "lucide-react-native";
 import { trpc } from "@/lib/trpc";
 import { useSession } from "@/lib/auth";
 import { Colors, fontSize, fontFamily, spacing, radius } from "@/lib/constants";
+import { triggerFollowHaptic } from "@/lib/haptics";
 
 interface FollowButtonProps {
 	userId: string;
@@ -31,6 +32,8 @@ export function FollowButton({ userId, isFollowing }: FollowButtonProps) {
 	const loading = follow.isPending || unfollow.isPending;
 
 	function handlePress() {
+		triggerFollowHaptic();
+
 		if (isFollowing) {
 			unfollow.mutate({ friendId: userId });
 		} else {

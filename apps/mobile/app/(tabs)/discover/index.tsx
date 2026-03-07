@@ -5,6 +5,7 @@ import { CarouselSkeleton } from "@/components/carousel-skeleton";
 import { MovieCarousel } from "@/components/movie-carousel";
 import { SearchBar } from "@/components/search-bar";
 import { Colors, spacing } from "@/lib/constants";
+import { triggerRefreshHaptic } from "@/lib/haptics";
 import { trpc } from "@/lib/trpc";
 
 const styles = StyleSheet.create({
@@ -31,6 +32,7 @@ export default function DiscoverScreen() {
 	} = trpc.movie.getDiscoverSections.useQuery();
 
 	async function handleRefresh() {
+		triggerRefreshHaptic();
 		setRefreshing(true);
 		try {
 			await refetch();

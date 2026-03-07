@@ -16,6 +16,10 @@ import { StreamingStep } from "@/components/onboarding/streaming-step";
 import { WatchlistStep } from "@/components/onboarding/watchlist-step";
 import { FriendsStep } from "@/components/onboarding/friends-step";
 import { Colors, fontSize, fontFamily, spacing, radius } from "@/lib/constants";
+import {
+	triggerStepCompleteHaptic,
+	triggerWatchlistHaptic,
+} from "@/lib/haptics";
 
 const TOTAL_STEPS = 5;
 
@@ -55,6 +59,8 @@ export default function OnboardingScreen() {
 
 	const handleWatchlistToggle = useCallback(
 		(movieId: number) => {
+			triggerWatchlistHaptic();
+
 			setWatchlistIds((prev) => {
 				const next = new Set(prev);
 				if (next.has(movieId)) {
@@ -96,9 +102,11 @@ export default function OnboardingScreen() {
 			}
 
 			if (step < TOTAL_STEPS) {
+				triggerStepCompleteHaptic();
 				setStep(step + 1);
 			} else {
 				await completeMut.mutateAsync();
+				triggerStepCompleteHaptic();
 				utils.onboarding.getState.invalidate();
 				router.replace("/(tabs)");
 			}

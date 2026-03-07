@@ -2,6 +2,7 @@ import { View, Pressable, Text, StyleSheet } from "react-native";
 import { Bookmark, BookmarkPlus, Eye } from "lucide-react-native";
 import { trpc } from "@/lib/trpc";
 import { Colors, fontSize, fontFamily, spacing, radius } from "@/lib/constants";
+import { triggerWatchlistHaptic } from "@/lib/haptics";
 
 interface MovieActionsProps {
 	movieId: number;
@@ -38,6 +39,8 @@ export function MovieActions({
 	});
 
 	function handleWatchlistToggle() {
+		triggerWatchlistHaptic();
+
 		if (inWatchlist) {
 			removeFromWatchlist.mutate({ movieId });
 		} else {

@@ -16,6 +16,7 @@ import { MoviePoster } from "@/components/movie-poster";
 import { UserAvatar } from "@/components/user-avatar";
 import { EmptyState } from "@/components/empty-state";
 import { Colors, fontSize, fontFamily, spacing, radius } from "@/lib/constants";
+import { triggerRefreshHaptic } from "@/lib/haptics";
 
 function getGreeting(): string {
 	const hour = new Date().getHours();
@@ -41,6 +42,7 @@ export default function HomeScreen() {
 	} = trpc.social.getDashboardMatches.useQuery();
 
 	async function handleRefresh() {
+		triggerRefreshHaptic();
 		setRefreshing(true);
 		try {
 			await refetch();
