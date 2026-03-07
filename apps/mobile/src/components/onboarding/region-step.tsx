@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
 import { Check } from "lucide-react-native";
 import {
@@ -18,10 +18,11 @@ export function RegionStep({ country, onSelect }: RegionStepProps) {
 		() => country ?? detectCountryFromTimezone(),
 	);
 
-	// Notify parent of auto-detected country on mount
-	if (!country && selected) {
-		onSelect(selected);
-	}
+	useEffect(() => {
+		if (!country && selected) {
+			onSelect(selected);
+		}
+	}, [country, onSelect, selected]);
 
 	function handleSelect(code: string) {
 		setSelected(code);

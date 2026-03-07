@@ -52,7 +52,7 @@ jobs:
           MESSAGE="${{ github.event.inputs.message }}"
           cd apps/mobile
           if [ -n "$MESSAGE" ]; then
-            eas update --channel production --message "$MESSAGE" --non-interactive
+            eas update --channel production --environment production --message "$MESSAGE" --non-interactive
           else
-            eas update --channel production --non-interactive
+            eas update --channel production --environment production --non-interactive
           fi

@@ -103,7 +103,7 @@ jobs:
           mv app.tmp.json app.json
 
       - name: Publish update
-        run: cd apps/mobile && eas update --channel production --message "Release ${{ github.ref_name }}" --non-interactive
+        run: cd apps/mobile && eas update --channel production --environment production --message "Release ${{ github.ref_name }}" --non-interactive
 
   sync-version:
     name: Sync version to main

@@ -59,6 +59,8 @@ export default function SignInScreen() {
 		try {
 			await signIn.social({
 				provider: "google",
+				callbackURL: "/",
+				errorCallbackURL: "/(auth)/sign-in",
 			});
 		} catch {
 			setLoading(null);
