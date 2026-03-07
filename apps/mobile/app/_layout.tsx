@@ -57,11 +57,7 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 
 		if (!session && !inAuthGroup) {
 			router.replace("/(auth)/sign-in");
-		} else if (
-			session &&
-			onboardingCompleted === false &&
-			!inOnboardingGroup
-		) {
+		} else if (session && onboardingCompleted === false && !inOnboardingGroup) {
 			router.replace("/(onboarding)");
 		} else if (
 			session &&
