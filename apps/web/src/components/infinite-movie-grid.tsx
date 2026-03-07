@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef } from "react";
+import { useEffect, useEffectEvent, useRef } from "react";
 import { MoviePoster } from "./movie-poster";
 import { MovieGridSkeleton } from "./movie-grid";
 import {
@@ -35,16 +35,27 @@ export function InfiniteMovieGrid({
 }: InfiniteMovieGridProps) {
 	const sentinelRef = useRef<HTMLDivElement>(null);
 
-	const handleIntersect = useCallback(
+	const handleIntersect = useEffectEvent(
 		(entries: IntersectionObserverEntry[]) => {
 			if (entries[0]?.isIntersecting && !isFetching) {
 				onLoadMore();
 			}
 		},
-		[isFetching, onLoadMore],
 	);
 
-	// Stable observer — recreate when hasMore, isLoading, or callback identity changes
+	const checkAndLoadMore = useEffectEvent(() => {
+		const el = sentinelRef.current;
+		if (!el || isFetching || !hasMore) {
+			return;
+		}
+
+		const rect = el.getBoundingClientRect();
+		if (rect.top < window.innerHeight + 400) {
+			onLoadMore();
+		}
+	});
+
+	// Stable observer — recreate when hasMore or loading state changes
 	// isLoading is needed because the sentinel isn't mounted during the loading state
 	useEffect(() => {
 		const el = sentinelRef.current;
@@ -52,23 +63,23 @@ export function InfiniteMovieGrid({
 			return;
 		}
 
-		const observer = new IntersectionObserver(handleIntersect, {
-			rootMargin: "400px",
-		});
+		const observer = new IntersectionObserver(
+			(entries) => {
+				handleIntersect(entries);
+			},
+			{
+				rootMargin: "400px",
+			},
+		);
 
 		observer.observe(el);
 		return () => observer.disconnect();
-	}, [hasMore, isLoading, handleIntersect]);
+	}, [hasMore, isLoading]);
 
 	// When fetching completes, check if sentinel is still visible to continue loading
 	useEffect(() => {
-		if (!isFetching && hasMore && sentinelRef.current) {
-			const rect = sentinelRef.current.getBoundingClientRect();
-			if (rect.top < window.innerHeight + 400) {
-				onLoadMore();
-			}
-		}
-	}, [isFetching, hasMore, onLoadMore]);
+		checkAndLoadMore();
+	}, [isFetching, hasMore]);
 
 	if (isLoading) {
 		return <MovieGridSkeleton />;
