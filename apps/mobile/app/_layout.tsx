@@ -1,6 +1,11 @@
 import { useEffect } from "react";
 import { AppState } from "react-native";
-import { Stack, useRouter, useSegments } from "expo-router";
+import {
+	Stack,
+	useNavigationContainerRef,
+	useRouter,
+	useSegments,
+} from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import * as SplashScreen from "expo-splash-screen";
 import { isRunningInExpoGo } from "expo";
@@ -21,6 +26,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { TRPCProvider } from "@/lib/trpc-provider";
 import { trpc } from "@/lib/trpc";
 import { useSession } from "@/lib/auth";
+import { Sentry, navigationIntegration } from "@/lib/sentry";
 
 if (!isRunningInExpoGo()) {
 	SplashScreen.preventAutoHideAsync();
@@ -45,6 +51,19 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 
 	const onboardingResolved = !session || !onboardingPending;
 	const isPending = sessionPending || !onboardingResolved;
+
+	useEffect(() => {
+		if (session?.user) {
+			Sentry.setUser({
+				id: session.user.id,
+				email: session.user.email,
+				username: session.user.name,
+			});
+			return;
+		}
+
+		Sentry.setUser(null);
+	}, [session]);
 
 	useEffect(() => {
 		if (isPending) {
@@ -80,7 +99,7 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 	return <>{children}</>;
 }
 
-export default function RootLayout() {
+function RootLayout() {
 	const [fontsLoaded] = useFonts({
 		DMSans_400Regular,
 		DMSans_500Medium,
@@ -90,6 +109,11 @@ export default function RootLayout() {
 		Syne_600SemiBold,
 		Syne_700Bold,
 	});
+	const navigationRef = useNavigationContainerRef();
+
+	useEffect(() => {
+		navigationIntegration.registerNavigationContainer(navigationRef);
+	}, [navigationRef]);
 
 	if (!fontsLoaded) {
 		return null;
@@ -112,3 +136,5 @@ export default function RootLayout() {
 		</SafeAreaProvider>
 	);
 }
+
+export default Sentry.wrap(RootLayout);

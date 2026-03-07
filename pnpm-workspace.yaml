@@ -1,33 +1,34 @@
 packages:
-  - "apps/*"
-  - "packages/*"
+  - apps/*
+  - packages/*
 
 catalog:
-  # Shared libraries
-  "@lorenzopant/tmdb": "1.6.1"
-  "drizzle-orm": "0.45.1"
-  "ts-pattern": "5.9.0"
-  "zod": "4.3.6"
-
-  # Dev tooling
-  "@types/node": "25.3.5"
-  "eslint-plugin-react-hooks": "7.0.1"
-  "typescript": "5.9.3"
+  "@lorenzopant/tmdb": 1.6.1
+  "@types/node": 25.3.5
+  drizzle-orm: 0.45.1
+  eslint-plugin-react-hooks: 7.0.1
+  ts-pattern: 5.9.0
+  typescript: 5.9.3
+  zod: 4.3.6
 
 catalogs:
   better-auth:
-    "@better-auth/expo": "1.5.4"
-    "better-auth": "1.5.4"
-
-  trpc:
-    "@tanstack/react-query": "5.90.21"
-    "@trpc/client": "11.12.0"
-    "@trpc/react-query": "11.12.0"
-    "@trpc/server": "11.12.0"
-    "superjson": "2.2.6"
-
+    "@better-auth/expo": 1.5.4
+    better-auth: 1.5.4
   react:
-    "@types/react": "19.2.14"
-    "@types/react-dom": "19.2.3"
-    "react": "19.2.0"
-    "react-dom": "19.2.0"
+    "@types/react": 19.2.14
+    "@types/react-dom": 19.2.3
+    react: 19.2.0
+    react-dom: 19.2.0
+  trpc:
+    "@tanstack/react-query": 5.90.21
+    "@trpc/client": 11.12.0
+    "@trpc/react-query": 11.12.0
+    "@trpc/server": 11.12.0
+    superjson: 2.2.6
+
+ignoredBuiltDependencies:
+  - msw
+
+onlyBuiltDependencies:
+  - "@sentry/cli"

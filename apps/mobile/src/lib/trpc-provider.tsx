@@ -10,6 +10,7 @@ import superjson from "superjson";
 import { trpc } from "./trpc";
 import { authClient } from "./auth";
 import { API_URL } from "./api-url";
+import { Sentry } from "./sentry";
 
 let unauthorizedRecovery: Promise<void> | null = null;
 
@@ -35,22 +36,58 @@ function handleUnauthorized() {
 	return unauthorizedRecovery;
 }
 
+function captureTrpcError(
+	error: unknown,
+	context: {
+		type: "query" | "mutation";
+		key?: readonly unknown[];
+	},
+) {
+	if (isUnauthorized(error)) {
+		return;
+	}
+
+	Sentry.withScope((scope) => {
+		scope.setTag("error_source", "trpc");
+		scope.setTag("trpc_type", context.type);
+		if (context.key) {
+			scope.setContext("trpc", {
+				key: JSON.stringify(context.key),
+			});
+		}
+
+		Sentry.captureException(error);
+	});
+}
+
 export function TRPCProvider({ children }: { children: React.ReactNode }) {
 	const [queryClient] = useState(
 		() =>
 			new QueryClient({
 				queryCache: new QueryCache({
-					onError: (error) => {
+					onError: (error, query) => {
 						if (isUnauthorized(error)) {
 							handleUnauthorized().catch(() => undefined);
+							return;
 						}
+
+						captureTrpcError(error, {
+							type: "query",
+							key: query.queryKey,
+						});
 					},
 				}),
 				mutationCache: new MutationCache({
-					onError: (error) => {
+					onError: (error, _variables, _context, mutation) => {
 						if (isUnauthorized(error)) {
 							handleUnauthorized().catch(() => undefined);
+							return;
 						}
+
+						captureTrpcError(error, {
+							type: "mutation",
+							key: mutation.options.mutationKey,
+						});
 					},
 				}),
 				defaultOptions: {

@@ -2,13 +2,14 @@
 	"name": "@miru/mobile",
 	"version": "1.0.0",
 	"private": true,
-	"main": "expo-router/entry",
+	"main": "./index.ts",
 	"scripts": {
 		"dev": "expo start --dev-client",
 		"dev:expo-go": "expo start --clear",
 		"ios": "expo run:ios",
 		"ios:device": "expo run:ios --device",
 		"android": "expo run:android",
+		"sentry:upload-sourcemaps": "sentry-expo-upload-sourcemaps dist",
 		"typecheck": "tsc --noEmit"
 	},
 	"dependencies": {
@@ -19,6 +20,7 @@
 		"@expo/ui": "55.0.1",
 		"@expo/vector-icons": "15.0.3",
 		"@react-navigation/native": "7.1.28",
+		"@sentry/react-native": "^8.3.0",
 		"@tanstack/react-query": "catalog:trpc",
 		"@trpc/client": "catalog:trpc",
 		"@trpc/react-query": "catalog:trpc",

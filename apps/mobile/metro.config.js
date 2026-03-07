@@ -1,11 +1,13 @@
 // oxlint-disable no-require-imports
-const { getDefaultConfig } = require("expo/metro-config");
+const { getSentryExpoConfig } = require("@sentry/react-native/metro");
 const path = require("node:path");
 
 const projectRoot = __dirname;
 const monorepoRoot = path.resolve(projectRoot, "../..");
 
-const config = getDefaultConfig(projectRoot);
+const config = getSentryExpoConfig(projectRoot, {
+	annotateReactComponents: true,
+});
 
 // Allow Metro to resolve files from the monorepo root
 config.watchFolders = [
