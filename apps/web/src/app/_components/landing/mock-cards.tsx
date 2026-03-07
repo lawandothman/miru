@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { cn } from "@/lib/utils";
+import { POSTER_BLUR_DATA_URL } from "@/lib/image-placeholder";
 import { posters, tmdb } from "./posters";
 
 function PosterThumb({
@@ -24,6 +25,8 @@ function PosterThumb({
 				fill
 				className="object-cover"
 				sizes="120px"
+				placeholder="blur"
+				blurDataURL={POSTER_BLUR_DATA_URL}
 			/>
 		</div>
 	);

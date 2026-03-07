@@ -4,6 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { trpc } from "@/lib/trpc/server";
 import { movieIdFromSlug, movieSlug } from "@/lib/movie-slug";
+import { POSTER_BLUR_DATA_URL } from "@/lib/image-placeholder";
 import { ShareButton } from "@/components/share-button";
 import { WatchedButton } from "@/components/watched-button";
 import { WatchlistButton } from "@/components/watchlist-button";
@@ -83,6 +84,8 @@ export default async function MoviePage({ params }: MoviePageProps) {
 						height={1080}
 						className="h-[280px] w-full object-cover object-top opacity-40 sm:h-[380px]"
 						priority
+						placeholder="blur"
+						blurDataURL={POSTER_BLUR_DATA_URL}
 					/>
 				)}
 				<div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent" />
@@ -98,6 +101,8 @@ export default async function MoviePage({ params }: MoviePageProps) {
 									height={231}
 									className="rounded-lg shadow-2xl"
 									priority
+									placeholder="blur"
+									blurDataURL={POSTER_BLUR_DATA_URL}
 								/>
 							</div>
 						)}

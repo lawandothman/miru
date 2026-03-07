@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { movieSlug } from "@/lib/movie-slug";
+import { POSTER_BLUR_DATA_URL } from "@/lib/image-placeholder";
 
 interface MoviePosterProps {
 	id: number;
@@ -37,6 +38,8 @@ export function MoviePoster({
 						className="object-cover transition-transform duration-300 group-hover:scale-105"
 						sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
 						priority={priority ?? false}
+						placeholder="blur"
+						blurDataURL={POSTER_BLUR_DATA_URL}
 					/>
 				) : (
 					<div className="flex h-full items-center justify-center p-4 text-center text-xs text-muted-foreground">
