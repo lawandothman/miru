@@ -43,7 +43,8 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 			enabled: Boolean(session),
 		});
 
-	const isPending = sessionPending || (Boolean(session) && onboardingPending);
+	const onboardingResolved = !session || !onboardingPending;
+	const isPending = sessionPending || !onboardingResolved;
 
 	useEffect(() => {
 		if (isPending) {
@@ -52,14 +53,19 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 
 		const inAuthGroup = segments[0] === "(auth)";
 		const inOnboardingGroup = segments[0] === "(onboarding)";
+		const onboardingCompleted = onboardingState?.isCompleted;
 
 		if (!session && !inAuthGroup) {
 			router.replace("/(auth)/sign-in");
-		} else if (session && !onboardingState?.isCompleted && !inOnboardingGroup) {
+		} else if (
+			session &&
+			onboardingCompleted === false &&
+			!inOnboardingGroup
+		) {
 			router.replace("/(onboarding)");
 		} else if (
 			session &&
-			onboardingState?.isCompleted &&
+			onboardingCompleted === true &&
 			(inAuthGroup || inOnboardingGroup)
 		) {
 			router.replace("/(tabs)");
