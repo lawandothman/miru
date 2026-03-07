@@ -15,9 +15,9 @@
 	"dependencies": {
 		"@lorenzopant/tmdb": "catalog:",
 		"@miru/db": "workspace:*",
-		"@trpc/server": "catalog:",
+		"@trpc/server": "catalog:trpc",
 		"drizzle-orm": "catalog:",
-		"superjson": "catalog:",
+		"superjson": "catalog:trpc",
 		"ts-pattern": "catalog:",
 		"zod": "catalog:"
 	},
