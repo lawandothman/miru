@@ -14,8 +14,8 @@ catalogs:
       version: 1.5.4
   default:
     '@lorenzopant/tmdb':
-      specifier: 1.6.1
-      version: 1.6.1
+      specifier: 1.9.0
+      version: 1.9.0
     '@types/node':
       specifier: 25.3.5
       version: 25.3.5
@@ -108,7 +108,7 @@ importers:
         specifier: 7.1.28
         version: 7.1.28(react-native@0.83.2(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.0))(react@19.2.0)
       '@sentry/react-native':
-        specifier: ^8.3.0
+        specifier: 8.3.0
         version: 8.3.0(expo@55.0.5)(react-native@0.83.2(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.0))(react@19.2.0)
       '@tanstack/react-query':
         specifier: catalog:trpc
@@ -236,7 +236,7 @@ importers:
         version: 1.5.4(@better-auth/core@1.5.4(@better-auth/utils@0.3.1)(@better-fetch/fetch@1.1.21)(better-call@1.3.2(zod@4.3.6))(jose@6.1.3)(kysely@0.28.11)(nanostores@1.1.1))(better-auth@1.5.4(89387fb359649e0ee62690491e41df4b))(expo-constants@55.0.7)(expo-linking@55.0.7)(expo-network@55.0.8(expo@55.0.5)(react@19.2.0))(expo-web-browser@55.0.9(expo@55.0.5)(react-native@0.84.0(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.0)))
       '@lorenzopant/tmdb':
         specifier: 'catalog:'
-        version: 1.6.1
+        version: 1.9.0
       '@miru/db':
         specifier: workspace:*
         version: link:../../packages/db
@@ -391,7 +391,7 @@ importers:
     dependencies:
       '@lorenzopant/tmdb':
         specifier: 'catalog:'
-        version: 1.6.1
+        version: 1.9.0
       '@miru/db':
         specifier: workspace:*
         version: link:../db
@@ -2040,8 +2040,8 @@ packages:
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
 
-  '@lorenzopant/tmdb@1.6.1':
-    resolution: {integrity: sha512-kKOohL0JtrUaEXIjrhEEvz4WkncvX+H5+t2Qjfmi+7YU5VPnmmeuY5MPseQX7/Oy93jFtDUPX0F4Dqp5Sv/18Q==}
+  '@lorenzopant/tmdb@1.9.0':
+    resolution: {integrity: sha512-xHqaRbueEkHtpg8nq/sVJdbfhyXlMSd2CmIA9zCAa6RCNls+2GXsJR4AwxEJgKU4+xZ6aCRW/jLma2YBfcJjqg==}
 
   '@modelcontextprotocol/sdk@1.26.0':
     resolution: {integrity: sha512-Y5RmPncpiDtTXDbLKswIJzTqu2hyBKxTNsgKqKclDbhIgg1wgtf1fRuvxgTnRfcnxtvvgbIEcqUOzZrJ6iSReg==}
@@ -10038,7 +10038,7 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
 
-  '@lorenzopant/tmdb@1.6.1': {}
+  '@lorenzopant/tmdb@1.9.0': {}
 
   '@modelcontextprotocol/sdk@1.26.0(zod@3.25.76)':
     dependencies:
