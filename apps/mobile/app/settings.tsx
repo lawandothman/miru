@@ -513,7 +513,7 @@ function NotificationPreferences() {
 				<View style={styles.notificationCopy}>
 					<Text style={styles.notificationTitle}>Push notifications</Text>
 					<Text style={styles.notificationHint}>
-						Get notified when someone new follows you.
+						Turn push notifications on or off for your account.
 					</Text>
 				</View>
 				<Switch
