@@ -186,7 +186,13 @@ export const socialRouter = router({
 
 			if (follow) {
 				sendNewFollowerPushNotification({
+					...(ctx.captureException
+						? { captureException: ctx.captureException }
+						: {}),
 					db: ctx.db,
+					...(ctx.expoAccessToken
+						? { expoAccessToken: ctx.expoAccessToken }
+						: {}),
 					followerId: ctx.session.user.id,
 					followerName: ctx.session.user.name,
 					userId: input.friendId,

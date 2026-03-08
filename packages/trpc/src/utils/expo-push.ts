@@ -24,7 +24,12 @@ interface ExpoPushMessage {
 }
 
 interface NewFollowerPushInput {
+	captureException?: (
+		error: unknown,
+		context?: Record<string, unknown>,
+	) => void;
 	db: Database;
+	expoAccessToken?: string;
 	followerId: string;
 	followerName: string;
 	userId: string;
@@ -38,16 +43,26 @@ async function deletePushTokens(db: Database, tokens: string[]) {
 	);
 }
 
-async function sendExpoPushMessages(db: Database, messages: ExpoPushMessage[]) {
+async function sendExpoPushMessages(
+	db: Database,
+	messages: ExpoPushMessage[],
+	expoAccessToken?: string,
+) {
 	if (messages.length === 0) {
 		return;
 	}
 
+	const headers: Record<string, string> = {
+		"Content-Type": "application/json",
+	};
+
+	if (expoAccessToken) {
+		headers["Authorization"] = `Bearer ${expoAccessToken}`;
+	}
+
 	const response = await fetch(EXPO_PUSH_API_URL, {
 		method: "POST",
-		headers: {
-			"Content-Type": "application/json",
-		},
+		headers,
 		body: JSON.stringify(messages),
 	});
 
@@ -56,18 +71,19 @@ async function sendExpoPushMessages(db: Database, messages: ExpoPushMessage[]) {
 	}
 
 	const body = (await response.json()) as ExpoPushResponse;
-	const invalidTokens = (body.data ?? [])
-		.flatMap((ticket, index) => {
-			if (ticket.status !== "error") {
-				return [];
-			}
+	const invalidTokens = (body.data ?? []).flatMap((ticket, index) => {
+		if (ticket.status !== "error") {
+			return [];
+		}
 
-			if (ticket.details?.error !== "DeviceNotRegistered") {
-				return [];
-			}
+		if (ticket.details?.error !== "DeviceNotRegistered") {
+			return [];
+		}
 
-			return [messages[index]?.to].filter((token): token is string => Boolean(token));
-		});
+		return [messages[index]?.to].filter((token): token is string =>
+			Boolean(token),
+		);
+	});
 
 	if (invalidTokens.length > 0) {
 		await deletePushTokens(db, invalidTokens);
@@ -75,7 +91,9 @@ async function sendExpoPushMessages(db: Database, messages: ExpoPushMessage[]) {
 }
 
 export async function sendNewFollowerPushNotification({
+	captureException,
 	db,
+	expoAccessToken,
 	followerId,
 	followerName,
 	userId,
@@ -115,11 +133,14 @@ export async function sendNewFollowerPushNotification({
 					userId: followerId,
 				},
 			})),
+			expoAccessToken,
 		);
 	} catch (error) {
-		process.stderr.write(
-			`Failed to send new follower push notification: ${String(error)}\n`,
-		);
+		captureException?.(error, {
+			context: "new-follower-push",
+			followerId,
+			userId,
+		});
 	}
 }
 
