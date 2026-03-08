@@ -3,6 +3,17 @@ import { type Database, schema } from "@miru/db";
 
 const EXPO_PUSH_API_URL = "https://exp.host/--/api/v2/push/send";
 
+interface ExpoPushTicket {
+	details?: {
+		error?: string;
+	};
+	status: "error" | "ok";
+}
+
+interface ExpoPushResponse {
+	data?: ExpoPushTicket[];
+}
+
 interface ExpoPushMessage {
 	body: string;
 	data?: Record<string, string>;
@@ -19,7 +30,15 @@ interface NewFollowerPushInput {
 	userId: string;
 }
 
-async function sendExpoPushMessages(messages: ExpoPushMessage[]) {
+async function deletePushTokens(db: Database, tokens: string[]) {
+	await Promise.all(
+		tokens.map((token) =>
+			db.delete(schema.pushTokens).where(eq(schema.pushTokens.token, token)),
+		),
+	);
+}
+
+async function sendExpoPushMessages(db: Database, messages: ExpoPushMessage[]) {
 	if (messages.length === 0) {
 		return;
 	}
@@ -34,6 +53,24 @@ async function sendExpoPushMessages(messages: ExpoPushMessage[]) {
 
 	if (!response.ok) {
 		throw new Error(`Expo push request failed with status ${response.status}`);
+	}
+
+	const body = (await response.json()) as ExpoPushResponse;
+	const invalidTokens = (body.data ?? [])
+		.flatMap((ticket, index) => {
+			if (ticket.status !== "error") {
+				return [];
+			}
+
+			if (ticket.details?.error !== "DeviceNotRegistered") {
+				return [];
+			}
+
+			return [messages[index]?.to].filter((token): token is string => Boolean(token));
+		});
+
+	if (invalidTokens.length > 0) {
+		await deletePushTokens(db, invalidTokens);
 	}
 }
 
@@ -66,6 +103,7 @@ export async function sendNewFollowerPushNotification({
 
 	try {
 		await sendExpoPushMessages(
+			db,
 			recipient.pushTokens.map(({ token }) => ({
 				to: token,
 				title: "New follower",
@@ -78,8 +116,10 @@ export async function sendNewFollowerPushNotification({
 				},
 			})),
 		);
-	} catch {
-		// Ignore push delivery failures so following still succeeds.
+	} catch (error) {
+		process.stderr.write(
+			`Failed to send new follower push notification: ${String(error)}\n`,
+		);
 	}
 }
 

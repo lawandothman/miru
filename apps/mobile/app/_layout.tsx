@@ -45,7 +45,8 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 	const { data: session, isPending: sessionPending } = useSession();
 	const segments = useSegments();
 	const router = useRouter();
-	const registerPushToken = trpc.notification.registerPushToken.useMutation();
+	const { mutateAsync: registerPushToken } =
+		trpc.notification.registerPushToken.useMutation();
 
 	const { data: onboardingState, isPending: onboardingPending } =
 		trpc.onboarding.getState.useQuery(undefined, {
@@ -69,6 +70,18 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 	}, [session]);
 
 	useEffect(() => {
+		Notifications.getLastNotificationResponseAsync()
+			.then((response) => {
+				const route = getNotificationRoute(
+					response?.notification.request.content.data,
+				);
+
+				if (route) {
+					router.push(route);
+				}
+			})
+			.catch(() => undefined);
+
 		const subscription = Notifications.addNotificationResponseReceivedListener(
 			(response) => {
 				const route = getNotificationRoute(
@@ -100,7 +113,7 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 					return;
 				}
 
-				await registerPushToken.mutateAsync({
+				await registerPushToken({
 					platform: Platform.OS === "ios" ? "ios" : "android",
 					token: result.token,
 				});

@@ -185,12 +185,12 @@ export const socialRouter = router({
 				.returning({ followingId: schema.follows.followingId });
 
 			if (follow) {
-				await sendNewFollowerPushNotification({
+				sendNewFollowerPushNotification({
 					db: ctx.db,
 					followerId: ctx.session.user.id,
 					followerName: ctx.session.user.name,
 					userId: input.friendId,
-				});
+				}).catch(() => undefined);
 			}
 
 			return { success: true };
