@@ -47,6 +47,7 @@ export const movieRouter = router({
 			z.object({
 				cursor: z.number().int().min(0).nullish(),
 				genreId: z.number().int().positive(),
+				limit: z.number().int().positive().max(100).default(DEFAULT_PAGE_SIZE),
 			}),
 		)
 		.query(async ({ ctx, input }) => {
@@ -70,8 +71,8 @@ export const movieRouter = router({
 						eq(schema.movies.adult, false),
 					),
 				)
-				.orderBy(desc(schema.movies.tmdbVoteCount))
-				.limit(DEFAULT_PAGE_SIZE)
+				.orderBy(desc(schema.movies.tmdbVoteCount), desc(schema.movies.id))
+				.limit(input.limit)
 				.offset(offset);
 
 			const movieIds = movies.map((m) => m.id);

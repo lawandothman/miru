@@ -19,9 +19,9 @@ export default function GenreScreen() {
 		{ enabled: !Number.isNaN(genreId) },
 	);
 
-	const { data, fetchNextPage, hasNextPage, isLoading } =
+	const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
 		trpc.movie.getByGenre.useInfiniteQuery(
-			{ genreId },
+			{ genreId, limit: PAGE_SIZE },
 			{
 				enabled: !Number.isNaN(genreId),
 				getNextPageParam: offsetPageParam(PAGE_SIZE),
@@ -46,6 +46,7 @@ export default function GenreScreen() {
 						movies={movies}
 						hasNextPage={hasNextPage}
 						fetchNextPage={fetchNextPage}
+						isFetchingNextPage={isFetchingNextPage}
 					/>
 				)}
 			</SafeAreaView>

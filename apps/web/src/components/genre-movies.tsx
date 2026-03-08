@@ -7,7 +7,7 @@ import { InfiniteMovieGrid } from "./infinite-movie-grid";
 
 export function GenreMovies({ genreId }: { genreId: number }) {
 	const query = trpc.movie.getByGenre.useInfiniteQuery(
-		{ genreId },
+		{ genreId, limit: PAGE_SIZE },
 		{
 			getNextPageParam: (_lastPage, allPages) => {
 				const total = allPages.flat().length;
