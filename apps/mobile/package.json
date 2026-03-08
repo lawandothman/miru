@@ -20,7 +20,7 @@
 		"@expo/ui": "55.0.1",
 		"@expo/vector-icons": "15.0.3",
 		"@react-navigation/native": "7.1.28",
-		"@sentry/react-native": "^8.3.0",
+		"@sentry/react-native": "8.3.0",
 		"@tanstack/react-query": "catalog:trpc",
 		"@trpc/client": "catalog:trpc",
 		"@trpc/react-query": "catalog:trpc",
