@@ -132,7 +132,7 @@ importers:
         specifier: 55.0.7
         version: 55.0.7(expo@55.0.5)(react-native@0.83.2(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.0))(typescript@5.9.3)
       expo-device:
-        specifier: ~55.0.9
+        specifier: 55.0.9
         version: 55.0.9(expo@55.0.5)
       expo-font:
         specifier: 55.0.4
@@ -159,7 +159,7 @@ importers:
         specifier: 55.0.8
         version: 55.0.8(expo@55.0.5)(react@19.2.0)
       expo-notifications:
-        specifier: ~55.0.11
+        specifier: 55.0.11
         version: 55.0.11(expo@55.0.5)(react-native@0.83.2(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.0))(react@19.2.0)(typescript@5.9.3)
       expo-router:
         specifier: 55.0.4
