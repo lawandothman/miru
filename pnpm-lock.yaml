@@ -108,7 +108,7 @@ importers:
         specifier: 7.1.28
         version: 7.1.28(react-native@0.83.2(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.0))(react@19.2.0)
       '@sentry/react-native':
-        specifier: ^8.3.0
+        specifier: 8.3.0
         version: 8.3.0(expo@55.0.5)(react-native@0.83.2(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.0))(react@19.2.0)
       '@tanstack/react-query':
         specifier: catalog:trpc
