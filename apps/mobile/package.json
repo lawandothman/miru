@@ -57,6 +57,7 @@
 	"devDependencies": {
 		"@miru/design-tokens": "workspace:*",
 		"@miru/trpc": "workspace:*",
+		"@sentry/cli": "3.3.0",
 		"@types/react": "catalog:react",
 		"babel-plugin-module-resolver": "5.0.2",
 		"babel-preset-expo": "55.0.10",
