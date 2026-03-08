@@ -1,5 +1,6 @@
 import { relations } from "drizzle-orm";
 import { accounts, sessions, users } from "./users";
+import { pushTokens } from "./notifications";
 import { follows } from "./social";
 import { watchedEntries } from "./watched";
 import { watchlistEntries } from "./watchlist";
@@ -17,10 +18,18 @@ export const usersRelations = relations(users, ({ many }) => ({
 	followers: many(follows, { relationName: "following" }),
 	following: many(follows, { relationName: "follower" }),
 	genrePreferences: many(userGenrePreferences),
+	pushTokens: many(pushTokens),
 	sessions: many(sessions),
 	streamingServices: many(userStreamingServices),
 	watchedEntries: many(watchedEntries),
 	watchlistEntries: many(watchlistEntries),
+}));
+
+export const pushTokensRelations = relations(pushTokens, ({ one }) => ({
+	user: one(users, {
+		fields: [pushTokens.userId],
+		references: [users.id],
+	}),
 }));
 
 export const accountsRelations = relations(accounts, ({ one }) => ({

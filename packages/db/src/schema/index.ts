@@ -4,4 +4,5 @@ export * from "./social";
 export * from "./watched";
 export * from "./watchlist";
 export * from "./preferences";
+export * from "./notifications";
 export * from "./relations";

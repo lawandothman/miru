@@ -10,6 +10,9 @@ export const users = pgTable("users", {
 		.$defaultFn(() => crypto.randomUUID()),
 	image: text("image"),
 	name: text("name").notNull(),
+	pushNotificationsEnabled: boolean("push_notifications_enabled")
+		.default(true)
+		.notNull(),
 	onboardingCompletedAt: timestamp("onboarding_completed_at", { mode: "date" }),
 	updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow().notNull(),
 });
