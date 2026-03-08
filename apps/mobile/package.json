@@ -18,7 +18,7 @@
 		"@expo-google-fonts/syne": "0.4.2",
 		"@expo/metro-runtime": "55.0.6",
 		"@expo/ui": "55.0.1",
-		"@expo/vector-icons": "15.0.3",
+		"@expo/vector-icons": "15.1.1",
 		"@react-navigation/native": "7.1.28",
 		"@sentry/react-native": "8.3.0",
 		"@tanstack/react-query": "catalog:trpc",
