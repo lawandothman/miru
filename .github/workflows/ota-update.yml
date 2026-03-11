@@ -13,6 +13,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
+  EAS_CLI_VERSION: 18.3.0
   EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
 jobs:
@@ -30,28 +31,30 @@ jobs:
         with:
           node-version: 24.14.0
           cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
 
       - run: pnpm install --frozen-lockfile
 
       - uses: expo/expo-github-action@c7b66a9c327a43a8fa7c0158e7f30d6040d2481e # v8
         with:
-          eas-version: latest
+          eas-version: ${{ env.EAS_CLI_VERSION }}
           token: ${{ secrets.EXPO_TOKEN }}
-
-      - name: Patch version from latest release tag
-        run: |
-          TAG=$(git tag --sort=-v:refname | grep '^v' | head -n 1)
-          VERSION="${TAG#v}"
-          echo "Resolved version: $VERSION (from tag $TAG)"
-          cd apps/mobile
-          node -e 'const fs = require("node:fs"); const file = "app.config.ts"; const version = process.argv[1]; const source = fs.readFileSync(file, "utf8"); const updated = source.replace(/version:\s*"[^"]+"/, `version: "${version}"`); if (source === updated) throw new Error("Failed to update Expo version in app.config.ts"); fs.writeFileSync(file, updated);' "$VERSION"
 
       - name: Publish update
         run: |
+          TAG=$(git tag --sort=-v:refname | grep '^v' | sed -n '1p')
+          APP_VERSION="${TAG#v}"
+
+          if [ -z "$TAG" ] || ! printf '%s' "$APP_VERSION" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "Latest release tag must be semver like v1.3.1" >&2
+            exit 1
+          fi
+
+          echo "Resolved version: $APP_VERSION (from tag $TAG)"
           MESSAGE="${{ github.event.inputs.message }}"
           cd apps/mobile
           if [ -n "$MESSAGE" ]; then
-            eas update --channel production --environment production --message "$MESSAGE" --non-interactive
+            APP_VERSION="$APP_VERSION" eas update --channel production --environment production --message "$MESSAGE" --non-interactive
           else
-            eas update --channel production --environment production --non-interactive
+            APP_VERSION="$APP_VERSION" eas update --channel production --environment production --non-interactive
           fi

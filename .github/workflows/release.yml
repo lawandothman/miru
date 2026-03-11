@@ -10,11 +10,37 @@ concurrency:
   cancel-in-progress: true
 
 env:
+  EAS_CLI_VERSION: 18.3.0
   EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
 jobs:
+  validate-release:
+    name: Validate release tag
+    runs-on: ubuntu-latest
+    outputs:
+      app-version: ${{ steps.validate.outputs.app-version }}
+    steps:
+      - name: Validate semver tag
+        id: validate
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          VERSION="${TAG#v}"
+
+          if [ "$TAG" = "$VERSION" ]; then
+            echo "Release tags must start with v (example: v1.3.1)" >&2
+            exit 1
+          fi
+
+          if ! printf '%s' "$VERSION" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "Release tag must be semver like v1.3.1" >&2
+            exit 1
+          fi
+
+          echo "app-version=$VERSION" >> "$GITHUB_OUTPUT"
+
   build:
     name: Build iOS
+    needs: validate-release
     runs-on: ubuntu-latest
     outputs:
       build-id: ${{ steps.eas-build.outputs.build-id }}
@@ -27,22 +53,19 @@ jobs:
         with:
           node-version: 24.14.0
           cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
 
       - run: pnpm install --frozen-lockfile
 
       - uses: expo/expo-github-action@c7b66a9c327a43a8fa7c0158e7f30d6040d2481e # v8
         with:
-          eas-version: latest
+          eas-version: ${{ env.EAS_CLI_VERSION }}
           token: ${{ secrets.EXPO_TOKEN }}
-
-      - name: Patch version from tag
-        run: |
-          VERSION="${GITHUB_REF_NAME#v}"
-          cd apps/mobile
-          node -e 'const fs = require("node:fs"); const file = "app.config.ts"; const version = process.argv[1]; const source = fs.readFileSync(file, "utf8"); const updated = source.replace(/version:\s*"[^"]+"/, `version: "${version}"`); if (source === updated) throw new Error("Failed to update Expo version in app.config.ts"); fs.writeFileSync(file, updated);' "$VERSION"
 
       - name: Build on EAS
         id: eas-build
+        env:
+          APP_VERSION: ${{ needs.validate-release.outputs.app-version }}
         run: |
           cd apps/mobile
           BUILD_JSON=$(eas build --profile production --platform ios --non-interactive --wait --json)
@@ -51,7 +74,9 @@ jobs:
 
   submit:
     name: Submit to TestFlight
-    needs: build
+    needs:
+      - validate-release
+      - build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
@@ -62,20 +87,26 @@ jobs:
         with:
           node-version: 24.14.0
           cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
 
       - run: pnpm install --frozen-lockfile
 
       - uses: expo/expo-github-action@c7b66a9c327a43a8fa7c0158e7f30d6040d2481e # v8
         with:
-          eas-version: latest
+          eas-version: ${{ env.EAS_CLI_VERSION }}
           token: ${{ secrets.EXPO_TOKEN }}
 
       - name: Submit to App Store Connect
+        env:
+          APP_VERSION: ${{ needs.validate-release.outputs.app-version }}
         run: cd apps/mobile && eas submit --profile production --platform ios --id ${{ needs.build.outputs.build-id }} --non-interactive
 
   ota-update:
     name: Publish OTA Update
-    needs: build
+    needs:
+      - validate-release
+      - build
+      - submit
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
@@ -86,53 +117,26 @@ jobs:
         with:
           node-version: 24.14.0
           cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
 
       - run: pnpm install --frozen-lockfile
 
       - uses: expo/expo-github-action@c7b66a9c327a43a8fa7c0158e7f30d6040d2481e # v8
         with:
-          eas-version: latest
+          eas-version: ${{ env.EAS_CLI_VERSION }}
           token: ${{ secrets.EXPO_TOKEN }}
 
-      - name: Patch version from tag
-        run: |
-          VERSION="${GITHUB_REF_NAME#v}"
-          cd apps/mobile
-          node -e 'const fs = require("node:fs"); const file = "app.config.ts"; const version = process.argv[1]; const source = fs.readFileSync(file, "utf8"); const updated = source.replace(/version:\s*"[^"]+"/, `version: "${version}"`); if (source === updated) throw new Error("Failed to update Expo version in app.config.ts"); fs.writeFileSync(file, updated);' "$VERSION"
-
       - name: Publish update
+        env:
+          APP_VERSION: ${{ needs.validate-release.outputs.app-version }}
         run: cd apps/mobile && eas update --channel production --environment production --message "Release ${{ github.ref_name }}" --non-interactive
-
-  sync-version:
-    name: Sync version to main
-    needs: build
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
-        with:
-          ref: main
-
-      - name: Update app.config.ts version
-        run: |
-          VERSION="${GITHUB_REF_NAME#v}"
-          cd apps/mobile
-          node -e 'const fs = require("node:fs"); const file = "app.config.ts"; const version = process.argv[1]; const source = fs.readFileSync(file, "utf8"); const updated = source.replace(/version:\s*"[^"]+"/, `version: "${version}"`); if (source === updated) throw new Error("Failed to update Expo version in app.config.ts"); fs.writeFileSync(file, updated);' "$VERSION"
-
-      - name: Commit and push
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add apps/mobile/app.config.ts
-          git diff --cached --quiet && exit 0
-          git commit -m "chore(mobile): sync version to ${GITHUB_REF_NAME#v}"
-          git pull --rebase origin main
-          git push origin main
 
   github-release:
     name: GitHub Release
-    needs: build
+    needs:
+      - build
+      - submit
+      - ota-update
     runs-on: ubuntu-latest
     permissions:
       contents: write

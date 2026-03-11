@@ -11,6 +11,7 @@ const plugins: NonNullable<ExpoConfig["plugins"]> = [
 
 const sentryOrg = process.env.SENTRY_ORG ?? "lwnd";
 const sentryProject = process.env.SENTRY_PROJECT ?? "miru-mobile";
+const appVersion = (process.env.APP_VERSION ?? "1.3.0").replace(/^v/, "");
 
 if (sentryProject) {
 	plugins.push([
@@ -26,7 +27,7 @@ if (sentryProject) {
 const config: ExpoConfig = {
 	name: "Miru",
 	slug: "miru",
-	version: "1.1.0",
+	version: appVersion,
 	orientation: "portrait",
 	icon: "./assets/icon.png",
 	scheme: "miru",

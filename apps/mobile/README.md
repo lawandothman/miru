@@ -29,7 +29,7 @@ git tag v1.3.0
 git push origin v1.3.0
 ```
 
-The version in `app.config.ts` is patched from the tag in CI and then synced back to `main`. The build number is auto-incremented by EAS.
+The Expo version in `app.config.ts` reads from `APP_VERSION` in CI and falls back to the checked-in default locally. The build number is auto-incremented by EAS.
 
 ### Re-releasing the same version
 
