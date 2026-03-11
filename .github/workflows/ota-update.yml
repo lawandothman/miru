@@ -44,8 +44,7 @@ jobs:
           VERSION="${TAG#v}"
           echo "Resolved version: $VERSION (from tag $TAG)"
           cd apps/mobile
-          jq --arg v "$VERSION" '.expo.version = $v' app.json > app.tmp.json
-          mv app.tmp.json app.json
+          node -e 'const fs = require("node:fs"); const file = "app.config.ts"; const version = process.argv[1]; const source = fs.readFileSync(file, "utf8"); const updated = source.replace(/version:\s*"[^"]+"/, `version: "${version}"`); if (source === updated) throw new Error("Failed to update Expo version in app.config.ts"); fs.writeFileSync(file, updated);' "$VERSION"
 
       - name: Publish update
         run: |

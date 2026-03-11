@@ -25,21 +25,21 @@ Use a physical device when testing Apple Sign-In or Google Sign-In — neither w
 Releases are automated via GitHub Actions. Pushing a version tag builds on EAS, submits to TestFlight, and creates a GitHub Release.
 
 ```bash
-git tag v1.1.0
-git push origin v1.1.0
+git tag v1.3.0
+git push origin v1.3.0
 ```
 
-The version in `app.json` is patched from the tag in CI (not committed back). The build number is auto-incremented by EAS.
+The version in `app.config.ts` is patched from the tag in CI and then synced back to `main`. The build number is auto-incremented by EAS.
 
 ### Re-releasing the same version
 
 Delete and re-push the tag. EAS increments the build number, so App Store Connect sees it as a new build.
 
 ```bash
-git tag -d v1.1.0
-git push origin :refs/tags/v1.1.0
-git tag v1.1.0
-git push origin v1.1.0
+git tag -d v1.3.0
+git push origin :refs/tags/v1.3.0
+git tag v1.3.0
+git push origin v1.3.0
 ```
 
 ### Preview builds
