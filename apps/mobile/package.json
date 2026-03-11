@@ -19,7 +19,7 @@
 		"@expo/metro-runtime": "55.0.6",
 		"@expo/ui": "55.0.1",
 		"@expo/vector-icons": "15.1.1",
-		"@react-navigation/native": "7.1.28",
+		"@react-navigation/native": "7.1.33",
 		"@sentry/react-native": "8.3.0",
 		"@tanstack/react-query": "catalog:trpc",
 		"@trpc/client": "catalog:trpc",
