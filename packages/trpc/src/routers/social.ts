@@ -4,6 +4,7 @@ import { and, eq, ilike, inArray, ne } from "drizzle-orm";
 import { z } from "zod";
 import { annotateFollowStatus } from "../helpers";
 import { protectedProcedure, publicProcedure, router } from "../trpc";
+import { sendNewFollowerPushNotification } from "../utils/expo-push";
 
 function fetchFriendWatchlistRows(db: Database, userId: string) {
 	return db
@@ -174,13 +175,29 @@ export const socialRouter = router({
 
 			await assertUserExists(ctx.db, input.friendId);
 
-			await ctx.db
+			const [follow] = await ctx.db
 				.insert(schema.follows)
 				.values({
 					followerId: ctx.session.user.id,
 					followingId: input.friendId,
 				})
-				.onConflictDoNothing();
+				.onConflictDoNothing()
+				.returning({ followingId: schema.follows.followingId });
+
+			if (follow) {
+				sendNewFollowerPushNotification({
+					...(ctx.captureException
+						? { captureException: ctx.captureException }
+						: {}),
+					db: ctx.db,
+					...(ctx.expoAccessToken
+						? { expoAccessToken: ctx.expoAccessToken }
+						: {}),
+					followerId: ctx.session.user.id,
+					followerName: ctx.session.user.name,
+					userId: input.friendId,
+				}).catch(() => undefined);
+			}
 
 			return { success: true };
 		}),

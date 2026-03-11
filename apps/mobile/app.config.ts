@@ -2,6 +2,7 @@ import type { ExpoConfig } from "expo/config";
 
 const plugins: NonNullable<ExpoConfig["plugins"]> = [
 	"expo-router",
+	"expo-notifications",
 	"expo-secure-store",
 	"expo-image-picker",
 	"expo-apple-authentication",

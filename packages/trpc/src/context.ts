@@ -9,14 +9,21 @@ export interface Session {
 }
 
 export interface CreateContextOptions {
+	captureException?: (
+		error: unknown,
+		context?: Record<string, unknown>,
+	) => void;
 	db: Database;
+	expoAccessToken?: string;
 	tmdb: TMDBClient;
 	session: Session | null;
 }
 
 export function createContext(opts: CreateContextOptions) {
 	return {
+		captureException: opts.captureException,
 		db: opts.db,
+		expoAccessToken: opts.expoAccessToken,
 		session: opts.session,
 		tmdb: opts.tmdb,
 	};
