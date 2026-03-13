@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { AppState, Platform } from "react-native";
 import {
 	Stack,
@@ -27,7 +27,11 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { TRPCProvider } from "@/lib/trpc-provider";
 import { trpc } from "@/lib/trpc";
 import { useSession } from "@/lib/auth";
-import { getDevicePushToken, getNotificationRoute } from "@/lib/notifications";
+import {
+	getDevicePushToken,
+	getNotificationPermissionsStatus,
+	getNotificationRoute,
+} from "@/lib/notifications";
 import { Sentry, navigationIntegration } from "@/lib/sentry";
 
 if (!isRunningInExpoGo()) {
@@ -47,6 +51,7 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 	const router = useRouter();
 	const { mutateAsync: registerPushToken } =
 		trpc.notification.registerPushToken.useMutation();
+	const promptedForPushPermissionUserId = useRef<string | null>(null);
 
 	const { data: onboardingState, isPending: onboardingPending } =
 		trpc.onboarding.getState.useQuery(undefined, {
@@ -128,6 +133,61 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 			cancelled = true;
 		};
 	}, [registerPushToken, session?.user]);
+
+	useEffect(() => {
+		let cancelled = false;
+		const user = session?.user;
+		const onboardingCompleted = onboardingState?.isCompleted;
+
+		async function promptForPushPermission() {
+			if (
+				!user ||
+				onboardingCompleted !== true ||
+				isPending ||
+				isRunningInExpoGo() ||
+				segments[0] === "(auth)" ||
+				segments[0] === "(onboarding)" ||
+				promptedForPushPermissionUserId.current === user.id
+			) {
+				return;
+			}
+
+			const status = await getNotificationPermissionsStatus();
+			if (status !== Notifications.PermissionStatus.UNDETERMINED) {
+				promptedForPushPermissionUserId.current = user.id;
+				return;
+			}
+
+			promptedForPushPermissionUserId.current = user.id;
+
+			try {
+				const result = await getDevicePushToken({ promptForPermission: true });
+
+				if (cancelled || !result.token) {
+					return;
+				}
+
+				await registerPushToken({
+					platform: Platform.OS === "ios" ? "ios" : "android",
+					token: result.token,
+				});
+			} catch {
+				// Ignore permission prompt failures and let settings manage retries.
+			}
+		}
+
+		promptForPushPermission().catch(() => undefined);
+
+		return () => {
+			cancelled = true;
+		};
+	}, [
+		isPending,
+		onboardingState?.isCompleted,
+		registerPushToken,
+		segments,
+		session?.user,
+	]);
 
 	useEffect(() => {
 		if (isPending) {

@@ -107,6 +107,9 @@ export default function OnboardingScreen() {
 			} else {
 				await completeMut.mutateAsync();
 				triggerStepCompleteHaptic();
+				utils.onboarding.getState.setData(undefined, (current) =>
+					current ? { ...current, isCompleted: true } : current,
+				);
 				utils.onboarding.getState.invalidate();
 				router.replace("/(tabs)");
 			}
