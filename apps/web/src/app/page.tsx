@@ -6,6 +6,7 @@ import { auth } from "@/lib/auth";
 import { Bookmark } from "lucide-react";
 import { RevealOnScroll } from "@/components/reveal-on-scroll";
 import { SectionDivider, ConnectorSvg } from "./_components/landing/decorative";
+import { AppStoreButton } from "./_components/landing/app-store-button";
 import {
 	MockWatchlist,
 	MockMatches,
@@ -63,34 +64,17 @@ export default async function Home() {
 								movies you both want to watch. No more group chat debates.
 							</p>
 							<div
-								className="animate-fade-in-up mt-10 flex items-center gap-4"
+								className="animate-fade-in-up mt-10 flex flex-col items-start gap-4 sm:flex-row sm:flex-wrap sm:items-center"
 								style={{ animationDelay: "0.15s" }}
 							>
+								<AppStoreButton className="shadow-[0_14px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_14px_30px_rgba(0,0,0,0.28)]" />
 								<Link
 									href="/signin"
 									className="inline-flex h-12 items-center rounded-full bg-foreground px-8 text-[13px] font-semibold text-background transition-opacity hover:opacity-90"
 								>
 									Join for free
 								</Link>
-								<Link
-									href="/discover"
-									className="inline-flex h-12 items-center rounded-full border border-foreground/10 px-8 text-[13px] font-medium text-foreground/60 transition-colors hover:border-foreground/20 hover:text-foreground/80"
-								>
-									Discover
-								</Link>
 							</div>
-							<p
-								className="animate-fade-in-up mt-5 text-[13px] text-foreground/25"
-								style={{ animationDelay: "0.2s" }}
-							>
-								Already a member?{" "}
-								<Link
-									href="/signin"
-									className="underline underline-offset-2 transition-colors hover:text-foreground/40"
-								>
-									Sign in.
-								</Link>
-							</p>
 						</div>
 
 						{/* Hero visual — floating movie posters */}
