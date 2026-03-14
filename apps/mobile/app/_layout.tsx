@@ -23,7 +23,10 @@ import {
 	Syne_600SemiBold,
 	Syne_700Bold,
 } from "@expo-google-fonts/syne";
-import { SafeAreaProvider } from "react-native-safe-area-context";
+import {
+	SafeAreaProvider,
+	initialWindowMetrics,
+} from "react-native-safe-area-context";
 import { TRPCProvider } from "@/lib/trpc-provider";
 import { trpc } from "@/lib/trpc";
 import { useSession } from "@/lib/auth";
@@ -244,7 +247,7 @@ function RootLayout() {
 	}
 
 	return (
-		<SafeAreaProvider>
+		<SafeAreaProvider initialMetrics={initialWindowMetrics}>
 			<TRPCProvider>
 				<AuthGuard>
 					{/* oxlint-disable-next-line style-prop-object */}
