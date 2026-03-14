@@ -39,7 +39,9 @@ function handleUnauthorized() {
 function isNetworkError(error: unknown): boolean {
 	if (error instanceof TRPCClientError) {
 		const msg = error.message.toLowerCase();
-		return msg.includes("network request failed") || msg.includes("fetch failed");
+		return (
+			msg.includes("network request failed") || msg.includes("fetch failed")
+		);
 	}
 	return false;
 }
