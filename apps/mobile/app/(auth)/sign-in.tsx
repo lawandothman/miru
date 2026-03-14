@@ -10,6 +10,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import Svg, { Path } from "react-native-svg";
 import * as AppleAuthentication from "expo-apple-authentication";
+import * as Sentry from "@sentry/react-native";
 import { signIn, useSession } from "@/lib/auth";
 import { Colors, fontSize, fontFamily, spacing, radius } from "@/lib/constants";
 
@@ -62,9 +63,15 @@ export default function SignInScreen() {
 				callbackURL: "/",
 				errorCallbackURL: "/(auth)/sign-in",
 			});
-		} catch {
+		} catch (error) {
 			setLoading(null);
-			Alert.alert("Sign in failed", "Something went wrong. Please try again.");
+			Sentry.captureException(error, {
+				tags: { flow: "sign-in", provider: "google" },
+			});
+			Alert.alert(
+				"Sign in failed",
+				error instanceof Error ? error.message : "Something went wrong.",
+			);
 		}
 	}
 
@@ -99,7 +106,13 @@ export default function SignInScreen() {
 				// User cancelled — do nothing
 				return;
 			}
-			Alert.alert("Sign in failed", "Something went wrong. Please try again.");
+			Sentry.captureException(error, {
+				tags: { flow: "sign-in", provider: "apple" },
+			});
+			Alert.alert(
+				"Sign in failed",
+				error instanceof Error ? error.message : "Something went wrong.",
+			);
 		}
 	}
 
