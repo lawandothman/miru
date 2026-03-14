@@ -15,7 +15,6 @@ Sentry.init({
 	dsn,
 	enabled: isSentryEnabled,
 	sendDefaultPii: true,
-	enableLogs: true,
 	tracesSampleRate: __DEV__ ? 1 : 0.2,
 	profilesSampleRate: __DEV__ ? 1 : 0.2,
 	replaysSessionSampleRate: __DEV__ ? 1 : 0.1,

@@ -58,3 +58,14 @@ jobs:
           else
             APP_VERSION="$APP_VERSION" eas update --channel production --environment production --non-interactive
           fi
+
+      - name: Upload sourcemaps to Sentry
+        if: env.SENTRY_AUTH_TOKEN != ''
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+        run: |
+          cd apps/mobile
+          npx sentry-cli sourcemaps upload \
+            --org lwnd \
+            --project miru-mobile \
+            dist

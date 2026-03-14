@@ -131,6 +131,17 @@ jobs:
           APP_VERSION: ${{ needs.validate-release.outputs.app-version }}
         run: cd apps/mobile && eas update --channel production --environment production --message "Release ${{ github.ref_name }}" --non-interactive
 
+      - name: Upload sourcemaps to Sentry
+        if: env.SENTRY_AUTH_TOKEN != ''
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+        run: |
+          cd apps/mobile
+          npx sentry-cli sourcemaps upload \
+            --org lwnd \
+            --project miru-mobile \
+            dist
+
   github-release:
     name: GitHub Release
     needs:
