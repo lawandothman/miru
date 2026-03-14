@@ -17,7 +17,7 @@
 		"@expo-google-fonts/dm-sans": "0.4.2",
 		"@expo-google-fonts/syne": "0.4.2",
 		"@expo/metro-runtime": "55.0.6",
-		"@expo/ui": "55.0.2",
+		"@expo/ui": "55.0.1",
 		"@expo/vector-icons": "15.1.1",
 		"@react-navigation/native": "7.1.33",
 		"@sentry/react-native": "7.11.0",
@@ -68,7 +68,8 @@
 	"expo": {
 		"install": {
 			"exclude": [
-				"@react-navigation/native"
+				"@react-navigation/native",
+				"@expo/ui"
 			]
 		}
 	}
