@@ -50,20 +50,17 @@ export default function SearchScreen() {
 		return () => clearTimeout(timer);
 	}, []);
 
-	const { data: autocompleteResults } =
-		trpc.movie.searchAutocomplete.useQuery(
-			{ query: debouncedQuery },
-			{ enabled: debouncedQuery.length > 0 && submittedQuery.length === 0 },
-		);
+	const { data: autocompleteResults } = trpc.movie.searchAutocomplete.useQuery(
+		{ query: debouncedQuery },
+		{ enabled: debouncedQuery.length > 0 && submittedQuery.length === 0 },
+	);
 
 	const fullSearch = trpc.movie.search.useInfiniteQuery(
 		{ query: submittedQuery },
 		{
 			enabled: submittedQuery.length > 0,
 			getNextPageParam: (lastPage) =>
-				lastPage.page < lastPage.totalPages
-					? lastPage.page + 1
-					: undefined,
+				lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
 		},
 	);
 
@@ -156,18 +153,10 @@ export default function SearchScreen() {
 									contentFit="cover"
 								/>
 							) : (
-								<View
-									style={[
-										styles.resultPoster,
-										styles.posterPlaceholder,
-									]}
-								/>
+								<View style={[styles.resultPoster, styles.posterPlaceholder]} />
 							)}
 							<View style={styles.resultInfo}>
-								<Text
-									style={styles.resultTitle}
-									numberOfLines={1}
-								>
+								<Text style={styles.resultTitle} numberOfLines={1}>
 									{item.title}
 								</Text>
 								{item.releaseDate && (
@@ -229,19 +218,12 @@ function PeopleSection({ people }: { people: UserResult[] }) {
 					onPress={() => router.push(`/user/${user.id}`)}
 				>
 					<View style={styles.userInfo}>
-						<UserAvatar
-							imageUrl={user.image}
-							name={user.name}
-							size={40}
-						/>
+						<UserAvatar imageUrl={user.image} name={user.name} size={40} />
 						<Text style={styles.userName} numberOfLines={1}>
 							{user.name ?? "Unknown"}
 						</Text>
 					</View>
-					<FollowButton
-						userId={user.id}
-						isFollowing={user.isFollowing}
-					/>
+					<FollowButton userId={user.id} isFollowing={user.isFollowing} />
 				</Pressable>
 			))}
 		</View>

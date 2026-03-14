@@ -8,10 +8,7 @@ export function SearchBar() {
 
 	return (
 		<Pressable
-			style={({ pressed }) => [
-				styles.container,
-				pressed && styles.pressed,
-			]}
+			style={({ pressed }) => [styles.container, pressed && styles.pressed]}
 			onPress={() => router.push("/discover/search")}
 		>
 			<Search size={18} color={Colors.mutedForeground} />
