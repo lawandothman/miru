@@ -66,6 +66,7 @@ export function MovieGrid({
 			contentContainerStyle={styles.list}
 			columnWrapperStyle={styles.row}
 			showsVerticalScrollIndicator={false}
+			alwaysBounceVertical={movies.length > 0}
 			onEndReached={handleEndReached}
 			onEndReachedThreshold={0.5}
 			ListEmptyComponent={
