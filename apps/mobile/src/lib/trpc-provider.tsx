@@ -36,6 +36,14 @@ function handleUnauthorized() {
 	return unauthorizedRecovery;
 }
 
+function isNetworkError(error: unknown): boolean {
+	if (error instanceof TRPCClientError) {
+		const msg = error.message.toLowerCase();
+		return msg.includes("network request failed") || msg.includes("fetch failed");
+	}
+	return false;
+}
+
 function captureTrpcError(
 	error: unknown,
 	context: {
@@ -43,7 +51,7 @@ function captureTrpcError(
 		key?: readonly unknown[];
 	},
 ) {
-	if (isUnauthorized(error)) {
+	if (isUnauthorized(error) || isNetworkError(error)) {
 		return;
 	}
 
