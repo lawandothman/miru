@@ -8,7 +8,7 @@ import {
 import { httpBatchLink, TRPCClientError } from "@trpc/client";
 import superjson from "superjson";
 import { trpc } from "./trpc";
-import { authClient } from "./auth";
+import { authClient, clearAuthState } from "./auth";
 import { API_URL } from "./api-url";
 import { Sentry } from "./sentry";
 
@@ -24,10 +24,10 @@ function handleUnauthorized() {
 	}
 
 	unauthorizedRecovery = (async () => {
-		const { data: session } = await authClient.getSession();
-
-		if (!session) {
+		try {
 			await authClient.signOut();
+		} catch {
+			clearAuthState();
 		}
 	})().finally(() => {
 		unauthorizedRecovery = null;
@@ -120,6 +120,8 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
 				httpBatchLink({
 					url: `${API_URL}/api/trpc`,
 					transformer: superjson,
+					fetch: (url, options) =>
+						fetch(url, { ...options, credentials: "omit" }),
 					headers() {
 						const cookies = authClient.getCookie();
 						if (cookies) {

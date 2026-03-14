@@ -11,7 +11,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Svg, { Path } from "react-native-svg";
 import * as AppleAuthentication from "expo-apple-authentication";
 import * as Sentry from "@sentry/react-native";
-import { signIn, useSession } from "@/lib/auth";
+import { signIn, useSession, clearAuthState } from "@/lib/auth";
 import { Colors, fontSize, fontFamily, spacing, radius } from "@/lib/constants";
 
 function AppleIcon({ size = 20 }: { size?: number }) {
@@ -64,6 +64,7 @@ export default function SignInScreen() {
 				errorCallbackURL: "/(auth)/sign-in",
 			});
 		} catch (error) {
+			clearAuthState();
 			setLoading(null);
 			Sentry.captureException(error, {
 				tags: { flow: "sign-in", provider: "google" },
@@ -96,16 +97,17 @@ export default function SignInScreen() {
 				},
 			});
 		} catch (error) {
-			setLoading(null);
-
 			if (
 				error instanceof Error &&
 				"code" in error &&
 				(error as { code: string }).code === "ERR_REQUEST_CANCELED"
 			) {
-				// User cancelled — do nothing
+				setLoading(null);
 				return;
 			}
+
+			clearAuthState();
+			setLoading(null);
 			Sentry.captureException(error, {
 				tags: { flow: "sign-in", provider: "apple" },
 			});
