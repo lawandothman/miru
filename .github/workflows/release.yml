@@ -135,11 +135,13 @@ jobs:
         if: env.SENTRY_AUTH_TOKEN != ''
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          APP_VERSION: ${{ needs.validate-release.outputs.app-version }}
         run: |
           cd apps/mobile
           npx sentry-cli sourcemaps upload \
             --org lwnd \
             --project miru-mobile \
+            --release "com.miru.app@${APP_VERSION}" \
             dist
 
   github-release:

@@ -64,8 +64,11 @@ jobs:
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
         run: |
+          TAG=$(git tag --sort=-v:refname | grep '^v' | sed -n '1p')
+          APP_VERSION="${TAG#v}"
           cd apps/mobile
           npx sentry-cli sourcemaps upload \
             --org lwnd \
             --project miru-mobile \
+            --release "com.miru.app@${APP_VERSION}" \
             dist
