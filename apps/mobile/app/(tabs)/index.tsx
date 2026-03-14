@@ -57,6 +57,7 @@ export default function HomeScreen() {
 		<View style={[styles.container, { paddingTop: insets.top }]}>
 			<ScrollView
 				contentContainerStyle={styles.scroll}
+				alwaysBounceVertical={matches !== undefined && matches.length > 0}
 				refreshControl={
 					<RefreshControl
 						refreshing={refreshing}
