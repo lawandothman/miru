@@ -1,5 +1,5 @@
 import { Stack } from "expo-router";
-import { Colors, fontFamily } from "@/lib/constants";
+import { Colors } from "@/lib/constants";
 
 export default function DiscoverLayout() {
 	return (
@@ -10,16 +10,7 @@ export default function DiscoverLayout() {
 			}}
 		>
 			<Stack.Screen name="index" />
-			<Stack.Screen
-				name="search"
-				options={{
-					headerShown: true,
-					headerStyle: { backgroundColor: Colors.background },
-					headerTintColor: Colors.foreground,
-					headerTitleStyle: { fontFamily: fontFamily.displayBold },
-					headerBackButtonDisplayMode: "minimal",
-				}}
-			/>
+			<Stack.Screen name="search" />
 		</Stack>
 	);
 }
