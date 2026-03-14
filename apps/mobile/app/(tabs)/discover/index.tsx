@@ -1,6 +1,6 @@
 import { RefreshControl, ScrollView, StyleSheet, View } from "react-native";
 import { useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { CarouselSkeleton } from "@/components/carousel-skeleton";
 import { MovieCarousel } from "@/components/movie-carousel";
 import { SearchBar } from "@/components/search-bar";
@@ -41,8 +41,10 @@ export default function DiscoverScreen() {
 		}
 	}
 
+	const insets = useSafeAreaInsets();
+
 	return (
-		<SafeAreaView style={styles.container} edges={["top"]}>
+		<View style={[styles.container, { paddingTop: insets.top }]}>
 			<ScrollView
 				contentContainerStyle={styles.scroll}
 				keyboardShouldPersistTaps="handled"
@@ -79,6 +81,6 @@ export default function DiscoverScreen() {
 					</>
 				)}
 			</ScrollView>
-		</SafeAreaView>
+		</View>
 	);
 }

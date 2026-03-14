@@ -1,5 +1,5 @@
-import { Text, StyleSheet } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { View, Text, StyleSheet } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Bookmark } from "lucide-react-native";
 import { useRouter } from "expo-router";
 import { trpc } from "@/lib/trpc";
@@ -21,9 +21,10 @@ export default function WatchlistScreen() {
 		);
 
 	const movies = data?.pages.flat() ?? [];
+	const insets = useSafeAreaInsets();
 
 	return (
-		<SafeAreaView style={styles.container} edges={["top"]}>
+		<View style={[styles.container, { paddingTop: insets.top }]}>
 			<Text style={styles.title}>Watchlist</Text>
 			<MovieGrid
 				movies={movies}
@@ -40,7 +41,7 @@ export default function WatchlistScreen() {
 					/>
 				}
 			/>
-		</SafeAreaView>
+		</View>
 	);
 }
 

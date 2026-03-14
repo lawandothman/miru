@@ -7,7 +7,7 @@ import {
 	StyleSheet,
 } from "react-native";
 import { useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Film } from "lucide-react-native";
 import { useRouter } from "expo-router";
 import { trpc } from "@/lib/trpc";
@@ -51,8 +51,10 @@ export default function HomeScreen() {
 		}
 	}
 
+	const insets = useSafeAreaInsets();
+
 	return (
-		<SafeAreaView style={styles.container} edges={["top"]}>
+		<View style={[styles.container, { paddingTop: insets.top }]}>
 			<ScrollView
 				contentContainerStyle={styles.scroll}
 				refreshControl={
@@ -119,7 +121,7 @@ export default function HomeScreen() {
 					</View>
 				)}
 			</ScrollView>
-		</SafeAreaView>
+		</View>
 	);
 }
 

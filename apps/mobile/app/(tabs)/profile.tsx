@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Settings } from "lucide-react-native";
 import { useRouter } from "expo-router";
 import { useSession } from "@/lib/auth";
@@ -44,8 +44,10 @@ export default function ProfileScreen() {
 	const activeQuery = activeTab === "watchlist" ? watchlist : watched;
 	const movies = activeQuery.data?.pages.flat() ?? [];
 
+	const insets = useSafeAreaInsets();
+
 	return (
-		<SafeAreaView style={styles.container} edges={["top"]}>
+		<View style={[styles.container, { paddingTop: insets.top }]}>
 			<MovieGrid
 				movies={movies}
 				isLoading={activeQuery.isLoading}
@@ -116,7 +118,7 @@ export default function ProfileScreen() {
 					</View>
 				}
 			/>
-		</SafeAreaView>
+		</View>
 	);
 }
 
