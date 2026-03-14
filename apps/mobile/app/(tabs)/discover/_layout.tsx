@@ -7,10 +7,16 @@ export default function DiscoverLayout() {
 			screenOptions={{
 				headerShown: false,
 				contentStyle: { backgroundColor: Colors.background },
+				navigationBarColor: Colors.background,
 			}}
 		>
 			<Stack.Screen name="index" />
-			<Stack.Screen name="search" />
+			<Stack.Screen
+				name="search"
+				options={{
+					animation: "fade",
+				}}
+			/>
 		</Stack>
 	);
 }
