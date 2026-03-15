@@ -44,6 +44,9 @@ export const metadata: Metadata = {
 		"movie discovery",
 	],
 	manifest: "/site.webmanifest",
+	verification: {
+		google: "4UoEQxW4iwaUv_rq4YWlHIfExDyT6Qtd9vNTsQlHbhY",
+	},
 	metadataBase: new URL(env.BETTER_AUTH_URL),
 	openGraph: {
 		description:
