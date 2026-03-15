@@ -4,10 +4,10 @@ export function SectionDivider() {
 	return (
 		<div className="mx-auto max-w-6xl px-6 lg:px-16">
 			<div className="relative h-px">
-				<div className="absolute inset-0 bg-gradient-to-r from-transparent via-foreground/[0.06] to-transparent" />
+				<div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/10 to-transparent" />
 				{/* Center diamond */}
 				<div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-					<div className="size-1.5 rotate-45 bg-foreground/10" />
+					<div className="size-1.5 rotate-45 bg-primary/25" />
 				</div>
 			</div>
 		</div>

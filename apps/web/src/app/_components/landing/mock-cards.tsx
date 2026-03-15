@@ -32,16 +32,34 @@ function PosterThumb({
 	);
 }
 
-function UserPill({ name, color }: { name: string; color: string }) {
+const avatars: Record<string, string> = {
+	Sarah: "https://api.dicebear.com/9.x/lorelei/png?seed=Sarah&size=56&backgroundColor=ffd5dc",
+	You: "https://api.dicebear.com/9.x/adventurer/png?seed=You&size=56&backgroundColor=b6e3f4",
+	Alex: "https://api.dicebear.com/9.x/adventurer-neutral/png?seed=Alex&size=56&backgroundColor=ffdfbf",
+	Maya: "https://api.dicebear.com/9.x/notionists/png?seed=Maya&size=56&backgroundColor=d1d4f9",
+	Jordan: "https://api.dicebear.com/9.x/avataaars/png?seed=Jordan&size=56&backgroundColor=c0aede",
+	Sam: "https://api.dicebear.com/9.x/lorelei/png?seed=Sam&size=56&backgroundColor=ffd5dc",
+};
+
+function UserAvatar({
+	name,
+	size = 28,
+	ring = "ring-2 ring-background",
+}: {
+	name: string;
+	size?: number;
+	ring?: string;
+}) {
 	return (
-		<div
-			className={cn(
-				"flex size-7 items-center justify-center rounded-full text-[10px] font-bold ring-2 ring-background",
-				color,
-			)}
-		>
-			{name.charAt(0)}
-		</div>
+		// oxlint-disable-next-line nextjs/no-img-element -- tiny decorative avatars, no optimization benefit
+		<img
+			src={avatars[name] ?? `https://api.dicebear.com/9.x/adventurer/png?seed=${name}&size=56&backgroundColor=b6e3f4`}
+			alt={name}
+			width={size}
+			height={size}
+			className={cn("rounded-full object-cover", ring)}
+			style={{ width: size, height: size }}
+		/>
 	);
 }
 
@@ -56,7 +74,7 @@ export function MockWatchlist() {
 	];
 
 	return (
-		<div className="rounded-2xl border border-foreground/[0.06] bg-foreground/[0.02] p-5">
+		<div className="rounded-2xl border border-foreground/[0.08] bg-foreground/[0.02] p-5 shadow-lg shadow-black/[0.04] dark:bg-white/[0.03] dark:shadow-[0_8px_32px_rgba(0,0,0,0.25)]">
 			<div className="flex items-center justify-between px-1">
 				<p className="text-sm font-medium text-foreground/70">My Watchlist</p>
 				<p className="text-xs text-foreground/25">12 movies</p>
@@ -83,11 +101,11 @@ export function MockMatches() {
 	];
 
 	return (
-		<div className="rounded-2xl border border-foreground/[0.06] bg-foreground/[0.02] p-5">
+		<div className="rounded-2xl border border-foreground/[0.08] bg-foreground/[0.02] p-5 shadow-lg shadow-black/[0.04] dark:bg-white/[0.03] dark:shadow-[0_8px_32px_rgba(0,0,0,0.25)]">
 			<div className="flex items-center gap-3 px-1">
 				<div className="flex -space-x-2">
-					<UserPill name="Sarah" color="bg-amber-500/20 text-amber-300" />
-					<UserPill name="You" color="bg-sky-500/20 text-sky-300" />
+					<UserAvatar name="Sarah" />
+					<UserAvatar name="You" />
 				</div>
 				<div>
 					<p className="text-sm font-medium text-foreground/70">
@@ -115,29 +133,19 @@ export function MockMatches() {
 export function MockForYou() {
 	const recommendations = [
 		{
-			friendColors: [
-				"bg-rose-500/20 text-rose-300",
-				"bg-emerald-500/20 text-emerald-300",
-			],
-			friends: ["A", "M"],
+			friends: ["Alex", "Maya"],
 			path: posters.ladybird,
 			title: "Lady Bird",
 			year: "2017",
 		},
 		{
-			friendColors: ["bg-violet-500/20 text-violet-300"],
-			friends: ["J"],
+			friends: ["Jordan"],
 			path: posters.fightClub,
 			title: "Fight Club",
 			year: "1999",
 		},
 		{
-			friendColors: [
-				"bg-rose-500/20 text-rose-300",
-				"bg-amber-500/20 text-amber-300",
-				"bg-violet-500/20 text-violet-300",
-			],
-			friends: ["A", "S", "J"],
+			friends: ["Alex", "Sam", "Jordan"],
 			path: posters.grandBudapest,
 			title: "The Grand Budapest Hotel",
 			year: "2014",
@@ -145,7 +153,7 @@ export function MockForYou() {
 	];
 
 	return (
-		<div className="rounded-2xl border border-foreground/[0.06] bg-foreground/[0.02] p-5">
+		<div className="rounded-2xl border border-foreground/[0.08] bg-foreground/[0.02] p-5 shadow-lg shadow-black/[0.04] dark:bg-white/[0.03] dark:shadow-[0_8px_32px_rgba(0,0,0,0.25)]">
 			<div className="px-1">
 				<p className="text-sm font-medium text-foreground/70">For You</p>
 				<p className="text-[11px] text-foreground/25">Based on 5 friends</p>
@@ -168,16 +176,13 @@ export function MockForYou() {
 							<p className="text-[11px] text-foreground/25">{m.year}</p>
 						</div>
 						<div className="flex -space-x-1.5">
-							{m.friends.map((f, i) => (
-								<div
+							{m.friends.map((f) => (
+								<UserAvatar
 									key={f}
-									className={cn(
-										"flex size-5 items-center justify-center rounded-full text-[8px] font-bold ring-1 ring-background",
-										m.friendColors[i],
-									)}
-								>
-									{f}
-								</div>
+									name={f}
+									size={20}
+									ring="ring-1 ring-background"
+								/>
 							))}
 						</div>
 					</div>

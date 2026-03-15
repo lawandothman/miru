@@ -26,7 +26,19 @@ export async function generateMetadata({
 	const api = await trpc();
 	try {
 		const user = await api.user.getById({ id });
-		return { title: user.name };
+		const description = `Check out ${user.name}'s watchlist and movie matches on Miru.`;
+		return {
+			description,
+			openGraph: {
+				description,
+				title: `${user.name} on Miru`,
+				type: "profile",
+			},
+			other: {
+				"apple-itunes-app": `app-id=6759829491, app-argument=miru://user/${id}`,
+			},
+			title: user.name,
+		};
 	} catch {
 		return { title: "User" };
 	}

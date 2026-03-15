@@ -76,8 +76,42 @@ export default async function MoviePage({ params }: MoviePageProps) {
 	const hours = movie.runtime ? Math.floor(movie.runtime / 60) : null;
 	const minutes = movie.runtime ? movie.runtime % 60 : null;
 
+	const jsonLd = {
+		"@context": "https://schema.org",
+		"@type": "Movie",
+		name: movie.title,
+		...(movie.overview && { description: movie.overview }),
+		...(year && { datePublished: movie.releaseDate }),
+		...(movie.posterPath && {
+			image: `https://image.tmdb.org/t/p/w500${movie.posterPath}`,
+		}),
+		...(movie.runtime && {
+			duration: `PT${Math.floor(movie.runtime / 60)}H${movie.runtime % 60}M`,
+		}),
+		...(movie.tmdbVoteAverage !== null &&
+			movie.tmdbVoteAverage !== undefined && {
+				aggregateRating: {
+					"@type": "AggregateRating",
+					bestRating: 10,
+					ratingValue: movie.tmdbVoteAverage,
+				},
+			}),
+		...(movie.genres &&
+			movie.genres.length > 0 && {
+				genre: movie.genres.map((mg) => mg.genre.name),
+			}),
+		url: `${process.env["BETTER_AUTH_URL"] ?? ""}/movie/${canonical}`,
+	};
+
 	return (
 		<div className="space-y-8">
+			{/* oxlint-disable react/no-danger -- JSON-LD structured data for SEO */}
+			<script
+				type="application/ld+json"
+				// oxlint-disable-next-line react/no-danger
+				dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+			/>
+			{/* oxlint-enable react/no-danger */}
 			{/* Hero */}
 			<div className="relative -mx-4 -mt-6 overflow-hidden lg:-mx-8 lg:-mt-8">
 				{movie.backdropPath ? (

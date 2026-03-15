@@ -268,6 +268,39 @@
 		0 0 4px oklch(0.78 0.115 80 / 20%);
 }
 
+@utility text-gradient-hero {
+	background: linear-gradient(
+		135deg,
+		var(--foreground) 0%,
+		var(--primary) 45%,
+		var(--foreground) 90%
+	);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+}
+
+@keyframes glow-drift {
+	0%,
+	100% {
+		transform: translate(0, 0) scale(1);
+	}
+	33% {
+		transform: translate(30px, -25px) scale(1.05);
+	}
+	66% {
+		transform: translate(-20px, 20px) scale(0.97);
+	}
+}
+
+@utility animate-glow-drift {
+	animation: glow-drift 20s ease-in-out infinite;
+}
+
+@utility animate-glow-drift-reverse {
+	animation: glow-drift 25s ease-in-out infinite reverse;
+}
+
 @media (prefers-reduced-motion: reduce) {
 	*,
 	*::before,
