@@ -1,4 +1,3 @@
-import { NativeModules, Platform } from "react-native";
 import { createAuthClient } from "better-auth/react";
 import { expoClient } from "@better-auth/expo/client";
 import * as SecureStore from "expo-secure-store";
@@ -20,28 +19,12 @@ export const authClient = createAuthClient({
 });
 
 /**
- * Clear all locally stored auth state:
- * 1. SecureStore cookies + cached session (Better Auth expo client)
- * 2. Native HTTP cookie jar (NSHTTPCookieStorage on iOS)
+ * Clear locally stored auth state (cookies + cached session).
+ * Used as a fallback when signOut() fails.
  */
-export async function clearAuthState() {
-	await Promise.all([
-		SecureStore.deleteItemAsync(COOKIE_KEY).catch(() => undefined),
-		SecureStore.deleteItemAsync(SESSION_CACHE_KEY).catch(() => undefined),
-	]);
-
-	if (Platform.OS === "ios") {
-		const networking = NativeModules.Networking as
-			| { clearCookies?: (cb: (cleared: boolean) => void) => void }
-			| undefined;
-		await new Promise<void>((resolve) => {
-			if (networking?.clearCookies) {
-				networking.clearCookies(() => resolve());
-			} else {
-				resolve();
-			}
-		});
-	}
+export function clearAuthState() {
+	SecureStore.deleteItemAsync(COOKIE_KEY).catch(() => undefined);
+	SecureStore.deleteItemAsync(SESSION_CACHE_KEY).catch(() => undefined);
 }
 
 export const { signIn, signOut, useSession } = authClient;

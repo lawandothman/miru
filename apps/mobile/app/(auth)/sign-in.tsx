@@ -11,7 +11,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Svg, { Path } from "react-native-svg";
 import * as AppleAuthentication from "expo-apple-authentication";
 import * as Sentry from "@sentry/react-native";
-import { signIn, useSession, clearAuthState } from "@/lib/auth";
+import { signIn, useSession } from "@/lib/auth";
 import { Colors, fontSize, fontFamily, spacing, radius } from "@/lib/constants";
 
 function AppleIcon({ size = 20 }: { size?: number }) {
@@ -55,37 +55,12 @@ export default function SignInScreen() {
 	const { data: session } = useSession();
 	const isFinishingSignIn = loading !== null || Boolean(session);
 
-	async function handleSignInError(error: unknown, provider: string) {
-		await clearAuthState();
+	function handleSignInError(error: unknown, provider: string) {
 		setLoading(null);
 		Sentry.captureException(error, {
 			tags: { flow: "sign-in", provider },
 		});
-
-		const name = error instanceof Error ? error.constructor.name : typeof error;
-		const message = error instanceof Error ? error.message : String(error);
-		const cause =
-			error instanceof Error && error.cause ? String(error.cause) : "none";
-		const code =
-			error instanceof Error && "code" in error
-				? String((error as { code: unknown }).code)
-				: "none";
-		const status =
-			error instanceof Error && "status" in error
-				? String((error as { status: unknown }).status)
-				: "none";
-
-		Alert.alert(
-			"Sign in failed",
-			[
-				message,
-				"",
-				`type: ${name}`,
-				`code: ${code}`,
-				`status: ${status}`,
-				`cause: ${cause}`,
-			].join("\n"),
-		);
+		Alert.alert("Sign in failed", "Something went wrong. Please try again.");
 	}
 
 	async function handleGoogleSignIn() {
