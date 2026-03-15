@@ -1,8 +1,28 @@
 import { NativeModules, Platform } from "react-native";
 import { createAuthClient } from "better-auth/react";
 import { expoClient } from "@better-auth/expo/client";
+import { kOnlineManager } from "better-auth/client";
 import * as SecureStore from "expo-secure-store";
 import { API_URL } from "./api-url";
+
+// Override the ExpoOnlineManager to prevent expo-network's
+// addNetworkStateListener from interfering with networking.
+// The manager is initialized as a side effect by importing expoClient.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const onlineManager = (globalThis as Record<symbol, unknown>)[kOnlineManager] as
+	| {
+			isOnline: boolean;
+			setOnline: (v: boolean) => void;
+			setup: () => () => void;
+	  }
+	| undefined;
+if (onlineManager) {
+	onlineManager.isOnline = true;
+	// oxlint-disable-next-line no-empty-function
+	onlineManager.setOnline = () => undefined;
+	// oxlint-disable-next-line no-empty-function
+	onlineManager.setup = () => () => undefined;
+}
 
 const STORAGE_PREFIX = "miru";
 const COOKIE_KEY = `${STORAGE_PREFIX}_cookie`;
