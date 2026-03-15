@@ -29,15 +29,19 @@ export async function generateMetadata({
 		const movie = await api.movie.getById({ tmdbId });
 		const year = movie.releaseDate?.split("-")[0];
 		const title = year ? `${movie.title} (${year})` : movie.title;
+		const canonical = movieSlug(movie.title, tmdbId);
 		return {
 			alternates: {
-				canonical: `/movie/${movieSlug(movie.title, tmdbId)}`,
+				canonical: `/movie/${canonical}`,
 			},
 			description: movie.overview ?? undefined,
 			openGraph: {
 				description: movie.overview ?? undefined,
 				title,
 				type: "video.movie",
+			},
+			other: {
+				"apple-itunes-app": `app-id=6759829491, app-argument=miru://movie/${tmdbId}`,
 			},
 			title,
 		};

@@ -5,12 +5,13 @@ import {
 	Pressable,
 	StyleSheet,
 	Dimensions,
+	Share,
 } from "react-native";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams, useRouter, Stack } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { ChevronLeft, Star } from "lucide-react-native";
+import { ChevronLeft, Share2, Star } from "lucide-react-native";
 import { trpc } from "@/lib/trpc";
 import { MovieActions } from "@/components/movie-actions";
 import { UserAvatar } from "@/components/user-avatar";
@@ -30,6 +31,17 @@ const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const HERO_HEIGHT = SCREEN_WIDTH * 0.75;
 const POSTER_WIDTH = 110;
 const POSTER_HEIGHT = 165;
+const WEB_BASE = "https://miru-chi.vercel.app";
+
+function movieSlug(title: string, tmdbId: number): string {
+	const slug = title
+		.toLowerCase()
+		.normalize("NFD")
+		.replace(/[\u0300-\u036f]/g, "")
+		.replace(/[^a-z0-9]+/g, "-")
+		.replace(/^-+|-+$/g, "");
+	return `${slug}-${tmdbId}`;
+}
 
 export default function MovieDetailScreen() {
 	const { id } = useLocalSearchParams<{ id: string }>();
@@ -85,13 +97,37 @@ export default function MovieDetailScreen() {
 						style={styles.heroGradient}
 					/>
 
-					{/* Back button — respects safe area */}
-					<Pressable
-						style={[styles.backButton, { top: insets.top + spacing[2] }]}
-						onPress={() => router.back()}
+					{/* Navigation — respects safe area */}
+					<View
+						style={[styles.heroNav, { top: insets.top + spacing[2] }]}
+						pointerEvents="box-none"
 					>
-						<ChevronLeft size={24} color="#fff" />
-					</Pressable>
+						<Pressable
+							style={({ pressed }) => [
+								styles.heroButton,
+								pressed && styles.heroButtonPressed,
+							]}
+							onPress={() => router.back()}
+						>
+							<ChevronLeft size={20} color="#fff" />
+						</Pressable>
+
+						<Pressable
+							style={({ pressed }) => [
+								styles.heroButton,
+								pressed && styles.heroButtonPressed,
+							]}
+							onPress={() => {
+								const url = `${WEB_BASE}/movie/${movieSlug(movie.title, movie.id)}`;
+								Share.share({
+									message: `Check out ${movie.title} on Miru\n${url}`,
+									url,
+								}).catch(() => undefined);
+							}}
+						>
+							<Share2 size={18} color="#fff" />
+						</Pressable>
+					</View>
 				</View>
 
 				{/* ── Poster + Title row — overlaps hero bottom ──────── */}
@@ -257,15 +293,23 @@ const styles = StyleSheet.create({
 	heroGradient: {
 		...StyleSheet.absoluteFillObject,
 	},
-	backButton: {
+	heroNav: {
 		position: "absolute",
 		left: spacing[4],
+		right: spacing[4],
+		flexDirection: "row",
+		justifyContent: "space-between",
+	},
+	heroButton: {
 		width: 36,
 		height: 36,
 		borderRadius: 18,
 		backgroundColor: "rgba(0,0,0,0.45)",
 		justifyContent: "center",
 		alignItems: "center",
+	},
+	heroButtonPressed: {
+		opacity: 0.7,
 	},
 
 	/* Poster + Title row */

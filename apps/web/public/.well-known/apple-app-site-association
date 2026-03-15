@@ -1,0 +1,11 @@
+{
+	"applinks": {
+		"apps": [],
+		"details": [
+			{
+				"appID": "LY9UXT2PY8.com.miru.app",
+				"paths": ["/movie/*"]
+			}
+		]
+	}
+}
