@@ -55,6 +55,39 @@ export default function SignInScreen() {
 	const { data: session } = useSession();
 	const isFinishingSignIn = loading !== null || Boolean(session);
 
+	async function handleSignInError(error: unknown, provider: string) {
+		await clearAuthState();
+		setLoading(null);
+		Sentry.captureException(error, {
+			tags: { flow: "sign-in", provider },
+		});
+
+		const name = error instanceof Error ? error.constructor.name : typeof error;
+		const message = error instanceof Error ? error.message : String(error);
+		const cause =
+			error instanceof Error && error.cause ? String(error.cause) : "none";
+		const code =
+			error instanceof Error && "code" in error
+				? String((error as { code: unknown }).code)
+				: "none";
+		const status =
+			error instanceof Error && "status" in error
+				? String((error as { status: unknown }).status)
+				: "none";
+
+		Alert.alert(
+			"Sign in failed",
+			[
+				message,
+				"",
+				`type: ${name}`,
+				`code: ${code}`,
+				`status: ${status}`,
+				`cause: ${cause}`,
+			].join("\n"),
+		);
+	}
+
 	async function handleGoogleSignIn() {
 		setLoading("google");
 		try {
@@ -64,15 +97,7 @@ export default function SignInScreen() {
 				errorCallbackURL: "/(auth)/sign-in",
 			});
 		} catch (error) {
-			clearAuthState();
-			setLoading(null);
-			Sentry.captureException(error, {
-				tags: { flow: "sign-in", provider: "google" },
-			});
-			Alert.alert(
-				"Sign in failed",
-				error instanceof Error ? error.message : "Something went wrong.",
-			);
+			handleSignInError(error, "google");
 		}
 	}
 
@@ -106,15 +131,7 @@ export default function SignInScreen() {
 				return;
 			}
 
-			clearAuthState();
-			setLoading(null);
-			Sentry.captureException(error, {
-				tags: { flow: "sign-in", provider: "apple" },
-			});
-			Alert.alert(
-				"Sign in failed",
-				error instanceof Error ? error.message : "Something went wrong.",
-			);
+			handleSignInError(error, "apple");
 		}
 	}
 

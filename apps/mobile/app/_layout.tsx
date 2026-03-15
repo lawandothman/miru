@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { AppState, Platform } from "react-native";
+import { Platform } from "react-native";
 import {
 	Stack,
 	useNavigationContainerRef,
@@ -10,7 +10,6 @@ import { StatusBar } from "expo-status-bar";
 import * as SplashScreen from "expo-splash-screen";
 import * as Notifications from "expo-notifications";
 import { isRunningInExpoGo } from "expo";
-import { focusManager } from "@tanstack/react-query";
 import { useFonts } from "expo-font";
 import {
 	DMSans_400Regular,
@@ -40,13 +39,6 @@ import { Sentry, navigationIntegration } from "@/lib/sentry";
 if (!isRunningInExpoGo()) {
 	SplashScreen.preventAutoHideAsync();
 }
-
-focusManager.setEventListener((handleFocus) => {
-	const subscription = AppState.addEventListener("change", (state) => {
-		handleFocus(state === "active");
-	});
-	return () => subscription.remove();
-});
 
 function AuthGuard({ children }: { children: React.ReactNode }) {
 	const { data: session, isPending: sessionPending } = useSession();
