@@ -9,29 +9,20 @@ const navigationIntegration = Sentry.reactNavigationIntegration({
 });
 
 const dsn = process.env.EXPO_PUBLIC_SENTRY_DSN;
-// Temporarily force-disable to test if Sentry's fetch/XHR patching
-// causes "Network request failed" after background/foreground.
-// oxlint-disable-next-line no-constant-binary-expression
-const isSentryEnabled = false as boolean;
+const isSentryEnabled = !__DEV__ && Boolean(dsn);
 
 Sentry.init({
 	dsn,
 	enabled: isSentryEnabled,
 	sendDefaultPii: true,
-	tracesSampleRate: 0,
-	profilesSampleRate: 0,
+	tracesSampleRate: __DEV__ ? 1 : 0.2,
+	profilesSampleRate: __DEV__ ? 1 : 0.2,
 	replaysSessionSampleRate: __DEV__ ? 1 : 0.1,
 	replaysOnErrorSampleRate: 1,
 	attachScreenshot: true,
 	attachViewHierarchy: true,
-	enableNativeFramesTracking: false,
-	integrations: (defaults) => {
-		// Remove tracing integration to prevent Sentry from patching fetch/XHR.
-		// Suspected cause of "Network request failed" after app background/foreground.
-		return defaults
-			.filter((i) => i.name !== "ReactNativeTracing")
-			.concat([navigationIntegration, Sentry.mobileReplayIntegration()]);
-	},
+	enableNativeFramesTracking: !isRunningInExpoGo(),
+	integrations: [navigationIntegration, Sentry.mobileReplayIntegration()],
 	environment: __DEV__ ? "development" : (Updates.channel ?? "production"),
 	beforeSend(event) {
 		if (!isSentryEnabled) {

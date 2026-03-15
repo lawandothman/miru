@@ -37,6 +37,7 @@ const config: ExpoConfig = {
 	},
 	updates: {
 		url: "https://u.expo.dev/9f32c09b-90b8-455b-a800-068f06d24f1e",
+		checkAutomatically: "NEVER",
 	},
 	splash: {
 		image: "./assets/splash-icon.png",
