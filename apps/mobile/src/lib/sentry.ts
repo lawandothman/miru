@@ -15,14 +15,20 @@ Sentry.init({
 	dsn,
 	enabled: isSentryEnabled,
 	sendDefaultPii: true,
-	tracesSampleRate: __DEV__ ? 1 : 0.2,
-	profilesSampleRate: __DEV__ ? 1 : 0.2,
+	tracesSampleRate: 0,
+	profilesSampleRate: 0,
 	replaysSessionSampleRate: __DEV__ ? 1 : 0.1,
 	replaysOnErrorSampleRate: 1,
 	attachScreenshot: true,
 	attachViewHierarchy: true,
-	enableNativeFramesTracking: !isRunningInExpoGo(),
-	integrations: [navigationIntegration, Sentry.mobileReplayIntegration()],
+	enableNativeFramesTracking: false,
+	integrations: (defaults) => {
+		// Remove tracing integration to prevent Sentry from patching fetch/XHR.
+		// Suspected cause of "Network request failed" after app background/foreground.
+		return defaults
+			.filter((i) => i.name !== "ReactNativeTracing")
+			.concat([navigationIntegration, Sentry.mobileReplayIntegration()]);
+	},
 	environment: __DEV__ ? "development" : (Updates.channel ?? "production"),
 	beforeSend(event) {
 		if (!isSentryEnabled) {
