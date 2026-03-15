@@ -91,7 +91,6 @@ export default function SignInScreen() {
 	async function handleGoogleSignIn() {
 		setLoading("google");
 		try {
-			await clearAuthState();
 			await signIn.social({
 				provider: "google",
 				callbackURL: "/",
@@ -105,7 +104,6 @@ export default function SignInScreen() {
 	async function handleAppleSignIn() {
 		setLoading("apple");
 		try {
-			await clearAuthState();
 			const credential = await AppleAuthentication.signInAsync({
 				requestedScopes: [
 					AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
