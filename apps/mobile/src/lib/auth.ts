@@ -18,11 +18,8 @@ export const authClient = createAuthClient({
 	],
 });
 
-/**
- * Clear locally stored auth state (cookies + cached session).
- * Used as a fallback when signOut() fails.
- */
-export function clearAuthState() {
+/** Clear locally stored auth state when signOut() fails. */
+export function clearAuthState(): void {
 	SecureStore.deleteItemAsync(COOKIE_KEY).catch(() => undefined);
 	SecureStore.deleteItemAsync(SESSION_CACHE_KEY).catch(() => undefined);
 }

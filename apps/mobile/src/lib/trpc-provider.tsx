@@ -37,13 +37,11 @@ function handleUnauthorized() {
 }
 
 function isNetworkError(error: unknown): boolean {
-	if (error instanceof TRPCClientError) {
-		const msg = error.message.toLowerCase();
-		return (
-			msg.includes("network request failed") || msg.includes("fetch failed")
-		);
+	if (!(error instanceof TRPCClientError)) {
+		return false;
 	}
-	return false;
+	const msg = error.message.toLowerCase();
+	return msg.includes("network request failed") || msg.includes("fetch failed");
 }
 
 function captureTrpcError(
@@ -88,7 +86,7 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
 					},
 				}),
 				mutationCache: new MutationCache({
-					onError: (error, _variables, _context, mutation) => {
+					onError: (error, _vars, _ctx, mutation) => {
 						if (isUnauthorized(error)) {
 							handleUnauthorized().catch(() => undefined);
 							return;

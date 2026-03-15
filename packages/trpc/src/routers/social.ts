@@ -230,9 +230,10 @@ export const socialRouter = router({
 				});
 			}
 
-			await assertUserExists(ctx.db, input.friendId);
-
-			const blockedIds = await getBlockedUserIds(ctx.db, ctx.session.user.id);
+			const [, blockedIds] = await Promise.all([
+				assertUserExists(ctx.db, input.friendId),
+				getBlockedUserIds(ctx.db, ctx.session.user.id),
+			]);
 			if (blockedIds.has(input.friendId)) {
 				throw new TRPCError({
 					code: "BAD_REQUEST",
@@ -270,19 +271,25 @@ export const socialRouter = router({
 	getFollowers: publicProcedure
 		.input(z.object({ userId: z.string().min(1) }))
 		.query(async ({ ctx, input }) => {
-			const blockedIds = ctx.session?.user
-				? await getBlockedUserIds(ctx.db, ctx.session.user.id)
-				: new Set<string>();
+			const blockedIdsPromise = ctx.session?.user
+				? getBlockedUserIds(ctx.db, ctx.session.user.id)
+				: Promise.resolve(new Set<string>());
 
-			const followers = await ctx.db
-				.select({
-					id: schema.users.id,
-					name: schema.users.name,
-					image: schema.users.image,
-				})
-				.from(schema.follows)
-				.innerJoin(schema.users, eq(schema.users.id, schema.follows.followerId))
-				.where(eq(schema.follows.followingId, input.userId));
+			const [blockedIds, followers] = await Promise.all([
+				blockedIdsPromise,
+				ctx.db
+					.select({
+						id: schema.users.id,
+						name: schema.users.name,
+						image: schema.users.image,
+					})
+					.from(schema.follows)
+					.innerJoin(
+						schema.users,
+						eq(schema.users.id, schema.follows.followerId),
+					)
+					.where(eq(schema.follows.followingId, input.userId)),
+			]);
 
 			return annotateFollowStatus(
 				ctx,
@@ -293,22 +300,25 @@ export const socialRouter = router({
 	getFollowing: publicProcedure
 		.input(z.object({ userId: z.string().min(1) }))
 		.query(async ({ ctx, input }) => {
-			const blockedIds = ctx.session?.user
-				? await getBlockedUserIds(ctx.db, ctx.session.user.id)
-				: new Set<string>();
+			const blockedIdsPromise = ctx.session?.user
+				? getBlockedUserIds(ctx.db, ctx.session.user.id)
+				: Promise.resolve(new Set<string>());
 
-			const following = await ctx.db
-				.select({
-					id: schema.users.id,
-					name: schema.users.name,
-					image: schema.users.image,
-				})
-				.from(schema.follows)
-				.innerJoin(
-					schema.users,
-					eq(schema.users.id, schema.follows.followingId),
-				)
-				.where(eq(schema.follows.followerId, input.userId));
+			const [blockedIds, following] = await Promise.all([
+				blockedIdsPromise,
+				ctx.db
+					.select({
+						id: schema.users.id,
+						name: schema.users.name,
+						image: schema.users.image,
+					})
+					.from(schema.follows)
+					.innerJoin(
+						schema.users,
+						eq(schema.users.id, schema.follows.followingId),
+					)
+					.where(eq(schema.follows.followerId, input.userId)),
+			]);
 
 			return annotateFollowStatus(
 				ctx,
@@ -319,15 +329,16 @@ export const socialRouter = router({
 	getMatchesWith: protectedProcedure
 		.input(z.object({ friendId: z.string().min(1) }))
 		.query(async ({ ctx, input }) => {
-			const blockedIds = await getBlockedUserIds(ctx.db, ctx.session.user.id);
+			const [blockedIds] = await Promise.all([
+				getBlockedUserIds(ctx.db, ctx.session.user.id),
+				assertUserExists(ctx.db, input.friendId),
+			]);
 			if (blockedIds.has(input.friendId)) {
 				throw new TRPCError({
 					code: "NOT_FOUND",
 					message: "User not found",
 				});
 			}
-
-			await assertUserExists(ctx.db, input.friendId);
 
 			const myWatchlist = ctx.db
 				.select({ movieId: schema.watchlistEntries.movieId })
@@ -377,24 +388,27 @@ export const socialRouter = router({
 		.query(async ({ ctx, input }) => {
 			const escaped = input.query.replace(/[%_\\]/g, "\\$&");
 			const currentUserId = ctx.session?.user?.id;
-			const blockedIds = currentUserId
-				? await getBlockedUserIds(ctx.db, currentUserId)
-				: new Set<string>();
+			const blockedIdsPromise = currentUserId
+				? getBlockedUserIds(ctx.db, currentUserId)
+				: Promise.resolve(new Set<string>());
 
-			const users = await ctx.db
-				.select({
-					id: schema.users.id,
-					name: schema.users.name,
-					image: schema.users.image,
-				})
-				.from(schema.users)
-				.where(
-					and(
-						ilike(schema.users.name, `%${escaped}%`),
-						currentUserId ? ne(schema.users.id, currentUserId) : undefined,
-					),
-				)
-				.limit(20);
+			const [blockedIds, users] = await Promise.all([
+				blockedIdsPromise,
+				ctx.db
+					.select({
+						id: schema.users.id,
+						name: schema.users.name,
+						image: schema.users.image,
+					})
+					.from(schema.users)
+					.where(
+						and(
+							ilike(schema.users.name, `%${escaped}%`),
+							currentUserId ? ne(schema.users.id, currentUserId) : undefined,
+						),
+					)
+					.limit(20),
+			]);
 
 			return annotateFollowStatus(
 				ctx,

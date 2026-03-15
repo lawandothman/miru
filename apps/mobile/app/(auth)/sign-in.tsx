@@ -97,11 +97,12 @@ export default function SignInScreen() {
 				},
 			});
 		} catch (error) {
-			if (
-				error instanceof Error &&
-				"code" in error &&
-				(error as { code: string }).code === "ERR_REQUEST_CANCELED"
-			) {
+			const code =
+				error instanceof Error && "code" in error
+					? (error as { code: string }).code
+					: undefined;
+
+			if (code === "ERR_REQUEST_CANCELED") {
 				setLoading(null);
 				return;
 			}
