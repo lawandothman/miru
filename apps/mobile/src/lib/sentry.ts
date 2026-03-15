@@ -9,7 +9,10 @@ const navigationIntegration = Sentry.reactNavigationIntegration({
 });
 
 const dsn = process.env.EXPO_PUBLIC_SENTRY_DSN;
-const isSentryEnabled = !__DEV__ && Boolean(dsn);
+// Temporarily force-disable to test if Sentry's fetch/XHR patching
+// causes "Network request failed" after background/foreground.
+// oxlint-disable-next-line no-constant-binary-expression
+const isSentryEnabled = false as boolean;
 
 Sentry.init({
 	dsn,
