@@ -12,7 +12,7 @@
 				"simulator": true
 			}
 		},
-"preview": {
+		"preview": {
 			"distribution": "internal",
 			"channel": "preview",
 			"env": {
