@@ -40,6 +40,9 @@ if (!isRunningInExpoGo()) {
 	SplashScreen.preventAutoHideAsync();
 }
 
+const pushPlatform =
+	Platform.OS === "ios" ? ("ios" as const) : ("android" as const);
+
 function AuthGuard({ children }: { children: React.ReactNode }) {
 	const { data: session, isPending: sessionPending } = useSession();
 	const segments = useSegments();
@@ -114,7 +117,7 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 				}
 
 				await registerPushToken({
-					platform: Platform.OS === "ios" ? "ios" : "android",
+					platform: pushPlatform,
 					token: result.token,
 				});
 			} catch {
@@ -122,12 +125,13 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 			}
 		}
 
-		syncPushToken().catch(() => undefined);
+		syncPushToken();
 
 		return () => {
 			cancelled = true;
 		};
-	}, [registerPushToken, session?.user]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- registerPushToken is stable from useMutation
+	}, [session?.user]);
 
 	useEffect(() => {
 		let cancelled = false;
@@ -163,7 +167,7 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 				}
 
 				await registerPushToken({
-					platform: Platform.OS === "ios" ? "ios" : "android",
+					platform: pushPlatform,
 					token: result.token,
 				});
 			} catch {
@@ -171,18 +175,13 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 			}
 		}
 
-		promptForPushPermission().catch(() => undefined);
+		promptForPushPermission();
 
 		return () => {
 			cancelled = true;
 		};
-	}, [
-		isPending,
-		onboardingState?.isCompleted,
-		registerPushToken,
-		segments,
-		session?.user,
-	]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- registerPushToken is stable from useMutation
+	}, [isPending, onboardingState?.isCompleted, segments, session?.user]);
 
 	useEffect(() => {
 		if (isPending) {

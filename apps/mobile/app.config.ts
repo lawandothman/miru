@@ -9,20 +9,16 @@ const plugins: NonNullable<ExpoConfig["plugins"]> = [
 	"expo-updates",
 ];
 
-const sentryOrg = process.env.SENTRY_ORG ?? "lwnd";
-const sentryProject = process.env.SENTRY_PROJECT ?? "miru-mobile";
 const appVersion = (process.env.APP_VERSION ?? "1.3.0").replace(/^v/, "");
 
-if (sentryProject) {
-	plugins.push([
-		"@sentry/react-native/expo",
-		{
-			organization: sentryOrg,
-			project: sentryProject,
-			...(process.env.SENTRY_URL ? { url: process.env.SENTRY_URL } : {}),
-		},
-	]);
-}
+plugins.push([
+	"@sentry/react-native/expo",
+	{
+		organization: process.env.SENTRY_ORG ?? "lwnd",
+		project: process.env.SENTRY_PROJECT ?? "miru-mobile",
+		...(process.env.SENTRY_URL ? { url: process.env.SENTRY_URL } : {}),
+	},
+]);
 
 const config: ExpoConfig = {
 	name: "Miru",

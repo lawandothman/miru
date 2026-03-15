@@ -14,7 +14,7 @@ const isSentryEnabled = !__DEV__ && Boolean(dsn);
 Sentry.init({
 	dsn,
 	enabled: isSentryEnabled,
-	sendDefaultPii: true,
+	sendDefaultPii: false,
 	tracesSampleRate: __DEV__ ? 1 : 0.2,
 	profilesSampleRate: __DEV__ ? 1 : 0.2,
 	replaysSessionSampleRate: __DEV__ ? 1 : 0.1,
