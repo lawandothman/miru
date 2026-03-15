@@ -1,7 +1,7 @@
 import { relations } from "drizzle-orm";
 import { accounts, sessions, users } from "./users";
 import { pushTokens } from "./notifications";
-import { follows } from "./social";
+import { blockedUsers, follows } from "./social";
 import { watchedEntries } from "./watched";
 import { watchlistEntries } from "./watchlist";
 import { userGenrePreferences, userStreamingServices } from "./preferences";
@@ -15,6 +15,8 @@ import {
 
 export const usersRelations = relations(users, ({ many }) => ({
 	accounts: many(accounts),
+	blockedByMe: many(blockedUsers, { relationName: "blocker" }),
+	blockedMe: many(blockedUsers, { relationName: "blocked" }),
 	followers: many(follows, { relationName: "following" }),
 	following: many(follows, { relationName: "follower" }),
 	genrePreferences: many(userGenrePreferences),
@@ -38,6 +40,19 @@ export const accountsRelations = relations(accounts, ({ one }) => ({
 
 export const sessionsRelations = relations(sessions, ({ one }) => ({
 	user: one(users, { fields: [sessions.userId], references: [users.id] }),
+}));
+
+export const blockedUsersRelations = relations(blockedUsers, ({ one }) => ({
+	blocker: one(users, {
+		fields: [blockedUsers.blockerId],
+		references: [users.id],
+		relationName: "blocker",
+	}),
+	blocked: one(users, {
+		fields: [blockedUsers.blockedId],
+		references: [users.id],
+		relationName: "blocked",
+	}),
 }));
 
 export const followsRelations = relations(follows, ({ one }) => ({

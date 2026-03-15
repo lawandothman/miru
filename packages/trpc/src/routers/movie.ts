@@ -13,7 +13,7 @@ import {
 } from "drizzle-orm";
 import { z } from "zod";
 import { hasBlockedKeyword } from "../blocked-keywords";
-import { buildGenreMap, getMovieStatuses } from "../helpers";
+import { buildGenreMap, getBlockedUserIds, getMovieStatuses } from "../helpers";
 import type { TMDBClient } from "../tmdb";
 import { protectedProcedure, publicProcedure, router } from "../trpc";
 import {
@@ -121,56 +121,61 @@ export const movieRouter = router({
 			if (ctx.session?.user) {
 				const userId = ctx.session.user.id;
 
-				const [entry, watchedEntry, friendMatches, friendsWhoWatched] =
-					await Promise.all([
-						ctx.db.query.watchlistEntries.findFirst({
-							where: and(
-								eq(schema.watchlistEntries.userId, userId),
-								eq(schema.watchlistEntries.movieId, movie.id),
+				const [
+					entry,
+					watchedEntry,
+					friendMatches,
+					friendsWhoWatched,
+					blockedIds,
+				] = await Promise.all([
+					ctx.db.query.watchlistEntries.findFirst({
+						where: and(
+							eq(schema.watchlistEntries.userId, userId),
+							eq(schema.watchlistEntries.movieId, movie.id),
+						),
+					}),
+					ctx.db.query.watchedEntries.findFirst({
+						where: and(
+							eq(schema.watchedEntries.userId, userId),
+							eq(schema.watchedEntries.movieId, movie.id),
+						),
+					}),
+					ctx.db
+						.select({
+							id: schema.users.id,
+							name: schema.users.name,
+							image: schema.users.image,
+						})
+						.from(schema.watchlistEntries)
+						.innerJoin(
+							schema.follows,
+							and(
+								eq(schema.follows.followerId, userId),
+								eq(schema.follows.followingId, schema.watchlistEntries.userId),
 							),
-						}),
-						ctx.db.query.watchedEntries.findFirst({
-							where: and(
-								eq(schema.watchedEntries.userId, userId),
-								eq(schema.watchedEntries.movieId, movie.id),
-							),
-						}),
-						ctx.db
-							.select({
-								id: schema.users.id,
-								name: schema.users.name,
-								image: schema.users.image,
-							})
-							.from(schema.watchlistEntries)
-							.innerJoin(
-								schema.follows,
-								and(
-									eq(schema.follows.followerId, userId),
-									eq(
-										schema.follows.followingId,
-										schema.watchlistEntries.userId,
-									),
-								),
-							)
-							.innerJoin(
-								schema.users,
-								eq(schema.users.id, schema.watchlistEntries.userId),
-							)
-							.where(eq(schema.watchlistEntries.movieId, movie.id)),
-						ctx.db
-							.select({ userId: schema.watchedEntries.userId })
-							.from(schema.watchedEntries)
-							.where(eq(schema.watchedEntries.movieId, movie.id)),
-					]);
+						)
+						.innerJoin(
+							schema.users,
+							eq(schema.users.id, schema.watchlistEntries.userId),
+						)
+						.where(eq(schema.watchlistEntries.movieId, movie.id)),
+					ctx.db
+						.select({ userId: schema.watchedEntries.userId })
+						.from(schema.watchedEntries)
+						.where(eq(schema.watchedEntries.movieId, movie.id)),
+					getBlockedUserIds(ctx.db, userId),
+				]);
 
 				inWatchlist = Boolean(entry);
 				isWatched = Boolean(watchedEntry);
 
-				// Only show friends who haven't watched this movie yet
+				// Only show friends who haven't watched this movie yet and aren't blocked
 				const watchedByFriendSet = new Set(
 					friendsWhoWatched.map((f) => f.userId),
 				);
-				matches = friendMatches.filter((f) => !watchedByFriendSet.has(f.id));
+				matches = friendMatches.filter(
+					(f) => !watchedByFriendSet.has(f.id) && !blockedIds.has(f.id),
+				);
 			}
 
 			return { ...movie, inWatchlist, isWatched, matches };

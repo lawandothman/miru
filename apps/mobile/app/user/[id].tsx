@@ -1,6 +1,14 @@
-import { View, Text, ScrollView, StyleSheet } from "react-native";
+import {
+	View,
+	Text,
+	ScrollView,
+	StyleSheet,
+	Alert,
+	Pressable,
+} from "react-native";
 import { useLocalSearchParams, Stack } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Ellipsis } from "lucide-react-native";
 import { trpc } from "@/lib/trpc";
 import { useSession } from "@/lib/auth";
 import { UserAvatar } from "@/components/user-avatar";
@@ -38,6 +46,43 @@ export default function UserProfileScreen() {
 		{ enabled: Boolean(id) && !isOwnProfile },
 	);
 
+	const utils = trpc.useUtils();
+	const blockUser = trpc.social.block.useMutation({
+		onSuccess: () => {
+			utils.user.getById.invalidate({ id: userId });
+			utils.social.getDashboardMatches.invalidate();
+		},
+	});
+	const unblockUser = trpc.social.unblock.useMutation({
+		onSuccess: () => {
+			utils.user.getById.invalidate({ id: userId });
+		},
+	});
+
+	function handleBlockPress() {
+		if (!profile) {
+			return;
+		}
+
+		if (profile.isBlocked) {
+			unblockUser.mutate({ userId });
+			return;
+		}
+
+		Alert.alert(
+			`Block ${profile.name ?? "this user"}?`,
+			"They won't be able to find your profile or see your watchlist. You will also unfollow each other.",
+			[
+				{ text: "Cancel", style: "cancel" },
+				{
+					text: "Block",
+					style: "destructive",
+					onPress: () => blockUser.mutate({ userId }),
+				},
+			],
+		);
+	}
+
 	if (isLoading || !profile) {
 		return (
 			<>
@@ -53,6 +98,13 @@ export default function UserProfileScreen() {
 				options={{
 					...defaultHeaderOptions,
 					title: profile.name ?? "",
+					headerRight: !isOwnProfile
+						? () => (
+								<Pressable onPress={handleBlockPress} hitSlop={8}>
+									<Ellipsis size={20} color={Colors.foreground} />
+								</Pressable>
+							)
+						: undefined,
 				}}
 			/>
 			<SafeAreaView style={styles.container} edges={[]}>
@@ -70,16 +122,26 @@ export default function UserProfileScreen() {
 							followingCount={profile.followingCount}
 						/>
 
-						{!isOwnProfile && (
+						{!isOwnProfile && !profile.isBlocked && (
 							<FollowButton userId={userId} isFollowing={profile.isFollowing} />
+						)}
+
+						{profile.isBlocked && (
+							<Text style={styles.blockedText}>You blocked this user</Text>
 						)}
 					</View>
 
-					{matches && <MovieCarousel title="Matches" movies={matches} />}
+					{!profile.isBlocked && matches && (
+						<MovieCarousel title="Matches" movies={matches} />
+					)}
 
-					{watchlist && <MovieCarousel title="Watchlist" movies={watchlist} />}
+					{!profile.isBlocked && watchlist && (
+						<MovieCarousel title="Watchlist" movies={watchlist} />
+					)}
 
-					{watched && <MovieCarousel title="Watched" movies={watched} />}
+					{!profile.isBlocked && watched && (
+						<MovieCarousel title="Watched" movies={watched} />
+					)}
 				</ScrollView>
 			</SafeAreaView>
 		</>
@@ -104,5 +166,10 @@ const styles = StyleSheet.create({
 		fontSize: fontSize["2xl"],
 		fontFamily: fontFamily.displayBold,
 		color: Colors.foreground,
+	},
+	blockedText: {
+		fontSize: fontSize.sm,
+		fontFamily: fontFamily.sans,
+		color: Colors.mutedForeground,
 	},
 });

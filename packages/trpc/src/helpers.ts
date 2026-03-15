@@ -1,5 +1,5 @@
 import { type Database, schema } from "@miru/db";
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, or } from "drizzle-orm";
 
 export async function annotateFollowStatus<
 	T extends { id: string; name: string | null; image: string | null },
@@ -74,6 +74,30 @@ export async function getMovieStatuses(
 	]);
 
 	return { watchlistSet, watchedSet };
+}
+
+export async function getBlockedUserIds(
+	db: Database,
+	userId: string,
+): Promise<Set<string>> {
+	const rows = await db
+		.select({
+			blockerId: schema.blockedUsers.blockerId,
+			blockedId: schema.blockedUsers.blockedId,
+		})
+		.from(schema.blockedUsers)
+		.where(
+			or(
+				eq(schema.blockedUsers.blockerId, userId),
+				eq(schema.blockedUsers.blockedId, userId),
+			),
+		);
+
+	const ids = new Set<string>();
+	for (const row of rows) {
+		ids.add(row.blockerId === userId ? row.blockedId : row.blockerId);
+	}
+	return ids;
 }
 
 export function buildGenreMap(

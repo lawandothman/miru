@@ -1,8 +1,8 @@
 import { type Database, schema } from "@miru/db";
 import { TRPCError } from "@trpc/server";
-import { and, eq, ilike, inArray, ne } from "drizzle-orm";
+import { and, eq, ilike, inArray, ne, or } from "drizzle-orm";
 import { z } from "zod";
-import { annotateFollowStatus } from "../helpers";
+import { annotateFollowStatus, getBlockedUserIds } from "../helpers";
 import { protectedProcedure, publicProcedure, router } from "../trpc";
 import { sendNewFollowerPushNotification } from "../utils/expo-push";
 
@@ -147,16 +147,73 @@ async function assertUserExists(db: Database, userId: string) {
 }
 
 export const socialRouter = router({
+	block: protectedProcedure
+		.input(z.object({ userId: z.string().min(1) }))
+		.mutation(async ({ ctx, input }) => {
+			if (input.userId === ctx.session.user.id) {
+				throw new TRPCError({
+					code: "BAD_REQUEST",
+					message: "Cannot block yourself",
+				});
+			}
+
+			await assertUserExists(ctx.db, input.userId);
+
+			await ctx.db.transaction(async (tx) => {
+				await tx
+					.insert(schema.blockedUsers)
+					.values({
+						blockerId: ctx.session.user.id,
+						blockedId: input.userId,
+					})
+					.onConflictDoNothing();
+
+				await tx
+					.delete(schema.follows)
+					.where(
+						or(
+							and(
+								eq(schema.follows.followerId, ctx.session.user.id),
+								eq(schema.follows.followingId, input.userId),
+							),
+							and(
+								eq(schema.follows.followerId, input.userId),
+								eq(schema.follows.followingId, ctx.session.user.id),
+							),
+						),
+					);
+			});
+
+			return { success: true };
+		}),
+
+	getBlockedUsers: protectedProcedure.query(({ ctx }) => {
+		return ctx.db
+			.select({
+				id: schema.users.id,
+				name: schema.users.name,
+				image: schema.users.image,
+			})
+			.from(schema.blockedUsers)
+			.innerJoin(
+				schema.users,
+				eq(schema.users.id, schema.blockedUsers.blockedId),
+			)
+			.where(eq(schema.blockedUsers.blockerId, ctx.session.user.id));
+	}),
+
 	getDashboardMatches: protectedProcedure.query(async ({ ctx }) => {
 		const userId = ctx.session.user.id;
 
-		const [rows, [myWatchlist, myWatched, friendWatched]] = await Promise.all([
-			fetchFriendWatchlistRows(ctx.db, userId),
-			fetchUserMovieSets(ctx.db, userId),
-		]);
+		const [rows, [myWatchlist, myWatched, friendWatched], blockedIds] =
+			await Promise.all([
+				fetchFriendWatchlistRows(ctx.db, userId),
+				fetchUserMovieSets(ctx.db, userId),
+				getBlockedUserIds(ctx.db, userId),
+			]);
 
 		return groupMatchesByFriend(
-			rows,
+			rows.filter((r) => !blockedIds.has(r.friendId)),
 			new Set(myWatchlist.map((w) => w.movieId)),
 			new Set(myWatched.map((w) => w.movieId)),
 			buildFriendWatchedMap(friendWatched),
@@ -174,6 +231,14 @@ export const socialRouter = router({
 			}
 
 			await assertUserExists(ctx.db, input.friendId);
+
+			const blockedIds = await getBlockedUserIds(ctx.db, ctx.session.user.id);
+			if (blockedIds.has(input.friendId)) {
+				throw new TRPCError({
+					code: "BAD_REQUEST",
+					message: "Cannot follow this user",
+				});
+			}
 
 			const [follow] = await ctx.db
 				.insert(schema.follows)
@@ -205,6 +270,10 @@ export const socialRouter = router({
 	getFollowers: publicProcedure
 		.input(z.object({ userId: z.string().min(1) }))
 		.query(async ({ ctx, input }) => {
+			const blockedIds = ctx.session?.user
+				? await getBlockedUserIds(ctx.db, ctx.session.user.id)
+				: new Set<string>();
+
 			const followers = await ctx.db
 				.select({
 					id: schema.users.id,
@@ -215,12 +284,19 @@ export const socialRouter = router({
 				.innerJoin(schema.users, eq(schema.users.id, schema.follows.followerId))
 				.where(eq(schema.follows.followingId, input.userId));
 
-			return annotateFollowStatus(ctx, followers);
+			return annotateFollowStatus(
+				ctx,
+				followers.filter((f) => !blockedIds.has(f.id)),
+			);
 		}),
 
 	getFollowing: publicProcedure
 		.input(z.object({ userId: z.string().min(1) }))
 		.query(async ({ ctx, input }) => {
+			const blockedIds = ctx.session?.user
+				? await getBlockedUserIds(ctx.db, ctx.session.user.id)
+				: new Set<string>();
+
 			const following = await ctx.db
 				.select({
 					id: schema.users.id,
@@ -234,12 +310,23 @@ export const socialRouter = router({
 				)
 				.where(eq(schema.follows.followerId, input.userId));
 
-			return annotateFollowStatus(ctx, following);
+			return annotateFollowStatus(
+				ctx,
+				following.filter((f) => !blockedIds.has(f.id)),
+			);
 		}),
 
 	getMatchesWith: protectedProcedure
 		.input(z.object({ friendId: z.string().min(1) }))
 		.query(async ({ ctx, input }) => {
+			const blockedIds = await getBlockedUserIds(ctx.db, ctx.session.user.id);
+			if (blockedIds.has(input.friendId)) {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: "User not found",
+				});
+			}
+
 			await assertUserExists(ctx.db, input.friendId);
 
 			const myWatchlist = ctx.db
@@ -290,6 +377,10 @@ export const socialRouter = router({
 		.query(async ({ ctx, input }) => {
 			const escaped = input.query.replace(/[%_\\]/g, "\\$&");
 			const currentUserId = ctx.session?.user?.id;
+			const blockedIds = currentUserId
+				? await getBlockedUserIds(ctx.db, currentUserId)
+				: new Set<string>();
+
 			const users = await ctx.db
 				.select({
 					id: schema.users.id,
@@ -305,7 +396,25 @@ export const socialRouter = router({
 				)
 				.limit(20);
 
-			return annotateFollowStatus(ctx, users);
+			return annotateFollowStatus(
+				ctx,
+				users.filter((u) => !blockedIds.has(u.id)),
+			);
+		}),
+
+	unblock: protectedProcedure
+		.input(z.object({ userId: z.string().min(1) }))
+		.mutation(async ({ ctx, input }) => {
+			await ctx.db
+				.delete(schema.blockedUsers)
+				.where(
+					and(
+						eq(schema.blockedUsers.blockerId, ctx.session.user.id),
+						eq(schema.blockedUsers.blockedId, input.userId),
+					),
+				);
+
+			return { success: true };
 		}),
 
 	unfollow: protectedProcedure
