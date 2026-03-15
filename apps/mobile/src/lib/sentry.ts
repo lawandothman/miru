@@ -35,7 +35,7 @@ Sentry.init({
 
 Sentry.setTags({
 	platform: Platform.OS,
-	appOwnership: Constants.appOwnership ?? "unknown",
+	executionEnvironment: Constants.executionEnvironment ?? "unknown",
 	updateChannel: Updates.channel ?? "unknown",
 });
 
