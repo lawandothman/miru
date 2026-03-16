@@ -76,6 +76,7 @@ export default function ProfileScreen() {
 							/>
 							<Text style={styles.name}>{session?.user?.name}</Text>
 							<UserStats
+								userId={userId ?? ""}
 								followerCount={profile?.followerCount ?? 0}
 								followingCount={profile?.followingCount ?? 0}
 							/>
