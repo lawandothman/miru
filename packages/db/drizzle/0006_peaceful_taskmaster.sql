@@ -1,0 +1,1 @@
+CREATE INDEX "movies_popularity_idx" ON "movies" USING btree ("popularity");

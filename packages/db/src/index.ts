@@ -1,14 +1,10 @@
-import postgres from "postgres";
-import { drizzle } from "drizzle-orm/postgres-js";
+import { neon } from "@neondatabase/serverless";
+import { drizzle } from "drizzle-orm/neon-http";
 import type { InferSelectModel } from "drizzle-orm";
 import * as schema from "./schema/index";
 
 export function createDb(databaseUrl: string) {
-	const sql = postgres(databaseUrl, {
-		prepare: false,
-		max: 1,
-		idle_timeout: 20,
-	});
+	const sql = neon(databaseUrl);
 	return drizzle(sql, { schema });
 }
 

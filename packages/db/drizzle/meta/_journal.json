@@ -43,6 +43,13 @@
 			"when": 1773533344343,
 			"tag": "0005_marvelous_ricochet",
 			"breakpoints": true
+		},
+		{
+			"idx": 6,
+			"version": "7",
+			"when": 1773688272971,
+			"tag": "0006_peaceful_taskmaster",
+			"breakpoints": true
 		}
 	]
 }
