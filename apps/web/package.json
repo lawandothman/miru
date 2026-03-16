@@ -7,7 +7,6 @@
 		"dev": "next dev --turbopack -H 0.0.0.0",
 		"build": "next build",
 		"start": "next start",
-		"lint": "next lint",
 		"typecheck": "tsc --noEmit"
 	},
 	"dependencies": {
@@ -48,7 +47,6 @@
 		"@types/react": "catalog:react",
 		"@types/react-dom": "catalog:react",
 		"babel-plugin-react-compiler": "1.0.0",
-		"eslint-plugin-react-hooks": "catalog:",
 		"postcss": "8.5.8",
 		"shadcn": "4.0.5",
 		"tailwindcss": "4.2.1",

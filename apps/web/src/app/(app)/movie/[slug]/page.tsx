@@ -105,13 +105,11 @@ export default async function MoviePage({ params }: MoviePageProps) {
 
 	return (
 		<div className="space-y-8">
-			{/* oxlint-disable react/no-danger -- JSON-LD structured data for SEO */}
 			<script
 				type="application/ld+json"
-				// oxlint-disable-next-line react/no-danger
+				// oxlint-disable-next-line react/no-danger - JSON-LD structured data for SEO
 				dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
 			/>
-			{/* oxlint-enable react/no-danger */}
 			{/* Hero */}
 			<div className="relative -mx-4 -mt-6 overflow-hidden lg:-mx-8 lg:-mt-8">
 				{movie.backdropPath ? (

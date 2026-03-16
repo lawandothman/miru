@@ -2,7 +2,6 @@ import { useMemo, useState } from "react";
 
 export function useToggleSet(initialIds: number[] | undefined) {
 	const stableKey = initialIds?.join(",") ?? "";
-	// oxlint-disable-next-line exhaustive-deps
 	const initialSet = useMemo(() => new Set(initialIds ?? []), [stableKey]);
 	const [selected, setSelected] = useState<Set<number>>(new Set());
 	const [appliedKey, setAppliedKey] = useState("");

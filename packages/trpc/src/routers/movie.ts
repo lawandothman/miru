@@ -312,8 +312,6 @@ export const movieRouter = router({
 					genres = await ctx.db.select().from(schema.genres);
 				}
 			} catch (error) {
-				// eslint-disable-next-line no-console
-				console.error("[getGenres] Failed to fetch genres from TMDB:", error);
 				throw new TRPCError({
 					code: "INTERNAL_SERVER_ERROR",
 					message: "Unable to load genres. Please try again later.",
@@ -768,7 +766,7 @@ async function refreshMovie(
 			throw error;
 		}
 
-		// eslint-disable-next-line no-console
+		// oxlint-disable-next-line no-console
 		console.error(`[TMDB] Failed to refresh movie ${tmdbId}:`, error);
 		const staleMovie = await findMovieWithProviders(ctx.db, tmdbId);
 		if (!staleMovie) {

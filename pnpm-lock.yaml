@@ -343,9 +343,6 @@ importers:
       babel-plugin-react-compiler:
         specifier: 1.0.0
         version: 1.0.0
-      eslint-plugin-react-hooks:
-        specifier: 'catalog:'
-        version: 7.0.1(eslint@9.39.4(jiti@2.6.1))
       postcss:
         specifier: 8.5.8
         version: 8.5.8

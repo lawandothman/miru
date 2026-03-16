@@ -130,7 +130,6 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 		return () => {
 			cancelled = true;
 		};
-		// eslint-disable-next-line react-hooks/exhaustive-deps -- registerPushToken is stable from useMutation
 	}, [session?.user]);
 
 	useEffect(() => {
@@ -180,7 +179,6 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 		return () => {
 			cancelled = true;
 		};
-		// eslint-disable-next-line react-hooks/exhaustive-deps -- registerPushToken is stable from useMutation
 	}, [isPending, onboardingState?.isCompleted, segments, session?.user]);
 
 	useEffect(() => {
@@ -213,7 +211,6 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 		return null;
 	}
 
-	// oxlint-disable-next-line jsx-no-useless-fragment
 	return <>{children}</>;
 }
 
@@ -241,7 +238,6 @@ function RootLayout() {
 		<SafeAreaProvider initialMetrics={initialWindowMetrics}>
 			<TRPCProvider>
 				<AuthGuard>
-					{/* oxlint-disable-next-line style-prop-object */}
 					<StatusBar style="light" />
 					<Stack
 						screenOptions={{

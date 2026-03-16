@@ -1,4 +1,3 @@
-// oxlint-disable no-require-imports
 const { getSentryExpoConfig } = require("@sentry/react-native/metro");
 const path = require("node:path");
 
