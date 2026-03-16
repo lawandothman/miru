@@ -14,7 +14,7 @@ import { useSession } from "@/lib/auth";
 import { UserAvatar } from "@/components/user-avatar";
 import { FollowButton } from "@/components/follow-button";
 import { defaultHeaderOptions } from "@/lib/navigation";
-import { Colors, fontSize, fontFamily, spacing, radius } from "@/lib/constants";
+import { Colors, fontSize, fontFamily, spacing } from "@/lib/constants";
 
 type Tab = "followers" | "following";
 
@@ -73,7 +73,8 @@ export default function FollowersScreen() {
 		);
 
 	const activeData = activeTab === "followers" ? followers : following;
-	const isLoading = activeTab === "followers" ? followersLoading : followingLoading;
+	const isLoading =
+		activeTab === "followers" ? followersLoading : followingLoading;
 
 	return (
 		<>

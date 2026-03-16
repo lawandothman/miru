@@ -19,18 +19,14 @@ export function UserStats({
 		<View style={styles.stats}>
 			<Pressable
 				style={({ pressed }) => [styles.stat, pressed && styles.pressed]}
-				onPress={() =>
-					router.push(`/followers/${userId}?tab=followers`)
-				}
+				onPress={() => router.push(`/followers/${userId}?tab=followers`)}
 			>
 				<Text style={styles.statValue}>{followerCount}</Text>
 				<Text style={styles.statLabel}>Followers</Text>
 			</Pressable>
 			<Pressable
 				style={({ pressed }) => [styles.stat, pressed && styles.pressed]}
-				onPress={() =>
-					router.push(`/followers/${userId}?tab=following`)
-				}
+				onPress={() => router.push(`/followers/${userId}?tab=following`)}
 			>
 				<Text style={styles.statValue}>{followingCount}</Text>
 				<Text style={styles.statLabel}>Following</Text>
