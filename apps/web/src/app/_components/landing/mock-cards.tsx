@@ -33,11 +33,13 @@ function PosterThumb({
 }
 
 const avatars: Record<string, string> = {
-	Sarah: "https://api.dicebear.com/9.x/lorelei/png?seed=Sarah&size=56&backgroundColor=ffd5dc",
+	Sarah:
+		"https://api.dicebear.com/9.x/lorelei/png?seed=Sarah&size=56&backgroundColor=ffd5dc",
 	You: "https://api.dicebear.com/9.x/adventurer/png?seed=You&size=56&backgroundColor=b6e3f4",
 	Alex: "https://api.dicebear.com/9.x/adventurer-neutral/png?seed=Alex&size=56&backgroundColor=ffdfbf",
 	Maya: "https://api.dicebear.com/9.x/notionists/png?seed=Maya&size=56&backgroundColor=d1d4f9",
-	Jordan: "https://api.dicebear.com/9.x/avataaars/png?seed=Jordan&size=56&backgroundColor=c0aede",
+	Jordan:
+		"https://api.dicebear.com/9.x/avataaars/png?seed=Jordan&size=56&backgroundColor=c0aede",
 	Sam: "https://api.dicebear.com/9.x/lorelei/png?seed=Sam&size=56&backgroundColor=ffd5dc",
 };
 
@@ -53,7 +55,10 @@ function UserAvatar({
 	return (
 		// oxlint-disable-next-line nextjs/no-img-element -- tiny decorative avatars, no optimization benefit
 		<img
-			src={avatars[name] ?? `https://api.dicebear.com/9.x/adventurer/png?seed=${name}&size=56&backgroundColor=b6e3f4`}
+			src={
+				avatars[name] ??
+				`https://api.dicebear.com/9.x/adventurer/png?seed=${name}&size=56&backgroundColor=b6e3f4`
+			}
 			alt={name}
 			width={size}
 			height={size}
