@@ -18,13 +18,13 @@
 	},
 	"dependencies": {
 		"@neondatabase/serverless": "1.0.2",
-		"drizzle-orm": "catalog:",
-		"postgres": "3.4.8"
+		"drizzle-orm": "catalog:"
 	},
 	"devDependencies": {
 		"@miru/typescript-config": "workspace:*",
 		"@types/node": "catalog:",
 		"drizzle-kit": "0.31.9",
+		"postgres": "3.4.8",
 		"typescript": "catalog:"
 	}
 }
