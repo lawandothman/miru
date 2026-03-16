@@ -129,7 +129,7 @@ function DashboardMatchesSkeleton() {
 						</div>
 					</div>
 					<div className="flex gap-2">
-						{Array.from({ length: 5 }, (_, j) => (
+						{Array.from({ length: 5 }, (_v, j) => (
 							<Skeleton
 								key={j}
 								className="aspect-[2/3] w-28 shrink-0 rounded-lg"
