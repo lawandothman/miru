@@ -1,22 +1,40 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, Pressable, StyleSheet } from "react-native";
+import { useRouter } from "expo-router";
 import { Colors, fontSize, fontFamily, spacing } from "@/lib/constants";
 
 interface UserStatsProps {
+	userId: string;
 	followerCount: number;
 	followingCount: number;
 }
 
-export function UserStats({ followerCount, followingCount }: UserStatsProps) {
+export function UserStats({
+	userId,
+	followerCount,
+	followingCount,
+}: UserStatsProps) {
+	const router = useRouter();
+
 	return (
 		<View style={styles.stats}>
-			<View style={styles.stat}>
+			<Pressable
+				style={({ pressed }) => [styles.stat, pressed && styles.pressed]}
+				onPress={() =>
+					router.push(`/followers/${userId}?tab=followers`)
+				}
+			>
 				<Text style={styles.statValue}>{followerCount}</Text>
 				<Text style={styles.statLabel}>Followers</Text>
-			</View>
-			<View style={styles.stat}>
+			</Pressable>
+			<Pressable
+				style={({ pressed }) => [styles.stat, pressed && styles.pressed]}
+				onPress={() =>
+					router.push(`/followers/${userId}?tab=following`)
+				}
+			>
 				<Text style={styles.statValue}>{followingCount}</Text>
 				<Text style={styles.statLabel}>Following</Text>
-			</View>
+			</Pressable>
 		</View>
 	);
 }
@@ -29,6 +47,9 @@ const styles = StyleSheet.create({
 	},
 	stat: {
 		alignItems: "center",
+	},
+	pressed: {
+		opacity: 0.6,
 	},
 	statValue: {
 		fontSize: fontSize.lg,

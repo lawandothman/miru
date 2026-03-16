@@ -118,6 +118,7 @@ export default function UserProfileScreen() {
 						<Text style={styles.name}>{profile.name}</Text>
 
 						<UserStats
+							userId={userId}
 							followerCount={profile.followerCount}
 							followingCount={profile.followingCount}
 						/>
