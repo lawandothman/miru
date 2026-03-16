@@ -38,6 +38,7 @@ export const movies = pgTable(
 		index("movies_title_idx").on(table.title),
 		index("movies_vote_idx").on(table.tmdbVoteCount, table.tmdbVoteAverage),
 		index("movies_release_idx").on(table.releaseDate),
+		index("movies_popularity_idx").on(table.popularity),
 	],
 );
 
