@@ -347,8 +347,8 @@ importers:
         specifier: 8.5.8
         version: 8.5.8
       shadcn:
-        specifier: 4.0.5
-        version: 4.0.5(@types/node@25.5.0)(typescript@5.9.3)
+        specifier: 4.0.7
+        version: 4.0.7(@types/node@25.5.0)(typescript@5.9.3)
       tailwindcss:
         specifier: 4.2.1
         version: 4.2.1
@@ -7535,8 +7535,8 @@ packages:
     resolution: {integrity: sha512-TPbeg0b7ylrswdGCji8FRGFAKuqbpQlLbL8SOle3j1iHSs5Ob5mhvMAxWN2UItOjgALAB5Zp3fmMfj8mbWvXKw==}
     engines: {node: '>=10'}
 
-  shadcn@4.0.5:
-    resolution: {integrity: sha512-z0SOHEU1+ADam1UJHrgxJhUsOb0/jBoYc+u9mhWs071KrnORq48X7uCwG3mD2ysQEBtOfeK/MxMGsmzL5Jt+Jg==}
+  shadcn@4.0.7:
+    resolution: {integrity: sha512-QwnD52EtnZo575yG/mk4fp6n0Qu8HZTVj10dsbg1O8DBLZPZG1V7AGOgTQSTjdsl8Jtye8GJfoKFz5npBkfExg==}
     hasBin: true
 
   shallowequal@1.1.0:
@@ -15929,7 +15929,7 @@ snapshots:
 
   sf-symbols-typescript@2.2.0: {}
 
-  shadcn@4.0.5(@types/node@25.5.0)(typescript@5.9.3):
+  shadcn@4.0.7(@types/node@25.5.0)(typescript@5.9.3):
     dependencies:
       '@antfu/ni': 25.0.0
       '@babel/core': 7.29.0
