@@ -1,17 +1,12 @@
-import * as Device from "expo-device";
-
 function getApiUrl(): string {
+	// When set (e.g. by dev:tunnel), use it as-is.
 	const configured = process.env.EXPO_PUBLIC_API_URL;
 	if (configured) {
 		return configured;
 	}
 
-	if (Device.isDevice) {
-		throw new Error(
-			"EXPO_PUBLIC_API_URL is not set. Physical devices cannot reach localhost.",
-		);
-	}
-
+	// Default to localhost — works for simulators.
+	// Physical devices need a tunnel (pnpm dev:tunnel) which sets EXPO_PUBLIC_API_URL.
 	return "http://localhost:3000";
 }
 
