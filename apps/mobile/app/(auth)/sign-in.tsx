@@ -12,7 +12,6 @@ import Svg, { Path } from "react-native-svg";
 import * as AppleAuthentication from "expo-apple-authentication";
 import * as Sentry from "@sentry/react-native";
 import { signIn, useSession } from "@/lib/auth";
-import { API_URL } from "@/lib/api-url";
 import { Colors, fontSize, fontFamily, spacing, radius } from "@/lib/constants";
 
 function AppleIcon({ size = 20 }: { size?: number }) {
@@ -58,16 +57,10 @@ export default function SignInScreen() {
 
 	function handleSignInError(error: unknown, provider: string) {
 		setLoading(null);
-		const message =
-			error instanceof Error ? error.message : JSON.stringify(error);
 		Sentry.captureException(error, {
 			tags: { flow: "sign-in", provider },
-			extra: { apiUrl: API_URL },
 		});
-		Alert.alert(
-			"Sign in failed",
-			`${message}\n\nAPI: ${API_URL}`,
-		);
+		Alert.alert("Sign in failed", "Something went wrong. Please try again.");
 	}
 
 	async function handleGoogleSignIn() {
