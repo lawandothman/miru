@@ -152,18 +152,16 @@ export const onboardingRouter = router({
 		.mutation(async ({ ctx, input }) => {
 			const userId = ctx.session.user.id;
 
-			await ctx.db.transaction(async (tx) => {
-				await tx
-					.delete(schema.userGenrePreferences)
-					.where(eq(schema.userGenrePreferences.userId, userId));
+			await ctx.db
+				.delete(schema.userGenrePreferences)
+				.where(eq(schema.userGenrePreferences.userId, userId));
 
-				await tx.insert(schema.userGenrePreferences).values(
-					input.genreIds.map((genreId) => ({
-						userId,
-						genreId,
-					})),
-				);
-			});
+			await ctx.db.insert(schema.userGenrePreferences).values(
+				input.genreIds.map((genreId) => ({
+					userId,
+					genreId,
+				})),
+			);
 
 			return { success: true };
 		}),
@@ -173,20 +171,18 @@ export const onboardingRouter = router({
 		.mutation(async ({ ctx, input }) => {
 			const userId = ctx.session.user.id;
 
-			await ctx.db.transaction(async (tx) => {
-				await tx
-					.delete(schema.userStreamingServices)
-					.where(eq(schema.userStreamingServices.userId, userId));
+			await ctx.db
+				.delete(schema.userStreamingServices)
+				.where(eq(schema.userStreamingServices.userId, userId));
 
-				if (input.providerIds.length > 0) {
-					await tx.insert(schema.userStreamingServices).values(
-						input.providerIds.map((providerId) => ({
-							userId,
-							providerId,
-						})),
-					);
-				}
-			});
+			if (input.providerIds.length > 0) {
+				await ctx.db.insert(schema.userStreamingServices).values(
+					input.providerIds.map((providerId) => ({
+						userId,
+						providerId,
+					})),
+				);
+			}
 
 			return { success: true };
 		}),

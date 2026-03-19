@@ -159,30 +159,28 @@ export const socialRouter = router({
 
 			await assertUserExists(ctx.db, input.userId);
 
-			await ctx.db.transaction(async (tx) => {
-				await tx
-					.insert(schema.blockedUsers)
-					.values({
-						blockerId: ctx.session.user.id,
-						blockedId: input.userId,
-					})
-					.onConflictDoNothing();
+			await ctx.db
+				.insert(schema.blockedUsers)
+				.values({
+					blockerId: ctx.session.user.id,
+					blockedId: input.userId,
+				})
+				.onConflictDoNothing();
 
-				await tx
-					.delete(schema.follows)
-					.where(
-						or(
-							and(
-								eq(schema.follows.followerId, ctx.session.user.id),
-								eq(schema.follows.followingId, input.userId),
-							),
-							and(
-								eq(schema.follows.followerId, input.userId),
-								eq(schema.follows.followingId, ctx.session.user.id),
-							),
+			await ctx.db
+				.delete(schema.follows)
+				.where(
+					or(
+						and(
+							eq(schema.follows.followerId, ctx.session.user.id),
+							eq(schema.follows.followingId, input.userId),
 						),
-					);
-			});
+						and(
+							eq(schema.follows.followerId, input.userId),
+							eq(schema.follows.followingId, ctx.session.user.id),
+						),
+					),
+				);
 
 			return { success: true };
 		}),

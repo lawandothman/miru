@@ -10,24 +10,22 @@ export const watchedRouter = router({
 		.mutation(async ({ ctx, input }) => {
 			await ensureMovieExists(ctx.db, ctx.tmdb, input.movieId);
 
-			await ctx.db.transaction(async (tx) => {
-				await tx
-					.insert(schema.watchedEntries)
-					.values({
-						userId: ctx.session.user.id,
-						movieId: input.movieId,
-					})
-					.onConflictDoNothing();
+			await ctx.db
+				.insert(schema.watchedEntries)
+				.values({
+					userId: ctx.session.user.id,
+					movieId: input.movieId,
+				})
+				.onConflictDoNothing();
 
-				await tx
-					.delete(schema.watchlistEntries)
-					.where(
-						and(
-							eq(schema.watchlistEntries.userId, ctx.session.user.id),
-							eq(schema.watchlistEntries.movieId, input.movieId),
-						),
-					);
-			});
+			await ctx.db
+				.delete(schema.watchlistEntries)
+				.where(
+					and(
+						eq(schema.watchlistEntries.userId, ctx.session.user.id),
+						eq(schema.watchlistEntries.movieId, input.movieId),
+					),
+				);
 
 			return { success: true };
 		}),
