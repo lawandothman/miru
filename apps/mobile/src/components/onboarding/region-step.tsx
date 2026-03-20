@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
+import { useCallback, useEffect, useState } from "react";
+import { View, Text, Pressable, FlatList, StyleSheet } from "react-native";
 import { Check } from "lucide-react-native";
 import {
 	COUNTRIES,
@@ -12,6 +12,8 @@ interface RegionStepProps {
 	country: string | null;
 	onSelect: (code: string) => void;
 }
+
+const ITEM_HEIGHT = 49;
 
 export function RegionStep({ country, onSelect }: RegionStepProps) {
 	const [selected, setSelected] = useState<string | null>(
@@ -29,44 +31,61 @@ export function RegionStep({ country, onSelect }: RegionStepProps) {
 		onSelect(code);
 	}
 
+	const renderItem = useCallback(
+		({ item: c }: { item: (typeof COUNTRIES)[number] }) => {
+			const isSelected = selected === c.code;
+			return (
+				<Pressable
+					style={[styles.item, isSelected && styles.itemSelected]}
+					onPress={() => handleSelect(c.code)}
+					accessibilityRole="radio"
+					accessibilityLabel={c.name}
+					accessibilityState={{ selected: isSelected }}
+				>
+					<Text style={styles.flag}>{countryFlag(c.code)}</Text>
+					<Text style={styles.countryName}>{c.name}</Text>
+					{isSelected && <Check size={18} color={Colors.primary} />}
+				</Pressable>
+			);
+		},
+		[selected],
+	);
+
 	return (
-		<ScrollView
-			style={styles.container}
-			contentContainerStyle={styles.content}
-			showsVerticalScrollIndicator={false}
-		>
-			<Text style={styles.title}>Where are you?</Text>
-			<Text style={styles.subtitle}>
-				This helps us show the right streaming services for your region.
-			</Text>
-			<View style={styles.list}>
-				{COUNTRIES.map((c) => {
-					const isSelected = selected === c.code;
-					return (
-						<Pressable
-							key={c.code}
-							style={[styles.item, isSelected && styles.itemSelected]}
-							onPress={() => handleSelect(c.code)}
-						>
-							<Text style={styles.flag}>{countryFlag(c.code)}</Text>
-							<Text style={styles.countryName}>{c.name}</Text>
-							{isSelected && <Check size={18} color={Colors.primary} />}
-						</Pressable>
-					);
-				})}
+		<View style={styles.container}>
+			<View style={styles.header}>
+				<Text style={styles.title}>Where are you?</Text>
+				<Text style={styles.subtitle}>
+					This helps us show the right streaming services for your region.
+				</Text>
 			</View>
-		</ScrollView>
+			<FlatList
+				data={COUNTRIES}
+				renderItem={renderItem}
+				keyExtractor={(c) => c.code}
+				getItemLayout={(_, index) => ({
+					length: ITEM_HEIGHT,
+					offset: ITEM_HEIGHT * index,
+					index,
+				})}
+				style={styles.list}
+				showsVerticalScrollIndicator={false}
+				initialNumToRender={15}
+				windowSize={7}
+			/>
+		</View>
 	);
 }
 
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-	},
-	content: {
 		padding: spacing[4],
 		paddingBottom: spacing[8],
 		gap: spacing[4],
+	},
+	header: {
+		gap: spacing[2],
 	},
 	title: {
 		fontSize: fontSize["2xl"],
@@ -90,6 +109,7 @@ const styles = StyleSheet.create({
 		gap: spacing[3],
 		paddingHorizontal: spacing[4],
 		paddingVertical: spacing[3],
+		height: ITEM_HEIGHT,
 		borderBottomWidth: StyleSheet.hairlineWidth,
 		borderBottomColor: Colors.border,
 	},

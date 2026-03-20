@@ -9,6 +9,13 @@ interface RevealOnScrollProps {
 	className?: string;
 }
 
+function prefersReducedMotion(): boolean {
+	return (
+		typeof window !== "undefined" &&
+		window.matchMedia("(prefers-reduced-motion: reduce)").matches
+	);
+}
+
 export function RevealOnScroll({
 	children,
 	direction = "up",
@@ -16,9 +23,14 @@ export function RevealOnScroll({
 	className,
 }: RevealOnScrollProps) {
 	const ref = useRef<HTMLDivElement>(null);
-	const [visible, setVisible] = useState(false);
+	const reducedMotion = prefersReducedMotion();
+	const [visible, setVisible] = useState(reducedMotion);
 
 	useEffect(() => {
+		if (reducedMotion) {
+			return;
+		}
+
 		const el = ref.current;
 		if (!el) {
 			return;
@@ -36,7 +48,7 @@ export function RevealOnScroll({
 
 		observer.observe(el);
 		return () => observer.disconnect();
-	}, []);
+	}, [reducedMotion]);
 
 	const transforms = {
 		left: "translateX(-32px)",
@@ -48,11 +60,15 @@ export function RevealOnScroll({
 		<div
 			ref={ref}
 			className={className}
-			style={{
-				opacity: visible ? 1 : 0,
-				transform: visible ? "none" : transforms[direction],
-				transition: `opacity 0.7s ease-out ${delay}ms, transform 0.7s ease-out ${delay}ms`,
-			}}
+			style={
+				reducedMotion
+					? undefined
+					: {
+							opacity: visible ? 1 : 0,
+							transform: visible ? "none" : transforms[direction],
+							transition: `opacity 0.7s ease-out ${delay}ms, transform 0.7s ease-out ${delay}ms`,
+						}
+			}
 		>
 			{children}
 		</div>

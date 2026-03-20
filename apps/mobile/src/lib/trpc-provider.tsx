@@ -100,13 +100,14 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
 				}),
 				defaultOptions: {
 					queries: {
-						staleTime: 30 * 1000,
+						staleTime: 5 * 60 * 1000,
 						retry: (failureCount, error) => {
 							if (isUnauthorized(error)) {
 								return false;
 							}
 							return failureCount < 3;
 						},
+						retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 30000),
 					},
 				},
 			}),

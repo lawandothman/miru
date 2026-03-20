@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import {
 	View,
 	Text,
 	TextInput,
 	Pressable,
-	ScrollView,
+	FlatList,
 	ActivityIndicator,
 	StyleSheet,
 } from "react-native";
@@ -25,6 +25,14 @@ interface StreamingStepProps {
 	onSelectionChange: (providers: Set<number>) => void;
 }
 
+interface Provider {
+	id: number;
+	name: string;
+	logoPath: string | null;
+}
+
+const NUM_COLUMNS = 4;
+
 export function StreamingStep({
 	selectedProviders,
 	onSelectionChange,
@@ -43,21 +51,59 @@ export function StreamingStep({
 		onSelectionChange(next);
 	}
 
-	const filtered = providers?.filter((p) =>
-		p.name.toLowerCase().includes(search.toLowerCase()),
-	);
+	const sorted = useMemo(() => {
+		const filtered = providers?.filter((p) =>
+			p.name.toLowerCase().includes(search.toLowerCase()),
+		);
+		return filtered?.slice().sort((a, b) => {
+			const aSelected = selectedProviders.has(a.id);
+			const bSelected = selectedProviders.has(b.id);
+			if (aSelected && !bSelected) return -1;
+			if (!aSelected && bSelected) return 1;
+			return a.name.localeCompare(b.name);
+		});
+	}, [providers, search, selectedProviders]);
 
-	const sorted = filtered?.slice().sort((a, b) => {
-		const aSelected = selectedProviders.has(a.id);
-		const bSelected = selectedProviders.has(b.id);
-		if (aSelected && !bSelected) {
-			return -1;
-		}
-		if (!aSelected && bSelected) {
-			return 1;
-		}
-		return a.name.localeCompare(b.name);
-	});
+	const renderItem = useCallback(
+		({ item: p }: { item: Provider }) => {
+			const isSelected = selectedProviders.has(p.id);
+			const logo = providerLogoUrl(p.logoPath);
+			return (
+				<View style={styles.providerCell}>
+					<Pressable
+						style={styles.providerItem}
+						onPress={() => toggle(p.id)}
+						accessibilityRole="checkbox"
+						accessibilityLabel={p.name}
+						accessibilityState={{ checked: isSelected }}
+					>
+						{logo ? (
+							<Image
+								source={{ uri: logo }}
+								style={styles.providerLogo}
+								contentFit="cover"
+							/>
+						) : (
+							<View style={[styles.providerLogo, styles.providerFallback]}>
+								<Text style={styles.providerFallbackText}>
+									{p.name.charAt(0)}
+								</Text>
+							</View>
+						)}
+						<Text style={styles.providerName} numberOfLines={2}>
+							{p.name}
+						</Text>
+						{isSelected && (
+							<View style={styles.checkBadge}>
+								<Check size={12} color={Colors.primaryForeground} />
+							</View>
+						)}
+					</Pressable>
+				</View>
+			);
+		},
+		[selectedProviders],
+	);
 
 	return (
 		<View style={styles.container}>
@@ -79,6 +125,7 @@ export function StreamingStep({
 						placeholderTextColor={Colors.mutedForeground}
 						autoCapitalize="none"
 						autoCorrect={false}
+						accessibilityLabel="Search streaming services"
 					/>
 				</View>
 			</View>
@@ -88,54 +135,20 @@ export function StreamingStep({
 					<ActivityIndicator color={Colors.primary} size="large" />
 				</View>
 			) : (
-				<ScrollView
+				<FlatList
+					data={sorted}
+					renderItem={renderItem}
+					keyExtractor={(p) => String(p.id)}
+					numColumns={NUM_COLUMNS}
 					contentContainerStyle={styles.gridContainer}
 					showsVerticalScrollIndicator={false}
-				>
-					<View style={styles.grid}>
-						{sorted?.map((p) => {
-							const isSelected = selectedProviders.has(p.id);
-							const logo = providerLogoUrl(p.logoPath);
-							return (
-								<Pressable
-									key={p.id}
-									style={styles.providerItem}
-									onPress={() => toggle(p.id)}
-								>
-									{logo ? (
-										<Image
-											source={{ uri: logo }}
-											style={styles.providerLogo}
-											contentFit="cover"
-										/>
-									) : (
-										<View
-											style={[styles.providerLogo, styles.providerFallback]}
-										>
-											<Text style={styles.providerFallbackText}>
-												{p.name.charAt(0)}
-											</Text>
-										</View>
-									)}
-									<Text style={styles.providerName} numberOfLines={2}>
-										{p.name}
-									</Text>
-									{isSelected && (
-										<View style={styles.checkBadge}>
-											<Check size={12} color={Colors.primaryForeground} />
-										</View>
-									)}
-								</Pressable>
-							);
-						})}
-					</View>
-				</ScrollView>
+					initialNumToRender={20}
+					windowSize={5}
+				/>
 			)}
 		</View>
 	);
 }
-
-const ITEM_SIZE = 80;
 
 const styles = StyleSheet.create({
 	container: {
@@ -188,14 +201,14 @@ const styles = StyleSheet.create({
 		padding: spacing[4],
 		paddingBottom: spacing[8],
 	},
-	grid: {
-		flexDirection: "row",
-		flexWrap: "wrap",
-		gap: spacing[3],
+	providerCell: {
+		flex: 1 / NUM_COLUMNS,
+		alignItems: "center",
+		marginBottom: spacing[3],
 	},
 	providerItem: {
 		alignItems: "center",
-		width: ITEM_SIZE,
+		width: 80,
 		gap: spacing[1],
 		position: "relative",
 	},
