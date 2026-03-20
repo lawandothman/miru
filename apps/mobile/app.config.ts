@@ -7,6 +7,7 @@ const plugins: NonNullable<ExpoConfig["plugins"]> = [
 	"expo-image-picker",
 	"expo-apple-authentication",
 	"expo-updates",
+	"expo-web-browser",
 ];
 
 const appVersion = (process.env.APP_VERSION ?? "1.3.0").replace(/^v/, "");
