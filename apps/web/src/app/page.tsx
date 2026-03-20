@@ -28,7 +28,7 @@ function PhoneFrame({
 							width={390}
 							height={844}
 							className="w-full"
-							priority={priority}
+							priority={priority ?? false}
 						/>
 					</div>
 				</div>

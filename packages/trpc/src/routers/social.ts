@@ -246,7 +246,7 @@ export const socialRouter = router({
 					followingId: input.friendId,
 				})
 				.onConflictDoNothing()
-				.returning({ followingId: schema.follows.followingId });
+				.returning();
 
 			if (follow) {
 				sendNewFollowerPushNotification({

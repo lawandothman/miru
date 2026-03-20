@@ -13,7 +13,8 @@
 	--radius-3xl: calc(var(--radius) + 12px);
 	--radius-4xl: calc(var(--radius) + 16px);
 	--font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
-	--font-display: var(--font-plus-jakarta-sans), ui-sans-serif, system-ui, sans-serif;
+	--font-display:
+		var(--font-plus-jakarta-sans), ui-sans-serif, system-ui, sans-serif;
 	--text-2xs: 0.625rem;
 	--text-2xs--line-height: 0.875rem;
 	--color-background: var(--background);
