@@ -18,10 +18,10 @@ import {
 	DMSans_700Bold,
 } from "@expo-google-fonts/dm-sans";
 import {
-	Syne_400Regular,
-	Syne_600SemiBold,
-	Syne_700Bold,
-} from "@expo-google-fonts/syne";
+	PlusJakartaSans_400Regular,
+	PlusJakartaSans_600SemiBold,
+	PlusJakartaSans_700Bold,
+} from "@expo-google-fonts/plus-jakarta-sans";
 import {
 	SafeAreaProvider,
 	initialWindowMetrics,
@@ -220,9 +220,9 @@ function RootLayout() {
 		DMSans_500Medium,
 		DMSans_600SemiBold,
 		DMSans_700Bold,
-		Syne_400Regular,
-		Syne_600SemiBold,
-		Syne_700Bold,
+		PlusJakartaSans_400Regular,
+		PlusJakartaSans_600SemiBold,
+		PlusJakartaSans_700Bold,
 	});
 	const navigationRef = useNavigationContainerRef();
 

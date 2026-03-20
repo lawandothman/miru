@@ -70,7 +70,7 @@ export function DangerZone() {
 					<DialogTrigger asChild>
 						<Button
 							variant="outline"
-							className="w-full justify-start gap-3 border-destructive/30 text-destructive hover:bg-destructive/5 hover:text-destructive"
+							className="w-full justify-start gap-3 border-destructive/20 text-destructive hover:bg-destructive/5 hover:text-destructive"
 							size="lg"
 						>
 							<Trash2 className="size-4" />

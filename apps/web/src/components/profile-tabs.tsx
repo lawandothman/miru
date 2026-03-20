@@ -30,7 +30,7 @@ export function ProfileTabs({
 					className="gap-2.5 rounded-none border-b-2 border-transparent bg-transparent px-4 py-2 text-sm font-medium text-muted-foreground shadow-none transition-colors data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none"
 				>
 					{watchlistLabel}
-					<span className="rounded-full border border-border bg-foreground/5 px-1.5 py-0.5 text-[11px] tabular-nums leading-none text-muted-foreground">
+					<span className="rounded-full border border-border bg-foreground/5 px-1.5 py-0.5 text-xs tabular-nums leading-none text-muted-foreground">
 						{watchlist.length}
 					</span>
 				</TabsTrigger>
@@ -39,7 +39,7 @@ export function ProfileTabs({
 					className="gap-2.5 rounded-none border-b-2 border-transparent bg-transparent px-4 py-2 text-sm font-medium text-muted-foreground shadow-none transition-colors data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none"
 				>
 					{watchedLabel}
-					<span className="rounded-full border border-border bg-foreground/5 px-1.5 py-0.5 text-[11px] tabular-nums leading-none text-muted-foreground">
+					<span className="rounded-full border border-border bg-foreground/5 px-1.5 py-0.5 text-xs tabular-nums leading-none text-muted-foreground">
 						{watched.length}
 					</span>
 				</TabsTrigger>

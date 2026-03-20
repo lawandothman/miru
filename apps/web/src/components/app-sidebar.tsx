@@ -89,34 +89,24 @@ export function AppSidebar({ user }: AppSidebarProps) {
 								: "hover:bg-sidebar-accent/60",
 						)}
 					>
-						<div className="relative shrink-0">
-							{/* Gradient ring — visible on hover and active */}
-							<div
-								className={cn(
-									"absolute -inset-[3px] rounded-full bg-gradient-to-br from-primary to-gold opacity-0 transition-opacity duration-300",
-									"group-hover/profile:opacity-100",
-									pathname === `/user/${user.id}` && "opacity-100",
-								)}
-							/>
-							<Avatar className="relative size-9 ring-[2.5px] ring-sidebar">
-								{user.image && <AvatarImage src={user.image} alt={user.name} />}
-								<AvatarFallback
-									className={cn(
-										"text-xs font-bold transition-colors duration-300",
-										pathname === `/user/${user.id}`
-											? "bg-primary text-primary-foreground"
-											: "bg-primary/15 text-primary group-hover/profile:bg-primary group-hover/profile:text-primary-foreground",
-									)}
-								>
-									{user.name.charAt(0).toUpperCase()}
-								</AvatarFallback>
-							</Avatar>
-						</div>
+						<Avatar
+							className={cn(
+								"size-9 shrink-0 transition-shadow duration-200",
+								pathname === `/user/${user.id}`
+									? "ring-2 ring-primary ring-offset-2 ring-offset-sidebar"
+									: "group-hover/profile:ring-2 group-hover/profile:ring-primary/50 group-hover/profile:ring-offset-2 group-hover/profile:ring-offset-sidebar",
+							)}
+						>
+							{user.image && <AvatarImage src={user.image} alt={user.name} />}
+							<AvatarFallback className="bg-primary/10 text-xs font-bold text-primary">
+								{user.name.charAt(0).toUpperCase()}
+							</AvatarFallback>
+						</Avatar>
 						<div className="flex min-w-0 flex-col">
 							<span className="truncate text-sm font-semibold text-foreground">
 								{user.name}
 							</span>
-							<span className="text-[11px] leading-tight text-muted-foreground">
+							<span className="text-xs leading-tight text-muted-foreground">
 								Profile
 							</span>
 						</div>

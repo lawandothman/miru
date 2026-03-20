@@ -63,7 +63,7 @@ export function GenreStep({
 					<Sparkles className="size-3.5" />
 					Your taste
 				</div>
-				<h2 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
+				<h2 className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">
 					What do you like to watch?
 				</h2>
 				<p className="text-sm text-muted-foreground sm:text-base">
@@ -81,7 +81,7 @@ export function GenreStep({
 					))}
 				</div>
 			) : error ? (
-				<div className="space-y-3 rounded-2xl border border-destructive/30 bg-destructive/5 p-4 text-center">
+				<div className="space-y-3 rounded-2xl border border-destructive/20 bg-destructive/5 p-4 text-center">
 					<p className="text-sm text-muted-foreground">
 						We could not load genres right now.
 					</p>

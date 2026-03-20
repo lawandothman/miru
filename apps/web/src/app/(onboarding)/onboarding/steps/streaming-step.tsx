@@ -56,7 +56,7 @@ export function StreamingStep({
 					<Sparkles className="size-3.5" />
 					Your services
 				</div>
-				<h2 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
+				<h2 className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">
 					Where do you stream?
 				</h2>
 				<p className="text-sm text-muted-foreground sm:text-base">

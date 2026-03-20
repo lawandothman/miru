@@ -18,11 +18,11 @@ export default function AppError({
 		<div className="relative flex flex-col items-center justify-center py-32 text-center">
 			{/* Background glow */}
 			<div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-				<div className="h-[400px] w-[400px] rounded-full bg-destructive/[0.04] blur-[100px]" />
+				<div className="h-[400px] w-[400px] rounded-full bg-destructive/5 blur-[100px]" />
 			</div>
 
 			{/* Broken film strip icon */}
-			<div className="relative mb-8 flex items-center gap-1.5 text-muted-foreground/30">
+			<div className="relative mb-8 flex items-center gap-1.5 text-muted-foreground/20">
 				<div className="flex flex-col gap-1">
 					{["a", "b", "c"].map((id) => (
 						<div key={id} className="h-1.5 w-5 rounded-full bg-current" />
@@ -57,7 +57,7 @@ export default function AppError({
 			</button>
 
 			{error.digest && (
-				<p className="mt-6 font-mono text-[11px] text-muted-foreground/40">
+				<p className="mt-6 font-mono text-xs text-muted-foreground/40">
 					Error ID: {error.digest}
 				</p>
 			)}

@@ -1,15 +1,15 @@
 import type { Metadata, Viewport } from "next";
-import { DM_Sans, Syne } from "next/font/google";
+import { DM_Sans, Plus_Jakarta_Sans } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Providers } from "@/components/providers";
 import { Toaster } from "@/components/ui/sonner";
 import { env } from "@/env";
 import "./globals.css";
 
-const syne = Syne({
+const plusJakartaSans = Plus_Jakarta_Sans({
 	display: "swap",
 	subsets: ["latin"],
-	variable: "--font-syne",
+	variable: "--font-plus-jakarta-sans",
 });
 
 const dmSans = DM_Sans({
@@ -81,7 +81,7 @@ export default function RootLayout({
 	return (
 		<html lang="en" suppressHydrationWarning>
 			<body
-				className={`${syne.variable} ${dmSans.variable} font-sans antialiased`}
+				className={`${plusJakartaSans.variable} ${dmSans.variable} font-sans antialiased`}
 			>
 				<Providers>
 					{children}

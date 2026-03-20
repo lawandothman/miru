@@ -10,11 +10,11 @@ export default function TermsAndConditionsPage() {
 	return (
 		<MarketingShell>
 			<main className="mx-auto max-w-2xl px-6 pb-24 pt-12 lg:px-8">
-				<h1 className="font-display text-3xl font-bold tracking-tight">
+				<h1 className="font-display text-3xl font-semibold tracking-tight">
 					Terms &amp; Conditions
 				</h1>
 
-				<div className="mt-8 space-y-6 leading-relaxed text-muted-foreground">
+				<div className="mt-8 max-w-prose space-y-6 leading-relaxed text-muted-foreground">
 					<h2 className="font-display text-xl font-semibold text-foreground">
 						Terms
 					</h2>

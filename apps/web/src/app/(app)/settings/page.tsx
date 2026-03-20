@@ -26,12 +26,12 @@ export default async function SettingsPage() {
 
 	return (
 		<div className="mx-auto max-w-2xl space-y-10">
-			<h1 className="font-display text-2xl font-bold tracking-tight">
+			<h1 className="font-display text-2xl font-semibold tracking-tight">
 				Settings
 			</h1>
 
 			<div className="overflow-hidden rounded-2xl border bg-card">
-				<div className="h-24 bg-gradient-to-br from-primary/15 via-primary/5 to-transparent" />
+				<div className="h-24 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent" />
 				<div className="px-6 pb-6">
 					<div className="-mt-10 flex items-end gap-4">
 						<AvatarUpload name={user.name} image={user.image ?? null} />

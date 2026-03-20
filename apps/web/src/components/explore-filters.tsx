@@ -334,9 +334,9 @@ function FilterTrigger({
 			className={cn(
 				"flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-all active:scale-[0.97]",
 				isExpanded
-					? "border-primary/50 bg-primary/10 text-foreground"
+					? "border-primary/40 bg-primary/10 text-foreground"
 					: isActive
-						? "border-primary/40 bg-primary/[0.07] text-foreground"
+						? "border-primary/20 bg-primary/5 text-foreground"
 						: "border-border bg-background text-muted-foreground",
 			)}
 		>
@@ -400,7 +400,7 @@ function MobileFilters({
 				>
 					Genre
 					{selectedGenres.size > 0 && (
-						<span className="flex size-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
+						<span className="flex size-4 items-center justify-center rounded-full bg-primary text-2xs font-bold text-primary-foreground">
 							{selectedGenres.size}
 						</span>
 					)}
@@ -427,7 +427,7 @@ function MobileFilters({
 									key={g.id}
 									type="button"
 									onClick={() => onToggleGenre(g.id)}
-									className="flex shrink-0 items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-medium text-foreground transition-all active:scale-95"
+									className="flex shrink-0 items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-foreground transition-all active:scale-95"
 								>
 									{g.name}
 									<X className="size-2.5 text-muted-foreground" />
@@ -460,7 +460,7 @@ function MobileFilters({
 								className={cn(
 									"flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-all active:scale-[0.96]",
 									isSelected
-										? "border-primary/50 bg-primary/15 text-foreground"
+										? "border-primary/40 bg-primary/10 text-foreground"
 										: "border-border/60 bg-card/40 text-muted-foreground",
 								)}
 							>

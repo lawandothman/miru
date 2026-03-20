@@ -2,7 +2,7 @@
  * Typography tokens.
  *
  * Font families:
- * - Web uses DM Sans (body) and Syne (display) via Google Fonts / CSS variables.
+ * - Web uses DM Sans (body) and Plus Jakarta Sans (display) via Google Fonts / CSS variables.
  * - Mobile loads custom fonts via expo-font with weight-specific names.
  *
  * Size and weight values are shared across both platforms.
@@ -10,7 +10,7 @@
 
 export const fontFamily = {
 	sans: "DM Sans",
-	display: "Syne",
+	display: "Plus Jakarta Sans",
 	mono: "monospace",
 } as const;
 
@@ -23,9 +23,9 @@ export const mobileFontFamily = {
 	sansMedium: "DMSans_500Medium",
 	sansSemibold: "DMSans_600SemiBold",
 	sansBold: "DMSans_700Bold",
-	display: "Syne_400Regular",
-	displaySemibold: "Syne_600SemiBold",
-	displayBold: "Syne_700Bold",
+	display: "PlusJakartaSans_400Regular",
+	displaySemibold: "PlusJakartaSans_600SemiBold",
+	displayBold: "PlusJakartaSans_700Bold",
 } as const;
 
 export const fontSize = {

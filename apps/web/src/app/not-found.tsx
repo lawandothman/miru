@@ -6,11 +6,11 @@ export default function NotFound() {
 		<div className="relative flex min-h-svh flex-col items-center justify-center overflow-hidden px-6">
 			{/* Background glow */}
 			<div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-				<div className="h-[500px] w-[500px] rounded-full bg-primary/[0.04] blur-[120px]" />
+				<div className="h-[500px] w-[500px] rounded-full bg-primary/5 blur-[120px]" />
 			</div>
 
 			{/* Large decorative 404 */}
-			<p className="select-none font-display text-[clamp(8rem,25vw,14rem)] font-bold leading-none tracking-tighter text-foreground/[0.04]">
+			<p className="select-none font-display text-[clamp(8rem,25vw,14rem)] font-bold leading-none tracking-tighter text-foreground/5">
 				404
 			</p>
 

@@ -88,7 +88,7 @@ export function RecommendationBadge({
 	const { icon, text } = getReasonContent(reason);
 
 	return (
-		<span className="inline-flex max-w-full items-center gap-1.5 text-[11px] leading-tight text-white/90 drop-shadow-sm [&>svg]:text-gold">
+		<span className="inline-flex max-w-full items-center gap-1.5 text-xs leading-tight text-white/90 drop-shadow-sm [&>svg]:text-gold">
 			{icon}
 			<span className="truncate">{text}</span>
 		</span>

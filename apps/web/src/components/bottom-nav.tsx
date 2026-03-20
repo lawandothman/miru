@@ -37,7 +37,7 @@ export function BottomNav({ user }: BottomNavProps) {
 							key={item.href}
 							href={item.href}
 							className={cn(
-								"relative flex min-h-[52px] flex-1 flex-col items-center justify-center gap-0.5 text-[10px] font-medium transition-colors duration-200",
+								"relative flex min-h-[52px] flex-1 flex-col items-center justify-center gap-0.5 text-2xs font-medium transition-colors duration-200",
 								isActive
 									? "text-foreground"
 									: "text-muted-foreground active:text-foreground",
@@ -63,7 +63,7 @@ export function BottomNav({ user }: BottomNavProps) {
 					<Link
 						href={`/user/${user.id}`}
 						className={cn(
-							"relative flex min-h-[52px] flex-1 flex-col items-center justify-center gap-0.5 text-[10px] font-medium transition-colors duration-200",
+							"relative flex min-h-[52px] flex-1 flex-col items-center justify-center gap-0.5 text-2xs font-medium transition-colors duration-200",
 							pathname === `/user/${user.id}`
 								? "text-foreground"
 								: "text-muted-foreground active:text-foreground",
@@ -77,7 +77,7 @@ export function BottomNav({ user }: BottomNavProps) {
 							)}
 						>
 							{user.image && <AvatarImage src={user.image} alt={user.name} />}
-							<AvatarFallback className="bg-primary/15 text-[7px] font-bold text-primary">
+							<AvatarFallback className="bg-primary/10 text-[7px] font-bold text-primary">
 								{user.name.charAt(0).toUpperCase()}
 							</AvatarFallback>
 						</Avatar>
@@ -95,7 +95,7 @@ export function BottomNav({ user }: BottomNavProps) {
 					<Link
 						href="/signin"
 						className={cn(
-							"relative flex min-h-[52px] flex-1 flex-col items-center justify-center gap-0.5 text-[10px] font-medium transition-colors duration-200",
+							"relative flex min-h-[52px] flex-1 flex-col items-center justify-center gap-0.5 text-2xs font-medium transition-colors duration-200",
 							pathname === "/signin"
 								? "text-foreground"
 								: "text-muted-foreground active:text-foreground",

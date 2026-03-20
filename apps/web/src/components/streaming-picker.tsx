@@ -105,7 +105,7 @@ export function StreamingPicker({
 								<span
 									className={cn(
 										"line-clamp-1 font-medium leading-tight",
-										compact ? "text-[11px]" : "text-xs",
+										compact ? "text-2xs" : "text-xs",
 									)}
 								>
 									{provider.name}

@@ -10,11 +10,11 @@ export default function PrivacyPage() {
 	return (
 		<MarketingShell>
 			<main className="mx-auto max-w-2xl px-6 pb-24 pt-12 lg:px-8">
-				<h1 className="font-display text-3xl font-bold tracking-tight">
+				<h1 className="font-display text-3xl font-semibold tracking-tight">
 					Privacy Policy
 				</h1>
 
-				<div className="mt-8 space-y-6 leading-relaxed text-muted-foreground">
+				<div className="mt-8 max-w-prose space-y-6 leading-relaxed text-muted-foreground">
 					<p>
 						At Miru, one of our main priorities is the privacy of our visitors.
 						This Privacy Policy explains what information we collect and how we

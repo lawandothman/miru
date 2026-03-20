@@ -92,7 +92,7 @@ export default function HomeScreen() {
 									<UserAvatar
 										imageUrl={friend.image}
 										name={friend.name}
-										size={36}
+										size={44}
 									/>
 									<View>
 										<Text style={styles.friendName}>{friend.name}</Text>
@@ -114,8 +114,8 @@ export default function HomeScreen() {
 											id={m.id}
 											posterPath={m.posterPath}
 											title={m.title}
-											width={90}
-											height={135}
+											width={100}
+											height={150}
 										/>
 									))}
 								</ScrollView>
@@ -153,12 +153,12 @@ const styles = StyleSheet.create({
 		backgroundColor: Colors.card,
 		borderRadius: radius.xl,
 		padding: spacing[4],
-		gap: spacing[3],
+		gap: spacing[4],
 	},
 	friendHeader: {
 		flexDirection: "row",
 		alignItems: "center",
-		gap: spacing[3],
+		gap: spacing[4],
 	},
 	friendName: {
 		fontSize: fontSize.base,
@@ -170,6 +170,6 @@ const styles = StyleSheet.create({
 		color: Colors.mutedForeground,
 	},
 	posterRow: {
-		gap: spacing[2],
+		gap: spacing[3],
 	},
 });

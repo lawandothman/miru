@@ -65,7 +65,7 @@ export function FriendsStep({ onComplete }: FriendsStepProps) {
 					<Sparkles className="size-3.5" />
 					Better together
 				</div>
-				<h2 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
+				<h2 className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">
 					Find your friends
 				</h2>
 				<p className="text-sm text-muted-foreground sm:text-base">

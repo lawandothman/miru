@@ -33,12 +33,11 @@ export default async function ForYouPage() {
 
 	return (
 		<div className="space-y-8">
-			<div className="relative">
-				<div className="pointer-events-none absolute -left-12 -top-10 h-36 w-72 rounded-full bg-primary/[0.06] blur-3xl" />
-				<h1 className="relative font-display text-2xl font-semibold tracking-tight">
+			<div>
+				<h1 className="font-display text-2xl font-semibold tracking-tight">
 					For You
 				</h1>
-				<p className="relative mt-1 text-sm text-muted-foreground">
+				<p className="mt-1 text-sm text-muted-foreground">
 					Personalized picks based on your taste
 				</p>
 			</div>

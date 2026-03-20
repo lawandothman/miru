@@ -15,7 +15,7 @@
 	"dependencies": {
 		"@better-auth/expo": "catalog:better-auth",
 		"@expo-google-fonts/dm-sans": "0.4.2",
-		"@expo-google-fonts/syne": "0.4.2",
+		"@expo-google-fonts/plus-jakarta-sans": "0.4.2",
 		"@expo/metro-runtime": "55.0.6",
 		"@expo/ui": "55.0.1",
 		"@expo/vector-icons": "15.1.1",

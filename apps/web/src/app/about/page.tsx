@@ -9,11 +9,11 @@ export default function AboutPage() {
 	return (
 		<MarketingShell>
 			<main className="mx-auto max-w-2xl px-6 pb-24 pt-12 lg:px-8">
-				<h1 className="font-display text-3xl font-bold tracking-tight">
+				<h1 className="font-display text-3xl font-semibold tracking-tight">
 					About Miru
 				</h1>
 
-				<div className="mt-8 space-y-6 leading-relaxed text-muted-foreground">
+				<div className="mt-8 max-w-prose space-y-6 leading-relaxed text-muted-foreground">
 					<p>
 						Miru is a platform that helps you and your friends find movies to
 						watch together. One of the best parts of watching movies is sharing

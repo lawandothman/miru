@@ -41,7 +41,7 @@ export function RegionStep({ initialCountry, onComplete }: RegionStepProps) {
 					<Sparkles className="size-3.5" />
 					Welcome to Miru
 				</div>
-				<h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
+				<h2 className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">
 					Where are you watching from?
 				</h2>
 				<p className="text-sm text-muted-foreground sm:text-base">

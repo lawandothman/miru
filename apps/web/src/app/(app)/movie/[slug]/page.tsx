@@ -147,7 +147,7 @@ export default async function MoviePage({ params }: MoviePageProps) {
 						)}
 
 						<div className="flex flex-col justify-end">
-							<h1 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
+							<h1 className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">
 								{movie.title}
 							</h1>
 							{movie.tagline && (
@@ -222,7 +222,7 @@ export default async function MoviePage({ params }: MoviePageProps) {
 							<Link
 								key={friend.id}
 								href={`/user/${friend.id}`}
-								className="flex items-center gap-2 rounded-full border border-border/50 bg-card py-1.5 pl-1.5 pr-4 transition-colors hover:border-primary/30"
+								className="flex items-center gap-2 rounded-full border border-border/50 bg-card py-1.5 pl-1.5 pr-4 transition-colors hover:border-primary/20"
 							>
 								<UserAvatar
 									name={friend.name ?? "?"}
