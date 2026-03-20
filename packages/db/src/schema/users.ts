@@ -1,21 +1,29 @@
+import { sql } from "drizzle-orm";
 import { boolean, index, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
-export const users = pgTable("users", {
-	country: text("country"),
-	createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
-	email: text("email").unique().notNull(),
-	emailVerified: boolean("email_verified").default(false).notNull(),
-	id: text("id")
-		.primaryKey()
-		.$defaultFn(() => crypto.randomUUID()),
-	image: text("image"),
-	name: text("name").notNull(),
-	pushNotificationsEnabled: boolean("push_notifications_enabled")
-		.default(true)
-		.notNull(),
-	onboardingCompletedAt: timestamp("onboarding_completed_at", { mode: "date" }),
-	updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow().notNull(),
-});
+export const users = pgTable(
+	"users",
+	{
+		country: text("country"),
+		createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+		email: text("email").unique().notNull(),
+		emailVerified: boolean("email_verified").default(false).notNull(),
+		id: text("id")
+			.primaryKey()
+			.$defaultFn(() => crypto.randomUUID()),
+		image: text("image"),
+		name: text("name").notNull(),
+		pushNotificationsEnabled: boolean("push_notifications_enabled")
+			.default(true)
+			.notNull(),
+		onboardingCompletedAt: timestamp("onboarding_completed_at", { mode: "date" }),
+		updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow().notNull(),
+	},
+	(table) => [
+		index("users_name_trgm_idx")
+			.using("gin", sql`${table.name} gin_trgm_ops`),
+	],
+);
 
 export const accounts = pgTable(
 	"accounts",
