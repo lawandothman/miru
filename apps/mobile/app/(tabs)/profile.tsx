@@ -64,6 +64,8 @@ export default function ProfileScreen() {
 									pressed && styles.pressed,
 								]}
 								onPress={() => router.push("/settings")}
+								accessibilityRole="button"
+								accessibilityLabel="Settings"
 							>
 								<Settings size={22} color={Colors.mutedForeground} />
 							</Pressable>
@@ -82,13 +84,16 @@ export default function ProfileScreen() {
 							/>
 						</View>
 
-						<View style={styles.tabs}>
+						<View style={styles.tabs} accessibilityRole="tablist">
 							<Pressable
 								style={[
 									styles.tab,
 									activeTab === "watchlist" && styles.tabActive,
 								]}
 								onPress={() => setActiveTab("watchlist")}
+								accessibilityRole="tab"
+								accessibilityLabel="Watchlist"
+								accessibilityState={{ selected: activeTab === "watchlist" }}
 							>
 								<Text
 									style={[
@@ -105,6 +110,9 @@ export default function ProfileScreen() {
 									activeTab === "watched" && styles.tabActive,
 								]}
 								onPress={() => setActiveTab("watched")}
+								accessibilityRole="tab"
+								accessibilityLabel="Watched"
+								accessibilityState={{ selected: activeTab === "watched" }}
 							>
 								<Text
 									style={[

@@ -181,6 +181,8 @@ export default function OnboardingScreen() {
 						]}
 						onPress={() => setStep(step + 1)}
 						disabled={isSaving}
+						accessibilityRole="button"
+						accessibilityLabel="Skip this step"
 					>
 						<Text style={styles.skipText}>Skip</Text>
 					</Pressable>
@@ -196,6 +198,8 @@ export default function OnboardingScreen() {
 					]}
 					onPress={handleNext}
 					disabled={!canContinue || isSaving}
+					accessibilityRole="button"
+					accessibilityLabel={isSaving ? "Saving" : buttonLabel}
 				>
 					{isSaving ? (
 						<ActivityIndicator color={Colors.primaryForeground} size="small" />

@@ -55,6 +55,9 @@ export function GenreStep({
 								key={g.id}
 								style={[styles.chip, isSelected && styles.chipSelected]}
 								onPress={() => toggle(g.id)}
+								accessibilityRole="checkbox"
+								accessibilityLabel={g.name}
+								accessibilityState={{ checked: isSelected }}
 							>
 								{isSelected && (
 									<Check size={14} color={Colors.primaryForeground} />

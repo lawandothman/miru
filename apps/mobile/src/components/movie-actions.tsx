@@ -65,6 +65,10 @@ export function MovieActions({
 					pressed && styles.pressed,
 				]}
 				onPress={handleWatchlistToggle}
+				accessibilityRole="button"
+				accessibilityLabel={
+					inWatchlist ? "Remove from watchlist" : "Add to watchlist"
+				}
 			>
 				{inWatchlist ? (
 					<Bookmark
@@ -89,6 +93,10 @@ export function MovieActions({
 					pressed && styles.pressed,
 				]}
 				onPress={handleWatchedToggle}
+				accessibilityRole="button"
+				accessibilityLabel={
+					isWatched ? "Remove from watched" : "Mark as watched"
+				}
 			>
 				<Eye
 					size={18}

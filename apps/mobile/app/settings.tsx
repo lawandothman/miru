@@ -124,6 +124,8 @@ export default function SettingsScreen() {
 							styles.actionRow,
 							pressed && styles.pressed,
 						]}
+						accessibilityRole="button"
+						accessibilityLabel="Sign out"
 						onPress={async () => {
 							try {
 								await unregisterCurrentPushToken();
@@ -143,6 +145,8 @@ export default function SettingsScreen() {
 							styles.actionRow,
 							pressed && styles.pressed,
 						]}
+						accessibilityRole="button"
+						accessibilityLabel="Delete account"
 						onPress={() => {
 							Alert.alert(
 								"Delete account",
@@ -525,6 +529,8 @@ function NotificationPreferences() {
 						true: `${Colors.primary}80`,
 					}}
 					thumbColor={enabled ? Colors.primary : Colors.mutedForeground}
+					accessibilityLabel="Push notifications"
+					accessibilityRole="switch"
 				/>
 			</View>
 			<Text style={styles.systemStatusText}>{statusText}</Text>

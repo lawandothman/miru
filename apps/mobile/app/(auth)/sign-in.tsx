@@ -134,6 +134,8 @@ export default function SignInScreen() {
 							]}
 							onPress={handleAppleSignIn}
 							disabled={loading !== null}
+							accessibilityRole="button"
+							accessibilityLabel="Continue with Apple"
 						>
 							<View style={styles.socialButtonContent}>
 								<AppleIcon />
@@ -148,6 +150,8 @@ export default function SignInScreen() {
 							]}
 							onPress={handleGoogleSignIn}
 							disabled={loading !== null}
+							accessibilityRole="button"
+							accessibilityLabel="Continue with Google"
 						>
 							<View style={styles.socialButtonContent}>
 								<GoogleIcon />

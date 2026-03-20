@@ -37,6 +37,8 @@ export function MoviePoster({
 		<Pressable
 			style={({ pressed }) => [pressed && styles.pressed]}
 			onPress={() => router.push(`/movie/${id}`)}
+			accessibilityRole="button"
+			accessibilityLabel={title ? `View ${title}` : `View movie`}
 		>
 			{uri ? (
 				<Image

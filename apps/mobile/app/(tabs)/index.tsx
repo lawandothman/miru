@@ -85,6 +85,8 @@ export default function HomeScreen() {
 								key={friend.id}
 								style={styles.friendCard}
 								onPress={() => router.push(`/user/${friend.id}`)}
+								accessibilityRole="button"
+								accessibilityLabel={`${friend.name}, ${friend.matches.length} match${friend.matches.length !== 1 ? "es" : ""}`}
 							>
 								<View style={styles.friendHeader}>
 									<UserAvatar

@@ -26,6 +26,7 @@ export function UserAvatar({ imageUrl, name, size = 40 }: UserAvatarProps) {
 				]}
 				contentFit="cover"
 				transition={200}
+				accessibilityLabel={name ? `${name}'s avatar` : "User avatar"}
 			/>
 		);
 	}

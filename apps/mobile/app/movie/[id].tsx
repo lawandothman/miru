@@ -108,6 +108,8 @@ export default function MovieDetailScreen() {
 								pressed && styles.heroButtonPressed,
 							]}
 							onPress={() => router.back()}
+							accessibilityRole="button"
+							accessibilityLabel="Go back"
 						>
 							<ChevronLeft size={20} color="#fff" />
 						</Pressable>
@@ -117,6 +119,8 @@ export default function MovieDetailScreen() {
 								styles.heroButton,
 								pressed && styles.heroButtonPressed,
 							]}
+							accessibilityRole="button"
+							accessibilityLabel="Share movie"
 							onPress={() => {
 								const url = `${WEB_BASE}/movie/${movieSlug(movie.title, movie.id)}`;
 								Share.share({
@@ -301,9 +305,9 @@ const styles = StyleSheet.create({
 		justifyContent: "space-between",
 	},
 	heroButton: {
-		width: 36,
-		height: 36,
-		borderRadius: 18,
+		width: 44,
+		height: 44,
+		borderRadius: 22,
 		backgroundColor: "rgba(0,0,0,0.45)",
 		justifyContent: "center",
 		alignItems: "center",
