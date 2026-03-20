@@ -3,6 +3,7 @@ module.exports = function exports(api) {
 	return {
 		presets: ["babel-preset-expo"],
 		plugins: [
+			["babel-plugin-react-compiler"],
 			[
 				"module-resolver",
 				{
