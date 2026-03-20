@@ -2,7 +2,7 @@ import * as Sentry from "@sentry/nextjs";
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
 import { appRouter, createContext } from "@miru/trpc";
 import { env } from "@/env";
-import { db, getServerSession, tmdb } from "@/lib/server";
+import { cache, db, getServerSession, tmdb } from "@/lib/server";
 
 async function handler(req: Request) {
 	const session = await getServerSession();
@@ -10,6 +10,7 @@ async function handler(req: Request) {
 	return fetchRequestHandler({
 		createContext: () =>
 			createContext({
+				...(cache ? { cache } : {}),
 				captureException: (error, extra) => {
 					Sentry.withScope((scope) => {
 						if (extra) {

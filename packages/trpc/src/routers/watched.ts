@@ -1,3 +1,4 @@
+import { keys } from "@miru/cache";
 import { schema } from "@miru/db";
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
@@ -26,6 +27,8 @@ export const watchedRouter = router({
 						eq(schema.watchlistEntries.movieId, input.movieId),
 					),
 				);
+
+			await ctx.cache?.del(keys.recommendations(ctx.session.user.id));
 
 			return { success: true };
 		}),
@@ -90,6 +93,8 @@ export const watchedRouter = router({
 						eq(schema.watchedEntries.movieId, input.movieId),
 					),
 				);
+
+			await ctx.cache?.del(keys.recommendations(ctx.session.user.id));
 
 			return { success: true };
 		}),

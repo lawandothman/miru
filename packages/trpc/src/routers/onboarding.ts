@@ -1,3 +1,4 @@
+import { keys } from "@miru/cache";
 import { schema } from "@miru/db";
 import { TRPCError } from "@trpc/server";
 import { and, count, desc, eq, inArray, ne, notInArray } from "drizzle-orm";
@@ -163,6 +164,8 @@ export const onboardingRouter = router({
 				})),
 			);
 
+			await ctx.cache?.del(keys.recommendations(userId));
+
 			return { success: true };
 		}),
 
@@ -183,6 +186,8 @@ export const onboardingRouter = router({
 					})),
 				);
 			}
+
+			await ctx.cache?.del(keys.recommendations(userId));
 
 			return { success: true };
 		}),

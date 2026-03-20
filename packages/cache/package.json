@@ -1,0 +1,19 @@
+{
+	"name": "@miru/cache",
+	"version": "0.0.1",
+	"private": true,
+	"type": "module",
+	"exports": {
+		".": "./src/index.ts"
+	},
+	"scripts": {
+		"typecheck": "tsc --noEmit"
+	},
+	"dependencies": {
+		"@upstash/redis": "1.37.0"
+	},
+	"devDependencies": {
+		"@miru/typescript-config": "workspace:*",
+		"typescript": "catalog:"
+	}
+}

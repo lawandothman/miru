@@ -1,3 +1,4 @@
+import type { Cache } from "@miru/cache";
 import type { Database, User } from "@miru/db";
 import type { TMDBClient } from "./tmdb";
 
@@ -9,6 +10,7 @@ export interface Session {
 }
 
 export interface CreateContextOptions {
+	cache?: Cache;
 	captureException?: (
 		error: unknown,
 		context?: Record<string, unknown>,
@@ -21,6 +23,7 @@ export interface CreateContextOptions {
 
 export function createContext(opts: CreateContextOptions) {
 	return {
+		cache: opts.cache,
 		captureException: opts.captureException,
 		db: opts.db,
 		expoAccessToken: opts.expoAccessToken,

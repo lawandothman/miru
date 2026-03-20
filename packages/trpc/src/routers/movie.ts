@@ -1,3 +1,4 @@
+import { TTL, keys } from "@miru/cache";
 import { type Database, schema } from "@miru/db";
 import { TMDBError } from "@lorenzopant/tmdb";
 import { TRPCError } from "@trpc/server";
@@ -26,15 +27,11 @@ import {
 } from "./recommendation-engine";
 
 const STALE_AFTER_MS = 24 * 60 * 60 * 1000; // 24 hours
-const GENRES_CACHE_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 const DEFAULT_PAGE_SIZE = 20;
 const DEFAULT_REGION = "GB";
 const TRAILER_SITE = "YouTube";
 const TRAILER_TYPE = "Trailer";
 const DISCOVER_SECTION_LIMIT = 15;
-
-let genresCache: { data: { id: number; name: string }[]; ts: number } | null =
-	null;
 
 const movieWithProvidersQuery = {
 	genres: { with: { genre: true } },
@@ -192,75 +189,83 @@ export const movieRouter = router({
 			const userId = ctx.session.user.id;
 			const offset = input.cursor ?? 0;
 
-			// Gather user context in parallel
-			const [
-				existingWatchlist,
-				existingWatched,
-				genreWeights,
-				userStreamingServices,
-			] = await Promise.all([
-				ctx.db
-					.select({ movieId: schema.watchlistEntries.movieId })
-					.from(schema.watchlistEntries)
-					.where(eq(schema.watchlistEntries.userId, userId)),
-				ctx.db
-					.select({ movieId: schema.watchedEntries.movieId })
-					.from(schema.watchedEntries)
-					.where(eq(schema.watchedEntries.userId, userId)),
-				computeUserGenreWeights(ctx.db, userId),
-				ctx.db
-					.select({ providerId: schema.userStreamingServices.providerId })
-					.from(schema.userStreamingServices)
-					.where(eq(schema.userStreamingServices.userId, userId)),
-			]);
+			async function computeRecommendations() {
+				const [
+					existingWatchlist,
+					existingWatched,
+					genreWeights,
+					userStreamingServices,
+				] = await Promise.all([
+					ctx.db
+						.select({ movieId: schema.watchlistEntries.movieId })
+						.from(schema.watchlistEntries)
+						.where(eq(schema.watchlistEntries.userId, userId)),
+					ctx.db
+						.select({ movieId: schema.watchedEntries.movieId })
+						.from(schema.watchedEntries)
+						.where(eq(schema.watchedEntries.userId, userId)),
+					computeUserGenreWeights(ctx.db, userId),
+					ctx.db
+						.select({ providerId: schema.userStreamingServices.providerId })
+						.from(schema.userStreamingServices)
+						.where(eq(schema.userStreamingServices.userId, userId)),
+				]);
 
-			const userMovieIds = [
-				...existingWatchlist.map((e) => e.movieId),
-				...existingWatched.map((e) => e.movieId),
-			];
-			const userStreamingProviderIds = userStreamingServices.map(
-				(s) => s.providerId,
-			);
+				const userMovieIds = [
+					...existingWatchlist.map((e) => e.movieId),
+					...existingWatched.map((e) => e.movieId),
+				];
+				const userStreamingProviderIds = userStreamingServices.map(
+					(s) => s.providerId,
+				);
 
-			// Find similar users for collaborative filtering
-			const similarUsers = await findSimilarUsers(ctx.db, userId, userMovieIds);
+				const similarUsers = await findSimilarUsers(
+					ctx.db,
+					userId,
+					userMovieIds,
+				);
 
-			// Get all scored candidates
-			const scoredMovies = await getRecommendedMovies(
-				ctx.db,
-				userId,
-				genreWeights,
-				similarUsers,
-				userMovieIds,
-				userStreamingProviderIds,
-			);
+				const scoredMovies = await getRecommendedMovies(
+					ctx.db,
+					userId,
+					genreWeights,
+					similarUsers,
+					userMovieIds,
+					userStreamingProviderIds,
+				);
 
-			// Fetch genres for diversity reranking
-			const candidateIds = scoredMovies.map((m) => m.id);
-			const movieGenreRows =
-				candidateIds.length > 0
-					? await ctx.db
-							.select({
-								movieId: schema.movieGenres.movieId,
-								genreId: schema.movieGenres.genreId,
-							})
-							.from(schema.movieGenres)
-							.where(inArray(schema.movieGenres.movieId, candidateIds))
-					: [];
+				const candidateIds = scoredMovies.map((m) => m.id);
+				const movieGenreRows =
+					candidateIds.length > 0
+						? await ctx.db
+								.select({
+									movieId: schema.movieGenres.movieId,
+									genreId: schema.movieGenres.genreId,
+								})
+								.from(schema.movieGenres)
+								.where(inArray(schema.movieGenres.movieId, candidateIds))
+						: [];
 
-			const movieGenreMap = buildGenreMap(movieGenreRows);
+				const movieGenreMap = buildGenreMap(movieGenreRows);
 
-			// Diversity re-rank the full list, then paginate
-			const reranked = diversityRerank(
-				scoredMovies,
-				movieGenreMap,
-				genreWeights,
-				scoredMovies.length,
-			);
+				return diversityRerank(
+					scoredMovies,
+					movieGenreMap,
+					genreWeights,
+					scoredMovies.length,
+				);
+			}
+
+			const reranked = ctx.cache
+				? await ctx.cache.getOrSet(
+						keys.recommendations(userId),
+						TTL.RECOMMENDATIONS,
+						computeRecommendations,
+					)
+				: await computeRecommendations();
 
 			const page = reranked.slice(offset, offset + input.limit);
 
-			// Select explanations
 			const results = page.map((m) => ({
 				id: m.id,
 				title: m.title,
@@ -272,7 +277,6 @@ export const movieRouter = router({
 				reason: selectExplanation(m),
 			}));
 
-			// Enrich explanations (fills in "because you watched X" titles, provider names)
 			await enrichExplanations(ctx.db, userId, results);
 
 			return results;
@@ -291,40 +295,40 @@ export const movieRouter = router({
 		}),
 
 	getGenres: publicProcedure.query(async ({ ctx }) => {
-		if (genresCache && Date.now() - genresCache.ts < GENRES_CACHE_MS) {
-			return genresCache.data;
-		}
+		async function fetchGenres() {
+			let genres = await ctx.db.select().from(schema.genres);
 
-		let genres = await ctx.db.select().from(schema.genres);
+			if (genres.length === 0) {
+				try {
+					const response = await ctx.tmdb.genres.movie_list({ language: "en" });
+					const tmdbGenres = (response.genres ?? [])
+						.map((genre) => ({ id: genre.id, name: genre.name }))
+						.filter((genre) => Boolean(genre.name));
 
-		if (genres.length === 0) {
-			try {
-				const response = await ctx.tmdb.genres.movie_list({ language: "en" });
-				const tmdbGenres = (response.genres ?? [])
-					.map((genre) => ({ id: genre.id, name: genre.name }))
-					.filter((genre) => Boolean(genre.name));
-
-				if (tmdbGenres.length > 0) {
-					await ctx.db
-						.insert(schema.genres)
-						.values(tmdbGenres)
-						.onConflictDoNothing();
-					genres = await ctx.db.select().from(schema.genres);
+					if (tmdbGenres.length > 0) {
+						await ctx.db
+							.insert(schema.genres)
+							.values(tmdbGenres)
+							.onConflictDoNothing();
+						genres = await ctx.db.select().from(schema.genres);
+					}
+				} catch (error) {
+					throw new TRPCError({
+						code: "INTERNAL_SERVER_ERROR",
+						message: "Unable to load genres. Please try again later.",
+						cause: error,
+					});
 				}
-			} catch (error) {
-				throw new TRPCError({
-					code: "INTERNAL_SERVER_ERROR",
-					message: "Unable to load genres. Please try again later.",
-					cause: error,
-				});
 			}
+
+			genres.sort((a, b) => a.name.localeCompare(b.name));
+			return genres;
 		}
 
-		genres.sort((a, b) => a.name.localeCompare(b.name));
-		if (genres.length > 0) {
-			genresCache = { data: genres, ts: Date.now() };
+		if (ctx.cache) {
+			return ctx.cache.getOrSet(keys.genres(), TTL.GENRES, fetchGenres);
 		}
-		return genres;
+		return fetchGenres();
 	}),
 
 	getWatchProviders: publicProcedure.query(({ ctx }) => {
@@ -403,21 +407,32 @@ export const movieRouter = router({
 		)
 		.query(async ({ ctx, input }) => {
 			const page = input.cursor ?? 1;
-			let tmdbResults;
-			try {
-				tmdbResults = await ctx.tmdb.search.movies({
-					query: input.query,
-					page,
-					include_adult: false,
-					...(input.year ? { year: String(input.year) } : {}),
-				});
-			} catch (error) {
-				throw new TRPCError({
-					code: "INTERNAL_SERVER_ERROR",
-					message: "Search is temporarily unavailable. Please try again later.",
-					cause: error,
-				});
+
+			async function fetchFromTmdb() {
+				try {
+					return await ctx.tmdb.search.movies({
+						query: input.query,
+						page,
+						include_adult: false,
+						...(input.year ? { year: String(input.year) } : {}),
+					});
+				} catch (error) {
+					throw new TRPCError({
+						code: "INTERNAL_SERVER_ERROR",
+						message:
+							"Search is temporarily unavailable. Please try again later.",
+						cause: error,
+					});
+				}
 			}
+
+			const tmdbResults = ctx.cache
+				? await ctx.cache.getOrSet(
+						keys.search(input.query, page),
+						TTL.SEARCH,
+						fetchFromTmdb,
+					)
+				: await fetchFromTmdb();
 
 			let safeResults = tmdbResults.results.filter((r) => !r.adult);
 
@@ -506,68 +521,81 @@ export const movieRouter = router({
 
 	getDiscoverSections: publicProcedure.query(async ({ ctx }) => {
 		const userId = ctx.session?.user?.id ?? null;
-		const now = new Date();
-		const threeMonthsAgo = new Date(now);
-		threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
-		const todayStr = now.toISOString().slice(0, 10);
-		const threeMonthsAgoStr = threeMonthsAgo.toISOString().slice(0, 10);
 
-		const movieSelect = {
-			id: schema.movies.id,
-			title: schema.movies.title,
-			posterPath: schema.movies.posterPath,
-		} as const;
+		async function fetchSections() {
+			const now = new Date();
+			const threeMonthsAgo = new Date(now);
+			threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+			const todayStr = now.toISOString().slice(0, 10);
+			const threeMonthsAgoStr = threeMonthsAgo.toISOString().slice(0, 10);
 
-		const [trending, newReleases, popularOnMiruRaw] = await Promise.all([
-			ctx.db
-				.select(movieSelect)
-				.from(schema.movies)
-				.where(
-					and(
-						eq(schema.movies.adult, false),
-						isNotNull(schema.movies.posterPath),
-					),
-				)
-				.orderBy(desc(schema.movies.popularity))
-				.limit(DISCOVER_SECTION_LIMIT),
-			ctx.db
-				.select(movieSelect)
-				.from(schema.movies)
-				.where(
-					and(
-						eq(schema.movies.adult, false),
-						isNotNull(schema.movies.posterPath),
-						gte(schema.movies.releaseDate, threeMonthsAgoStr),
-						lte(schema.movies.releaseDate, todayStr),
-					),
-				)
-				.orderBy(desc(schema.movies.popularity))
-				.limit(DISCOVER_SECTION_LIMIT),
-			ctx.db
-				.select({
-					...movieSelect,
-					watchlistCount: count(schema.watchlistEntries.userId),
-				})
-				.from(schema.movies)
-				.innerJoin(
-					schema.watchlistEntries,
-					eq(schema.watchlistEntries.movieId, schema.movies.id),
-				)
-				.where(eq(schema.movies.adult, false))
-				.groupBy(schema.movies.id)
-				.orderBy(desc(count(schema.watchlistEntries.userId)))
-				.limit(DISCOVER_SECTION_LIMIT),
-		]);
+			const movieSelect = {
+				id: schema.movies.id,
+				title: schema.movies.title,
+				posterPath: schema.movies.posterPath,
+			} as const;
 
-		const popularOnMiru = popularOnMiruRaw.map(
-			({ watchlistCount: _, ...m }) => m,
-		);
+			const [trending, newReleases, popularOnMiruRaw] = await Promise.all([
+				ctx.db
+					.select(movieSelect)
+					.from(schema.movies)
+					.where(
+						and(
+							eq(schema.movies.adult, false),
+							isNotNull(schema.movies.posterPath),
+						),
+					)
+					.orderBy(desc(schema.movies.popularity))
+					.limit(DISCOVER_SECTION_LIMIT),
+				ctx.db
+					.select(movieSelect)
+					.from(schema.movies)
+					.where(
+						and(
+							eq(schema.movies.adult, false),
+							isNotNull(schema.movies.posterPath),
+							gte(schema.movies.releaseDate, threeMonthsAgoStr),
+							lte(schema.movies.releaseDate, todayStr),
+						),
+					)
+					.orderBy(desc(schema.movies.popularity))
+					.limit(DISCOVER_SECTION_LIMIT),
+				ctx.db
+					.select({
+						...movieSelect,
+						watchlistCount: count(schema.watchlistEntries.userId),
+					})
+					.from(schema.movies)
+					.innerJoin(
+						schema.watchlistEntries,
+						eq(schema.watchlistEntries.movieId, schema.movies.id),
+					)
+					.where(eq(schema.movies.adult, false))
+					.groupBy(schema.movies.id)
+					.orderBy(desc(count(schema.watchlistEntries.userId)))
+					.limit(DISCOVER_SECTION_LIMIT),
+			]);
+
+			return {
+				trending,
+				newReleases,
+				popularOnMiru: popularOnMiruRaw.map(({ watchlistCount: _, ...m }) => m),
+			};
+		}
+
+		const sections = ctx.cache
+			? await ctx.cache.getOrSet(
+					keys.discoverSections(),
+					TTL.DISCOVER_SECTIONS,
+					fetchSections,
+				)
+			: await fetchSections();
 
 		const friendsWatching = userId
 			? await getFriendsWatchingMovies(ctx.db, userId)
 			: [];
 
-		return { trending, newReleases, popularOnMiru, friendsWatching };
+		return { ...sections, friendsWatching };
 	}),
 
 	discover: publicProcedure
@@ -590,23 +618,32 @@ export const movieRouter = router({
 		.query(async ({ ctx, input }) => {
 			const page = input.cursor ?? 1;
 
-			let data;
-			try {
-				data = await ctx.tmdb.discoverMovies({
-					genres: input.genres,
-					yearGte: input.yearGte,
-					yearLte: input.yearLte,
-					sortBy: input.sortBy,
-					page,
-				});
-			} catch (error) {
-				throw new TRPCError({
-					code: "INTERNAL_SERVER_ERROR",
-					message:
-						"Discover is temporarily unavailable. Please try again later.",
-					cause: error,
-				});
+			async function fetchDiscover() {
+				try {
+					return await ctx.tmdb.discoverMovies({
+						genres: input.genres,
+						yearGte: input.yearGte,
+						yearLte: input.yearLte,
+						sortBy: input.sortBy,
+						page,
+					});
+				} catch (error) {
+					throw new TRPCError({
+						code: "INTERNAL_SERVER_ERROR",
+						message:
+							"Discover is temporarily unavailable. Please try again later.",
+						cause: error,
+					});
+				}
 			}
+
+			const data = ctx.cache
+				? await ctx.cache.getOrSet(
+						keys.discover({ ...input, page }),
+						TTL.SEARCH,
+						fetchDiscover,
+					)
+				: await fetchDiscover();
 
 			const safeResults = data.results.filter((r) => !r.adult);
 			const movieIds = safeResults.map((r) => r.id);
