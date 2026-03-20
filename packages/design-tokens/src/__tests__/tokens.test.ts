@@ -94,7 +94,7 @@ describe("radius tokens", () => {
 describe("typography tokens", () => {
 	it("font families include sans and display", () => {
 		expect(fontFamily.sans).toBe("DM Sans");
-		expect(fontFamily.display).toBe("Syne");
+		expect(fontFamily.display).toBe("Plus Jakarta Sans");
 	});
 
 	it("mobile font families map to expo-google-fonts names", () => {
@@ -102,9 +102,9 @@ describe("typography tokens", () => {
 		expect(mobileFontFamily.sansMedium).toBe("DMSans_500Medium");
 		expect(mobileFontFamily.sansSemibold).toBe("DMSans_600SemiBold");
 		expect(mobileFontFamily.sansBold).toBe("DMSans_700Bold");
-		expect(mobileFontFamily.display).toBe("Syne_400Regular");
-		expect(mobileFontFamily.displaySemibold).toBe("Syne_600SemiBold");
-		expect(mobileFontFamily.displayBold).toBe("Syne_700Bold");
+		expect(mobileFontFamily.display).toBe("PlusJakartaSans_400Regular");
+		expect(mobileFontFamily.displaySemibold).toBe("PlusJakartaSans_600SemiBold");
+		expect(mobileFontFamily.displayBold).toBe("PlusJakartaSans_700Bold");
 	});
 
 	it("font sizes increase monotonically", () => {
