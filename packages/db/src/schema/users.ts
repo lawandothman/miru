@@ -16,12 +16,13 @@ export const users = pgTable(
 		pushNotificationsEnabled: boolean("push_notifications_enabled")
 			.default(true)
 			.notNull(),
-		onboardingCompletedAt: timestamp("onboarding_completed_at", { mode: "date" }),
+		onboardingCompletedAt: timestamp("onboarding_completed_at", {
+			mode: "date",
+		}),
 		updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow().notNull(),
 	},
 	(table) => [
-		index("users_name_trgm_idx")
-			.using("gin", sql`${table.name} gin_trgm_ops`),
+		index("users_name_trgm_idx").using("gin", sql`${table.name} gin_trgm_ops`),
 	],
 );
 
