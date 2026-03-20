@@ -10,7 +10,7 @@ const isDevelopment = process.env.NODE_ENV === "development";
 const configuredHost = new URL(env.BETTER_AUTH_URL).host;
 
 const sharedTrustedOrigins = [
-	"https://miru-chi.vercel.app",
+	"https://watchmiru.app",
 	"https://appleid.apple.com",
 	"miru://",
 ];

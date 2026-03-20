@@ -129,7 +129,7 @@ jobs:
       - name: Publish update
         env:
           APP_VERSION: ${{ needs.validate-release.outputs.app-version }}
-          EXPO_PUBLIC_API_URL: https://miru-chi.vercel.app
+          EXPO_PUBLIC_API_URL: https://watchmiru.app
           EXPO_PUBLIC_SENTRY_DSN: https://332840843ec50e8927f572108a2d42af@o4504404409581568.ingest.us.sentry.io/4511005806034944
         run: cd apps/mobile && eas update --channel production --environment production --message "Release ${{ github.ref_name }}" --non-interactive
 

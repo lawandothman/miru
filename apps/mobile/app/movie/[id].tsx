@@ -31,7 +31,7 @@ const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const HERO_HEIGHT = SCREEN_WIDTH * 0.75;
 const POSTER_WIDTH = 110;
 const POSTER_HEIGHT = 165;
-const WEB_BASE = "https://miru-chi.vercel.app";
+const WEB_BASE = "https://watchmiru.app";
 
 function movieSlug(title: string, tmdbId: number): string {
 	const slug = title

@@ -43,7 +43,7 @@ const config: ExpoConfig = {
 	ios: {
 		supportsTablet: true,
 		bundleIdentifier: "com.miru.app",
-		associatedDomains: ["applinks:miru-chi.vercel.app"],
+		associatedDomains: ["applinks:watchmiru.app"],
 		infoPlist: {
 			ITSAppUsesNonExemptEncryption: false,
 		},

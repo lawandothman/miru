@@ -103,7 +103,9 @@ describe("typography tokens", () => {
 		expect(mobileFontFamily.sansSemibold).toBe("DMSans_600SemiBold");
 		expect(mobileFontFamily.sansBold).toBe("DMSans_700Bold");
 		expect(mobileFontFamily.display).toBe("PlusJakartaSans_400Regular");
-		expect(mobileFontFamily.displaySemibold).toBe("PlusJakartaSans_600SemiBold");
+		expect(mobileFontFamily.displaySemibold).toBe(
+			"PlusJakartaSans_600SemiBold",
+		);
 		expect(mobileFontFamily.displayBold).toBe("PlusJakartaSans_700Bold");
 	});
 

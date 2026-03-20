@@ -68,7 +68,7 @@ export default function OGImage() {
 					position: "absolute",
 				}}
 			>
-				miru-chi.vercel.app
+				watchmiru.app
 			</div>
 		</div>,
 		{ ...size },
