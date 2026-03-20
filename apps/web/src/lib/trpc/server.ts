@@ -1,18 +1,19 @@
 import "server-only";
 
-import { cache } from "react";
+import { cache as reactCache } from "react";
 import * as Sentry from "@sentry/nextjs";
 import { appRouter, createCallerFactory, createContext } from "@miru/trpc";
 import { env } from "@/env";
-import { db, getServerSession, tmdb } from "@/lib/server";
+import { cache, db, getServerSession, tmdb } from "@/lib/server";
 
 const createCaller = createCallerFactory(appRouter);
 
-export const trpc = cache(async () => {
+export const trpc = reactCache(async () => {
 	const session = await getServerSession();
 
 	return createCaller(
 		createContext({
+			...(cache ? { cache } : {}),
 			captureException: (error, extra) => {
 				Sentry.withScope((scope) => {
 					if (extra) {

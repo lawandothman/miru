@@ -16,6 +16,8 @@ export const env = createEnv({
 		SENTRY_AUTH_TOKEN: z.string().optional(),
 		CRON_SECRET: z.string().optional(),
 		VERCEL_URL: z.string().optional(),
+		UPSTASH_REDIS_REST_URL: z.string().url().optional(),
+		UPSTASH_REDIS_REST_TOKEN: z.string().min(1).optional(),
 	},
 	client: {
 		NEXT_PUBLIC_SENTRY_DSN: z.string().url().optional(),
