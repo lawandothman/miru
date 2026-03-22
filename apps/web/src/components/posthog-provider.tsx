@@ -45,9 +45,6 @@ export function PostHogIdentify({
 
 	useEffect(() => {
 		ph.identify(userId, properties);
-		return () => {
-			ph.reset();
-		};
 	}, [userId, properties, ph]);
 
 	return null;

@@ -16,6 +16,7 @@ import {
 	DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import posthog from "posthog-js";
 import { authClient, signOut } from "@/lib/auth-client";
 import { capture } from "@/lib/analytics";
 
@@ -31,6 +32,7 @@ export function DangerZone() {
 		try {
 			await signOut();
 			capture("signed_out", {});
+			posthog.reset();
 			router.push("/");
 		} catch {
 			toast.error("Failed to sign out");
