@@ -8,6 +8,10 @@ export function triggerWatchlistHaptic() {
 	fire(Haptics.selectionAsync());
 }
 
+export function triggerWatchedHaptic() {
+	fire(Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light));
+}
+
 export function triggerFollowHaptic() {
 	fire(Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light));
 }

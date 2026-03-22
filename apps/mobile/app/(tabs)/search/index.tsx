@@ -108,6 +108,7 @@ export default function SearchScreen() {
 				{showAutocomplete && (
 					<ScrollView
 						style={styles.results}
+						contentInsetAdjustmentBehavior="automatic"
 						keyboardShouldPersistTaps="handled"
 						keyboardDismissMode="on-drag"
 					>

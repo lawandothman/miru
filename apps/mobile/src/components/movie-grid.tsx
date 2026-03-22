@@ -64,6 +64,7 @@ export function MovieGrid({
 			numColumns={NUM_COLUMNS}
 			contentContainerStyle={styles.list}
 			columnWrapperStyle={styles.row}
+			contentInsetAdjustmentBehavior="automatic"
 			showsVerticalScrollIndicator={false}
 			alwaysBounceVertical={movies.length > 0}
 			onEndReached={handleEndReached}

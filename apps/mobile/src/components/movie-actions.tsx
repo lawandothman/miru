@@ -3,7 +3,7 @@ import { Bookmark, BookmarkPlus, Eye } from "lucide-react-native";
 import { trpc } from "@/lib/trpc";
 import { capture } from "@/lib/analytics";
 import { Colors, fontSize, fontFamily, spacing, radius } from "@/lib/constants";
-import { triggerWatchlistHaptic } from "@/lib/haptics";
+import { triggerWatchlistHaptic, triggerWatchedHaptic } from "@/lib/haptics";
 
 interface MovieActionsProps {
 	movieId: number;
@@ -119,6 +119,8 @@ export function MovieActions({
 	}
 
 	function handleWatchedToggle() {
+		triggerWatchedHaptic();
+
 		if (isWatched) {
 			removeFromWatched.mutate({ movieId });
 		} else {
