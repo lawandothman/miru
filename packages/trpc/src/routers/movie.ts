@@ -11,10 +11,11 @@ import {
 	inArray,
 	isNotNull,
 	lte,
+	notInArray,
 } from "drizzle-orm";
 import { z } from "zod";
 import { hasBlockedKeyword } from "../blocked-keywords";
-import { buildGenreMap, getBlockedUserIds, getMovieStatuses } from "../helpers";
+import { getBlockedUserIds, getMovieStatuses } from "../helpers";
 import type { TMDBClient } from "../tmdb";
 import { protectedProcedure, publicProcedure, router } from "../trpc";
 import {
@@ -22,6 +23,7 @@ import {
 	diversityRerank,
 	enrichExplanations,
 	findSimilarUsers,
+	getPlatformPopularMovies,
 	getRecommendedMovies,
 	selectExplanation,
 } from "./recommendation-engine";
@@ -37,6 +39,74 @@ const movieWithProvidersQuery = {
 	genres: { with: { genre: true } },
 	streamProviders: { with: { provider: true } },
 } as const;
+
+type MovieMatchUser = {
+	id: string;
+	image: string | null;
+	name: string | null;
+};
+
+interface MovieUserContext {
+	inWatchlist: boolean;
+	isWatched: boolean;
+	matches: MovieMatchUser[];
+}
+
+async function fetchMovieUserContext(
+	db: Database,
+	userId: string,
+	movieId: number,
+): Promise<MovieUserContext> {
+	const [entry, watchedEntry, friendMatches, friendsWhoWatched, blockedIds] =
+		await Promise.all([
+			db.query.watchlistEntries.findFirst({
+				where: and(
+					eq(schema.watchlistEntries.userId, userId),
+					eq(schema.watchlistEntries.movieId, movieId),
+				),
+			}),
+			db.query.watchedEntries.findFirst({
+				where: and(
+					eq(schema.watchedEntries.userId, userId),
+					eq(schema.watchedEntries.movieId, movieId),
+				),
+			}),
+			db
+				.select({
+					id: schema.users.id,
+					name: schema.users.name,
+					image: schema.users.image,
+				})
+				.from(schema.watchlistEntries)
+				.innerJoin(
+					schema.follows,
+					and(
+						eq(schema.follows.followerId, userId),
+						eq(schema.follows.followingId, schema.watchlistEntries.userId),
+					),
+				)
+				.innerJoin(
+					schema.users,
+					eq(schema.users.id, schema.watchlistEntries.userId),
+				)
+				.where(eq(schema.watchlistEntries.movieId, movieId)),
+			db
+				.select({ userId: schema.watchedEntries.userId })
+				.from(schema.watchedEntries)
+				.where(eq(schema.watchedEntries.movieId, movieId)),
+			getBlockedUserIds(db, userId),
+		]);
+
+	const watchedByFriendSet = new Set(friendsWhoWatched.map((f) => f.userId));
+
+	return {
+		inWatchlist: Boolean(entry),
+		isWatched: Boolean(watchedEntry),
+		matches: friendMatches.filter(
+			(f) => !watchedByFriendSet.has(f.id) && !blockedIds.has(f.id),
+		),
+	};
+}
 
 export const movieRouter = router({
 	getByGenre: publicProcedure
@@ -98,82 +168,30 @@ export const movieRouter = router({
 				Date.now() - existing.updatedAt.getTime() > STALE_AFTER_MS ||
 				existing.runtime === null;
 
-			const movie = isStale
-				? await refreshMovie(
+			const moviePromise = isStale
+				? refreshMovie(
 						ctx,
 						input.tmdbId,
 						ctx.session?.user?.country ?? undefined,
 					)
-				: existing;
+				: Promise.resolve(existing);
+			const userContextPromise = ctx.session?.user
+				? fetchMovieUserContext(ctx.db, ctx.session.user.id, input.tmdbId)
+				: Promise.resolve(null);
+			const [movie, userContext] = await Promise.all([
+				moviePromise,
+				userContextPromise,
+			]);
 
 			if (!movie || movie.adult) {
 				throw new TRPCError({ code: "NOT_FOUND", message: "Movie not found" });
 			}
 
-			let inWatchlist = false;
-			let isWatched = false;
-			let matches: { id: string; name: string | null; image: string | null }[] =
-				[];
-
-			if (ctx.session?.user) {
-				const userId = ctx.session.user.id;
-
-				const [
-					entry,
-					watchedEntry,
-					friendMatches,
-					friendsWhoWatched,
-					blockedIds,
-				] = await Promise.all([
-					ctx.db.query.watchlistEntries.findFirst({
-						where: and(
-							eq(schema.watchlistEntries.userId, userId),
-							eq(schema.watchlistEntries.movieId, movie.id),
-						),
-					}),
-					ctx.db.query.watchedEntries.findFirst({
-						where: and(
-							eq(schema.watchedEntries.userId, userId),
-							eq(schema.watchedEntries.movieId, movie.id),
-						),
-					}),
-					ctx.db
-						.select({
-							id: schema.users.id,
-							name: schema.users.name,
-							image: schema.users.image,
-						})
-						.from(schema.watchlistEntries)
-						.innerJoin(
-							schema.follows,
-							and(
-								eq(schema.follows.followerId, userId),
-								eq(schema.follows.followingId, schema.watchlistEntries.userId),
-							),
-						)
-						.innerJoin(
-							schema.users,
-							eq(schema.users.id, schema.watchlistEntries.userId),
-						)
-						.where(eq(schema.watchlistEntries.movieId, movie.id)),
-					ctx.db
-						.select({ userId: schema.watchedEntries.userId })
-						.from(schema.watchedEntries)
-						.where(eq(schema.watchedEntries.movieId, movie.id)),
-					getBlockedUserIds(ctx.db, userId),
-				]);
-
-				inWatchlist = Boolean(entry);
-				isWatched = Boolean(watchedEntry);
-
-				// Only show friends who haven't watched this movie yet and aren't blocked
-				const watchedByFriendSet = new Set(
-					friendsWhoWatched.map((f) => f.userId),
-				);
-				matches = friendMatches.filter(
-					(f) => !watchedByFriendSet.has(f.id) && !blockedIds.has(f.id),
-				);
-			}
+			const { inWatchlist, isWatched, matches } = userContext ?? {
+				inWatchlist: false,
+				isWatched: false,
+				matches: [],
+			};
 
 			return { ...movie, inWatchlist, isWatched, matches };
 		}),
@@ -190,11 +208,20 @@ export const movieRouter = router({
 			const offset = input.cursor ?? 0;
 
 			async function computeRecommendations() {
+				const platformPopularPromise = ctx.cache
+					? ctx.cache.getOrSet(
+							keys.recommendationPlatformPopular(),
+							TTL.RECOMMENDATION_PLATFORM_POPULAR,
+							() => getPlatformPopularMovies(ctx.db),
+						)
+					: getPlatformPopularMovies(ctx.db);
+
 				const [
 					existingWatchlist,
 					existingWatched,
 					genreWeights,
 					userStreamingServices,
+					platformPopular,
 				] = await Promise.all([
 					ctx.db
 						.select({ movieId: schema.watchlistEntries.movieId })
@@ -209,6 +236,7 @@ export const movieRouter = router({
 						.select({ providerId: schema.userStreamingServices.providerId })
 						.from(schema.userStreamingServices)
 						.where(eq(schema.userStreamingServices.userId, userId)),
+					platformPopularPromise,
 				]);
 
 				const userMovieIds = [
@@ -225,28 +253,16 @@ export const movieRouter = router({
 					userMovieIds,
 				);
 
-				const scoredMovies = await getRecommendedMovies(
-					ctx.db,
-					userId,
-					genreWeights,
-					similarUsers,
-					userMovieIds,
-					userStreamingProviderIds,
-				);
-
-				const candidateIds = scoredMovies.map((m) => m.id);
-				const movieGenreRows =
-					candidateIds.length > 0
-						? await ctx.db
-								.select({
-									movieId: schema.movieGenres.movieId,
-									genreId: schema.movieGenres.genreId,
-								})
-								.from(schema.movieGenres)
-								.where(inArray(schema.movieGenres.movieId, candidateIds))
-						: [];
-
-				const movieGenreMap = buildGenreMap(movieGenreRows);
+				const { movieGenreMap, movies: scoredMovies } =
+					await getRecommendedMovies(
+						ctx.db,
+						userId,
+						genreWeights,
+						similarUsers,
+						userMovieIds,
+						userStreamingProviderIds,
+						platformPopular,
+					);
 
 				return diversityRerank(
 					scoredMovies,
@@ -844,21 +860,15 @@ async function upsertProviders(
 }
 
 async function getFriendsWatchingMovies(db: Database, userId: string) {
-	const [ownWatchlist, ownWatched] = await Promise.all([
-		db
-			.select({ movieId: schema.watchlistEntries.movieId })
-			.from(schema.watchlistEntries)
-			.where(eq(schema.watchlistEntries.userId, userId)),
-		db
-			.select({ movieId: schema.watchedEntries.movieId })
-			.from(schema.watchedEntries)
-			.where(eq(schema.watchedEntries.userId, userId)),
-	]);
+	const ownWatchlist = db
+		.select({ movieId: schema.watchlistEntries.movieId })
+		.from(schema.watchlistEntries)
+		.where(eq(schema.watchlistEntries.userId, userId));
 
-	const excludeIds = new Set([
-		...ownWatchlist.map((e) => e.movieId),
-		...ownWatched.map((e) => e.movieId),
-	]);
+	const ownWatched = db
+		.select({ movieId: schema.watchedEntries.movieId })
+		.from(schema.watchedEntries)
+		.where(eq(schema.watchedEntries.userId, userId));
 
 	const friendMovies = await db
 		.select({
@@ -880,14 +890,13 @@ async function getFriendsWatchingMovies(db: Database, userId: string) {
 			and(
 				eq(schema.follows.followerId, userId),
 				eq(schema.movies.adult, false),
+				notInArray(schema.movies.id, ownWatchlist),
+				notInArray(schema.movies.id, ownWatched),
 			),
 		)
 		.groupBy(schema.movies.id)
 		.orderBy(desc(count(schema.watchlistEntries.userId)))
-		.limit(DISCOVER_SECTION_LIMIT * 3);
+		.limit(DISCOVER_SECTION_LIMIT);
 
-	return friendMovies
-		.filter((m) => !excludeIds.has(m.id))
-		.slice(0, DISCOVER_SECTION_LIMIT)
-		.map(({ friendCount: _, ...m }) => m);
+	return friendMovies.map(({ friendCount: _, ...m }) => m);
 }

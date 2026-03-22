@@ -238,6 +238,30 @@ interface ScoredMovie {
 	platformWatchlistCount: number;
 }
 
+interface RecommendationCandidates {
+	movieGenreMap: Map<number, number[]>;
+	movies: ScoredMovie[];
+}
+
+interface PlatformPopularMovie {
+	cnt: number;
+	movieId: number;
+}
+
+export function getPlatformPopularMovies(
+	db: Database,
+): Promise<PlatformPopularMovie[]> {
+	return db
+		.select({
+			movieId: schema.watchlistEntries.movieId,
+			cnt: count(),
+		})
+		.from(schema.watchlistEntries)
+		.groupBy(schema.watchlistEntries.movieId)
+		.orderBy(sql`count(*) DESC`)
+		.limit(100);
+}
+
 export async function getRecommendedMovies(
 	db: Database,
 	userId: string,
@@ -245,86 +269,71 @@ export async function getRecommendedMovies(
 	similarUsers: SimilarUser[],
 	excludeIds: number[],
 	userStreamingProviderIds: number[],
-): Promise<ScoredMovie[]> {
+	platformPopular: PlatformPopularMovie[],
+): Promise<RecommendationCandidates> {
 	const preferredGenreIds = [...genreWeights.keys()];
 
 	// Batch 1: All candidate source queries run in parallel
-	const [
-		friendMovies,
-		collabCandidates,
-		genreMovies,
-		platformPopular,
-		trendingMovies,
-	] = await Promise.all([
-		// Source A: Friend watchlist movies
-		db
-			.select({
-				movieId: schema.watchlistEntries.movieId,
-				friendCount: count(),
-			})
-			.from(schema.follows)
-			.innerJoin(
-				schema.watchlistEntries,
-				eq(schema.watchlistEntries.userId, schema.follows.followingId),
-			)
-			.where(eq(schema.follows.followerId, userId))
-			.groupBy(schema.watchlistEntries.movieId),
+	const [friendMovies, collabCandidates, genreMovies, trendingMovies] =
+		await Promise.all([
+			// Source A: Friend watchlist movies
+			db
+				.select({
+					movieId: schema.watchlistEntries.movieId,
+					friendCount: count(),
+				})
+				.from(schema.follows)
+				.innerJoin(
+					schema.watchlistEntries,
+					eq(schema.watchlistEntries.userId, schema.follows.followingId),
+				)
+				.where(eq(schema.follows.followerId, userId))
+				.groupBy(schema.watchlistEntries.movieId),
 
-		// Source B: Collaborative filtering candidates
-		similarUsers.length > 0
-			? db
-					.select({
-						movieId: schema.watchlistEntries.movieId,
-						userId: schema.watchlistEntries.userId,
-					})
-					.from(schema.watchlistEntries)
-					.where(
-						inArray(
-							schema.watchlistEntries.userId,
-							similarUsers.map((u) => u.userId),
-						),
-					)
-			: Promise.resolve([] as { movieId: number; userId: string }[]),
+			// Source B: Collaborative filtering candidates
+			similarUsers.length > 0
+				? db
+						.select({
+							movieId: schema.watchlistEntries.movieId,
+							userId: schema.watchlistEntries.userId,
+						})
+						.from(schema.watchlistEntries)
+						.where(
+							inArray(
+								schema.watchlistEntries.userId,
+								similarUsers.map((u) => u.userId),
+							),
+						)
+				: Promise.resolve([] as { movieId: number; userId: string }[]),
 
-		// Source C: Genre-matching movies
-		preferredGenreIds.length > 0
-			? db
-					.select({ movieId: schema.movieGenres.movieId })
-					.from(schema.movieGenres)
-					.innerJoin(
-						schema.movies,
-						eq(schema.movies.id, schema.movieGenres.movieId),
-					)
-					.where(
-						and(
-							inArray(schema.movieGenres.genreId, preferredGenreIds),
-							eq(schema.movies.adult, false),
-						),
-					)
-					.groupBy(schema.movieGenres.movieId)
-					.orderBy(sql`MAX(${schema.movies.popularity}) DESC NULLS LAST`)
-					.limit(200)
-			: Promise.resolve([] as { movieId: number }[]),
+			// Source C: Genre-matching movies
+			preferredGenreIds.length > 0
+				? db
+						.select({ movieId: schema.movieGenres.movieId })
+						.from(schema.movieGenres)
+						.innerJoin(
+							schema.movies,
+							eq(schema.movies.id, schema.movieGenres.movieId),
+						)
+						.where(
+							and(
+								inArray(schema.movieGenres.genreId, preferredGenreIds),
+								eq(schema.movies.adult, false),
+							),
+						)
+						.groupBy(schema.movieGenres.movieId)
+						.orderBy(sql`MAX(${schema.movies.popularity}) DESC NULLS LAST`)
+						.limit(200)
+				: Promise.resolve([] as { movieId: number }[]),
 
-		// Source D: Platform popular movies
-		db
-			.select({
-				movieId: schema.watchlistEntries.movieId,
-				cnt: count(),
-			})
-			.from(schema.watchlistEntries)
-			.groupBy(schema.watchlistEntries.movieId)
-			.orderBy(sql`count(*) DESC`)
-			.limit(100),
-
-		// Source E: Trending / high quality
-		db
-			.select({ id: schema.movies.id })
-			.from(schema.movies)
-			.where(eq(schema.movies.adult, false))
-			.orderBy(sql`${schema.movies.popularity} DESC NULLS LAST`)
-			.limit(200),
-	]);
+			// Source D: Trending / high quality
+			db
+				.select({ id: schema.movies.id })
+				.from(schema.movies)
+				.where(eq(schema.movies.adult, false))
+				.orderBy(sql`${schema.movies.popularity} DESC NULLS LAST`)
+				.limit(200),
+		]);
 
 	// Build candidate set + signal maps from batch 1 results
 	const candidateMovieIds = new Set<number>();
@@ -368,7 +377,7 @@ export async function getRecommendedMovies(
 	}
 
 	if (candidateMovieIds.size === 0) {
-		return [];
+		return { movieGenreMap: new Map(), movies: [] };
 	}
 
 	const candidateIds = [...candidateMovieIds];
@@ -527,7 +536,7 @@ export async function getRecommendedMovies(
 
 	scored.sort((a, b) => b.totalScore - a.totalScore);
 
-	return scored;
+	return { movieGenreMap, movies: scored };
 }
 
 // ---------------------------------------------------------------------------

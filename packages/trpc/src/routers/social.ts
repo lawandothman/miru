@@ -1,20 +1,44 @@
 import { type Database, schema } from "@miru/db";
 import { TRPCError } from "@trpc/server";
-import { and, eq, ilike, inArray, ne, or } from "drizzle-orm";
+import { and, count, desc, eq, ilike, isNull, ne, or, sql } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 import { z } from "zod";
 import { annotateFollowStatus, getBlockedUserIds } from "../helpers";
 import { protectedProcedure, publicProcedure, router } from "../trpc";
 import { sendNewFollowerPushNotification } from "../utils/expo-push";
 
-function fetchFriendWatchlistRows(db: Database, userId: string) {
-	return db
+type DashboardMatch = {
+	id: number;
+	posterPath: string | null;
+	title: string;
+};
+
+async function fetchDashboardMatches(db: Database, userId: string) {
+	const myWatchlist = alias(schema.watchlistEntries, "my_watchlist");
+	const myWatched = alias(schema.watchedEntries, "my_watched");
+	const friendWatched = alias(schema.watchedEntries, "friend_watched");
+	const blockedByMe = alias(schema.blockedUsers, "blocked_by_me");
+	const blockedMe = alias(schema.blockedUsers, "blocked_me");
+
+	const rows = await db
 		.select({
-			friendId: schema.users.id,
-			friendName: schema.users.name,
-			friendImage: schema.users.image,
-			movieId: schema.movies.id,
-			movieTitle: schema.movies.title,
-			moviePosterPath: schema.movies.posterPath,
+			id: schema.users.id,
+			name: schema.users.name,
+			image: schema.users.image,
+			matchCount: count(schema.movies.id),
+			matches: sql<DashboardMatch[]>`
+				coalesce(
+					jsonb_agg(
+						jsonb_build_object(
+							'id', ${schema.movies.id},
+							'title', ${schema.movies.title},
+							'posterPath', ${schema.movies.posterPath}
+						)
+						order by ${schema.watchlistEntries.createdAt} desc, ${schema.movies.id} desc
+					) filter (where ${schema.movies.id} is not null),
+					'[]'::jsonb
+				)
+			`,
 		})
 		.from(schema.follows)
 		.innerJoin(schema.users, eq(schema.users.id, schema.follows.followingId))
@@ -23,114 +47,64 @@ function fetchFriendWatchlistRows(db: Database, userId: string) {
 			eq(schema.watchlistEntries.userId, schema.follows.followingId),
 		)
 		.innerJoin(
+			myWatchlist,
+			and(
+				eq(myWatchlist.userId, userId),
+				eq(myWatchlist.movieId, schema.watchlistEntries.movieId),
+			),
+		)
+		.innerJoin(
 			schema.movies,
 			eq(schema.movies.id, schema.watchlistEntries.movieId),
+		)
+		.leftJoin(
+			myWatched,
+			and(
+				eq(myWatched.userId, userId),
+				eq(myWatched.movieId, schema.movies.id),
+			),
+		)
+		.leftJoin(
+			friendWatched,
+			and(
+				eq(friendWatched.userId, schema.follows.followingId),
+				eq(friendWatched.movieId, schema.movies.id),
+			),
+		)
+		.leftJoin(
+			blockedByMe,
+			and(
+				eq(blockedByMe.blockerId, userId),
+				eq(blockedByMe.blockedId, schema.follows.followingId),
+			),
+		)
+		.leftJoin(
+			blockedMe,
+			and(
+				eq(blockedMe.blockerId, schema.follows.followingId),
+				eq(blockedMe.blockedId, userId),
+			),
 		)
 		.where(
 			and(
 				eq(schema.follows.followerId, userId),
 				eq(schema.movies.adult, false),
+				isNull(myWatched.movieId),
+				isNull(friendWatched.movieId),
+				isNull(blockedByMe.blockedId),
+				isNull(blockedMe.blockerId),
 			),
-		);
-}
+		)
+		.groupBy(schema.users.id, schema.users.name, schema.users.image)
+		.orderBy(desc(count(schema.movies.id)), schema.users.id);
 
-function fetchUserMovieSets(db: Database, userId: string) {
-	return Promise.all([
-		db
-			.select({ movieId: schema.watchlistEntries.movieId })
-			.from(schema.watchlistEntries)
-			.where(eq(schema.watchlistEntries.userId, userId)),
-		db
-			.select({ movieId: schema.watchedEntries.movieId })
-			.from(schema.watchedEntries)
-			.where(eq(schema.watchedEntries.userId, userId)),
-		db
-			.select({
-				userId: schema.watchedEntries.userId,
-				movieId: schema.watchedEntries.movieId,
-			})
-			.from(schema.watchedEntries)
-			.innerJoin(
-				schema.follows,
-				and(
-					eq(schema.follows.followerId, userId),
-					eq(schema.follows.followingId, schema.watchedEntries.userId),
-				),
-			)
-			.where(
-				inArray(
-					schema.watchedEntries.movieId,
-					db
-						.select({ movieId: schema.watchlistEntries.movieId })
-						.from(schema.watchlistEntries)
-						.where(eq(schema.watchlistEntries.userId, userId)),
-				),
-			),
-	]);
-}
-
-function buildFriendWatchedMap(
-	friendWatched: { userId: string; movieId: number }[],
-) {
-	const map = new Map<string, Set<number>>();
-	for (const fw of friendWatched) {
-		let set = map.get(fw.userId);
-		if (!set) {
-			set = new Set();
-			map.set(fw.userId, set);
-		}
-		set.add(fw.movieId);
-	}
-	return map;
-}
-
-type FriendWatchlistRow = Awaited<
-	ReturnType<typeof fetchFriendWatchlistRows>
->[number];
-
-function groupMatchesByFriend(
-	rows: FriendWatchlistRow[],
-	myMovieIds: Set<number>,
-	myWatchedIds: Set<number>,
-	friendWatchedMap: Map<string, Set<number>>,
-) {
-	const friendMap = new Map<
-		string,
-		{
-			id: string;
-			name: string | null;
-			image: string | null;
-			matches: { id: number; title: string; posterPath: string | null }[];
-		}
-	>();
-
-	for (const row of rows) {
-		if (
-			myMovieIds.has(row.movieId) &&
-			!myWatchedIds.has(row.movieId) &&
-			!friendWatchedMap.get(row.friendId)?.has(row.movieId)
-		) {
-			let friend = friendMap.get(row.friendId);
-			if (!friend) {
-				friend = {
-					id: row.friendId,
-					name: row.friendName,
-					image: row.friendImage,
-					matches: [],
-				};
-				friendMap.set(row.friendId, friend);
-			}
-			friend.matches.push({
-				id: row.movieId,
-				title: row.movieTitle,
-				posterPath: row.moviePosterPath,
-			});
-		}
-	}
-
-	return Array.from(friendMap.values()).sort(
-		(a, b) => b.matches.length - a.matches.length,
-	);
+	return rows.map(({ matchCount: _, matches, ...row }) => ({
+		...row,
+		matches:
+			typeof matches === "string"
+				? (JSON.parse(matches) as DashboardMatch[])
+				: matches,
+	}));
 }
 
 async function assertUserExists(db: Database, userId: string) {
@@ -201,21 +175,7 @@ export const socialRouter = router({
 	}),
 
 	getDashboardMatches: protectedProcedure.query(async ({ ctx }) => {
-		const userId = ctx.session.user.id;
-
-		const [rows, [myWatchlist, myWatched, friendWatched], blockedIds] =
-			await Promise.all([
-				fetchFriendWatchlistRows(ctx.db, userId),
-				fetchUserMovieSets(ctx.db, userId),
-				getBlockedUserIds(ctx.db, userId),
-			]);
-
-		return groupMatchesByFriend(
-			rows.filter((r) => !blockedIds.has(r.friendId)),
-			new Set(myWatchlist.map((w) => w.movieId)),
-			new Set(myWatched.map((w) => w.movieId)),
-			buildFriendWatchedMap(friendWatched),
-		);
+		return fetchDashboardMatches(ctx.db, ctx.session.user.id);
 	}),
 
 	follow: protectedProcedure

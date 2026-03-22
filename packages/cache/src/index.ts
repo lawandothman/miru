@@ -70,6 +70,7 @@ export function createCache(opts: { url: string; token: string }): Cache {
 
 export const TTL = {
 	RECOMMENDATIONS: 900,
+	RECOMMENDATION_PLATFORM_POPULAR: 300,
 	SEARCH: 3600,
 	GENRES: 3600,
 	DISCOVER_SECTIONS: 300,
@@ -78,6 +79,7 @@ export const TTL = {
 export const keys = {
 	genres: () => "miru:genres",
 	discoverSections: () => "miru:discover:sections",
+	recommendationPlatformPopular: () => "miru:recs:platform-popular",
 	search: (query: string, page: number) =>
 		`miru:search:${hashKey(query.toLowerCase().trim())}:p${page}`,
 	discover: (params: Record<string, unknown>) =>
