@@ -4,6 +4,7 @@ import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 import { getMovieIdSet } from "../helpers";
 import { protectedProcedure, publicProcedure, router } from "../trpc";
+import { sendWatchlistMatchPushNotifications } from "../utils/expo-push";
 import { ensureMovieExists } from "./helpers";
 
 export const watchlistRouter = router({
@@ -21,6 +22,19 @@ export const watchlistRouter = router({
 				.onConflictDoNothing();
 
 			await ctx.cache?.del(keys.recommendations(ctx.session.user.id));
+
+			sendWatchlistMatchPushNotifications({
+				...(ctx.captureException
+					? { captureException: ctx.captureException }
+					: {}),
+				db: ctx.db,
+				...(ctx.expoAccessToken
+					? { expoAccessToken: ctx.expoAccessToken }
+					: {}),
+				movieId: input.movieId,
+				userId: ctx.session.user.id,
+				userName: ctx.session.user.name,
+			}).catch(() => undefined);
 
 			return { success: true };
 		}),
