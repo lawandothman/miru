@@ -109,6 +109,7 @@ export function getNotificationRoute(data: unknown) {
 
 	const type = "type" in data ? data.type : null;
 	const userId = "userId" in data ? data.userId : null;
+	const movieId = "movieId" in data ? data.movieId : null;
 
 	if (
 		type === "new-follower" &&
@@ -118,6 +119,17 @@ export function getNotificationRoute(data: unknown) {
 		return {
 			pathname: "/user/[id]" as const,
 			params: { id: userId },
+		};
+	}
+
+	if (
+		type === "watchlist-match" &&
+		typeof movieId === "string" &&
+		movieId.length > 0
+	) {
+		return {
+			pathname: "/movie/[id]" as const,
+			params: { id: movieId },
 		};
 	}
 

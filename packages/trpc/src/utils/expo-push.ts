@@ -23,6 +23,18 @@ interface ExpoPushMessage {
 	title: string;
 }
 
+interface WatchlistMatchPushInput {
+	captureException?: (
+		error: unknown,
+		context?: Record<string, unknown>,
+	) => void;
+	db: Database;
+	expoAccessToken?: string;
+	movieId: number;
+	userId: string;
+	userName: string;
+}
+
 interface NewFollowerPushInput {
 	captureException?: (
 		error: unknown,
@@ -87,6 +99,72 @@ async function sendExpoPushMessages(
 
 	if (invalidTokens.length > 0) {
 		await deletePushTokens(db, invalidTokens);
+	}
+}
+
+export async function sendWatchlistMatchPushNotifications({
+	captureException,
+	db,
+	expoAccessToken,
+	movieId,
+	userId,
+	userName,
+}: WatchlistMatchPushInput) {
+	const [movie, recipients] = await Promise.all([
+		db.query.movies.findFirst({
+			where: eq(schema.movies.id, movieId),
+			columns: { title: true },
+		}),
+		db
+			.select({ token: schema.pushTokens.token })
+			.from(schema.follows)
+			.innerJoin(
+				schema.watchlistEntries,
+				and(
+					eq(schema.watchlistEntries.userId, schema.follows.followerId),
+					eq(schema.watchlistEntries.movieId, movieId),
+				),
+			)
+			.innerJoin(
+				schema.users,
+				and(
+					eq(schema.users.id, schema.follows.followerId),
+					eq(schema.users.pushNotificationsEnabled, true),
+				),
+			)
+			.innerJoin(
+				schema.pushTokens,
+				eq(schema.pushTokens.userId, schema.follows.followerId),
+			)
+			.where(eq(schema.follows.followingId, userId)),
+	]);
+
+	if (!movie || recipients.length === 0) {
+		return;
+	}
+
+	try {
+		await sendExpoPushMessages(
+			db,
+			recipients.map(({ token }) => ({
+				to: token,
+				title: "New match",
+				body: `${userName} wants to watch ${movie.title} too!`,
+				sound: "default",
+				priority: "high",
+				data: {
+					type: "watchlist-match",
+					movieId: String(movieId),
+				},
+			})),
+			expoAccessToken,
+		);
+	} catch (error) {
+		captureException?.(error, {
+			context: "watchlist-match-push",
+			movieId: String(movieId),
+			userId,
+		});
 	}
 }
 
