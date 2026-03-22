@@ -1,4 +1,4 @@
-import { Pressable, Text, StyleSheet, ActivityIndicator } from "react-native";
+import { Pressable, Text, StyleSheet } from "react-native";
 import { UserPlus, UserMinus } from "lucide-react-native";
 import { trpc } from "@/lib/trpc";
 import { useSession } from "@/lib/auth";
@@ -15,8 +15,10 @@ export function FollowButton({ userId, isFollowing }: FollowButtonProps) {
 	const utils = trpc.useUtils();
 	const { data: session } = useSession();
 
+	const queryKey = { id: userId };
+
 	function invalidate() {
-		utils.user.getById.invalidate({ id: userId });
+		utils.user.getById.invalidate(queryKey);
 		if (session?.user?.id) {
 			utils.user.getById.invalidate({ id: session.user.id });
 		}
@@ -28,19 +30,58 @@ export function FollowButton({ userId, isFollowing }: FollowButtonProps) {
 	}
 
 	const follow = trpc.social.follow.useMutation({
+		onMutate: async () => {
+			await utils.user.getById.cancel(queryKey);
+			const previous = utils.user.getById.getData(queryKey);
+			utils.user.getById.setData(queryKey, (old) =>
+				old
+					? {
+							...old,
+							isFollowing: true,
+							followerCount: old.followerCount + 1,
+						}
+					: old,
+			);
+			return { previous };
+		},
 		onSuccess: () => {
 			capture("user_followed", { target_user_id: userId });
-			invalidate();
 		},
-	});
-	const unfollow = trpc.social.unfollow.useMutation({
-		onSuccess: () => {
-			capture("user_unfollowed", { target_user_id: userId });
-			invalidate();
+		onError: (_err, _vars, context) => {
+			if (context?.previous) {
+				utils.user.getById.setData(queryKey, context.previous);
+			}
 		},
+		onSettled: invalidate,
 	});
 
-	const loading = follow.isPending || unfollow.isPending;
+	const unfollow = trpc.social.unfollow.useMutation({
+		onMutate: async () => {
+			await utils.user.getById.cancel(queryKey);
+			const previous = utils.user.getById.getData(queryKey);
+			utils.user.getById.setData(queryKey, (old) =>
+				old
+					? {
+							...old,
+							isFollowing: false,
+							followerCount: Math.max(0, old.followerCount - 1),
+						}
+					: old,
+			);
+			return { previous };
+		},
+		onSuccess: () => {
+			capture("user_unfollowed", { target_user_id: userId });
+		},
+		onError: (_err, _vars, context) => {
+			if (context?.previous) {
+				utils.user.getById.setData(queryKey, context.previous);
+			}
+		},
+		onSettled: invalidate,
+	});
+
+	const isPending = follow.isPending || unfollow.isPending;
 
 	function handlePress() {
 		triggerFollowHaptic();
@@ -63,23 +104,17 @@ export function FollowButton({ userId, isFollowing }: FollowButtonProps) {
 				pressed && styles.pressed,
 			]}
 			onPress={handlePress}
-			disabled={loading}
+			disabled={isPending}
 		>
-			{loading ? (
-				<ActivityIndicator size="small" color={iconColor} />
-			) : (
-				<>
-					<Icon size={14} color={iconColor} />
-					<Text
-						style={[
-							styles.text,
-							isFollowing ? styles.followingText : styles.notFollowingText,
-						]}
-					>
-						{isFollowing ? "Following" : "Follow"}
-					</Text>
-				</>
-			)}
+			<Icon size={14} color={iconColor} />
+			<Text
+				style={[
+					styles.text,
+					isFollowing ? styles.followingText : styles.notFollowingText,
+				]}
+			>
+				{isFollowing ? "Following" : "Follow"}
+			</Text>
 		</Pressable>
 	);
 }

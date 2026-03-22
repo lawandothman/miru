@@ -1,7 +1,6 @@
 "use client";
 
 import { UserMinus, UserPlus } from "lucide-react";
-import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc/client";
@@ -23,28 +22,71 @@ export function FollowButton({
 	const router = useRouter();
 	const utils = trpc.useUtils();
 
-	const onSuccess = () => {
-		utils.social.invalidate();
-		utils.user.getById.invalidate({ id: userId });
-		router.refresh();
-	};
+	const queryKey = { id: userId };
 
 	const follow = trpc.social.follow.useMutation({
+		onMutate: async () => {
+			await utils.user.getById.cancel(queryKey);
+			const previous = utils.user.getById.getData(queryKey);
+			utils.user.getById.setData(queryKey, (old) =>
+				old
+					? {
+							...old,
+							isFollowing: true,
+							followerCount: old.followerCount + 1,
+						}
+					: old,
+			);
+			return { previous };
+		},
 		onSuccess: () => {
 			capture("user_followed", { target_user_id: userId });
-			onSuccess();
 		},
-		onError: () => toast.error("Failed to follow user"),
-	});
-	const unfollow = trpc.social.unfollow.useMutation({
-		onSuccess: () => {
-			capture("user_unfollowed", { target_user_id: userId });
-			onSuccess();
+		onError: (_err, _vars, context) => {
+			if (context?.previous) {
+				utils.user.getById.setData(queryKey, context.previous);
+			}
+			toast.error("Failed to follow user");
 		},
-		onError: () => toast.error("Failed to unfollow user"),
+		onSettled: () => {
+			utils.social.invalidate();
+			utils.user.getById.invalidate(queryKey);
+			router.refresh();
+		},
 	});
 
-	const isLoading = follow.isPending || unfollow.isPending;
+	const unfollow = trpc.social.unfollow.useMutation({
+		onMutate: async () => {
+			await utils.user.getById.cancel(queryKey);
+			const previous = utils.user.getById.getData(queryKey);
+			utils.user.getById.setData(queryKey, (old) =>
+				old
+					? {
+							...old,
+							isFollowing: false,
+							followerCount: Math.max(0, old.followerCount - 1),
+						}
+					: old,
+			);
+			return { previous };
+		},
+		onSuccess: () => {
+			capture("user_unfollowed", { target_user_id: userId });
+		},
+		onError: (_err, _vars, context) => {
+			if (context?.previous) {
+				utils.user.getById.setData(queryKey, context.previous);
+			}
+			toast.error("Failed to unfollow user");
+		},
+		onSettled: () => {
+			utils.social.invalidate();
+			utils.user.getById.invalidate(queryKey);
+			router.refresh();
+		},
+	});
+
+	const isPending = follow.isPending || unfollow.isPending;
 
 	return (
 		<Button
@@ -54,14 +96,16 @@ export function FollowButton({
 					? unfollow.mutate({ friendId: userId })
 					: follow.mutate({ friendId: userId })
 			}
-			disabled={isLoading}
+			disabled={isPending}
 			variant={isFollowing ? "outline" : "default"}
 			size="sm"
 			className={cn("gap-1.5", className)}
 		>
-			{isLoading && <Spinner className="size-3.5" />}
-			{!isLoading && isFollowing && <UserMinus className="size-3.5" />}
-			{!isLoading && !isFollowing && <UserPlus className="size-3.5" />}
+			{isFollowing ? (
+				<UserMinus className="size-3.5" />
+			) : (
+				<UserPlus className="size-3.5" />
+			)}
 			{isFollowing ? "Unfollow" : "Follow"}
 		</Button>
 	);

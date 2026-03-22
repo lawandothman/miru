@@ -1,7 +1,6 @@
 "use client";
 
 import { CircleCheck, Eye } from "lucide-react";
-import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc/client";
@@ -25,31 +24,65 @@ export function WatchedButton({
 	const router = useRouter();
 	const utils = trpc.useUtils();
 
-	const onSuccess = () => {
-		utils.watched.invalidate();
-		utils.watchlist.invalidate();
-		utils.movie.getById.invalidate({ tmdbId: movieId });
-		utils.movie.getPopular.invalidate();
-		utils.social.getDashboardMatches.invalidate();
-		router.refresh();
-	};
+	const queryKey = { tmdbId: movieId };
 
 	const add = trpc.watched.add.useMutation({
+		onMutate: async () => {
+			await utils.movie.getById.cancel(queryKey);
+			const previous = utils.movie.getById.getData(queryKey);
+			utils.movie.getById.setData(queryKey, (old) =>
+				old ? { ...old, isWatched: true, inWatchlist: false } : old,
+			);
+			return { previous };
+		},
 		onSuccess: () => {
 			capture("movie_marked_watched", { movie_id: movieId });
-			onSuccess();
 		},
-		onError: () => toast.error("Failed to mark as watched"),
-	});
-	const remove = trpc.watched.remove.useMutation({
-		onSuccess: () => {
-			capture("movie_unmarked_watched", { movie_id: movieId });
-			onSuccess();
+		onError: (_err, _vars, context) => {
+			if (context?.previous) {
+				utils.movie.getById.setData(queryKey, context.previous);
+			}
+			toast.error("Failed to mark as watched");
 		},
-		onError: () => toast.error("Failed to remove from watched"),
+		onSettled: () => {
+			utils.movie.getById.invalidate(queryKey);
+			utils.watched.invalidate();
+			utils.watchlist.invalidate();
+			utils.movie.getPopular.invalidate();
+			utils.social.getDashboardMatches.invalidate();
+			router.refresh();
+		},
 	});
 
-	const isLoading = add.isPending || remove.isPending;
+	const remove = trpc.watched.remove.useMutation({
+		onMutate: async () => {
+			await utils.movie.getById.cancel(queryKey);
+			const previous = utils.movie.getById.getData(queryKey);
+			utils.movie.getById.setData(queryKey, (old) =>
+				old ? { ...old, isWatched: false } : old,
+			);
+			return { previous };
+		},
+		onSuccess: () => {
+			capture("movie_unmarked_watched", { movie_id: movieId });
+		},
+		onError: (_err, _vars, context) => {
+			if (context?.previous) {
+				utils.movie.getById.setData(queryKey, context.previous);
+			}
+			toast.error("Failed to remove from watched");
+		},
+		onSettled: () => {
+			utils.movie.getById.invalidate(queryKey);
+			utils.watched.invalidate();
+			utils.watchlist.invalidate();
+			utils.movie.getPopular.invalidate();
+			utils.social.getDashboardMatches.invalidate();
+			router.refresh();
+		},
+	});
+
+	const isPending = add.isPending || remove.isPending;
 
 	const handleClick = () => {
 		if (isWatched) {
@@ -66,7 +99,7 @@ export function WatchedButton({
 			<button
 				type="button"
 				onClick={handleClick}
-				disabled={isLoading}
+				disabled={isPending}
 				className={cn(
 					"flex size-9 items-center justify-center rounded-full transition-colors",
 					isWatched
@@ -75,7 +108,7 @@ export function WatchedButton({
 					className,
 				)}
 			>
-				{isLoading ? <Spinner /> : <WatchedIcon className="size-4" />}
+				<WatchedIcon className="size-4" />
 			</button>
 		);
 	}
@@ -83,16 +116,12 @@ export function WatchedButton({
 	return (
 		<Button
 			onClick={handleClick}
-			disabled={isLoading}
+			disabled={isPending}
 			variant={isWatched ? "default" : "secondary"}
 			size="sm"
 			className={cn("gap-1.5", className)}
 		>
-			{isLoading ? (
-				<Spinner className="size-3.5" />
-			) : (
-				<WatchedIcon className="size-3.5" />
-			)}
+			<WatchedIcon className="size-3.5" />
 			{isWatched ? "Watched" : "Mark Watched"}
 		</Button>
 	);

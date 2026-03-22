@@ -18,37 +18,94 @@ export function MovieActions({
 }: MovieActionsProps) {
 	const utils = trpc.useUtils();
 
+	const queryKey = { tmdbId: movieId };
+
 	function invalidate() {
+		utils.movie.getById.invalidate(queryKey);
 		utils.watchlist.getMyWatchlist.invalidate();
 		utils.watched.getMyWatched.invalidate();
-		utils.movie.getById.invalidate({ tmdbId: movieId });
 		utils.social.getDashboardMatches.invalidate();
 		utils.social.getMatchesWith.invalidate();
 	}
 
 	const addToWatchlist = trpc.watchlist.add.useMutation({
+		onMutate: async () => {
+			await utils.movie.getById.cancel(queryKey);
+			const previous = utils.movie.getById.getData(queryKey);
+			utils.movie.getById.setData(queryKey, (old) =>
+				old ? { ...old, inWatchlist: true } : old,
+			);
+			return { previous };
+		},
 		onSuccess: () => {
 			capture("movie_added_to_watchlist", { movie_id: movieId });
-			invalidate();
 		},
+		onError: (_err, _vars, context) => {
+			if (context?.previous) {
+				utils.movie.getById.setData(queryKey, context.previous);
+			}
+		},
+		onSettled: invalidate,
 	});
+
 	const removeFromWatchlist = trpc.watchlist.remove.useMutation({
+		onMutate: async () => {
+			await utils.movie.getById.cancel(queryKey);
+			const previous = utils.movie.getById.getData(queryKey);
+			utils.movie.getById.setData(queryKey, (old) =>
+				old ? { ...old, inWatchlist: false } : old,
+			);
+			return { previous };
+		},
 		onSuccess: () => {
 			capture("movie_removed_from_watchlist", { movie_id: movieId });
-			invalidate();
 		},
+		onError: (_err, _vars, context) => {
+			if (context?.previous) {
+				utils.movie.getById.setData(queryKey, context.previous);
+			}
+		},
+		onSettled: invalidate,
 	});
+
 	const addToWatched = trpc.watched.add.useMutation({
+		onMutate: async () => {
+			await utils.movie.getById.cancel(queryKey);
+			const previous = utils.movie.getById.getData(queryKey);
+			utils.movie.getById.setData(queryKey, (old) =>
+				old ? { ...old, isWatched: true, inWatchlist: false } : old,
+			);
+			return { previous };
+		},
 		onSuccess: () => {
 			capture("movie_marked_watched", { movie_id: movieId });
-			invalidate();
 		},
+		onError: (_err, _vars, context) => {
+			if (context?.previous) {
+				utils.movie.getById.setData(queryKey, context.previous);
+			}
+		},
+		onSettled: invalidate,
 	});
+
 	const removeFromWatched = trpc.watched.remove.useMutation({
+		onMutate: async () => {
+			await utils.movie.getById.cancel(queryKey);
+			const previous = utils.movie.getById.getData(queryKey);
+			utils.movie.getById.setData(queryKey, (old) =>
+				old ? { ...old, isWatched: false } : old,
+			);
+			return { previous };
+		},
 		onSuccess: () => {
 			capture("movie_unmarked_watched", { movie_id: movieId });
-			invalidate();
 		},
+		onError: (_err, _vars, context) => {
+			if (context?.previous) {
+				utils.movie.getById.setData(queryKey, context.previous);
+			}
+		},
+		onSettled: invalidate,
 	});
 
 	function handleWatchlistToggle() {

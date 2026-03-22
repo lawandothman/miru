@@ -1,7 +1,6 @@
 "use client";
 
 import { Bookmark, BookmarkPlus } from "lucide-react";
-import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc/client";
@@ -25,30 +24,61 @@ export function WatchlistButton({
 	const router = useRouter();
 	const utils = trpc.useUtils();
 
-	const onSuccess = () => {
-		utils.watchlist.invalidate();
-		utils.watched.invalidate();
-		utils.movie.getById.invalidate({ tmdbId: movieId });
-		utils.movie.getPopular.invalidate();
-		router.refresh();
-	};
+	const queryKey = { tmdbId: movieId };
 
 	const add = trpc.watchlist.add.useMutation({
+		onMutate: async () => {
+			await utils.movie.getById.cancel(queryKey);
+			const previous = utils.movie.getById.getData(queryKey);
+			utils.movie.getById.setData(queryKey, (old) =>
+				old ? { ...old, inWatchlist: true } : old,
+			);
+			return { previous };
+		},
 		onSuccess: () => {
 			capture("movie_added_to_watchlist", { movie_id: movieId });
-			onSuccess();
 		},
-		onError: () => toast.error("Failed to add to watchlist"),
-	});
-	const remove = trpc.watchlist.remove.useMutation({
-		onSuccess: () => {
-			capture("movie_removed_from_watchlist", { movie_id: movieId });
-			onSuccess();
+		onError: (_err, _vars, context) => {
+			if (context?.previous) {
+				utils.movie.getById.setData(queryKey, context.previous);
+			}
+			toast.error("Failed to add to watchlist");
 		},
-		onError: () => toast.error("Failed to remove from watchlist"),
+		onSettled: () => {
+			utils.movie.getById.invalidate(queryKey);
+			utils.watchlist.invalidate();
+			utils.movie.getPopular.invalidate();
+			router.refresh();
+		},
 	});
 
-	const isLoading = add.isPending || remove.isPending;
+	const remove = trpc.watchlist.remove.useMutation({
+		onMutate: async () => {
+			await utils.movie.getById.cancel(queryKey);
+			const previous = utils.movie.getById.getData(queryKey);
+			utils.movie.getById.setData(queryKey, (old) =>
+				old ? { ...old, inWatchlist: false } : old,
+			);
+			return { previous };
+		},
+		onSuccess: () => {
+			capture("movie_removed_from_watchlist", { movie_id: movieId });
+		},
+		onError: (_err, _vars, context) => {
+			if (context?.previous) {
+				utils.movie.getById.setData(queryKey, context.previous);
+			}
+			toast.error("Failed to remove from watchlist");
+		},
+		onSettled: () => {
+			utils.movie.getById.invalidate(queryKey);
+			utils.watchlist.invalidate();
+			utils.movie.getPopular.invalidate();
+			router.refresh();
+		},
+	});
+
+	const isPending = add.isPending || remove.isPending;
 
 	const handleClick = () => {
 		if (inWatchlist) {
@@ -63,7 +93,7 @@ export function WatchlistButton({
 			<button
 				type="button"
 				onClick={handleClick}
-				disabled={isLoading}
+				disabled={isPending}
 				className={cn(
 					"flex size-9 items-center justify-center rounded-full transition-colors",
 					inWatchlist
@@ -72,9 +102,7 @@ export function WatchlistButton({
 					className,
 				)}
 			>
-				{isLoading ? (
-					<Spinner />
-				) : inWatchlist ? (
+				{inWatchlist ? (
 					<Bookmark className="size-4 fill-current" />
 				) : (
 					<BookmarkPlus className="size-4" />
@@ -86,14 +114,12 @@ export function WatchlistButton({
 	return (
 		<Button
 			onClick={handleClick}
-			disabled={isLoading}
+			disabled={isPending}
 			variant={inWatchlist ? "default" : "secondary"}
 			size="sm"
 			className={cn("gap-1.5", className)}
 		>
-			{isLoading ? (
-				<Spinner className="size-3.5" />
-			) : inWatchlist ? (
+			{inWatchlist ? (
 				<Bookmark className="size-3.5 fill-current" />
 			) : (
 				<BookmarkPlus className="size-3.5" />

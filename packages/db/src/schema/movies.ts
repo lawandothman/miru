@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm";
 import {
 	bigint,
 	boolean,
@@ -33,12 +34,22 @@ export const movies = pgTable(
 		trailerKey: text("trailer_key"),
 		trailerSite: text("trailer_site"),
 		updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow().notNull(),
+		watchlistCount: integer("watchlist_count").default(0).notNull(),
 	},
 	(table) => [
 		index("movies_title_idx").on(table.title),
 		index("movies_vote_idx").on(table.tmdbVoteCount, table.tmdbVoteAverage),
 		index("movies_release_idx").on(table.releaseDate),
 		index("movies_popularity_idx").on(table.popularity),
+		index("movies_watchlist_count_idx")
+			.on(table.watchlistCount)
+			.where(sql`${table.adult} = false and ${table.watchlistCount} > 0`),
+		index("movies_discover_popularity_idx")
+			.on(table.popularity)
+			.where(sql`${table.adult} = false and ${table.posterPath} is not null`),
+		index("movies_discover_release_idx")
+			.on(table.releaseDate, table.popularity)
+			.where(sql`${table.adult} = false and ${table.posterPath} is not null`),
 	],
 );
 

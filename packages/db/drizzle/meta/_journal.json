@@ -57,6 +57,13 @@
 			"when": 1774029020605,
 			"tag": "0007_jazzy_spirit",
 			"breakpoints": true
+		},
+		{
+			"idx": 8,
+			"version": "7",
+			"when": 1774209709923,
+			"tag": "0008_narrow_magma",
+			"breakpoints": true
 		}
 	]
 }

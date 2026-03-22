@@ -7,6 +7,7 @@ import {
 	count,
 	desc,
 	eq,
+	gt,
 	gte,
 	inArray,
 	isNotNull,
@@ -365,37 +366,38 @@ export const movieRouter = router({
 		.query(async ({ ctx, input }) => {
 			const offset = input.cursor ?? 0;
 
-			let query = ctx.db
+			const providerMovieIds =
+				input.providerIds && input.providerIds.length > 0
+					? ctx.db
+							.select({ movieId: schema.movieStreamProviders.movieId })
+							.from(schema.movieStreamProviders)
+							.where(
+								inArray(
+									schema.movieStreamProviders.providerId,
+									input.providerIds,
+								),
+							)
+					: null;
+
+			const movies = await ctx.db
 				.select({
 					id: schema.movies.id,
 					title: schema.movies.title,
 					posterPath: schema.movies.posterPath,
 					releaseDate: schema.movies.releaseDate,
-					watchlistCount: count(schema.watchlistEntries.userId),
+					watchlistCount: schema.movies.watchlistCount,
 				})
 				.from(schema.movies)
-				.innerJoin(
-					schema.watchlistEntries,
-					eq(schema.watchlistEntries.movieId, schema.movies.id),
-				);
-
-			if (input.providerIds && input.providerIds.length > 0) {
-				query = query.innerJoin(
-					schema.movieStreamProviders,
+				.where(
 					and(
-						eq(schema.movieStreamProviders.movieId, schema.movies.id),
-						inArray(schema.movieStreamProviders.providerId, input.providerIds),
+						eq(schema.movies.adult, false),
+						gt(schema.movies.watchlistCount, 0),
+						providerMovieIds
+							? inArray(schema.movies.id, providerMovieIds)
+							: undefined,
 					),
-				) as typeof query;
-			}
-
-			const movies = await query
-				.where(eq(schema.movies.adult, false))
-				.groupBy(schema.movies.id)
-				.orderBy(
-					desc(count(schema.watchlistEntries.userId)),
-					desc(schema.movies.id),
 				)
+				.orderBy(desc(schema.movies.watchlistCount), desc(schema.movies.id))
 				.limit(input.limit)
 				.offset(offset);
 
@@ -579,16 +581,16 @@ export const movieRouter = router({
 				ctx.db
 					.select({
 						...movieSelect,
-						watchlistCount: count(schema.watchlistEntries.userId),
+						watchlistCount: schema.movies.watchlistCount,
 					})
 					.from(schema.movies)
-					.innerJoin(
-						schema.watchlistEntries,
-						eq(schema.watchlistEntries.movieId, schema.movies.id),
+					.where(
+						and(
+							eq(schema.movies.adult, false),
+							gt(schema.movies.watchlistCount, 0),
+						),
 					)
-					.where(eq(schema.movies.adult, false))
-					.groupBy(schema.movies.id)
-					.orderBy(desc(count(schema.watchlistEntries.userId)))
+					.orderBy(desc(schema.movies.watchlistCount), desc(schema.movies.id))
 					.limit(DISCOVER_SECTION_LIMIT),
 			]);
 
@@ -870,33 +872,37 @@ async function getFriendsWatchingMovies(db: Database, userId: string) {
 		.from(schema.watchedEntries)
 		.where(eq(schema.watchedEntries.userId, userId));
 
-	const friendMovies = await db
+	const friendMovieCounts = db
 		.select({
-			id: schema.movies.id,
-			title: schema.movies.title,
-			posterPath: schema.movies.posterPath,
-			friendCount: count(schema.watchlistEntries.userId),
+			movieId: schema.watchlistEntries.movieId,
+			friendCount: count(),
 		})
 		.from(schema.follows)
 		.innerJoin(
 			schema.watchlistEntries,
 			eq(schema.watchlistEntries.userId, schema.follows.followingId),
 		)
-		.innerJoin(
-			schema.movies,
-			eq(schema.movies.id, schema.watchlistEntries.movieId),
-		)
 		.where(
 			and(
 				eq(schema.follows.followerId, userId),
-				eq(schema.movies.adult, false),
-				notInArray(schema.movies.id, ownWatchlist),
-				notInArray(schema.movies.id, ownWatched),
+				notInArray(schema.watchlistEntries.movieId, ownWatchlist),
+				notInArray(schema.watchlistEntries.movieId, ownWatched),
 			),
 		)
-		.groupBy(schema.movies.id)
-		.orderBy(desc(count(schema.watchlistEntries.userId)))
+		.groupBy(schema.watchlistEntries.movieId)
+		.as("friend_movie_counts");
+
+	const friendMovies = await db
+		.select({
+			id: schema.movies.id,
+			title: schema.movies.title,
+			posterPath: schema.movies.posterPath,
+		})
+		.from(friendMovieCounts)
+		.innerJoin(schema.movies, eq(schema.movies.id, friendMovieCounts.movieId))
+		.where(eq(schema.movies.adult, false))
+		.orderBy(desc(friendMovieCounts.friendCount), desc(schema.movies.id))
 		.limit(DISCOVER_SECTION_LIMIT);
 
-	return friendMovies.map(({ friendCount: _, ...m }) => m);
+	return friendMovies;
 }

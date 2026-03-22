@@ -57,15 +57,43 @@ export default function UserProfileScreen() {
 	);
 
 	const utils = trpc.useUtils();
+	const queryKey = { id: userId };
+
 	const blockUser = trpc.social.block.useMutation({
-		onSuccess: () => {
-			utils.user.getById.invalidate({ id: userId });
+		onMutate: async () => {
+			await utils.user.getById.cancel(queryKey);
+			const previous = utils.user.getById.getData(queryKey);
+			utils.user.getById.setData(queryKey, (old) =>
+				old ? { ...old, isBlocked: true, isFollowing: false } : old,
+			);
+			return { previous };
+		},
+		onError: (_err, _vars, context) => {
+			if (context?.previous) {
+				utils.user.getById.setData(queryKey, context.previous);
+			}
+		},
+		onSettled: () => {
+			utils.user.getById.invalidate(queryKey);
 			utils.social.getDashboardMatches.invalidate();
 		},
 	});
 	const unblockUser = trpc.social.unblock.useMutation({
-		onSuccess: () => {
-			utils.user.getById.invalidate({ id: userId });
+		onMutate: async () => {
+			await utils.user.getById.cancel(queryKey);
+			const previous = utils.user.getById.getData(queryKey);
+			utils.user.getById.setData(queryKey, (old) =>
+				old ? { ...old, isBlocked: false } : old,
+			);
+			return { previous };
+		},
+		onError: (_err, _vars, context) => {
+			if (context?.previous) {
+				utils.user.getById.setData(queryKey, context.previous);
+			}
+		},
+		onSettled: () => {
+			utils.user.getById.invalidate(queryKey);
 		},
 	});
 
