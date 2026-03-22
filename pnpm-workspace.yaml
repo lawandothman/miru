@@ -28,7 +28,9 @@ catalogs:
     superjson: 2.2.6
 
 ignoredBuiltDependencies:
+  - core-js
   - msw
+  - protobufjs
 
 onlyBuiltDependencies:
   - "@sentry/cli"
