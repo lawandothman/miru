@@ -2,7 +2,9 @@ import type { Metadata, Viewport } from "next";
 import { DM_Sans, Plus_Jakarta_Sans } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Providers } from "@/components/providers";
+import { PostHogProvider } from "@/components/posthog-provider";
 import { Toaster } from "@/components/ui/sonner";
+import { getServerSession } from "@/lib/server";
 import { env } from "@/env";
 import "./globals.css";
 
@@ -73,20 +75,24 @@ export const viewport: Viewport = {
 	viewportFit: "cover",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
 	children,
 }: {
 	children: React.ReactNode;
 }) {
+	const session = await getServerSession();
+
 	return (
 		<html lang="en" suppressHydrationWarning>
 			<body
 				className={`${plusJakartaSans.variable} ${dmSans.variable} font-sans antialiased`}
 			>
-				<Providers>
-					{children}
-					<Toaster />
-				</Providers>
+				<PostHogProvider userId={session?.user.id}>
+					<Providers>
+						{children}
+						<Toaster />
+					</Providers>
+				</PostHogProvider>
 				<SpeedInsights />
 			</body>
 		</html>

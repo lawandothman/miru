@@ -45,6 +45,7 @@
 		"expo-updates": "55.0.15",
 		"expo-web-browser": "55.0.10",
 		"lucide-react-native": "0.577.0",
+		"posthog-react-native": "4.37.5",
 		"react": "catalog:react",
 		"react-dom": "catalog:react",
 		"react-native": "0.83.2",

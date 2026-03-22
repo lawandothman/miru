@@ -26,9 +26,11 @@ import {
 	SafeAreaProvider,
 	initialWindowMetrics,
 } from "react-native-safe-area-context";
+import { PostHogProvider } from "posthog-react-native";
 import { TRPCProvider } from "@/lib/trpc-provider";
 import { trpc } from "@/lib/trpc";
 import { useSession } from "@/lib/auth";
+import { posthog } from "@/lib/analytics";
 import {
 	getDevicePushToken,
 	getNotificationPermissionsStatus,
@@ -66,10 +68,12 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 				email: session.user.email,
 				username: session.user.name,
 			});
+			posthog?.identify(session.user.id);
 			return;
 		}
 
 		Sentry.setUser(null);
+		posthog?.reset();
 	}, [session]);
 
 	useEffect(() => {
@@ -234,7 +238,7 @@ function RootLayout() {
 		return null;
 	}
 
-	return (
+	const content = (
 		<SafeAreaProvider initialMetrics={initialWindowMetrics}>
 			<TRPCProvider>
 				<AuthGuard>
@@ -248,6 +252,16 @@ function RootLayout() {
 				</AuthGuard>
 			</TRPCProvider>
 		</SafeAreaProvider>
+	);
+
+	if (!posthog) {
+		return content;
+	}
+
+	return (
+		<PostHogProvider client={posthog} autocapture>
+			{content}
+		</PostHogProvider>
 	);
 }
 

@@ -14,19 +14,11 @@
 		},
 		"preview": {
 			"distribution": "internal",
-			"channel": "preview",
-			"env": {
-				"EXPO_PUBLIC_API_URL": "https://watchmiru.app",
-				"EXPO_PUBLIC_SENTRY_DSN": "https://332840843ec50e8927f572108a2d42af@o4504404409581568.ingest.us.sentry.io/4511005806034944"
-			}
+			"channel": "preview"
 		},
 		"production": {
 			"autoIncrement": true,
-			"channel": "production",
-			"env": {
-				"EXPO_PUBLIC_API_URL": "https://watchmiru.app",
-				"EXPO_PUBLIC_SENTRY_DSN": "https://332840843ec50e8927f572108a2d42af@o4504404409581568.ingest.us.sentry.io/4511005806034944"
-			}
+			"channel": "production"
 		}
 	},
 	"submit": {
