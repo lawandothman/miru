@@ -12,6 +12,7 @@ if (typeof window !== "undefined" && env.NEXT_PUBLIC_POSTHOG_KEY) {
 		person_profiles: "identified_only",
 		capture_pageview: false,
 		capture_pageleave: true,
+		capture_exceptions: true,
 	});
 }
 

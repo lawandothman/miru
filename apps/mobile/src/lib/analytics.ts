@@ -7,6 +7,9 @@ export const posthog = posthogKey
 	? new PostHog(posthogKey, {
 			host: "https://eu.i.posthog.com",
 			disabled: __DEV__,
+			errorTracking: {
+				autocapture: true,
+			},
 		})
 	: undefined;
 
