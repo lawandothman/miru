@@ -21,13 +21,13 @@ function PhoneFrame({
 			<div className="relative mx-auto w-[280px] sm:w-[320px]">
 				<div className="absolute inset-x-4 -bottom-8 top-8 rounded-[3rem] bg-primary/5 blur-3xl" />
 				<div className="relative rounded-[3rem] bg-gradient-to-b from-white/20 to-white/10 p-[3px] shadow-[0_20px_60px_rgba(0,0,0,0.4)]">
-					<div className="overflow-hidden rounded-[calc(3rem-3px)] bg-black">
+					<div className="overflow-hidden rounded-[calc(3rem-3px)] bg-black p-1.5 pt-2">
 						<Image
 							src={src}
 							alt={alt}
 							width={390}
 							height={844}
-							className="w-full"
+							className="w-full rounded-[calc(3rem-8px)]"
 							priority={priority ?? false}
 						/>
 					</div>
