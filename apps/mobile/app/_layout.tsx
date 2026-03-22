@@ -70,7 +70,10 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 				email: session.user.email,
 				username: session.user.name,
 			});
-			posthog?.identify(session.user.id);
+			posthog?.identify(session.user.id, {
+				name: session.user.name,
+				email: session.user.email,
+			});
 			return;
 		}
 

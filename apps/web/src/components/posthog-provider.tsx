@@ -34,15 +34,21 @@ function PostHogPageview() {
 	return null;
 }
 
-export function PostHogIdentify({ userId }: { userId: string }) {
+export function PostHogIdentify({
+	userId,
+	properties,
+}: {
+	userId: string;
+	properties?: Record<string, string | null>;
+}) {
 	const ph = usePostHog();
 
 	useEffect(() => {
-		ph.identify(userId);
+		ph.identify(userId, properties);
 		return () => {
 			ph.reset();
 		};
-	}, [userId, ph]);
+	}, [userId, properties, ph]);
 
 	return null;
 }

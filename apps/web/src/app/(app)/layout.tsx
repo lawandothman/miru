@@ -34,7 +34,15 @@ export default async function AppLayout({
 
 	return (
 		<SidebarProvider>
-			{session?.user && <PostHogIdentify userId={session.user.id} />}
+			{session?.user && (
+				<PostHogIdentify
+					userId={session.user.id}
+					properties={{
+						name: session.user.name,
+						email: session.user.email,
+					}}
+				/>
+			)}
 			<div className="hidden md:contents">
 				<AppSidebar user={user} />
 			</div>

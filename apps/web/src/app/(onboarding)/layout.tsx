@@ -22,7 +22,13 @@ export default async function OnboardingLayout({
 
 	return (
 		<>
-			<PostHogIdentify userId={session.user.id} />
+			<PostHogIdentify
+				userId={session.user.id}
+				properties={{
+					name: session.user.name,
+					email: session.user.email,
+				}}
+			/>
 			<div className="min-h-svh px-4 pt-12 sm:pt-20">
 				<div className="mx-auto w-full max-w-2xl">{children}</div>
 			</div>
