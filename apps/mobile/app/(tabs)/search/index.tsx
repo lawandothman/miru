@@ -155,9 +155,14 @@ export default function SearchScreen() {
 						fetchNextPage={fullSearch.fetchNextPage}
 						isFetchingNextPage={fullSearch.isFetchingNextPage}
 						ListHeaderComponent={
-							users.data && users.data.length > 0 ? (
-								<PeopleSection people={users.data} />
-							) : undefined
+							<>
+								{users.data && users.data.length > 0 && (
+									<PeopleSection people={users.data} />
+								)}
+								{movies.length > 0 && (
+									<Text style={styles.sectionTitle}>Movies</Text>
+								)}
+							</>
 						}
 						ListEmptyComponent={
 							<EmptyState
