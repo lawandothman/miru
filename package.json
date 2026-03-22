@@ -2,7 +2,7 @@
 	"name": "miru",
 	"version": "1.0.0",
 	"private": true,
-	"license": "MIT",
+	"license": "UNLICENSED",
 	"repository": "https://github.com/lawandothman/miru.git",
 	"scripts": {
 		"dev": "turbo dev",
