@@ -1,14 +1,6 @@
-import {
-	View,
-	Text,
-	ScrollView,
-	StyleSheet,
-	Alert,
-	Pressable,
-} from "react-native";
+import { View, Text, ScrollView, StyleSheet, Alert, Share } from "react-native";
 import { useLocalSearchParams, Stack } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Ellipsis } from "lucide-react-native";
 import { useEffect, useRef } from "react";
 import { trpc } from "@/lib/trpc";
 import { useSession } from "@/lib/auth";
@@ -103,7 +95,17 @@ export default function UserProfileScreen() {
 		}
 
 		if (profile.isBlocked) {
-			unblockUser.mutate({ userId });
+			Alert.alert(
+				`Unblock ${profile.name ?? "this user"}?`,
+				"They'll be able to see your profile and watchlist again.",
+				[
+					{ text: "Cancel", style: "cancel" },
+					{
+						text: "Unblock",
+						onPress: () => unblockUser.mutate({ userId }),
+					},
+				],
+			);
 			return;
 		}
 
@@ -121,6 +123,15 @@ export default function UserProfileScreen() {
 		);
 	}
 
+	function handleShare() {
+		if (!profile) {
+			return;
+		}
+		Share.share({
+			message: `Check out ${profile.name ?? "this user"} on Miru!`,
+		});
+	}
+
 	if (isLoading || !profile) {
 		return (
 			<>
@@ -136,15 +147,29 @@ export default function UserProfileScreen() {
 				options={{
 					...defaultHeaderOptions,
 					title: profile.name ?? "",
-					headerRight: !isOwnProfile
-						? () => (
-								<Pressable onPress={handleBlockPress} hitSlop={8}>
-									<Ellipsis size={20} color={Colors.foreground} />
-								</Pressable>
-							)
-						: undefined,
 				}}
 			/>
+
+			{!isOwnProfile && (
+				<Stack.Toolbar placement="right">
+					<Stack.Toolbar.Menu icon="ellipsis">
+						<Stack.Toolbar.MenuAction
+							icon="square.and.arrow.up"
+							onPress={handleShare}
+						>
+							Share Profile
+						</Stack.Toolbar.MenuAction>
+						<Stack.Toolbar.MenuAction
+							icon={profile.isBlocked ? "checkmark.shield" : "hand.raised"}
+							destructive={!profile.isBlocked}
+							onPress={handleBlockPress}
+						>
+							{profile.isBlocked ? "Unblock" : "Block"}
+						</Stack.Toolbar.MenuAction>
+					</Stack.Toolbar.Menu>
+				</Stack.Toolbar>
+			)}
+
 			<SafeAreaView style={styles.container} edges={[]}>
 				<ScrollView contentContainerStyle={styles.scroll}>
 					<View style={styles.header}>
