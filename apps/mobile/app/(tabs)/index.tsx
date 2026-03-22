@@ -56,7 +56,10 @@ export default function HomeScreen() {
 	return (
 		<View style={[styles.container, { paddingTop: insets.top }]}>
 			<ScrollView
-				contentContainerStyle={styles.scroll}
+				contentContainerStyle={[
+					styles.scroll,
+					{ paddingBottom: spacing[8] + insets.bottom },
+				]}
 				alwaysBounceVertical={matches !== undefined && matches.length > 0}
 				refreshControl={
 					<RefreshControl
@@ -134,7 +137,6 @@ const styles = StyleSheet.create({
 		backgroundColor: Colors.background,
 	},
 	scroll: {
-		paddingBottom: spacing[8],
 		flexGrow: 1,
 	},
 	greeting: {

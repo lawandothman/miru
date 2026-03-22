@@ -14,7 +14,6 @@ const styles = StyleSheet.create({
 	},
 	scroll: {
 		paddingTop: spacing[4],
-		paddingBottom: spacing[8],
 		gap: spacing[6],
 	},
 	skeletons: {
@@ -45,7 +44,10 @@ export default function DiscoverScreen() {
 	return (
 		<View style={[styles.container, { paddingTop: insets.top }]}>
 			<ScrollView
-				contentContainerStyle={styles.scroll}
+				contentContainerStyle={[
+					styles.scroll,
+					{ paddingBottom: spacing[8] + insets.bottom },
+				]}
 				keyboardShouldPersistTaps="handled"
 				refreshControl={
 					<RefreshControl
