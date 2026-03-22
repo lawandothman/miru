@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc/client";
+import { capture } from "@/lib/analytics";
 import { OnboardingProgress } from "./onboarding-progress";
 import { GenreStep } from "./steps/genre-step";
 import { RegionStep } from "./steps/region-step";
@@ -22,8 +23,19 @@ export default function OnboardingPage() {
 	const [selectedProviders, setSelectedProviders] = useState<number[]>([]);
 	const [country, setCountry] = useState<string | null>(null);
 
+	const tracked = useRef(false);
+	useEffect(() => {
+		if (!tracked.current) {
+			tracked.current = true;
+			capture("onboarding_started", {});
+		}
+	});
+
 	const complete = trpc.onboarding.complete.useMutation({
-		onSuccess: () => router.push("/dashboard"),
+		onSuccess: () => {
+			capture("onboarding_completed", {});
+			router.push("/dashboard");
+		},
 		onError: () => toast.error("Something went wrong"),
 	});
 
@@ -90,6 +102,7 @@ export default function OnboardingPage() {
 					<RegionStep
 						initialCountry={country}
 						onComplete={(selectedCountry) => {
+							capture("onboarding_step_completed", { step: "region" });
 							setCountry(selectedCountry);
 							setStep(2);
 						}}
@@ -101,6 +114,7 @@ export default function OnboardingPage() {
 						selectedGenres={selectedGenres}
 						onSelectionChange={setSelectedGenres}
 						onComplete={(genreIds) => {
+							capture("onboarding_step_completed", { step: "genres" });
 							setSelectedGenres(genreIds);
 							setStep(3);
 						}}
@@ -112,6 +126,7 @@ export default function OnboardingPage() {
 						selectedProviders={selectedProviders}
 						country={country}
 						onComplete={(providerIds) => {
+							capture("onboarding_step_completed", { step: "streaming" });
 							setSelectedProviders(providerIds);
 							setStep(4);
 						}}
@@ -121,11 +136,21 @@ export default function OnboardingPage() {
 				{step === 4 && (
 					<WatchlistStep
 						genreIds={selectedGenres}
-						onComplete={() => setStep(5)}
+						onComplete={() => {
+							capture("onboarding_step_completed", { step: "watchlist" });
+							setStep(5);
+						}}
 					/>
 				)}
 
-				{step === 5 && <FriendsStep onComplete={() => complete.mutate()} />}
+				{step === 5 && (
+					<FriendsStep
+						onComplete={() => {
+							capture("onboarding_step_completed", { step: "friends" });
+							complete.mutate();
+						}}
+					/>
+				)}
 			</div>
 
 			<div className="h-16 sm:h-24" aria-hidden="true" />

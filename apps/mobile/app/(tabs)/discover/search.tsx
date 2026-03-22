@@ -13,6 +13,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { Search, X } from "lucide-react-native";
 import { trpc } from "@/lib/trpc";
+import { capture } from "@/lib/analytics";
 import { MovieGrid } from "@/components/movie-grid";
 import { EmptyState } from "@/components/empty-state";
 import { UserAvatar } from "@/components/user-avatar";
@@ -82,6 +83,7 @@ export default function SearchScreen() {
 	function handleSubmit() {
 		const trimmed = query.trim();
 		if (trimmed.length > 0) {
+			capture("search_performed", { query: trimmed });
 			setSubmittedQuery(trimmed);
 			Keyboard.dismiss();
 		}

@@ -1,5 +1,6 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { PostHogIdentify } from "@/components/posthog-provider";
 import { auth } from "@/lib/auth";
 
 export default async function OnboardingLayout({
@@ -20,8 +21,11 @@ export default async function OnboardingLayout({
 	}
 
 	return (
-		<div className="min-h-svh px-4 pt-12 sm:pt-20">
-			<div className="mx-auto w-full max-w-2xl">{children}</div>
-		</div>
+		<>
+			<PostHogIdentify userId={session.user.id} />
+			<div className="min-h-svh px-4 pt-12 sm:pt-20">
+				<div className="mx-auto w-full max-w-2xl">{children}</div>
+			</div>
+		</>
 	);
 }

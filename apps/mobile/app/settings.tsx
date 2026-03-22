@@ -33,6 +33,7 @@ import {
 	getNotificationPermissionsStatus,
 } from "@/lib/notifications";
 import { trpc } from "@/lib/trpc";
+import { capture } from "@/lib/analytics";
 import { defaultHeaderOptions } from "@/lib/navigation";
 import { AvatarUpload } from "@/components/avatar-upload";
 import {
@@ -130,6 +131,7 @@ export default function SettingsScreen() {
 							try {
 								await unregisterCurrentPushToken();
 								await signOut();
+								capture("signed_out", {});
 								queryClient.clear();
 							} catch {
 								Alert.alert("Error", "Failed to sign out. Please try again.");

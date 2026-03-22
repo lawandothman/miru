@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { DM_Sans, Plus_Jakarta_Sans } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Providers } from "@/components/providers";
+import { PostHogProvider } from "@/components/posthog-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { env } from "@/env";
 import "./globals.css";
@@ -83,10 +84,12 @@ export default function RootLayout({
 			<body
 				className={`${plusJakartaSans.variable} ${dmSans.variable} font-sans antialiased`}
 			>
-				<Providers>
-					{children}
-					<Toaster />
-				</Providers>
+				<PostHogProvider>
+					<Providers>
+						{children}
+						<Toaster />
+					</Providers>
+				</PostHogProvider>
 				<SpeedInsights />
 			</body>
 		</html>

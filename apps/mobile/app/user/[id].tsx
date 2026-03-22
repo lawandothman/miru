@@ -9,8 +9,10 @@ import {
 import { useLocalSearchParams, Stack } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ellipsis } from "lucide-react-native";
+import { useEffect, useRef } from "react";
 import { trpc } from "@/lib/trpc";
 import { useSession } from "@/lib/auth";
+import { capture } from "@/lib/analytics";
 import { UserAvatar } from "@/components/user-avatar";
 import { UserStats } from "@/components/user-stats";
 import { FollowButton } from "@/components/follow-button";
@@ -25,6 +27,14 @@ export default function UserProfileScreen() {
 	const isOwnProfile = session?.user?.id === id;
 
 	const userId = id ?? "";
+
+	const tracked = useRef(false);
+	useEffect(() => {
+		if (!isOwnProfile && userId && !tracked.current) {
+			tracked.current = true;
+			capture("match_viewed", { target_user_id: userId });
+		}
+	}, [isOwnProfile, userId]);
 
 	const { data: profile, isLoading } = trpc.user.getById.useQuery(
 		{ id: userId },

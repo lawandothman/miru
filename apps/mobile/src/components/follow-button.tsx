@@ -2,6 +2,7 @@ import { Pressable, Text, StyleSheet, ActivityIndicator } from "react-native";
 import { UserPlus, UserMinus } from "lucide-react-native";
 import { trpc } from "@/lib/trpc";
 import { useSession } from "@/lib/auth";
+import { capture } from "@/lib/analytics";
 import { Colors, fontSize, fontFamily, spacing, radius } from "@/lib/constants";
 import { triggerFollowHaptic } from "@/lib/haptics";
 
@@ -26,8 +27,18 @@ export function FollowButton({ userId, isFollowing }: FollowButtonProps) {
 		utils.onboarding.getSuggestedUsers.invalidate();
 	}
 
-	const follow = trpc.social.follow.useMutation({ onSuccess: invalidate });
-	const unfollow = trpc.social.unfollow.useMutation({ onSuccess: invalidate });
+	const follow = trpc.social.follow.useMutation({
+		onSuccess: () => {
+			capture("user_followed", { target_user_id: userId });
+			invalidate();
+		},
+	});
+	const unfollow = trpc.social.unfollow.useMutation({
+		onSuccess: () => {
+			capture("user_unfollowed", { target_user_id: userId });
+			invalidate();
+		},
+	});
 
 	const loading = follow.isPending || unfollow.isPending;
 

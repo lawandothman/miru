@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { authClient, signOut } from "@/lib/auth-client";
+import { capture } from "@/lib/analytics";
 
 export function DangerZone() {
 	const router = useRouter();
@@ -29,6 +30,7 @@ export function DangerZone() {
 		setIsSigningOut(true);
 		try {
 			await signOut();
+			capture("signed_out", {});
 			router.push("/");
 		} catch {
 			toast.error("Failed to sign out");

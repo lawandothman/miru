@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc/client";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { capture } from "@/lib/analytics";
 
 interface FollowButtonProps {
 	userId: string;
@@ -29,11 +30,17 @@ export function FollowButton({
 	};
 
 	const follow = trpc.social.follow.useMutation({
-		onSuccess,
+		onSuccess: () => {
+			capture("user_followed", { target_user_id: userId });
+			onSuccess();
+		},
 		onError: () => toast.error("Failed to follow user"),
 	});
 	const unfollow = trpc.social.unfollow.useMutation({
-		onSuccess,
+		onSuccess: () => {
+			capture("user_unfollowed", { target_user_id: userId });
+			onSuccess();
+		},
 		onError: () => toast.error("Failed to unfollow user"),
 	});
 

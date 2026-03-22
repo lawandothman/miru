@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc/client";
 import { cn } from "@/lib/utils";
+import { capture } from "@/lib/analytics";
 import { useRouter } from "next/navigation";
 
 interface WatchedButtonProps {
@@ -34,11 +35,17 @@ export function WatchedButton({
 	};
 
 	const add = trpc.watched.add.useMutation({
-		onSuccess,
+		onSuccess: () => {
+			capture("movie_marked_watched", { movie_id: movieId });
+			onSuccess();
+		},
 		onError: () => toast.error("Failed to mark as watched"),
 	});
 	const remove = trpc.watched.remove.useMutation({
-		onSuccess,
+		onSuccess: () => {
+			capture("movie_unmarked_watched", { movie_id: movieId });
+			onSuccess();
+		},
 		onError: () => toast.error("Failed to remove from watched"),
 	});
 
