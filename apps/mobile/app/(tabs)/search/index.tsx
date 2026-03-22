@@ -1,17 +1,16 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import {
 	View,
 	Text,
-	TextInput,
 	Pressable,
 	ScrollView,
 	StyleSheet,
-	Keyboard,
+	type NativeSyntheticEvent,
+	type TextInputFocusEventData,
 } from "react-native";
 import { Image } from "expo-image";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useRouter } from "expo-router";
-import { Search, X } from "lucide-react-native";
+import { useRouter, Stack } from "expo-router";
+import { Search } from "lucide-react-native";
 import { trpc } from "@/lib/trpc";
 import { capture } from "@/lib/analytics";
 import { MovieGrid } from "@/components/movie-grid";
@@ -41,15 +40,8 @@ function useDebounce(value: string, delay: number) {
 export default function SearchScreen() {
 	const [query, setQuery] = useState("");
 	const [submittedQuery, setSubmittedQuery] = useState("");
-	const inputRef = useRef<TextInput>(null);
 	const router = useRouter();
-	const insets = useSafeAreaInsets();
 	const debouncedQuery = useDebounce(query, 300);
-
-	useEffect(() => {
-		const timer = setTimeout(() => inputRef.current?.focus(), 100);
-		return () => clearTimeout(timer);
-	}, []);
 
 	const { data: autocompleteResults } = trpc.movie.searchAutocomplete.useQuery(
 		{ query: debouncedQuery },
@@ -80,26 +72,22 @@ export default function SearchScreen() {
 
 	const showFullResults = submittedQuery.length > 0;
 
-	function handleSubmit() {
-		const trimmed = query.trim();
-		if (trimmed.length > 0) {
-			capture("search_performed", { query: trimmed });
-			setSubmittedQuery(trimmed);
-			Keyboard.dismiss();
-		}
-	}
-
-	function handleChangeText(text: string) {
+	function handleChangeText(e: NativeSyntheticEvent<TextInputFocusEventData>) {
+		const text = e.nativeEvent.text;
 		setQuery(text);
 		if (submittedQuery.length > 0) {
 			setSubmittedQuery("");
 		}
 	}
 
-	function handleClear() {
-		setQuery("");
-		setSubmittedQuery("");
-		inputRef.current?.focus();
+	function handleSearchSubmit(
+		e: NativeSyntheticEvent<TextInputFocusEventData>,
+	) {
+		const trimmed = e.nativeEvent.text.trim();
+		if (trimmed.length > 0) {
+			capture("search_performed", { query: trimmed });
+			setSubmittedQuery(trimmed);
+		}
 	}
 
 	function handleSelect(id: number) {
@@ -107,93 +95,80 @@ export default function SearchScreen() {
 	}
 
 	return (
-		<View style={[styles.screen, { paddingTop: insets.top }]}>
-			<View style={styles.header}>
-				<View style={styles.inputContainer}>
-					<Search size={18} color={Colors.mutedForeground} />
-					<TextInput
-						ref={inputRef}
-						style={styles.input}
-						placeholder="Search movies & people..."
-						placeholderTextColor={Colors.mutedForeground}
-						value={query}
-						onChangeText={handleChangeText}
-						returnKeyType="search"
-						onSubmitEditing={handleSubmit}
-						autoCorrect={false}
-					/>
-					{query.length > 0 && (
-						<Pressable onPress={handleClear} hitSlop={8}>
-							<X size={18} color={Colors.mutedForeground} />
-						</Pressable>
-					)}
-				</View>
-				<Pressable onPress={() => router.back()} hitSlop={8}>
-					<Text style={styles.cancelText}>Cancel</Text>
-				</Pressable>
-			</View>
+		<>
+			<Stack.Screen options={{ title: "Search" }} />
+			<Stack.SearchBar
+				placement="automatic"
+				placeholder="Search"
+				onChangeText={handleChangeText}
+				onSearchButtonPress={handleSearchSubmit}
+			/>
 
-			{showAutocomplete && (
-				<ScrollView
-					style={styles.results}
-					keyboardShouldPersistTaps="handled"
-					keyboardDismissMode="on-drag"
-				>
-					{autocompleteResults.map((item) => (
-						<Pressable
-							key={item.id}
-							style={({ pressed }) => [
-								styles.resultItem,
-								pressed && styles.resultItemPressed,
-							]}
-							onPress={() => handleSelect(item.id)}
-						>
-							{item.posterPath ? (
-								<Image
-									source={{ uri: posterUrl(item.posterPath) }}
-									style={styles.resultPoster}
-									contentFit="cover"
-								/>
-							) : (
-								<View style={[styles.resultPoster, styles.posterPlaceholder]} />
-							)}
-							<View style={styles.resultInfo}>
-								<Text style={styles.resultTitle} numberOfLines={1}>
-									{item.title}
-								</Text>
-								{item.releaseDate && (
-									<Text style={styles.resultYear}>
-										{item.releaseDate.slice(0, 4)}
-									</Text>
+			<View style={styles.screen}>
+				{showAutocomplete && (
+					<ScrollView
+						style={styles.results}
+						keyboardShouldPersistTaps="handled"
+						keyboardDismissMode="on-drag"
+					>
+						{autocompleteResults.map((item) => (
+							<Pressable
+								key={item.id}
+								style={({ pressed }) => [
+									styles.resultItem,
+									pressed && styles.resultItemPressed,
+								]}
+								onPress={() => handleSelect(item.id)}
+							>
+								{item.posterPath ? (
+									<Image
+										source={{ uri: posterUrl(item.posterPath) }}
+										style={styles.resultPoster}
+										contentFit="cover"
+									/>
+								) : (
+									<View
+										style={[styles.resultPoster, styles.posterPlaceholder]}
+									/>
 								)}
-							</View>
-						</Pressable>
-					))}
-				</ScrollView>
-			)}
+								<View style={styles.resultInfo}>
+									<Text style={styles.resultTitle} numberOfLines={1}>
+										{item.title}
+									</Text>
+									{item.releaseDate && (
+										<Text style={styles.resultYear}>
+											{item.releaseDate.slice(0, 4)}
+										</Text>
+									)}
+								</View>
+							</Pressable>
+						))}
+					</ScrollView>
+				)}
 
-			{showFullResults && (
-				<MovieGrid
-					movies={movies}
-					isLoading={fullSearch.isLoading}
-					hasNextPage={fullSearch.hasNextPage}
-					fetchNextPage={fullSearch.fetchNextPage}
-					isFetchingNextPage={fullSearch.isFetchingNextPage}
-					ListHeaderComponent={
-						users.data && users.data.length > 0 ? (
-							<PeopleSection people={users.data} />
-						) : undefined
-					}
-					ListEmptyComponent={
-						<EmptyState
-							icon={Search}
-							title="No results"
-							description="Try a different search term."
-						/>
-					}
-				/>
-			)}
-		</View>
+				{showFullResults && (
+					<MovieGrid
+						movies={movies}
+						isLoading={fullSearch.isLoading}
+						hasNextPage={fullSearch.hasNextPage}
+						fetchNextPage={fullSearch.fetchNextPage}
+						isFetchingNextPage={fullSearch.isFetchingNextPage}
+						ListHeaderComponent={
+							users.data && users.data.length > 0 ? (
+								<PeopleSection people={users.data} />
+							) : undefined
+						}
+						ListEmptyComponent={
+							<EmptyState
+								icon={Search}
+								title="No results"
+								description="Try a different search term."
+							/>
+						}
+					/>
+				)}
+			</View>
+		</>
 	);
 }
 
@@ -236,34 +211,6 @@ const styles = StyleSheet.create({
 	screen: {
 		flex: 1,
 		backgroundColor: Colors.background,
-	},
-	header: {
-		flexDirection: "row",
-		alignItems: "center",
-		paddingHorizontal: spacing[4],
-		paddingVertical: spacing[2],
-		gap: spacing[3],
-	},
-	inputContainer: {
-		flex: 1,
-		flexDirection: "row",
-		alignItems: "center",
-		backgroundColor: Colors.secondary,
-		borderRadius: radius.lg,
-		paddingHorizontal: spacing[3],
-		height: 40,
-		gap: spacing[2],
-	},
-	input: {
-		flex: 1,
-		color: Colors.foreground,
-		fontSize: fontSize.base,
-		fontFamily: fontFamily.sans,
-	},
-	cancelText: {
-		color: Colors.primary,
-		fontSize: fontSize.base,
-		fontFamily: fontFamily.sansMedium,
 	},
 	results: {
 		flex: 1,

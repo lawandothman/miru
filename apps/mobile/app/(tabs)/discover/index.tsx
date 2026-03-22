@@ -3,7 +3,6 @@ import { useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { CarouselSkeleton } from "@/components/carousel-skeleton";
 import { MovieCarousel } from "@/components/movie-carousel";
-import { SearchBar } from "@/components/search-bar";
 import { Colors, spacing } from "@/lib/constants";
 import { triggerRefreshHaptic } from "@/lib/haptics";
 import { trpc } from "@/lib/trpc";
@@ -56,8 +55,6 @@ export default function DiscoverScreen() {
 					/>
 				}
 			>
-				<SearchBar />
-
 				{isLoading && (
 					<View style={styles.skeletons}>
 						<CarouselSkeleton />
