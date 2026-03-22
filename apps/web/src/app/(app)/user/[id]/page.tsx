@@ -7,6 +7,7 @@ import { Settings } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { trpc } from "@/lib/trpc/server";
 import { UserAvatar } from "@/components/user-avatar";
+import { TrackEvent } from "@/components/track-event";
 import { FollowButton } from "@/components/follow-button";
 import { FollowersDialog } from "@/components/followers-dialog";
 import { ShareButton } from "@/components/share-button";
@@ -63,6 +64,9 @@ export default async function UserPage({ params }: UserPageProps) {
 
 	return (
 		<div className="space-y-8">
+			{!isOwnProfile && (
+				<TrackEvent event="match_viewed" properties={{ target_user_id: id }} />
+			)}
 			<div className="flex items-start gap-5">
 				<UserAvatar name={user.name ?? "?"} image={user.image} size="xl" />
 				<div className="flex-1">

@@ -1,6 +1,7 @@
 import { View, Pressable, Text, StyleSheet } from "react-native";
 import { Bookmark, BookmarkPlus, Eye } from "lucide-react-native";
 import { trpc } from "@/lib/trpc";
+import { capture } from "@/lib/analytics";
 import { Colors, fontSize, fontFamily, spacing, radius } from "@/lib/constants";
 import { triggerWatchlistHaptic } from "@/lib/haptics";
 
@@ -26,16 +27,28 @@ export function MovieActions({
 	}
 
 	const addToWatchlist = trpc.watchlist.add.useMutation({
-		onSuccess: invalidate,
+		onSuccess: () => {
+			capture("movie_added_to_watchlist", { movie_id: movieId });
+			invalidate();
+		},
 	});
 	const removeFromWatchlist = trpc.watchlist.remove.useMutation({
-		onSuccess: invalidate,
+		onSuccess: () => {
+			capture("movie_removed_from_watchlist", { movie_id: movieId });
+			invalidate();
+		},
 	});
 	const addToWatched = trpc.watched.add.useMutation({
-		onSuccess: invalidate,
+		onSuccess: () => {
+			capture("movie_marked_watched", { movie_id: movieId });
+			invalidate();
+		},
 	});
 	const removeFromWatched = trpc.watched.remove.useMutation({
-		onSuccess: invalidate,
+		onSuccess: () => {
+			capture("movie_unmarked_watched", { movie_id: movieId });
+			invalidate();
+		},
 	});
 
 	function handleWatchlistToggle() {

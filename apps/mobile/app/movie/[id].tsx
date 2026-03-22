@@ -12,7 +12,9 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams, useRouter, Stack } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ChevronLeft, Share2, Star } from "lucide-react-native";
+import { useEffect, useRef } from "react";
 import { trpc } from "@/lib/trpc";
+import { capture } from "@/lib/analytics";
 import { MovieActions } from "@/components/movie-actions";
 import { UserAvatar } from "@/components/user-avatar";
 import { LoadingScreen } from "@/components/loading-screen";
@@ -53,6 +55,14 @@ export default function MovieDetailScreen() {
 		{ tmdbId },
 		{ enabled: !Number.isNaN(tmdbId) },
 	);
+
+	const tracked = useRef(false);
+	useEffect(() => {
+		if (movie && !tracked.current) {
+			tracked.current = true;
+			capture("movie_viewed", { movie_id: tmdbId });
+		}
+	}, [movie, tmdbId]);
 
 	if (isLoading || !movie) {
 		return (

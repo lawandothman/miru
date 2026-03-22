@@ -6,6 +6,7 @@ import { trpc } from "@/lib/trpc/server";
 import { movieIdFromSlug, movieSlug } from "@/lib/movie-slug";
 import { POSTER_BLUR_DATA_URL } from "@/lib/image-placeholder";
 import { ShareButton } from "@/components/share-button";
+import { TrackEvent } from "@/components/track-event";
 import { WatchedButton } from "@/components/watched-button";
 import { WatchlistButton } from "@/components/watchlist-button";
 import { UserAvatar } from "@/components/user-avatar";
@@ -105,6 +106,7 @@ export default async function MoviePage({ params }: MoviePageProps) {
 
 	return (
 		<div className="space-y-8">
+			<TrackEvent event="movie_viewed" properties={{ movie_id: tmdbId }} />
 			<script
 				type="application/ld+json"
 				// oxlint-disable-next-line react/no-danger - JSON-LD structured data for SEO

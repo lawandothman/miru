@@ -12,6 +12,7 @@
 	"dependencies": {
 		"@better-auth/expo": "catalog:better-auth",
 		"@lorenzopant/tmdb": "catalog:",
+		"@miru/analytics": "workspace:*",
 		"@miru/cache": "workspace:*",
 		"@miru/db": "workspace:*",
 		"@miru/trpc": "workspace:*",

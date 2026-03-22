@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { signIn } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
+import { capture } from "@/lib/analytics";
 
 export default function SignInPage() {
 	return (
@@ -21,12 +22,13 @@ export default function SignInPage() {
 				<div className="flex w-full flex-col gap-3">
 					<Button
 						variant="outline"
-						onClick={() =>
-							signIn.social({
+						onClick={async () => {
+							await signIn.social({
 								callbackURL: "/dashboard",
 								provider: "apple",
-							})
-						}
+							});
+							capture("signed_in", { method: "apple" });
+						}}
 						className="h-12 w-full gap-3 rounded-full"
 					>
 						<svg
@@ -41,12 +43,13 @@ export default function SignInPage() {
 
 					<Button
 						variant="outline"
-						onClick={() =>
-							signIn.social({
+						onClick={async () => {
+							await signIn.social({
 								callbackURL: "/dashboard",
 								provider: "google",
-							})
-						}
+							});
+							capture("signed_in", { method: "google" });
+						}}
 						className="h-12 w-full gap-3 rounded-full"
 					>
 						<svg className="size-5" viewBox="0 0 24 24">

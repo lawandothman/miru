@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc/client";
 import { cn } from "@/lib/utils";
+import { capture } from "@/lib/analytics";
 import { useRouter } from "next/navigation";
 
 interface WatchlistButtonProps {
@@ -33,11 +34,17 @@ export function WatchlistButton({
 	};
 
 	const add = trpc.watchlist.add.useMutation({
-		onSuccess,
+		onSuccess: () => {
+			capture("movie_added_to_watchlist", { movie_id: movieId });
+			onSuccess();
+		},
 		onError: () => toast.error("Failed to add to watchlist"),
 	});
 	const remove = trpc.watchlist.remove.useMutation({
-		onSuccess,
+		onSuccess: () => {
+			capture("movie_removed_from_watchlist", { movie_id: movieId });
+			onSuccess();
+		},
 		onError: () => toast.error("Failed to remove from watchlist"),
 	});
 

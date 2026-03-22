@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import {
 	View,
 	Text,
@@ -15,6 +15,7 @@ import { GenreStep } from "@/components/onboarding/genre-step";
 import { StreamingStep } from "@/components/onboarding/streaming-step";
 import { WatchlistStep } from "@/components/onboarding/watchlist-step";
 import { FriendsStep } from "@/components/onboarding/friends-step";
+import { capture } from "@/lib/analytics";
 import { Colors, fontSize, fontFamily, spacing, radius } from "@/lib/constants";
 import {
 	triggerStepCompleteHaptic,
@@ -36,6 +37,14 @@ export default function OnboardingScreen() {
 	);
 	const [watchlistIds, setWatchlistIds] = useState<Set<number>>(new Set());
 	const [isSaving, setIsSaving] = useState(false);
+
+	const tracked = useRef(false);
+	useEffect(() => {
+		if (!tracked.current) {
+			tracked.current = true;
+			capture("onboarding_started", {});
+		}
+	});
 
 	const setCountryMut = trpc.onboarding.setCountry.useMutation();
 	const setGenresMut = trpc.onboarding.setGenrePreferences.useMutation();
@@ -101,11 +110,23 @@ export default function OnboardingScreen() {
 					break;
 			}
 
+			const stepNames = [
+				"region",
+				"genres",
+				"streaming",
+				"watchlist",
+				"friends",
+			] as const;
+			capture("onboarding_step_completed", {
+				step: stepNames[step - 1] ?? String(step),
+			});
+
 			if (step < TOTAL_STEPS) {
 				triggerStepCompleteHaptic();
 				setStep(step + 1);
 			} else {
 				await completeMut.mutateAsync();
+				capture("onboarding_completed", {});
 				triggerStepCompleteHaptic();
 				utils.onboarding.getState.setData(undefined, (current) =>
 					current ? { ...current, isCompleted: true } : current,

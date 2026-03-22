@@ -12,6 +12,7 @@ import Svg, { Path } from "react-native-svg";
 import * as AppleAuthentication from "expo-apple-authentication";
 import * as Sentry from "@sentry/react-native";
 import { signIn, useSession } from "@/lib/auth";
+import { capture } from "@/lib/analytics";
 import { Colors, fontSize, fontFamily, spacing, radius } from "@/lib/constants";
 
 function AppleIcon({ size = 20 }: { size?: number }) {
@@ -71,6 +72,7 @@ export default function SignInScreen() {
 				callbackURL: "/",
 				errorCallbackURL: "/(auth)/sign-in",
 			});
+			capture("signed_in", { method: "google" });
 		} catch (error) {
 			handleSignInError(error, "google");
 		}
@@ -96,6 +98,7 @@ export default function SignInScreen() {
 					token: credential.identityToken,
 				},
 			});
+			capture("signed_in", { method: "apple" });
 		} catch (error) {
 			const code =
 				error instanceof Error && "code" in error

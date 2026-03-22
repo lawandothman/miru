@@ -8,6 +8,7 @@ import { POSTER_BLUR_DATA_URL } from "@/lib/image-placeholder";
 import { Input } from "@/components/ui/input";
 import { useDebounce } from "@/hooks/use-debounce";
 import { trpc } from "@/lib/trpc/client";
+import { capture } from "@/lib/analytics";
 import { movieSlug } from "@/lib/movie-slug";
 import { cn } from "@/lib/utils";
 
@@ -45,6 +46,9 @@ export function SearchAutocomplete({
 	function commitSearch() {
 		setShowDropdown(false);
 		setActiveIndex(-1);
+		if (value.trim()) {
+			capture("search_performed", { query: value.trim() });
+		}
 		onSubmit(value);
 		inputRef.current?.blur();
 	}

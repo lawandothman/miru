@@ -1,6 +1,5 @@
 export type EventProperties = {
 	signed_in: { method: string };
-	signed_up: { method: string };
 	signed_out: Record<string, never>;
 	onboarding_started: Record<string, never>;
 	onboarding_completed: Record<string, never>;
