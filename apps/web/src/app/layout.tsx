@@ -4,7 +4,6 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Providers } from "@/components/providers";
 import { PostHogProvider } from "@/components/posthog-provider";
 import { Toaster } from "@/components/ui/sonner";
-import { getServerSession } from "@/lib/server";
 import { env } from "@/env";
 import "./globals.css";
 
@@ -75,19 +74,17 @@ export const viewport: Viewport = {
 	viewportFit: "cover",
 };
 
-export default async function RootLayout({
+export default function RootLayout({
 	children,
 }: {
 	children: React.ReactNode;
 }) {
-	const session = await getServerSession();
-
 	return (
 		<html lang="en" suppressHydrationWarning>
 			<body
 				className={`${plusJakartaSans.variable} ${dmSans.variable} font-sans antialiased`}
 			>
-				<PostHogProvider userId={session?.user.id}>
+				<PostHogProvider>
 					<Providers>
 						{children}
 						<Toaster />

@@ -36,6 +36,7 @@ import {
 	getNotificationPermissionsStatus,
 	getNotificationRoute,
 } from "@/lib/notifications";
+import { useScreenTracking } from "@/hooks/use-screen-tracking";
 import { Sentry, navigationIntegration } from "@/lib/sentry";
 
 if (!isRunningInExpoGo()) {
@@ -46,6 +47,7 @@ const pushPlatform =
 	Platform.OS === "ios" ? ("ios" as const) : ("android" as const);
 
 function AuthGuard({ children }: { children: React.ReactNode }) {
+	useScreenTracking();
 	const { data: session, isPending: sessionPending } = useSession();
 	const segments = useSegments();
 	const router = useRouter();
@@ -259,7 +261,7 @@ function RootLayout() {
 	}
 
 	return (
-		<PostHogProvider client={posthog} autocapture>
+		<PostHogProvider client={posthog} autocapture={{ captureScreens: false }}>
 			{content}
 		</PostHogProvider>
 	);

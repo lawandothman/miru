@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { AppSidebar } from "@/components/app-sidebar";
 import { BottomNav } from "@/components/bottom-nav";
+import { PostHogIdentify } from "@/components/posthog-provider";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { auth } from "@/lib/auth";
 
@@ -33,6 +34,7 @@ export default async function AppLayout({
 
 	return (
 		<SidebarProvider>
+			{session?.user && <PostHogIdentify userId={session.user.id} />}
 			<div className="hidden md:contents">
 				<AppSidebar user={user} />
 			</div>

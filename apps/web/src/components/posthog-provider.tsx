@@ -34,32 +34,26 @@ function PostHogPageview() {
 	return null;
 }
 
-function PostHogUserIdentity({ userId }: { userId: string | undefined }) {
+export function PostHogIdentify({ userId }: { userId: string }) {
 	const ph = usePostHog();
 
 	useEffect(() => {
-		if (userId) {
-			ph.identify(userId);
-		}
+		ph.identify(userId);
+		return () => {
+			ph.reset();
+		};
 	}, [userId, ph]);
 
 	return null;
 }
 
-export function PostHogProvider({
-	children,
-	userId,
-}: {
-	children: React.ReactNode;
-	userId: string | undefined;
-}) {
+export function PostHogProvider({ children }: { children: React.ReactNode }) {
 	if (!env.NEXT_PUBLIC_POSTHOG_KEY) {
 		return <>{children}</>;
 	}
 
 	return (
 		<PHProvider client={posthog}>
-			<PostHogUserIdentity userId={userId} />
 			<Suspense fallback={null}>
 				<PostHogPageview />
 			</Suspense>
