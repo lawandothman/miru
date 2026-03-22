@@ -27,6 +27,9 @@ export default function TabLayout() {
 				/>
 				<NativeTabs.Trigger.Label>Profile</NativeTabs.Trigger.Label>
 			</NativeTabs.Trigger>
+			<NativeTabs.Trigger name="search" role="search">
+				<NativeTabs.Trigger.Label>Search</NativeTabs.Trigger.Label>
+			</NativeTabs.Trigger>
 		</NativeTabs>
 	);
 }

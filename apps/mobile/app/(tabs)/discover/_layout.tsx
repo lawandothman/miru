@@ -9,14 +9,6 @@ export default function DiscoverLayout() {
 				contentStyle: { backgroundColor: Colors.background },
 				navigationBarColor: Colors.background,
 			}}
-		>
-			<Stack.Screen name="index" />
-			<Stack.Screen
-				name="search"
-				options={{
-					animation: "fade",
-				}}
-			/>
-		</Stack>
+		/>
 	);
 }
