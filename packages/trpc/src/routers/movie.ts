@@ -875,7 +875,7 @@ async function getFriendsWatchingMovies(db: Database, userId: string) {
 	const friendMovieCounts = db
 		.select({
 			movieId: schema.watchlistEntries.movieId,
-			friendCount: count(),
+			friendCount: count().as("friend_count"),
 		})
 		.from(schema.follows)
 		.innerJoin(
