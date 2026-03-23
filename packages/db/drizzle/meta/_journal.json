@@ -78,6 +78,13 @@
 			"when": 1774221300000,
 			"tag": "0010_wooden_gargoyle",
 			"breakpoints": true
+		},
+		{
+			"idx": 11,
+			"version": "7",
+			"when": 1774222200000,
+			"tag": "0011_tidy_migration",
+			"breakpoints": true
 		}
 	]
 }
