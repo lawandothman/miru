@@ -7,8 +7,8 @@ import { describe, expect, it } from "vitest";
 
 describe("watch provider canonicalization", () => {
 	it("dedupes alias provider ids to their canonical ids", () => {
-		expect(normalizeWatchProviderIds([9, 2100, 2300, 41])).toEqual([9, 41]);
-		expect(normalizeWatchProviderIds([10, 175])).toEqual([10, 175]);
+		expect(normalizeWatchProviderIds([10, 9, 2100, 2300, 41])).toEqual([9, 41]);
+		expect(normalizeWatchProviderIds([175, 8, 1796])).toEqual([8]);
 	});
 
 	it("normalizes aliased provider metadata to the canonical provider", () => {
@@ -49,6 +49,32 @@ describe("watch provider canonicalization", () => {
 				id: 9,
 				logoPath: "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
 				name: "Amazon Prime Video",
+			},
+		]);
+	});
+
+	it("folds netflix kids into netflix for selection surfaces", () => {
+		expect(
+			mergeWatchProviders([
+				{
+					displayPriority: 7,
+					id: 175,
+					logoPath: "/kwVegvKCinXTPuzZmYT1J3i1HJz.jpg",
+					name: "Netflix Kids",
+				},
+				{
+					displayPriority: 4,
+					id: 8,
+					logoPath: "/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
+					name: "Netflix",
+				},
+			]),
+		).toEqual([
+			{
+				displayPriority: 4,
+				id: 8,
+				logoPath: "/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
+				name: "Netflix",
 			},
 		]);
 	});
