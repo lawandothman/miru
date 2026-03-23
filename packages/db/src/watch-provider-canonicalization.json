@@ -3,13 +3,13 @@
 		"name": "Netflix",
 		"logoPath": "/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
 		"displayPriority": 4,
-		"aliases": [175, 1796]
+		"aliases": [1796]
 	},
 	"9": {
 		"name": "Amazon Prime Video",
 		"logoPath": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
 		"displayPriority": 5,
-		"aliases": [10, 2100]
+		"aliases": [2100]
 	},
 	"41": {
 		"name": "ITVX",

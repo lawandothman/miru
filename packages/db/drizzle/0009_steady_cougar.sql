@@ -13,8 +13,6 @@ SET
 	"display_priority" = EXCLUDED."display_priority";--> statement-breakpoint
 WITH "alias_map" ("alias_id", "canonical_id") AS (
 	VALUES
-		(10, 9),
-		(175, 8),
 		(387, 386),
 		(1796, 8),
 		(2100, 9),
@@ -40,11 +38,9 @@ FROM "remapped"
 ORDER BY "movie_id", "provider_id", "updated_at" DESC
 ON CONFLICT ("movie_id", "provider_id") DO NOTHING;--> statement-breakpoint
 DELETE FROM "movie_stream_providers"
-WHERE "provider_id" IN (10, 175, 387, 1796, 2100, 2300, 2303, 2304, 2311);--> statement-breakpoint
+WHERE "provider_id" IN (387, 1796, 2100, 2300, 2303, 2304, 2311);--> statement-breakpoint
 WITH "alias_map" ("alias_id", "canonical_id") AS (
 	VALUES
-		(10, 9),
-		(175, 8),
 		(387, 386),
 		(1796, 8),
 		(2100, 9),
@@ -70,6 +66,6 @@ FROM "remapped"
 ORDER BY "user_id", "provider_id", "created_at" DESC
 ON CONFLICT ("user_id", "provider_id") DO NOTHING;--> statement-breakpoint
 DELETE FROM "user_streaming_services"
-WHERE "provider_id" IN (10, 175, 387, 1796, 2100, 2300, 2303, 2304, 2311);--> statement-breakpoint
+WHERE "provider_id" IN (387, 1796, 2100, 2300, 2303, 2304, 2311);--> statement-breakpoint
 DELETE FROM "watch_providers"
-WHERE "id" IN (10, 175, 387, 1796, 2100, 2300, 2303, 2304, 2311);
+WHERE "id" IN (387, 1796, 2100, 2300, 2303, 2304, 2311);

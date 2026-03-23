@@ -7,7 +7,8 @@ import { describe, expect, it } from "vitest";
 
 describe("watch provider canonicalization", () => {
 	it("dedupes alias provider ids to their canonical ids", () => {
-		expect(normalizeWatchProviderIds([10, 9, 2100, 2300, 41])).toEqual([9, 41]);
+		expect(normalizeWatchProviderIds([9, 2100, 2300, 41])).toEqual([9, 41]);
+		expect(normalizeWatchProviderIds([10, 175])).toEqual([10, 175]);
 	});
 
 	it("normalizes aliased provider metadata to the canonical provider", () => {
