@@ -55,13 +55,17 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 		trpc.notification.registerPushToken.useMutation();
 	const promptedForPushPermissionUserId = useRef<string | null>(null);
 
-	const { data: onboardingState, isPending: onboardingPending } =
-		trpc.onboarding.getState.useQuery(undefined, {
-			enabled: Boolean(session),
-		});
+	const { data: onboardingState } = trpc.onboarding.getState.useQuery(
+		undefined,
+		{ enabled: Boolean(session) },
+	);
 
-	const onboardingResolved = !session || !onboardingPending;
-	const isPending = sessionPending || !onboardingResolved;
+	const hasLocalSession = Boolean(session);
+	// Trust the cached session from SecureStore to skip waiting for network
+	// revalidation. If the session is invalid, the tRPC 401 handler will
+	// redirect to sign-in. Onboarding state resolves in the background and
+	// redirects if needed (rare for returning users).
+	const isPending = !hasLocalSession && sessionPending;
 
 	useEffect(() => {
 		if (session?.user) {
