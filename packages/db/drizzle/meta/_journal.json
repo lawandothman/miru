@@ -64,6 +64,20 @@
 			"when": 1774209709923,
 			"tag": "0008_narrow_magma",
 			"breakpoints": true
+		},
+		{
+			"idx": 9,
+			"version": "7",
+			"when": 1774220400000,
+			"tag": "0009_steady_cougar",
+			"breakpoints": true
+		},
+		{
+			"idx": 10,
+			"version": "7",
+			"when": 1774221300000,
+			"tag": "0010_wooden_gargoyle",
+			"breakpoints": true
 		}
 	]
 }

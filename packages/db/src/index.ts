@@ -28,5 +28,15 @@ export type Database = ReturnType<typeof createDb>;
 export type User = InferSelectModel<typeof schema.users>;
 
 export { schema };
+export {
+	aliasedWatchProviderIds,
+	canonicalWatchProviders,
+	compareWatchProviders,
+	getCanonicalWatchProviderId,
+	mergeWatchProviders,
+	normalizeWatchProvider,
+	normalizeWatchProviderIds,
+	type WatchProviderShape,
+} from "./watch-providers";
 
 export { eq, inArray, sql } from "drizzle-orm";

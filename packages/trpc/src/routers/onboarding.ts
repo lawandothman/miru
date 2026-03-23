@@ -1,5 +1,5 @@
 import { keys } from "@miru/cache";
-import { schema } from "@miru/db";
+import { normalizeWatchProviderIds, schema } from "@miru/db";
 import { TRPCError } from "@trpc/server";
 import { and, count, desc, eq, inArray, ne, notInArray } from "drizzle-orm";
 import { z } from "zod";
@@ -76,7 +76,19 @@ export const onboardingRouter = router({
 				ctx.db
 					.select({ providerId: schema.userStreamingServices.providerId })
 					.from(schema.userStreamingServices)
-					.where(eq(schema.userStreamingServices.userId, userId)),
+					.where(
+						and(
+							eq(schema.userStreamingServices.userId, userId),
+							inArray(
+								schema.userStreamingServices.providerId,
+								ctx.db
+									.select({
+										providerId: schema.movieStreamProviders.providerId,
+									})
+									.from(schema.movieStreamProviders),
+							),
+						),
+					),
 				ctx.db
 					.select({ count: count() })
 					.from(schema.watchlistEntries)
@@ -98,7 +110,9 @@ export const onboardingRouter = router({
 			isCompleted: Boolean(user.onboardingCompletedAt),
 			country: user.country ?? null,
 			genreIds: genrePrefs.map((p) => p.genreId),
-			providerIds: streamingPrefs.map((p) => p.providerId),
+			providerIds: normalizeWatchProviderIds(
+				streamingPrefs.map((preference) => preference.providerId),
+			),
 			watchlistCount: watchlistRows[0]?.count ?? 0,
 			followCount: followRows[0]?.count ?? 0,
 		};
@@ -173,14 +187,28 @@ export const onboardingRouter = router({
 		.input(z.object({ providerIds: z.array(z.number().int().positive()) }))
 		.mutation(async ({ ctx, input }) => {
 			const userId = ctx.session.user.id;
+			const providerIds = normalizeWatchProviderIds(input.providerIds);
+			const streamableProviders =
+				providerIds.length > 0
+					? await ctx.db
+							.select({ providerId: schema.movieStreamProviders.providerId })
+							.from(schema.movieStreamProviders)
+							.where(
+								inArray(schema.movieStreamProviders.providerId, providerIds),
+							)
+							.groupBy(schema.movieStreamProviders.providerId)
+					: [];
+			const streamableProviderIds = streamableProviders.map(
+				(provider) => provider.providerId,
+			);
 
 			await ctx.db
 				.delete(schema.userStreamingServices)
 				.where(eq(schema.userStreamingServices.userId, userId));
 
-			if (input.providerIds.length > 0) {
+			if (streamableProviderIds.length > 0) {
 				await ctx.db.insert(schema.userStreamingServices).values(
-					input.providerIds.map((providerId) => ({
+					streamableProviderIds.map((providerId) => ({
 						userId,
 						providerId,
 					})),

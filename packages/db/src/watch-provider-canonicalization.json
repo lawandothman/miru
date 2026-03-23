@@ -1,0 +1,38 @@
+{
+	"8": {
+		"name": "Netflix",
+		"logoPath": "/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
+		"displayPriority": 4,
+		"aliases": [175, 1796]
+	},
+	"9": {
+		"name": "Amazon Prime Video",
+		"logoPath": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+		"displayPriority": 5,
+		"aliases": [10, 2100]
+	},
+	"41": {
+		"name": "ITVX",
+		"logoPath": "/1LuvKw01c2KQCt6DqgAgR06H2pT.jpg",
+		"displayPriority": 20,
+		"aliases": [2300]
+	},
+	"103": {
+		"name": "Channel 4",
+		"logoPath": "/uMWCgjsGnO5IoQtqxXOjnQA5gt9.jpg",
+		"displayPriority": 15,
+		"aliases": [2311]
+	},
+	"386": {
+		"name": "Peacock Premium",
+		"logoPath": "/2aGrp1xw3qhwCYvNGAJZPdjfeeX.jpg",
+		"displayPriority": 17,
+		"aliases": [387]
+	},
+	"531": {
+		"name": "Paramount Plus",
+		"logoPath": "/h5DcR0J2EESLitnhR8xLG1QymTE.jpg",
+		"displayPriority": 6,
+		"aliases": [2303, 2304]
+	}
+}
