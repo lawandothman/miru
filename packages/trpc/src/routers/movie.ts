@@ -1,5 +1,12 @@
 import { TTL, keys } from "@miru/cache";
-import { type Database, schema } from "@miru/db";
+import {
+	type Database,
+	compareWatchProviders,
+	mergeWatchProviders,
+	normalizeWatchProvider,
+	normalizeWatchProviderIds,
+	schema,
+} from "@miru/db";
 import { TMDBError } from "@lorenzopant/tmdb";
 import { TRPCError } from "@trpc/server";
 import {
@@ -40,6 +47,38 @@ const movieWithProvidersQuery = {
 	genres: { with: { genre: true } },
 	streamProviders: { with: { provider: true } },
 } as const;
+
+function normalizeMovieProviders<
+	T extends {
+		streamProviders: Array<{
+			provider: {
+				displayPriority: number | null;
+				id: number;
+				logoPath: string | null;
+				name: string;
+			};
+		}>;
+	},
+>(movie: T): T {
+	const streamProviders = movie.streamProviders
+		.map((streamProvider) => ({
+			...streamProvider,
+			provider: normalizeWatchProvider(streamProvider.provider),
+		}))
+		.filter((streamProvider, index, providers) => {
+			return (
+				providers.findIndex(
+					(provider) => provider.provider.id === streamProvider.provider.id,
+				) === index
+			);
+		})
+		.sort((a, b) => compareWatchProviders(a.provider, b.provider));
+
+	return {
+		...movie,
+		streamProviders,
+	};
+}
 
 type MovieMatchUser = {
 	id: string;
@@ -175,7 +214,7 @@ export const movieRouter = router({
 						input.tmdbId,
 						ctx.session?.user?.country ?? undefined,
 					)
-				: Promise.resolve(existing);
+				: Promise.resolve(existing ? normalizeMovieProviders(existing) : null);
 			const userContextPromise = ctx.session?.user
 				? fetchMovieUserContext(ctx.db, ctx.session.user.id, input.tmdbId)
 				: Promise.resolve(null);
@@ -244,8 +283,8 @@ export const movieRouter = router({
 					...existingWatchlist.map((e) => e.movieId),
 					...existingWatched.map((e) => e.movieId),
 				];
-				const userStreamingProviderIds = userStreamingServices.map(
-					(s) => s.providerId,
+				const userStreamingProviderIds = normalizeWatchProviderIds(
+					userStreamingServices.map((service) => service.providerId),
 				);
 
 				const similarUsers = await findSimilarUsers(
@@ -352,7 +391,16 @@ export const movieRouter = router({
 		return ctx.db
 			.select()
 			.from(schema.watchProviders)
-			.orderBy(schema.watchProviders.displayPriority);
+			.where(
+				inArray(
+					schema.watchProviders.id,
+					ctx.db
+						.select({ providerId: schema.movieStreamProviders.providerId })
+						.from(schema.movieStreamProviders),
+				),
+			)
+			.orderBy(schema.watchProviders.displayPriority)
+			.then((providers) => mergeWatchProviders(providers));
 	}),
 
 	getPopular: publicProcedure
@@ -365,17 +413,15 @@ export const movieRouter = router({
 		)
 		.query(async ({ ctx, input }) => {
 			const offset = input.cursor ?? 0;
+			const providerIds = normalizeWatchProviderIds(input.providerIds ?? []);
 
 			const providerMovieIds =
-				input.providerIds && input.providerIds.length > 0
+				providerIds.length > 0
 					? ctx.db
 							.select({ movieId: schema.movieStreamProviders.movieId })
 							.from(schema.movieStreamProviders)
 							.where(
-								inArray(
-									schema.movieStreamProviders.providerId,
-									input.providerIds,
-								),
+								inArray(schema.movieStreamProviders.providerId, providerIds),
 							)
 					: null;
 
@@ -712,10 +758,12 @@ export const movieRouter = router({
 });
 
 function findMovieWithProviders(db: Database, tmdbId: number) {
-	return db.query.movies.findFirst({
-		where: eq(schema.movies.id, tmdbId),
-		with: movieWithProvidersQuery,
-	});
+	return db.query.movies
+		.findFirst({
+			where: eq(schema.movies.id, tmdbId),
+			with: movieWithProvidersQuery,
+		})
+		.then((movie) => (movie ? normalizeMovieProviders(movie) : movie));
 }
 
 interface TMDBProvider {
@@ -839,25 +887,39 @@ async function upsertProviders(
 	movieId: number,
 	providers: TMDBProvider[],
 ) {
-	if (providers.length === 0) {
+	const normalizedProviders = mergeWatchProviders(
+		providers.map((provider) => ({
+			displayPriority: provider.display_priority,
+			id: provider.provider_id,
+			logoPath: provider.logo_path,
+			name: provider.provider_name,
+		})),
+	);
+
+	if (normalizedProviders.length === 0) {
 		return;
 	}
 
 	await db
 		.insert(schema.watchProviders)
 		.values(
-			providers.map((p) => ({
-				displayPriority: p.display_priority,
-				id: p.provider_id,
-				logoPath: p.logo_path,
-				name: p.provider_name,
+			normalizedProviders.map((provider) => ({
+				displayPriority: provider.displayPriority,
+				id: provider.id,
+				logoPath: provider.logoPath,
+				name: provider.name,
 			})),
 		)
 		.onConflictDoNothing();
 
 	await db
 		.insert(schema.movieStreamProviders)
-		.values(providers.map((p) => ({ movieId, providerId: p.provider_id })))
+		.values(
+			normalizedProviders.map((provider) => ({
+				movieId,
+				providerId: provider.id,
+			})),
+		)
 		.onConflictDoNothing();
 }
 

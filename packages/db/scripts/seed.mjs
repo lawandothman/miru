@@ -8,6 +8,23 @@ const PROVIDER_MOVIE_LIMIT = parsePositiveInt(
 	process.env.TMDB_SEED_PROVIDER_MOVIE_LIMIT,
 	30,
 );
+const watchProviderCanonicalization = loadWatchProviderCanonicalization();
+const canonicalWatchProviderMap = new Map(
+	Object.entries(watchProviderCanonicalization).map(([id, definition]) => [
+		Number(id),
+		{
+			display_priority: definition.displayPriority,
+			id: Number(id),
+			logo_path: definition.logoPath,
+			name: definition.name,
+		},
+	]),
+);
+const watchProviderAliasMap = new Map(
+	Object.entries(watchProviderCanonicalization).flatMap(([id, definition]) =>
+		definition.aliases.map((aliasId) => [aliasId, Number(id)]),
+	),
+);
 
 async function main() {
 	const databaseUrl = process.env.DATABASE_URL;
@@ -37,23 +54,13 @@ async function main() {
 	try {
 		writeOut(`Seeding minimal TMDB catalog for region ${DEFAULT_REGION}...\n`);
 
-		const [genresResponse, providersResponse] = await Promise.all([
-			tmdbRequest(
-				"/genre/movie/list",
-				{
-					language: "en-US",
-				},
-				tmdbToken,
-			),
-			tmdbRequest(
-				"/watch/providers/movie",
-				{
-					language: "en-US",
-					watch_region: DEFAULT_REGION,
-				},
-				tmdbToken,
-			),
-		]);
+		const genresResponse = await tmdbRequest(
+			"/genre/movie/list",
+			{
+				language: "en-US",
+			},
+			tmdbToken,
+		);
 
 		const genres = (genresResponse.genres ?? []).map((genre) => ({
 			id: genre.id,
@@ -98,17 +105,7 @@ async function main() {
 			return;
 		}
 
-		const providerMap = new Map(
-			(providersResponse.results ?? []).map((provider) => [
-				provider.provider_id,
-				{
-					display_priority: provider.display_priority ?? null,
-					id: provider.provider_id,
-					logo_path: provider.logo_path ?? null,
-					name: provider.provider_name,
-				},
-			]),
-		);
+		const providerMap = new Map();
 
 		const movieRows = uniqueMovies.map((movie) => ({
 			adult: movie.adult ?? false,
@@ -176,6 +173,7 @@ async function main() {
 			.map((movie) => movie.id);
 
 		const streamRows = [];
+		const seenStreamRows = new Set();
 
 		for (const movieId of providerSeedMovieIds) {
 			const watchProvidersResponse = await tmdbRequest(
@@ -187,15 +185,18 @@ async function main() {
 			const regional = watchProvidersResponse.results?.[DEFAULT_REGION];
 			if (regional) {
 				for (const provider of regional.flatrate ?? []) {
-					providerMap.set(provider.provider_id, {
-						display_priority: provider.display_priority ?? null,
-						id: provider.provider_id,
-						logo_path: provider.logo_path ?? null,
-						name: provider.provider_name,
-					});
+					const normalizedProvider = normalizeWatchProvider(provider);
+					providerMap.set(normalizedProvider.id, normalizedProvider);
+
+					const streamRowKey = `${movieId}:${normalizedProvider.id}`;
+					if (seenStreamRows.has(streamRowKey)) {
+						continue;
+					}
+
+					seenStreamRows.add(streamRowKey);
 					streamRows.push({
 						movie_id: movieId,
-						provider_id: provider.provider_id,
+						provider_id: normalizedProvider.id,
 					});
 				}
 			}
@@ -270,6 +271,29 @@ async function tmdbRequest(path, params, token) {
 	}
 
 	return response.json();
+}
+
+function loadWatchProviderCanonicalization() {
+	return JSON.parse(
+		readFileSync(
+			new URL("../src/watch-provider-canonicalization.json", import.meta.url),
+			"utf8",
+		),
+	);
+}
+
+function normalizeWatchProvider(provider) {
+	const canonicalProviderId =
+		watchProviderAliasMap.get(provider.provider_id) ?? provider.provider_id;
+	const canonicalProvider = canonicalWatchProviderMap.get(canonicalProviderId);
+
+	return {
+		display_priority:
+			canonicalProvider?.display_priority ?? provider.display_priority ?? null,
+		id: canonicalProviderId,
+		logo_path: canonicalProvider?.logo_path ?? provider.logo_path ?? null,
+		name: canonicalProvider?.name ?? provider.provider_name,
+	};
 }
 
 function readEnvValue(filePath, key) {
