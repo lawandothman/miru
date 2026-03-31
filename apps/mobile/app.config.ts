@@ -1,3 +1,4 @@
+import { execSync } from "node:child_process";
 import type { ExpoConfig } from "expo/config";
 
 const plugins: NonNullable<ExpoConfig["plugins"]> = [
@@ -10,7 +11,20 @@ const plugins: NonNullable<ExpoConfig["plugins"]> = [
 	"expo-web-browser",
 ];
 
-const appVersion = (process.env.APP_VERSION ?? "1.3.0").replace(/^v/, "");
+function getVersionFromGitTag(): string {
+	try {
+		return execSync("git describe --tags --abbrev=0", { encoding: "utf-8" })
+			.trim()
+			.replace(/^v/, "");
+	} catch {
+		return "0.0.0";
+	}
+}
+
+const appVersion = (process.env.APP_VERSION ?? getVersionFromGitTag()).replace(
+	/^v/,
+	"",
+);
 
 plugins.push([
 	"@sentry/react-native/expo",
