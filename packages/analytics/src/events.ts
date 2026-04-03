@@ -11,6 +11,7 @@ export type EventProperties = {
 	user_followed: { target_user_id: string };
 	user_unfollowed: { target_user_id: string };
 	movie_viewed: { movie_id: number };
+	trailer_viewed: { movie_id: number };
 	search_performed: { query: string };
 	match_viewed: { target_user_id: string };
 };

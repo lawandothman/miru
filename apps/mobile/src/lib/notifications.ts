@@ -2,6 +2,7 @@ import { Platform } from "react-native";
 import Constants from "expo-constants";
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
+import { match } from "ts-pattern";
 
 Notifications.setNotificationHandler({
 	handleNotification: () =>
@@ -26,6 +27,18 @@ export interface PushRegistrationResult {
 	token: string | null;
 }
 
+function resolvePermissionStatus(
+	settings: Notifications.NotificationPermissionsStatus,
+): Notifications.PermissionStatus {
+	if (settings.granted) {
+		return Notifications.PermissionStatus.GRANTED;
+	}
+
+	return match(settings.canAskAgain)
+		.with(true, () => Notifications.PermissionStatus.UNDETERMINED)
+		.otherwise(() => Notifications.PermissionStatus.DENIED);
+}
+
 function getProjectId() {
 	return (
 		Constants.easConfig?.projectId ??
@@ -47,7 +60,7 @@ async function ensureAndroidChannel() {
 
 export async function getNotificationPermissionsStatus() {
 	const settings = await Notifications.getPermissionsAsync();
-	return settings.status;
+	return resolvePermissionStatus(settings);
 }
 
 export async function getDevicePushToken({
@@ -66,14 +79,14 @@ export async function getDevicePushToken({
 	}
 
 	const existingSettings = await Notifications.getPermissionsAsync();
-	let { status } = existingSettings;
+	let status = resolvePermissionStatus(existingSettings);
 
 	if (
 		status !== Notifications.PermissionStatus.GRANTED &&
 		promptForPermission
 	) {
 		const requestedSettings = await Notifications.requestPermissionsAsync();
-		({ status } = requestedSettings);
+		status = resolvePermissionStatus(requestedSettings);
 	}
 
 	if (status !== Notifications.PermissionStatus.GRANTED) {
