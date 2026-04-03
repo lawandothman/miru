@@ -28,7 +28,7 @@ catalogs:
     superjson: 2.2.6
 
 ignoredBuiltDependencies:
-  - '@prisma/engines'
+  - "@prisma/engines"
   - core-js
   - esbuild
   - msw
