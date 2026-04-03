@@ -10,17 +10,11 @@ import { Colors, fontSize, fontFamily, spacing, radius } from "@/lib/constants";
 export function FriendsStep() {
 	const [search, setSearch] = useState("");
 
-	const { data: suggested, isLoading: suggestedLoading } =
-		trpc.onboarding.getSuggestedUsers.useQuery();
-
 	const { data: searchResults, isLoading: searchLoading } =
 		trpc.social.searchUsers.useQuery(
 			{ query: search },
 			{ enabled: search.length >= 2 },
 		);
-
-	const users = search.length >= 2 ? searchResults : suggested;
-	const isLoading = search.length >= 2 ? searchLoading : suggestedLoading;
 
 	return (
 		<View style={styles.container}>
@@ -47,40 +41,35 @@ export function FriendsStep() {
 				</View>
 			</View>
 
-			{isLoading ? (
-				<View style={styles.loadingContainer}>
-					<Spinner size={32} color={Colors.primary} />
-				</View>
-			) : (
-				<FlatList
-					data={users}
-					keyExtractor={(item) => item.id}
-					contentContainerStyle={styles.listContent}
-					showsVerticalScrollIndicator={false}
-					renderItem={({ item }) => (
-						<View style={styles.userRow}>
-							<UserAvatar imageUrl={item.image} name={item.name} size={44} />
-							<View style={styles.userInfo}>
-								<Text style={styles.userName} numberOfLines={1}>
-									{item.name}
-								</Text>
-								{"watchlistCount" in item && (
-									<Text style={styles.userMeta}>
-										{String(item.watchlistCount)} in watchlist
+			{search.length >= 2 && (
+				searchLoading ? (
+					<View style={styles.loadingContainer}>
+						<Spinner size={32} color={Colors.primary} />
+					</View>
+				) : (
+					<FlatList
+						data={searchResults}
+						keyExtractor={(item) => item.id}
+						contentContainerStyle={styles.listContent}
+						showsVerticalScrollIndicator={false}
+						renderItem={({ item }) => (
+							<View style={styles.userRow}>
+								<UserAvatar imageUrl={item.image} name={item.name} size={44} />
+								<View style={styles.userInfo}>
+									<Text style={styles.userName} numberOfLines={1}>
+										{item.name}
 									</Text>
-								)}
+								</View>
+								<FollowButton userId={item.id} isFollowing={item.isFollowing} />
 							</View>
-							<FollowButton userId={item.id} isFollowing={item.isFollowing} />
-						</View>
-					)}
-					ListEmptyComponent={
-						<View style={styles.emptyContainer}>
-							<Text style={styles.emptyText}>
-								{search.length >= 2 ? "No users found" : "No suggestions yet"}
-							</Text>
-						</View>
-					}
-				/>
+						)}
+						ListEmptyComponent={
+							<View style={styles.emptyContainer}>
+								<Text style={styles.emptyText}>No users found</Text>
+							</View>
+						}
+					/>
+				)
 			)}
 		</View>
 	);

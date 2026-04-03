@@ -19,9 +19,6 @@ export function FriendsStep({ onComplete }: FriendsStepProps) {
 	const { copied, copy } = useCopyToClipboard();
 	const debouncedQuery = useDebounce(searchQuery, 300);
 
-	const { data: suggestedUsers, isLoading: isSuggestedLoading } =
-		trpc.onboarding.getSuggestedUsers.useQuery();
-
 	const { data: searchResults, isFetching: isSearchLoading } =
 		trpc.social.searchUsers.useQuery(
 			{ query: debouncedQuery },
@@ -47,9 +44,6 @@ export function FriendsStep({ onComplete }: FriendsStepProps) {
 
 		await copy(url);
 	};
-
-	const usersToShow =
-		debouncedQuery.length > 0 ? searchResults : suggestedUsers;
 
 	return (
 		<form
@@ -84,14 +78,9 @@ export function FriendsStep({ onComplete }: FriendsStepProps) {
 				/>
 			</div>
 
-			<div className="space-y-1">
-				{!debouncedQuery && (
-					<p className="px-1 text-xs font-medium text-muted-foreground">
-						Suggested
-					</p>
-				)}
+			{debouncedQuery.length > 0 && (
 				<div className="max-h-72 space-y-1 overflow-y-auto rounded-xl border border-border/70 bg-card/40 p-2">
-					{(isSuggestedLoading || isSearchLoading) && (
+					{isSearchLoading && (
 						<div className="space-y-2 p-1">
 							{Array.from({ length: 4 }, (_, i) => (
 								<div
@@ -102,8 +91,8 @@ export function FriendsStep({ onComplete }: FriendsStepProps) {
 						</div>
 					)}
 
-					{usersToShow && usersToShow.length > 0 ? (
-						usersToShow.map((user) => (
+					{searchResults && searchResults.length > 0 ? (
+						searchResults.map((user) => (
 							<div
 								key={user.id}
 								className="flex items-center gap-3 rounded-lg border border-transparent p-2 transition-colors hover:border-border/60 hover:bg-card"
@@ -119,13 +108,13 @@ export function FriendsStep({ onComplete }: FriendsStepProps) {
 								<FollowButton userId={user.id} isFollowing={user.isFollowing} />
 							</div>
 						))
-					) : !isSuggestedLoading && !isSearchLoading ? (
+					) : !isSearchLoading ? (
 						<p className="py-6 text-center text-sm text-muted-foreground">
-							{debouncedQuery ? "No users found" : "No suggestions yet"}
+							No users found
 						</p>
 					) : null}
 				</div>
-			</div>
+			)}
 
 			<div className="space-y-2">
 				<p className="text-center text-xs text-muted-foreground">

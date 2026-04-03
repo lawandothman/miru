@@ -26,7 +26,6 @@ export function FollowButton({ userId, isFollowing }: FollowButtonProps) {
 		utils.social.getFollowing.invalidate();
 		utils.social.searchUsers.invalidate();
 		utils.social.getDashboardMatches.invalidate();
-		utils.onboarding.getSuggestedUsers.invalidate();
 	}
 
 	const follow = trpc.social.follow.useMutation({

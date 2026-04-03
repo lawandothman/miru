@@ -1,9 +1,8 @@
 import { keys } from "@miru/cache";
 import { normalizeWatchProviderIds, schema } from "@miru/db";
 import { TRPCError } from "@trpc/server";
-import { and, count, desc, eq, inArray, ne, notInArray } from "drizzle-orm";
+import { and, count, desc, eq, inArray, notInArray } from "drizzle-orm";
 import { z } from "zod";
-import { annotateFollowStatus } from "../helpers";
 import { protectedProcedure, router } from "../trpc";
 
 export const onboardingRouter = router({
@@ -116,40 +115,6 @@ export const onboardingRouter = router({
 			watchlistCount: watchlistRows[0]?.count ?? 0,
 			followCount: followRows[0]?.count ?? 0,
 		};
-	}),
-
-	getSuggestedUsers: protectedProcedure.query(async ({ ctx }) => {
-		const userId = ctx.session.user.id;
-
-		const users = await ctx.db
-			.select({
-				id: schema.users.id,
-				name: schema.users.name,
-				image: schema.users.image,
-				watchlistCount: count(schema.watchlistEntries.movieId),
-			})
-			.from(schema.users)
-			.leftJoin(
-				schema.watchlistEntries,
-				eq(schema.watchlistEntries.userId, schema.users.id),
-			)
-			.where(
-				and(
-					ne(schema.users.id, userId),
-					notInArray(
-						schema.users.id,
-						ctx.db
-							.select({ id: schema.follows.followingId })
-							.from(schema.follows)
-							.where(eq(schema.follows.followerId, userId)),
-					),
-				),
-			)
-			.groupBy(schema.users.id)
-			.orderBy(desc(count(schema.watchlistEntries.movieId)))
-			.limit(20);
-
-		return annotateFollowStatus(ctx, users);
 	}),
 
 	setCountry: protectedProcedure
