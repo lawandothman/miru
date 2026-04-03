@@ -11,7 +11,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Svg, { Path } from "react-native-svg";
 import * as AppleAuthentication from "expo-apple-authentication";
 import * as Sentry from "@sentry/react-native";
-import { signIn, useSession } from "@/lib/auth";
+import { authClient, signIn, useSession } from "@/lib/auth";
 import { capture } from "@/lib/analytics";
 import { Colors, fontSize, fontFamily, spacing, radius } from "@/lib/constants";
 
@@ -98,6 +98,17 @@ export default function SignInScreen() {
 					token: credential.identityToken,
 				},
 			});
+
+			const fullName = [
+				credential.fullName?.givenName,
+				credential.fullName?.familyName,
+			]
+				.filter(Boolean)
+				.join(" ");
+
+			if (fullName) {
+				await authClient.updateUser({ name: fullName });
+			}
 			capture("signed_in", { method: "apple" });
 		} catch (error) {
 			const code =
