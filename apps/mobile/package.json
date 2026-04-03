@@ -14,6 +14,7 @@
 	},
 	"dependencies": {
 		"@better-auth/expo": "catalog:better-auth",
+		"@expo/dom-webview": "55.0.5",
 		"@expo-google-fonts/dm-sans": "0.4.2",
 		"@expo-google-fonts/plus-jakarta-sans": "0.4.2",
 		"@expo/metro-runtime": "55.0.9",
