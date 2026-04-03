@@ -11,7 +11,9 @@ import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams, useRouter, Stack } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { ChevronLeft, Share2, Star } from "lucide-react-native";
+import { ChevronLeft, Play, Share2 } from "lucide-react-native";
+import { ImdbLogo } from "@/components/imdb-logo";
+import { Linking } from "react-native";
 import { useEffect, useRef } from "react";
 import { trpc } from "@/lib/trpc";
 import { capture } from "@/lib/analytics";
@@ -79,6 +81,10 @@ export default function MovieDetailScreen() {
 	const rating = movie.tmdbVoteAverage
 		? movie.tmdbVoteAverage.toFixed(1)
 		: null;
+	const trailerUrl =
+		movie.trailerKey && movie.trailerSite === "YouTube"
+			? `https://www.youtube.com/watch?v=${movie.trailerKey}`
+			: null;
 
 	return (
 		<>
@@ -177,13 +183,51 @@ export default function MovieDetailScreen() {
 							{rating && (
 								<>
 									<Text style={styles.metaDot}>·</Text>
-									<Star
-										size={13}
-										color={Colors.gold}
-										fill={Colors.gold}
-										style={{ marginTop: 1 }}
-									/>
-									<Text style={styles.ratingText}>{rating}</Text>
+									<Pressable
+										style={({ pressed }) => [
+											styles.trailerPill,
+											pressed && styles.pressed,
+										]}
+										hitSlop={12}
+										onPress={() => {
+											if (movie.imdbId) {
+												Linking.openURL(
+													`https://www.imdb.com/title/${movie.imdbId}`,
+												);
+											}
+										}}
+										disabled={!movie.imdbId}
+										accessibilityRole="link"
+										accessibilityLabel={`IMDb rating ${rating}`}
+									>
+										<ImdbLogo />
+										<Text style={styles.ratingText}>{rating}</Text>
+									</Pressable>
+								</>
+							)}
+							{trailerUrl && (
+								<>
+									<Text style={styles.metaDot}>·</Text>
+									<Pressable
+										style={({ pressed }) => [
+											styles.trailerPill,
+											pressed && styles.pressed,
+										]}
+										hitSlop={12}
+										onPress={() => {
+											capture("trailer_viewed", { movie_id: tmdbId });
+											Linking.openURL(trailerUrl);
+										}}
+										accessibilityRole="button"
+										accessibilityLabel="Watch trailer"
+									>
+										<Play
+											size={10}
+											color={Colors.foreground}
+											fill={Colors.foreground}
+										/>
+										<Text style={styles.trailerPillText}>Trailer</Text>
+									</Pressable>
 								</>
 							)}
 						</View>
@@ -370,6 +414,16 @@ const styles = StyleSheet.create({
 		flexWrap: "wrap",
 		gap: spacing[1],
 		marginTop: spacing[1],
+	},
+	trailerPill: {
+		flexDirection: "row",
+		alignItems: "center",
+		gap: 3,
+	},
+	trailerPillText: {
+		fontSize: fontSize.xs,
+		fontFamily: fontFamily.sansSemibold,
+		color: Colors.foreground,
 	},
 	metaText: {
 		fontSize: fontSize.xs,
