@@ -215,7 +215,8 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 			router.replace("/(tabs)");
 		}
 
-		if (!isRunningInExpoGo()) {
+		const canHideSplash = !session || onboardingCompleted !== undefined;
+		if (!isRunningInExpoGo() && canHideSplash) {
 			SplashScreen.hideAsync();
 		}
 	}, [session, isPending, onboardingState, segments, router]);
