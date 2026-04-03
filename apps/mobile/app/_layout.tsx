@@ -221,7 +221,7 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 		}
 	}, [session, isPending, onboardingState, segments, router]);
 
-	if (isPending) {
+	if (isPending || (session && onboardingState === undefined)) {
 		return null;
 	}
 
