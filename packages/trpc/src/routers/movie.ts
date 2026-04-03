@@ -507,30 +507,86 @@ export const movieRouter = router({
 				);
 			}
 
-			const movieIds = safeResults.map((r) => r.id);
+			const candidateIds = safeResults.map((r) => r.id);
 
-			if (movieIds.length > 0) {
-				try {
-					await ctx.db
-						.insert(schema.movies)
-						.values(
-							safeResults.map((result) => ({
-								id: result.id,
-								title: result.title,
-								originalTitle: result.original_title ?? null,
-								overview: result.overview ?? null,
-								posterPath: result.poster_path ?? null,
-								backdropPath: result.backdrop_path ?? null,
-								releaseDate: result.release_date ?? null,
-								adult: false,
-								popularity: result.popularity ?? null,
-							})),
-						)
-						.onConflictDoNothing();
-				} catch {
-					// Best-effort cache; search results are still valid from TMDB
+			if (candidateIds.length > 0) {
+				const knownMovies = await ctx.db
+					.select({ id: schema.movies.id, adult: schema.movies.adult })
+					.from(schema.movies)
+					.where(inArray(schema.movies.id, candidateIds));
+
+				const knownMap = new Map(knownMovies.map((m) => [m.id, m.adult]));
+				const unknownResults = safeResults.filter((r) => !knownMap.has(r.id));
+				const adultIds = new Set(
+					knownMovies.filter((m) => m.adult).map((m) => m.id),
+				);
+
+				if (unknownResults.length > 0) {
+					const settled = await Promise.allSettled(
+						unknownResults.map((r) =>
+							ctx.tmdb.movies.details({
+								movie_id: r.id,
+								append_to_response: ["keywords"],
+							}),
+						),
+					);
+
+					const inserts: {
+						id: number;
+						title: string;
+						originalTitle: string | null;
+						overview: string | null;
+						posterPath: string | null;
+						backdropPath: string | null;
+						releaseDate: string | null;
+						adult: boolean;
+						popularity: number | null;
+					}[] = [];
+
+					for (const [i, r] of unknownResults.entries()) {
+						const result = settled[i];
+						const isAdult =
+							result?.status === "fulfilled" &&
+							hasBlockedKeyword(
+								result.value.keywords.keywords,
+								result.value.vote_count ?? 0,
+							);
+
+						if (isAdult) {
+							adultIds.add(r.id);
+						}
+
+						inserts.push({
+							id: r.id,
+							title: r.title,
+							originalTitle: r.original_title ?? null,
+							overview: r.overview ?? null,
+							posterPath: r.poster_path ?? null,
+							backdropPath: r.backdrop_path ?? null,
+							releaseDate: r.release_date ?? null,
+							adult: isAdult,
+							popularity: r.popularity ?? null,
+						});
+					}
+
+					if (inserts.length > 0) {
+						try {
+							await ctx.db
+								.insert(schema.movies)
+								.values(inserts)
+								.onConflictDoNothing();
+						} catch {
+							// Best-effort cache; search results are still valid from TMDB
+						}
+					}
+				}
+
+				if (adultIds.size > 0) {
+					safeResults = safeResults.filter((r) => !adultIds.has(r.id));
 				}
 			}
+
+			const movieIds = safeResults.map((r) => r.id);
 
 			const { watchlistSet, watchedSet } = await getMovieStatuses(
 				ctx,
@@ -571,8 +627,51 @@ export const movieRouter = router({
 				});
 			}
 
-			return tmdbResults.results
-				.filter((r) => !r.adult)
+			let safeResults = tmdbResults.results.filter((r) => !r.adult);
+
+			const candidateIds = safeResults.map((r) => r.id);
+			if (candidateIds.length > 0) {
+				const knownMovies = await ctx.db
+					.select({ id: schema.movies.id, adult: schema.movies.adult })
+					.from(schema.movies)
+					.where(inArray(schema.movies.id, candidateIds));
+
+				const knownMap = new Map(knownMovies.map((m) => [m.id, m.adult]));
+				const unknownResults = safeResults.filter((r) => !knownMap.has(r.id));
+				const adultIds = new Set(
+					knownMovies.filter((m) => m.adult).map((m) => m.id),
+				);
+
+				if (unknownResults.length > 0) {
+					const settled = await Promise.allSettled(
+						unknownResults.map((r) =>
+							ctx.tmdb.movies.details({
+								movie_id: r.id,
+								append_to_response: ["keywords"],
+							}),
+						),
+					);
+
+					for (const [i, r] of unknownResults.entries()) {
+						const result = settled[i];
+						if (
+							result?.status === "fulfilled" &&
+							hasBlockedKeyword(
+								result.value.keywords.keywords,
+								result.value.vote_count ?? 0,
+							)
+						) {
+							adultIds.add(r.id);
+						}
+					}
+				}
+
+				if (adultIds.size > 0) {
+					safeResults = safeResults.filter((r) => !adultIds.has(r.id));
+				}
+			}
+
+			return safeResults
 				.sort((a, b) => (b.popularity ?? 0) - (a.popularity ?? 0))
 				.slice(0, 5)
 				.map((r) => ({
