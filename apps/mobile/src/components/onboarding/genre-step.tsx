@@ -1,12 +1,6 @@
-import {
-	View,
-	Text,
-	Pressable,
-	ScrollView,
-	ActivityIndicator,
-	StyleSheet,
-} from "react-native";
+import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
 import { Check } from "lucide-react-native";
+import { Spinner } from "@/components/spinner";
 import { trpc } from "@/lib/trpc";
 import { Colors, fontSize, fontFamily, spacing, radius } from "@/lib/constants";
 
@@ -44,7 +38,7 @@ export function GenreStep({
 
 			{isLoading ? (
 				<View style={styles.loadingContainer}>
-					<ActivityIndicator color={Colors.primary} size="large" />
+					<Spinner size={32} color={Colors.primary} />
 				</View>
 			) : (
 				<View style={styles.grid}>

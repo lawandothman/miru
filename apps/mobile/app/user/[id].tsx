@@ -9,7 +9,7 @@ import { UserAvatar } from "@/components/user-avatar";
 import { UserStats } from "@/components/user-stats";
 import { FollowButton } from "@/components/follow-button";
 import { MovieCarousel } from "@/components/movie-carousel";
-import { LoadingScreen } from "@/components/loading-screen";
+import { UserProfileSkeleton } from "@/components/user-profile-skeleton";
 import { defaultHeaderOptions } from "@/lib/navigation";
 import { Colors, fontSize, fontFamily, spacing } from "@/lib/constants";
 
@@ -136,7 +136,7 @@ export default function UserProfileScreen() {
 		return (
 			<>
 				<Stack.Screen options={{ ...defaultHeaderOptions, title: "" }} />
-				<LoadingScreen />
+				<UserProfileSkeleton />
 			</>
 		);
 	}

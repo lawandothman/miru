@@ -1,14 +1,8 @@
 import { useState } from "react";
-import {
-	View,
-	Text,
-	FlatList,
-	Pressable,
-	StyleSheet,
-	ActivityIndicator,
-} from "react-native";
+import { View, Text, FlatList, Pressable, StyleSheet } from "react-native";
 import { useLocalSearchParams, useRouter, Stack } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Spinner } from "@/components/spinner";
 import { trpc } from "@/lib/trpc";
 import { useSession } from "@/lib/auth";
 import { UserAvatar } from "@/components/user-avatar";
@@ -118,7 +112,7 @@ export default function FollowersScreen() {
 				{/* List */}
 				{isLoading ? (
 					<View style={styles.loading}>
-						<ActivityIndicator color={Colors.mutedForeground} />
+						<Spinner />
 					</View>
 				) : (
 					<FlatList

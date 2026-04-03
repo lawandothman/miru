@@ -1,13 +1,7 @@
 import { useState } from "react";
-import {
-	View,
-	Text,
-	TextInput,
-	FlatList,
-	ActivityIndicator,
-	StyleSheet,
-} from "react-native";
+import { View, Text, TextInput, FlatList, StyleSheet } from "react-native";
 import { Search } from "lucide-react-native";
+import { Spinner } from "@/components/spinner";
 import { trpc } from "@/lib/trpc";
 import { UserAvatar } from "@/components/user-avatar";
 import { FollowButton } from "@/components/follow-button";
@@ -55,7 +49,7 @@ export function FriendsStep() {
 
 			{isLoading ? (
 				<View style={styles.loadingContainer}>
-					<ActivityIndicator color={Colors.primary} size="large" />
+					<Spinner size={32} color={Colors.primary} />
 				</View>
 			) : (
 				<FlatList

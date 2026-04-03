@@ -1,7 +1,8 @@
 import * as ImagePicker from "expo-image-picker";
 import { Camera } from "lucide-react-native";
 import { useState } from "react";
-import { ActivityIndicator, Alert, Pressable, StyleSheet } from "react-native";
+import { Alert, Pressable, StyleSheet } from "react-native";
+import { Spinner } from "./spinner";
 import { API_URL } from "@/lib/api-url";
 import { authClient } from "@/lib/auth";
 import { Colors } from "@/lib/constants";
@@ -93,11 +94,7 @@ export function AvatarUpload({ imageUrl, name, size = 64 }: AvatarUploadProps) {
 		>
 			<UserAvatar imageUrl={previewUri ?? imageUrl} name={name} size={size} />
 			{isUploading ? (
-				<ActivityIndicator
-					size="small"
-					color={Colors.foreground}
-					style={[styles.overlay, { borderRadius: size / 2 }]}
-				/>
+				<Spinner size={16} color={Colors.foreground} />
 			) : (
 				<Camera
 					size={size * 0.3}

@@ -7,7 +7,6 @@ import {
 	ScrollView,
 	Switch,
 	Alert,
-	ActivityIndicator,
 	StyleSheet,
 	Platform,
 } from "react-native";
@@ -36,6 +35,7 @@ import { trpc } from "@/lib/trpc";
 import { capture } from "@/lib/analytics";
 import { defaultHeaderOptions } from "@/lib/navigation";
 import { AvatarUpload } from "@/components/avatar-upload";
+import { Spinner } from "@/components/spinner";
 import {
 	Colors,
 	fontSize,
@@ -251,7 +251,7 @@ function EditNameForm({ currentName }: { currentName: string }) {
 					disabled={isPending}
 				>
 					{isPending ? (
-						<ActivityIndicator color={Colors.primaryForeground} size="small" />
+						<Spinner size={16} color={Colors.primaryForeground} />
 					) : (
 						<Text style={styles.saveButtonText}>Save</Text>
 					)}
@@ -269,7 +269,7 @@ function GenreSummary() {
 	const { data: state, isLoading } = trpc.onboarding.getState.useQuery();
 
 	if (isLoading) {
-		return <ActivityIndicator color={Colors.mutedForeground} />;
+		return <Spinner />;
 	}
 
 	const selectedGenres =
@@ -311,7 +311,7 @@ function StreamingSummary() {
 	const { data: state, isLoading } = trpc.onboarding.getState.useQuery();
 
 	if (isLoading) {
-		return <ActivityIndicator color={Colors.mutedForeground} />;
+		return <Spinner />;
 	}
 
 	const selectedProviders =
@@ -365,7 +365,7 @@ function RegionPicker() {
 	});
 
 	if (isLoading) {
-		return <ActivityIndicator color={Colors.mutedForeground} />;
+		return <Spinner />;
 	}
 
 	const current = COUNTRIES.find((c) => c.code === country);
@@ -510,7 +510,7 @@ function NotificationPreferences() {
 				: "System permission not requested yet";
 
 	if (isLoading) {
-		return <ActivityIndicator color={Colors.mutedForeground} />;
+		return <Spinner />;
 	}
 
 	return (

@@ -1,16 +1,10 @@
 import { useState } from "react";
-import {
-	View,
-	Text,
-	Pressable,
-	StyleSheet,
-	ActivityIndicator,
-	Alert,
-} from "react-native";
+import { View, Text, Pressable, StyleSheet, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Svg, { Path } from "react-native-svg";
 import * as AppleAuthentication from "expo-apple-authentication";
 import * as Sentry from "@sentry/react-native";
+import { Spinner } from "@/components/spinner";
 import { authClient, signIn, useSession } from "@/lib/auth";
 import { capture } from "@/lib/analytics";
 import { Colors, fontSize, fontFamily, spacing, radius } from "@/lib/constants";
@@ -137,7 +131,7 @@ export default function SignInScreen() {
 
 				{isFinishingSignIn ? (
 					<View style={styles.loadingContainer}>
-						<ActivityIndicator color={Colors.foreground} size="large" />
+						<Spinner size={32} color={Colors.foreground} />
 					</View>
 				) : (
 					<View style={styles.actions}>

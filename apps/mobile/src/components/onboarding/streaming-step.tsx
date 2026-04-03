@@ -5,11 +5,11 @@ import {
 	TextInput,
 	Pressable,
 	FlatList,
-	ActivityIndicator,
 	StyleSheet,
 } from "react-native";
 import { Image } from "expo-image";
 import { Check, Search } from "lucide-react-native";
+import { Spinner } from "@/components/spinner";
 import { trpc } from "@/lib/trpc";
 import {
 	Colors,
@@ -132,7 +132,7 @@ export function StreamingStep({
 
 			{isLoading ? (
 				<View style={styles.loadingContainer}>
-					<ActivityIndicator color={Colors.primary} size="large" />
+					<Spinner size={32} color={Colors.primary} />
 				</View>
 			) : (
 				<FlatList

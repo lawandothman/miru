@@ -5,13 +5,13 @@ import {
 	TextInput,
 	Pressable,
 	ScrollView,
-	ActivityIndicator,
 	Alert,
 	StyleSheet,
 } from "react-native";
 import { Stack, useRouter } from "expo-router";
 import { Image } from "expo-image";
 import { Check, Search } from "lucide-react-native";
+import { Spinner } from "@/components/spinner";
 import { trpc } from "@/lib/trpc";
 import { useToggleSet } from "@/hooks/use-toggle-set";
 import { defaultHeaderOptions } from "@/lib/navigation";
@@ -78,7 +78,7 @@ export default function SettingsStreamingScreen() {
 								disabled={setServices.isPending}
 							>
 								{setServices.isPending ? (
-									<ActivityIndicator color={Colors.primary} size="small" />
+									<Spinner size={16} color={Colors.primary} />
 								) : (
 									<Text style={styles.saveHeaderText}>Save</Text>
 								)}
@@ -105,7 +105,7 @@ export default function SettingsStreamingScreen() {
 
 				{isLoading ? (
 					<View style={styles.loadingContainer}>
-						<ActivityIndicator color={Colors.primary} size="large" />
+						<Spinner size={32} color={Colors.primary} />
 					</View>
 				) : (
 					<ScrollView

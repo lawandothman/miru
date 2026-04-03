@@ -3,7 +3,7 @@ import { useLocalSearchParams, Stack } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { trpc } from "@/lib/trpc";
 import { MovieGrid } from "@/components/movie-grid";
-import { LoadingScreen } from "@/components/loading-screen";
+import { MovieGridSkeleton } from "@/components/movie-grid-skeleton";
 import { defaultHeaderOptions } from "@/lib/navigation";
 import { offsetPageParam } from "@/lib/pagination";
 import { Colors } from "@/lib/constants";
@@ -40,7 +40,7 @@ export default function GenreScreen() {
 			/>
 			<SafeAreaView style={styles.container} edges={[]}>
 				{isLoading ? (
-					<LoadingScreen />
+					<MovieGridSkeleton />
 				) : (
 					<MovieGrid
 						movies={movies}

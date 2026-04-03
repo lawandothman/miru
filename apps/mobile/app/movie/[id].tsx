@@ -17,7 +17,7 @@ import { trpc } from "@/lib/trpc";
 import { capture } from "@/lib/analytics";
 import { MovieActions } from "@/components/movie-actions";
 import { UserAvatar } from "@/components/user-avatar";
-import { LoadingScreen } from "@/components/loading-screen";
+import { MovieDetailSkeleton } from "@/components/movie-detail-skeleton";
 import {
 	Colors,
 	backdropUrl,
@@ -68,7 +68,7 @@ export default function MovieDetailScreen() {
 		return (
 			<>
 				<Stack.Screen options={{ headerShown: false }} />
-				<LoadingScreen />
+				<MovieDetailSkeleton />
 			</>
 		);
 	}

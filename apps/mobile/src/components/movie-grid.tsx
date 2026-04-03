@@ -1,12 +1,8 @@
-import {
-	FlatList,
-	StyleSheet,
-	View,
-	RefreshControl,
-	ActivityIndicator,
-} from "react-native";
+import { FlatList, StyleSheet, View, RefreshControl } from "react-native";
 import { useState } from "react";
 import { MoviePoster } from "./movie-poster";
+import { MovieGridSkeleton } from "./movie-grid-skeleton";
+import { Spinner } from "./spinner";
 import { Colors, spacing } from "@/lib/constants";
 import { triggerRefreshHaptic } from "@/lib/haptics";
 import type { MovieSummary } from "@/lib/types";
@@ -74,19 +70,13 @@ export function MovieGrid({
 			maxToRenderPerBatch={9}
 			windowSize={5}
 			ListEmptyComponent={
-				isLoading ? (
-					<View style={styles.loadingContainer}>
-						<ActivityIndicator color={Colors.primary} size="large" />
-					</View>
-				) : (
-					ListEmptyComponent
-				)
+				isLoading ? <MovieGridSkeleton /> : ListEmptyComponent
 			}
 			ListHeaderComponent={ListHeaderComponent}
 			ListFooterComponent={
 				isFetchingNextPage ? (
 					<View style={styles.footer}>
-						<ActivityIndicator color={Colors.mutedForeground} />
+						<Spinner />
 					</View>
 				) : null
 			}
@@ -127,10 +117,6 @@ const styles = StyleSheet.create({
 		flex: 1,
 		maxWidth: `${100 / NUM_COLUMNS}%`,
 		marginBottom: ITEM_GAP,
-	},
-	loadingContainer: {
-		paddingVertical: spacing[12],
-		alignItems: "center",
 	},
 	footer: {
 		paddingVertical: spacing[4],
