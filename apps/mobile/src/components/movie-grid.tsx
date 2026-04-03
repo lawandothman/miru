@@ -69,6 +69,10 @@ export function MovieGrid({
 			alwaysBounceVertical={movies.length > 0}
 			onEndReached={handleEndReached}
 			onEndReachedThreshold={0.5}
+			removeClippedSubviews
+			initialNumToRender={9}
+			maxToRenderPerBatch={9}
+			windowSize={5}
 			ListEmptyComponent={
 				isLoading ? (
 					<View style={styles.loadingContainer}>
