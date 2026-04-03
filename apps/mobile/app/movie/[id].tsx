@@ -11,15 +11,24 @@ import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams, useRouter, Stack } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { ChevronLeft, Play, Share2 } from "lucide-react-native";
+import {
+	ChevronLeft,
+	Film,
+	Play,
+	RefreshCw,
+	Share2,
+} from "lucide-react-native";
 import { ImdbLogo } from "@/components/imdb-logo";
 import { Linking } from "react-native";
 import { useEffect, useRef } from "react";
+import { TRPCClientError } from "@trpc/client";
 import { trpc } from "@/lib/trpc";
 import { capture } from "@/lib/analytics";
 import { MovieActions } from "@/components/movie-actions";
 import { UserAvatar } from "@/components/user-avatar";
 import { MovieDetailSkeleton } from "@/components/movie-detail-skeleton";
+import { EmptyState } from "@/components/empty-state";
+import { defaultHeaderOptions } from "@/lib/navigation";
 import {
 	Colors,
 	backdropUrl,
@@ -47,13 +56,26 @@ function movieSlug(title: string, tmdbId: number): string {
 	return `${slug}-${tmdbId}`;
 }
 
+function isNotFoundError(error: unknown): boolean {
+	return (
+		error instanceof TRPCClientError &&
+		(error.data?.httpStatus === 404 || error.data?.code === "NOT_FOUND")
+	);
+}
+
 export default function MovieDetailScreen() {
 	const { id } = useLocalSearchParams<{ id: string }>();
 	const router = useRouter();
 	const insets = useSafeAreaInsets();
 	const tmdbId = Number(id);
 
-	const { data: movie, isLoading } = trpc.movie.getById.useQuery(
+	const {
+		data: movie,
+		error,
+		isLoading,
+		refetch,
+		isRefetching,
+	} = trpc.movie.getById.useQuery(
 		{ tmdbId },
 		{ enabled: !Number.isNaN(tmdbId) },
 	);
@@ -66,11 +88,51 @@ export default function MovieDetailScreen() {
 		}
 	}, [movie, tmdbId]);
 
-	if (isLoading || !movie) {
+	const isInvalidId = Number.isNaN(tmdbId);
+	const isMissingMovie =
+		isInvalidId || isNotFoundError(error) || (!isLoading && !error && !movie);
+
+	if (isLoading) {
 		return (
 			<>
 				<Stack.Screen options={{ headerShown: false }} />
 				<MovieDetailSkeleton />
+			</>
+		);
+	}
+
+	if (isMissingMovie) {
+		return (
+			<>
+				<Stack.Screen options={{ ...defaultHeaderOptions, title: "Movie" }} />
+				<View style={styles.emptyScreen}>
+					<EmptyState
+						icon={Film}
+						title="Movie not found"
+						description="This title may have moved, or the link is no longer available in Miru."
+						actionLabel="Search movies"
+						onAction={() => router.replace("/(tabs)/search")}
+					/>
+				</View>
+			</>
+		);
+	}
+
+	if (error || !movie) {
+		return (
+			<>
+				<Stack.Screen options={{ ...defaultHeaderOptions, title: "Movie" }} />
+				<View style={styles.emptyScreen}>
+					<EmptyState
+						icon={RefreshCw}
+						title="Couldn't load movie"
+						description="We hit a problem loading this page. Try again, or head back and pick another title."
+						actionLabel={isRefetching ? "Trying again..." : "Try again"}
+						onAction={() => {
+							void refetch();
+						}}
+					/>
+				</View>
 			</>
 		);
 	}
@@ -336,6 +398,10 @@ const styles = StyleSheet.create({
 	},
 	scroll: {
 		paddingBottom: spacing[16],
+	},
+	emptyScreen: {
+		flex: 1,
+		paddingBottom: spacing[8],
 	},
 
 	/* Hero */
