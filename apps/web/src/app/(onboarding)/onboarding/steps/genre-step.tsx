@@ -64,7 +64,7 @@ export function GenreStep({
 					Your taste
 				</div>
 				<h2 className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">
-					What do you like to watch?
+					Pick a few genres
 				</h2>
 				<p className="text-sm text-muted-foreground sm:text-base">
 					Pick your favourites and we&apos;ll recommend things you&apos;ll love.

@@ -19,10 +19,9 @@ export function FriendsStep() {
 	return (
 		<View style={styles.container}>
 			<View style={styles.header}>
-				<Text style={styles.title}>Find friends</Text>
+				<Text style={styles.title}>Find your friends</Text>
 				<Text style={styles.subtitle}>
-					Follow people to see what they&apos;re watching. You can skip this
-					step.
+					Follow friends to see their watchlists and find matches faster.
 				</Text>
 			</View>
 
@@ -33,7 +32,7 @@ export function FriendsStep() {
 						style={styles.searchInput}
 						value={search}
 						onChangeText={setSearch}
-						placeholder="Search by name..."
+						placeholder="Search by name"
 						placeholderTextColor={Colors.mutedForeground}
 						autoCapitalize="none"
 						autoCorrect={false}
@@ -41,35 +40,41 @@ export function FriendsStep() {
 				</View>
 			</View>
 
-			{search.length >= 2 && (
-				searchLoading ? (
-					<View style={styles.loadingContainer}>
-						<Spinner size={32} color={Colors.primary} />
-					</View>
-				) : (
-					<FlatList
-						data={searchResults}
-						keyExtractor={(item) => item.id}
-						contentContainerStyle={styles.listContent}
-						showsVerticalScrollIndicator={false}
-						renderItem={({ item }) => (
-							<View style={styles.userRow}>
-								<UserAvatar imageUrl={item.image} name={item.name} size={44} />
-								<View style={styles.userInfo}>
-									<Text style={styles.userName} numberOfLines={1}>
-										{item.name}
-									</Text>
-								</View>
-								<FollowButton userId={item.id} isFollowing={item.isFollowing} />
+			{search.length < 2 ? (
+				<View style={styles.emptyContainer}>
+					<Text style={styles.emptyText}>
+						Type at least 2 letters to find people already on Miru.
+					</Text>
+				</View>
+			) : searchLoading ? (
+				<View style={styles.loadingContainer}>
+					<Spinner size={32} color={Colors.primary} />
+				</View>
+			) : (
+				<FlatList
+					data={searchResults}
+					keyExtractor={(item) => item.id}
+					contentContainerStyle={styles.listContent}
+					showsVerticalScrollIndicator={false}
+					renderItem={({ item }) => (
+						<View style={styles.userRow}>
+							<UserAvatar imageUrl={item.image} name={item.name} size={44} />
+							<View style={styles.userInfo}>
+								<Text style={styles.userName} numberOfLines={1}>
+									{item.name}
+								</Text>
 							</View>
-						)}
-						ListEmptyComponent={
-							<View style={styles.emptyContainer}>
-								<Text style={styles.emptyText}>No users found</Text>
-							</View>
-						}
-					/>
-				)
+							<FollowButton userId={item.id} isFollowing={item.isFollowing} />
+						</View>
+					)}
+					ListEmptyComponent={
+						<View style={styles.emptyContainer}>
+							<Text style={styles.emptyText}>
+								No people found. Try another name.
+							</Text>
+						</View>
+					}
+				/>
 			)}
 		</View>
 	);
@@ -156,5 +161,6 @@ const styles = StyleSheet.create({
 		fontSize: fontSize.sm,
 		fontFamily: fontFamily.sans,
 		color: Colors.mutedForeground,
+		textAlign: "center",
 	},
 });

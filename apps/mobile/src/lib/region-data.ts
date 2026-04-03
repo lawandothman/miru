@@ -40,6 +40,14 @@ export function countryFlag(code: string): string {
 	);
 }
 
+export function countryName(code: string | null | undefined): string {
+	if (!code) {
+		return "your region";
+	}
+
+	return COUNTRIES.find((country) => country.code === code)?.name ?? code;
+}
+
 const TIMEZONE_TO_COUNTRY: Record<string, string> = {
 	"America/New_York": "US",
 	"America/Chicago": "US",

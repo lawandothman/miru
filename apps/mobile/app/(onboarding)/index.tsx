@@ -148,6 +148,7 @@ export default function OnboardingScreen() {
 			case 3:
 				return (
 					<StreamingStep
+						country={country}
 						selectedProviders={selectedProviders}
 						onSelectionChange={setSelectedProviders}
 					/>
@@ -169,10 +170,7 @@ export default function OnboardingScreen() {
 
 	const buttonLabel = (() => {
 		if (step === TOTAL_STEPS) {
-			return "Finish";
-		}
-		if (isSkippable) {
-			return "Next";
+			return "Open Miru";
 		}
 		return "Continue";
 	})();

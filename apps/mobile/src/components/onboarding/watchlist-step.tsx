@@ -48,15 +48,22 @@ export function WatchlistStep({
 	return (
 		<View style={styles.container}>
 			<View style={styles.header}>
-				<Text style={styles.title}>Build your watchlist</Text>
+				<Text style={styles.title}>Start your watchlist</Text>
 				<Text style={styles.subtitle}>
-					Tap movies you want to watch. You can skip this step.
+					Save a few movies now so Miru can spot matches faster.
 				</Text>
 			</View>
 
 			{isLoading ? (
 				<View style={styles.loadingContainer}>
 					<Spinner size={32} color={Colors.primary} />
+				</View>
+			) : (movies?.length ?? 0) === 0 ? (
+				<View style={styles.emptyContainer}>
+					<Text style={styles.emptyText}>
+						No picks yet. Keep going and Miru will learn from what you save
+						later.
+					</Text>
 				</View>
 			) : (
 				<FlatList
@@ -128,6 +135,19 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: "center",
 		alignItems: "center",
+	},
+	emptyContainer: {
+		flex: 1,
+		paddingHorizontal: HORIZONTAL_PADDING,
+		alignItems: "center",
+		justifyContent: "center",
+	},
+	emptyText: {
+		fontSize: fontSize.sm,
+		fontFamily: fontFamily.sans,
+		color: Colors.mutedForeground,
+		lineHeight: 20,
+		textAlign: "center",
 	},
 	gridContent: {
 		paddingHorizontal: HORIZONTAL_PADDING,

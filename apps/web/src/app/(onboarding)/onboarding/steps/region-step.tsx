@@ -42,7 +42,7 @@ export function RegionStep({ initialCountry, onComplete }: RegionStepProps) {
 					Welcome to Miru
 				</div>
 				<h2 className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">
-					Where are you watching from?
+					Let&apos;s set your region
 				</h2>
 				<p className="text-sm text-muted-foreground sm:text-base">
 					This helps us show what&apos;s streaming near you.

@@ -10,6 +10,7 @@ import {
 import { Image } from "expo-image";
 import { Check, Search } from "lucide-react-native";
 import { Spinner } from "@/components/spinner";
+import { countryName } from "@/lib/region-data";
 import { trpc } from "@/lib/trpc";
 import {
 	Colors,
@@ -21,6 +22,7 @@ import {
 } from "@/lib/constants";
 
 interface StreamingStepProps {
+	country: string | null;
 	selectedProviders: Set<number>;
 	onSelectionChange: (providers: Set<number>) => void;
 }
@@ -34,6 +36,7 @@ interface Provider {
 const NUM_COLUMNS = 4;
 
 export function StreamingStep({
+	country,
 	selectedProviders,
 	onSelectionChange,
 }: StreamingStepProps) {
@@ -108,9 +111,9 @@ export function StreamingStep({
 	return (
 		<View style={styles.container}>
 			<View style={styles.header}>
-				<Text style={styles.title}>Streaming services</Text>
+				<Text style={styles.title}>Where do you stream?</Text>
 				<Text style={styles.subtitle}>
-					Select the services you subscribe to. You can skip this step.
+					Pick the services you use in {countryName(country)}.
 				</Text>
 			</View>
 
@@ -121,7 +124,7 @@ export function StreamingStep({
 						style={styles.searchInput}
 						value={search}
 						onChangeText={setSearch}
-						placeholder="Search services..."
+						placeholder="Search services"
 						placeholderTextColor={Colors.mutedForeground}
 						autoCapitalize="none"
 						autoCorrect={false}
@@ -136,7 +139,7 @@ export function StreamingStep({
 				</View>
 			) : (
 				<FlatList
-					data={sorted}
+					data={sorted ?? []}
 					renderItem={renderItem}
 					keyExtractor={(p) => String(p.id)}
 					numColumns={NUM_COLUMNS}
@@ -144,6 +147,13 @@ export function StreamingStep({
 					showsVerticalScrollIndicator={false}
 					initialNumToRender={20}
 					windowSize={5}
+					ListEmptyComponent={
+						<View style={styles.emptyContainer}>
+							<Text style={styles.emptyText}>
+								No services match that search.
+							</Text>
+						</View>
+					}
 				/>
 			)}
 		</View>
@@ -196,6 +206,16 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: "center",
 		alignItems: "center",
+	},
+	emptyContainer: {
+		paddingVertical: spacing[12],
+		alignItems: "center",
+	},
+	emptyText: {
+		fontSize: fontSize.sm,
+		fontFamily: fontFamily.sans,
+		color: Colors.mutedForeground,
+		textAlign: "center",
 	},
 	gridContainer: {
 		padding: spacing[4],

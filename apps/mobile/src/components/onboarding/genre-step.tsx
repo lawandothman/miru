@@ -31,9 +31,9 @@ export function GenreStep({
 			contentContainerStyle={styles.content}
 			showsVerticalScrollIndicator={false}
 		>
-			<Text style={styles.title}>What do you like?</Text>
+			<Text style={styles.title}>Pick a few genres</Text>
 			<Text style={styles.subtitle}>
-				Pick at least one genre so we can recommend movies you&apos;ll love.
+				Choose at least one genre so we can recommend better movies.
 			</Text>
 
 			{isLoading ? (

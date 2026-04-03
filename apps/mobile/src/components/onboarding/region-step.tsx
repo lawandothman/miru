@@ -54,9 +54,10 @@ export function RegionStep({ country, onSelect }: RegionStepProps) {
 	return (
 		<View style={styles.container}>
 			<View style={styles.header}>
-				<Text style={styles.title}>Where are you?</Text>
+				<Text style={styles.title}>Let's set your region</Text>
 				<Text style={styles.subtitle}>
-					This helps us show the right streaming services for your region.
+					We use your region to show what&apos;s streaming near you. You can
+					change it later.
 				</Text>
 			</View>
 			<FlatList
