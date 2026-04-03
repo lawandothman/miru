@@ -161,15 +161,9 @@ export default function MovieDetailScreen() {
 							/>
 						</View>
 					)}
+
 					<View style={styles.titleBlock}>
-						<Text style={styles.title} numberOfLines={3}>
-							{movie.title}
-						</Text>
-						{movie.tagline ? (
-							<Text style={styles.tagline} numberOfLines={2}>
-								{movie.tagline}
-							</Text>
-						) : null}
+						<Text style={styles.title}>{movie.title}</Text>
 						<View style={styles.metaRow}>
 							{year && <Text style={styles.metaText}>{year}</Text>}
 							{hours !== null && (
@@ -185,7 +179,7 @@ export default function MovieDetailScreen() {
 									<Text style={styles.metaDot}>·</Text>
 									<Pressable
 										style={({ pressed }) => [
-											styles.trailerPill,
+											styles.inlineTap,
 											pressed && styles.pressed,
 										]}
 										hitSlop={12}
@@ -210,7 +204,7 @@ export default function MovieDetailScreen() {
 									<Text style={styles.metaDot}>·</Text>
 									<Pressable
 										style={({ pressed }) => [
-											styles.trailerPill,
+											styles.inlineTap,
 											pressed && styles.pressed,
 										]}
 										hitSlop={12}
@@ -226,7 +220,7 @@ export default function MovieDetailScreen() {
 											color={Colors.foreground}
 											fill={Colors.foreground}
 										/>
-										<Text style={styles.trailerPillText}>Trailer</Text>
+										<Text style={styles.trailerText}>Trailer</Text>
 									</Pressable>
 								</>
 							)}
@@ -262,8 +256,15 @@ export default function MovieDetailScreen() {
 					)}
 
 					{/* Overview */}
-					{movie.overview && (
-						<Text style={styles.overview}>{movie.overview}</Text>
+					{(movie.tagline || movie.overview) && (
+						<View style={styles.overviewBlock}>
+							{movie.tagline ? (
+								<Text style={styles.tagline}>{movie.tagline}</Text>
+							) : null}
+							{movie.overview ? (
+								<Text style={styles.overview}>{movie.overview}</Text>
+							) : null}
+						</View>
 					)}
 
 					{/* Watch with friends */}
@@ -378,19 +379,6 @@ const styles = StyleSheet.create({
 		marginTop: -(POSTER_HEIGHT / 2),
 		zIndex: 2,
 	},
-	posterShadow: {
-		shadowColor: "#000",
-		shadowOffset: { width: 0, height: 8 },
-		shadowOpacity: 0.5,
-		shadowRadius: 16,
-		elevation: 12,
-	},
-	poster: {
-		width: POSTER_WIDTH,
-		height: POSTER_HEIGHT,
-		borderRadius: radius.lg,
-		backgroundColor: Colors.secondary,
-	},
 	titleBlock: {
 		flex: 1,
 		justifyContent: "flex-end",
@@ -401,12 +389,7 @@ const styles = StyleSheet.create({
 		fontSize: fontSize["2xl"],
 		fontFamily: fontFamily.displayBold,
 		color: Colors.foreground,
-	},
-	tagline: {
-		fontSize: fontSize.xs,
-		fontFamily: fontFamily.sans,
-		fontStyle: "italic",
-		color: Colors.mutedForeground,
+		marginBottom: spacing[3],
 	},
 	metaRow: {
 		flexDirection: "row",
@@ -415,12 +398,12 @@ const styles = StyleSheet.create({
 		gap: spacing[1],
 		marginTop: spacing[1],
 	},
-	trailerPill: {
+	inlineTap: {
 		flexDirection: "row",
 		alignItems: "center",
 		gap: 3,
 	},
-	trailerPillText: {
+	trailerText: {
 		fontSize: fontSize.xs,
 		fontFamily: fontFamily.sansSemibold,
 		color: Colors.foreground,
@@ -440,6 +423,19 @@ const styles = StyleSheet.create({
 		fontSize: fontSize.xs,
 		fontFamily: fontFamily.sansSemibold,
 		color: Colors.gold,
+	},
+	posterShadow: {
+		shadowColor: "#000",
+		shadowOffset: { width: 0, height: 8 },
+		shadowOpacity: 0.5,
+		shadowRadius: 16,
+		elevation: 12,
+	},
+	poster: {
+		width: POSTER_WIDTH,
+		height: POSTER_HEIGHT,
+		borderRadius: radius.lg,
+		backgroundColor: Colors.secondary,
 	},
 
 	/* Body */
@@ -473,6 +469,16 @@ const styles = StyleSheet.create({
 	},
 
 	/* Overview */
+	overviewBlock: {
+		gap: spacing[2],
+	},
+	tagline: {
+		fontSize: fontSize.xs,
+		fontFamily: fontFamily.sansSemibold,
+		color: Colors.mutedForeground,
+		textTransform: "uppercase",
+		letterSpacing: 1,
+	},
 	overview: {
 		fontSize: fontSize.sm,
 		fontFamily: fontFamily.sans,
