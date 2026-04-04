@@ -23,8 +23,9 @@ export function StreamingStep({
 	);
 	const [search, setSearch] = useState("");
 
-	const { data: providers, isLoading } =
-		trpc.movie.getWatchProviders.useQuery();
+	const { data: providers, isLoading } = trpc.movie.getWatchProviders.useQuery(
+		country ? { country } : undefined,
+	);
 	const setServices = trpc.onboarding.setStreamingServices.useMutation({
 		onError: () => toast.error("Failed to save streaming services"),
 		onSuccess: () => onComplete(Array.from(selected)),

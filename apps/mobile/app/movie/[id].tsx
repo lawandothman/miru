@@ -366,20 +366,27 @@ export default function MovieDetailScreen() {
 						<View style={styles.section}>
 							<Text style={styles.sectionTitle}>Available on</Text>
 							<View style={styles.providers}>
-								{movie.streamProviders.map((sp) => (
-									<View key={sp.provider.id} style={styles.providerCard}>
-										<Image
-											source={{
-												uri: providerLogoUrl(sp.provider.logoPath),
-											}}
-											style={styles.providerLogo}
-											contentFit="cover"
-										/>
-										<Text style={styles.providerName} numberOfLines={1}>
-											{sp.provider.name}
-										</Text>
-									</View>
-								))}
+								{movie.streamProviders.map((sp) => {
+									const { url } = sp;
+									return (
+										<Pressable
+											key={sp.provider.id}
+											style={styles.providerCard}
+											onPress={url ? () => Linking.openURL(url) : undefined}
+										>
+											<Image
+												source={{
+													uri: providerLogoUrl(sp.provider.logoPath),
+												}}
+												style={styles.providerLogo}
+												contentFit="cover"
+											/>
+											<Text style={styles.providerName} numberOfLines={1}>
+												{sp.provider.name}
+											</Text>
+										</Pressable>
+									);
+								})}
 							</View>
 						</View>
 					)}
