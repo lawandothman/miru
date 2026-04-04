@@ -6,6 +6,7 @@ import {
 	StyleSheet,
 	Dimensions,
 	Share,
+	ActivityIndicator,
 } from "react-native";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
@@ -20,8 +21,11 @@ import {
 } from "lucide-react-native";
 import { ImdbLogo } from "@/components/imdb-logo";
 import { Linking } from "react-native";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { TRPCClientError } from "@trpc/client";
+import { captureRef } from "react-native-view-shot";
+import * as Sharing from "expo-sharing";
+import { StoryCard } from "@/components/story-card";
 import { trpc } from "@/lib/trpc";
 import { capture } from "@/lib/analytics";
 import { MovieActions } from "@/components/movie-actions";
@@ -79,6 +83,33 @@ export default function MovieDetailScreen() {
 		{ tmdbId },
 		{ enabled: !Number.isNaN(tmdbId) },
 	);
+
+	const storyCardRef = useRef<View>(null);
+	const [isSharing, setIsSharing] = useState(false);
+
+	const handleShare = useCallback(async () => {
+		if (!movie || isSharing) return;
+		setIsSharing(true);
+		try {
+			const uri = await captureRef(storyCardRef, {
+				format: "png",
+				quality: 1,
+			});
+			await Sharing.shareAsync(uri, {
+				mimeType: "image/png",
+				UTI: "public.png",
+			});
+		} catch {
+			// Fallback to text share
+			const url = `${WEB_BASE}/movie/${movieSlug(movie.title, movie.id)}`;
+			Share.share({
+				message: `Check out ${movie.title} on Miru\n${url}`,
+				url,
+			}).catch(() => undefined);
+		} finally {
+			setIsSharing(false);
+		}
+	}, [movie, isSharing]);
 
 	const tracked = useRef(false);
 	useEffect(() => {
@@ -199,15 +230,14 @@ export default function MovieDetailScreen() {
 							]}
 							accessibilityRole="button"
 							accessibilityLabel="Share movie"
-							onPress={() => {
-								const url = `${WEB_BASE}/movie/${movieSlug(movie.title, movie.id)}`;
-								Share.share({
-									message: `Check out ${movie.title} on Miru\n${url}`,
-									url,
-								}).catch(() => undefined);
-							}}
+							onPress={handleShare}
+							disabled={isSharing}
 						>
-							<Share2 size={18} color="#fff" />
+							{isSharing ? (
+								<ActivityIndicator size="small" color="#fff" />
+							) : (
+								<Share2 size={18} color="#fff" />
+							)}
 						</Pressable>
 					</View>
 				</View>
@@ -392,6 +422,11 @@ export default function MovieDetailScreen() {
 					)}
 				</View>
 			</ScrollView>
+
+			{/* Off-screen story card for share capture */}
+			<View style={styles.offscreen} pointerEvents="none">
+				<StoryCard ref={storyCardRef} movie={movie} />
+			</View>
 		</>
 	);
 }
@@ -409,6 +444,11 @@ const styles = StyleSheet.create({
 	emptyScreen: {
 		flex: 1,
 		paddingBottom: spacing[8],
+	},
+	offscreen: {
+		position: "absolute",
+		left: -9999,
+		top: 0,
 	},
 
 	/* Hero */

@@ -9,6 +9,7 @@ const plugins: NonNullable<ExpoConfig["plugins"]> = [
 	"expo-apple-authentication",
 	"expo-updates",
 	"expo-web-browser",
+	"expo-sharing",
 ];
 
 function getVersionFromGitTag(): string {
