@@ -16,6 +16,10 @@
 			"matchUpdateTypes": ["minor", "patch"]
 		},
 		{
+			"matchDepNames": ["node"],
+			"rangeStrategy": "widen"
+		},
+		{
 			"matchManagers": ["github-actions"],
 			"pinDigests": true
 		},
