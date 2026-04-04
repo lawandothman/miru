@@ -245,24 +245,36 @@ export default async function MoviePage({ params }: MoviePageProps) {
 						Stream
 					</h2>
 					<div className="flex flex-wrap gap-3">
-						{movie.streamProviders.map((sp) => (
-							<div
-								key={sp.provider.id}
-								className="flex items-center gap-2 rounded-lg border border-border/50 bg-card px-3 py-2"
-							>
-								{sp.provider.logoPath && (
-									<Image
-										src={`https://image.tmdb.org/t/p/w92${sp.provider.logoPath}`}
-										alt={sp.provider.name}
-										width={24}
-										height={24}
-										className="rounded"
-										unoptimized
-									/>
-								)}
-								<span className="text-sm">{sp.provider.name}</span>
-							</div>
-						))}
+						{movie.streamProviders.map((sp) => {
+							const Card = (
+								<div className="flex items-center gap-2 rounded-lg border border-border/50 bg-card px-3 py-2">
+									{sp.provider.logoPath && (
+										<Image
+											src={`https://image.tmdb.org/t/p/w92${sp.provider.logoPath}`}
+											alt={sp.provider.name}
+											width={24}
+											height={24}
+											className="rounded"
+											unoptimized
+										/>
+									)}
+									<span className="text-sm">{sp.provider.name}</span>
+								</div>
+							);
+							return sp.url ? (
+								<a
+									key={sp.provider.id}
+									href={sp.url}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="transition-opacity hover:opacity-80"
+								>
+									{Card}
+								</a>
+							) : (
+								<div key={sp.provider.id}>{Card}</div>
+							);
+						})}
 					</div>
 				</div>
 			)}

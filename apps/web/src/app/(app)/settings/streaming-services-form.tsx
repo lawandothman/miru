@@ -29,8 +29,10 @@ import { toast } from "sonner";
 export function StreamingServicesForm() {
 	const isMobile = useIsMobile();
 
-	const { data: providers } = trpc.movie.getWatchProviders.useQuery();
 	const { data: state, isLoading } = trpc.onboarding.getState.useQuery();
+	const { data: providers } = trpc.movie.getWatchProviders.useQuery(
+		state?.country ? { country: state.country } : undefined,
+	);
 
 	const [open, setOpen] = useState(false);
 	const [selected, setSelected] = useState(

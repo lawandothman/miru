@@ -39,4 +39,6 @@ export {
 	type WatchProviderShape,
 } from "./watch-providers";
 
+export { getWatchProviderUrl } from "./watch-provider-urls";
+
 export { eq, inArray, sql } from "drizzle-orm";

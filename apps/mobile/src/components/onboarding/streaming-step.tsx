@@ -40,8 +40,9 @@ export function StreamingStep({
 	selectedProviders,
 	onSelectionChange,
 }: StreamingStepProps) {
-	const { data: providers, isLoading } =
-		trpc.movie.getWatchProviders.useQuery();
+	const { data: providers, isLoading } = trpc.movie.getWatchProviders.useQuery(
+		country ? { country } : undefined,
+	);
 	const [search, setSearch] = useState("");
 
 	function toggle(id: number) {

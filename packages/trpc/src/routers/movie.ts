@@ -2,6 +2,7 @@ import { TTL, keys } from "@miru/cache";
 import {
 	type Database,
 	compareWatchProviders,
+	getWatchProviderUrl,
 	mergeWatchProviders,
 	normalizeWatchProvider,
 	normalizeWatchProviderIds,
@@ -50,6 +51,7 @@ const movieWithProvidersQuery = {
 
 function normalizeMovieProviders<
 	T extends {
+		title: string;
 		streamProviders: Array<{
 			provider: {
 				displayPriority: number | null;
@@ -59,11 +61,16 @@ function normalizeMovieProviders<
 			};
 		}>;
 	},
->(movie: T): T {
+>(
+	movie: T,
+): Omit<T, "streamProviders"> & {
+	streamProviders: Array<T["streamProviders"][number] & { url: string | null }>;
+} {
 	const streamProviders = movie.streamProviders
 		.map((streamProvider) => ({
 			...streamProvider,
 			provider: normalizeWatchProvider(streamProvider.provider),
+			url: getWatchProviderUrl(streamProvider.provider.id, movie.title),
 		}))
 		.filter((streamProvider, index, providers) => {
 			return (
@@ -77,6 +84,10 @@ function normalizeMovieProviders<
 	return {
 		...movie,
 		streamProviders,
+	} as Omit<T, "streamProviders"> & {
+		streamProviders: Array<
+			T["streamProviders"][number] & { url: string | null }
+		>;
 	};
 }
 
@@ -387,21 +398,45 @@ export const movieRouter = router({
 		return fetchGenres();
 	}),
 
-	getWatchProviders: publicProcedure.query(({ ctx }) => {
-		return ctx.db
-			.select()
-			.from(schema.watchProviders)
-			.where(
-				inArray(
-					schema.watchProviders.id,
-					ctx.db
-						.select({ providerId: schema.movieStreamProviders.providerId })
-						.from(schema.movieStreamProviders),
-				),
-			)
-			.orderBy(schema.watchProviders.displayPriority)
-			.then((providers) => mergeWatchProviders(providers));
-	}),
+	getWatchProviders: publicProcedure
+		.input(z.object({ country: z.string().length(2).optional() }).optional())
+		.query(async ({ ctx, input }) => {
+			const providers = await ctx.db
+				.select()
+				.from(schema.watchProviders)
+				.where(
+					inArray(
+						schema.watchProviders.id,
+						ctx.db
+							.select({ providerId: schema.movieStreamProviders.providerId })
+							.from(schema.movieStreamProviders),
+					),
+				)
+				.orderBy(schema.watchProviders.displayPriority)
+				.then((p) => mergeWatchProviders(p));
+
+			const country = input?.country;
+			if (!country) {
+				return providers;
+			}
+
+			try {
+				const tmdbProviders = await ctx.tmdb.watch_providers.movie_providers();
+				const regionProviderIds = new Set(
+					tmdbProviders.results
+						.filter(
+							(p) =>
+								p.display_priorities[
+									country as keyof typeof p.display_priorities
+								] !== undefined,
+						)
+						.map((p) => p.provider_id),
+				);
+				return providers.filter((p) => regionProviderIds.has(p.id));
+			} catch {
+				return providers;
+			}
+		}),
 
 	getPopular: publicProcedure
 		.input(
