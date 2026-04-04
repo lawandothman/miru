@@ -41,7 +41,7 @@ export const StoryCard = React.forwardRef<View, { movie: StoryCardMovie }>(
 				{movie.backdropPath ? (
 					<Image
 						source={{ uri: backdropUrl(movie.backdropPath) }}
-						style={[StyleSheet.absoluteFillObject, styles.backdrop]}
+						style={[StyleSheet.absoluteFill, styles.backdrop]}
 						blurRadius={25}
 						resizeMode="cover"
 					/>
@@ -52,9 +52,9 @@ export const StoryCard = React.forwardRef<View, { movie: StoryCardMovie }>(
 
 				{/* Gradient for depth */}
 				<LinearGradient
-					colors={["rgba(0,0,0,0.1)", "rgba(0,0,0,0.45)", "rgba(0,0,0,0.85)"]}
-					locations={[0, 0.5, 1]}
-					style={StyleSheet.absoluteFillObject}
+					colors={["rgba(0,0,0,0.05)", "rgba(0,0,0,0.3)", "rgba(0,0,0,0.6)"]}
+					locations={[0, 0.55, 1]}
+					style={StyleSheet.absoluteFill}
 				/>
 
 				{/* Main content */}
@@ -112,8 +112,7 @@ export const StoryCard = React.forwardRef<View, { movie: StoryCardMovie }>(
 
 				{/* Branding */}
 				<View style={styles.branding}>
-					<View style={styles.accentLine} />
-					<Text style={styles.brandName}>miru</Text>
+					<Text style={styles.brandName}>Miru</Text>
 					<Text style={styles.brandUrl}>watchmiru.app</Text>
 				</View>
 			</View>
@@ -133,8 +132,8 @@ const styles = StyleSheet.create({
 		height: CARD_HEIGHT,
 	},
 	overlay: {
-		...StyleSheet.absoluteFillObject,
-		backgroundColor: "rgba(0,0,0,0.55)",
+		...StyleSheet.absoluteFill,
+		backgroundColor: "rgba(0,0,0,0.4)",
 	},
 
 	/* Content */
@@ -231,13 +230,6 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 		paddingBottom: spacing[8],
 		gap: spacing[1],
-	},
-	accentLine: {
-		width: 32,
-		height: 2,
-		backgroundColor: Colors.gold,
-		borderRadius: 1,
-		marginBottom: spacing[2],
 	},
 	brandName: {
 		fontSize: fontSize.lg,
