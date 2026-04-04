@@ -31,5 +31,8 @@
 		"turbo": "2.8.16",
 		"vitest": "4.0.18"
 	},
+	"engines": {
+		"node": ">=24"
+	},
 	"packageManager": "pnpm@10.32.1"
 }
