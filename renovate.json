@@ -5,11 +5,11 @@
 	"labels": ["dependencies"],
 	"semanticCommits": "enabled",
 	"lockFileMaintenance": {
-		"enabled": true
+		"enabled": false
 	},
 	"postUpdateOptions": [],
-	"prConcurrentLimit": 5,
-	"branchConcurrentLimit": 5,
+	"prConcurrentLimit": 3,
+	"branchConcurrentLimit": 3,
 	"packageRules": [
 		{
 			"matchDepTypes": ["devDependencies"],
