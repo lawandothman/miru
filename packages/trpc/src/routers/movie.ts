@@ -44,6 +44,12 @@ const TRAILER_SITE = "YouTube";
 const TRAILER_TYPE = "Trailer";
 const DISCOVER_SECTION_LIMIT = 15;
 
+const ADDON_CHANNEL_PATTERN = /Amazon Channel|Apple TV Channel/i;
+
+function isAddonChannel(name: string) {
+	return ADDON_CHANNEL_PATTERN.test(name);
+}
+
 const movieWithProvidersQuery = {
 	genres: { with: { genre: true } },
 	streamProviders: { with: { provider: true } },
@@ -413,7 +419,11 @@ export const movieRouter = router({
 					),
 				)
 				.orderBy(schema.watchProviders.displayPriority)
-				.then((p) => mergeWatchProviders(p));
+				.then((p) =>
+					mergeWatchProviders(p).filter(
+						(provider) => !isAddonChannel(provider.name),
+					),
+				);
 
 			const country = input?.country;
 			if (!country) {
