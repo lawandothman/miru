@@ -21,7 +21,6 @@ const nextConfig: NextConfig = {
 			},
 		],
 	},
-	optimizePackageImports: ["lucide-react", "@radix-ui/react-icons"],
 	transpilePackages: ["@miru/db", "@miru/trpc", "@miru/cache"],
 	headers() {
 		return [
