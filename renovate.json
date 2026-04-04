@@ -8,6 +8,8 @@
 		"enabled": true
 	},
 	"postUpdateOptions": [],
+	"prConcurrentLimit": 5,
+	"branchConcurrentLimit": 5,
 	"packageRules": [
 		{
 			"matchDepTypes": ["devDependencies"],
