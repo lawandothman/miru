@@ -7,7 +7,7 @@
 	"lockFileMaintenance": {
 		"enabled": true
 	},
-	"postUpdateOptions": ["pnpmDedupe"],
+	"postUpdateOptions": [],
 	"packageRules": [
 		{
 			"matchDepTypes": ["devDependencies"],
