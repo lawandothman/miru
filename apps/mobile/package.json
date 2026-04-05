@@ -69,7 +69,7 @@
 		"@types/react": "catalog:react",
 		"babel-plugin-module-resolver": "5.0.3",
 		"babel-plugin-react-compiler": "1.0.0",
-		"babel-preset-expo": "55.0.10",
+		"babel-preset-expo": "55.0.15",
 		"typescript": "catalog:"
 	},
 	"expo": {
