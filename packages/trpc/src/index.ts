@@ -1,7 +1,4 @@
-export type {
-	NotificationType,
-	TypedNotificationData,
-} from "@miru/db/schema";
+export type { NotificationType, TypedNotificationData } from "@miru/db/schema";
 export {
 	type Context,
 	type CreateContextOptions,
