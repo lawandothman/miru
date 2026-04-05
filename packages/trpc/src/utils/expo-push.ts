@@ -65,12 +65,12 @@ async function sendExpoPushMessages(
 		return;
 	}
 
-	const headers: Record<string, string> = {
+	const headers: { Authorization?: string; "Content-Type": string } = {
 		"Content-Type": "application/json",
 	};
 
 	if (expoAccessToken) {
-		headers["Authorization"] = `Bearer ${expoAccessToken}`;
+		headers.Authorization = `Bearer ${expoAccessToken}`;
 	}
 
 	const response = await fetch(EXPO_PUSH_API_URL, {
