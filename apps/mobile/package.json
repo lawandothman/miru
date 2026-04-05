@@ -76,7 +76,9 @@
 		"install": {
 			"exclude": [
 				"@react-navigation/native",
-				"@expo/ui"
+				"@expo/ui",
+				"react",
+				"react-dom"
 			]
 		}
 	}
