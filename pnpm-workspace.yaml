@@ -4,7 +4,7 @@ packages:
 
 catalog:
   "@lorenzopant/tmdb": 1.11.0
-  "@types/node": 25.5.0
+  "@types/node": 25.5.2
   drizzle-orm: 0.45.1
   eslint-plugin-react-hooks: 7.0.1
   ts-pattern: 5.9.0
