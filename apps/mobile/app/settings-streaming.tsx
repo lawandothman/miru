@@ -69,23 +69,18 @@ export default function SettingsStreamingScreen() {
 				options={{
 					...defaultHeaderOptions,
 					title: "Streaming Services",
-					headerRight: () =>
-						hasChanges ? (
-							<Pressable
-								onPress={() =>
-									setServices.mutate({ providerIds: Array.from(selected) })
-								}
-								disabled={setServices.isPending}
-							>
-								{setServices.isPending ? (
-									<Spinner size={16} color={Colors.primary} />
-								) : (
-									<Text style={styles.saveHeaderText}>Save</Text>
-								)}
-							</Pressable>
-						) : null,
 				}}
 			/>
+			<Stack.Toolbar placement="right">
+				<Stack.Toolbar.Button
+					icon="checkmark"
+					variant="done"
+					hidden={!hasChanges || setServices.isPending}
+					onPress={() =>
+						setServices.mutate({ providerIds: Array.from(selected) })
+					}
+				/>
+			</Stack.Toolbar>
 			<View style={styles.container}>
 				{/* Search bar */}
 				<View style={styles.searchContainer}>
@@ -240,10 +235,5 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 		borderWidth: 2,
 		borderColor: Colors.background,
-	},
-	saveHeaderText: {
-		fontSize: fontSize.base,
-		fontFamily: fontFamily.sansSemibold,
-		color: Colors.primary,
 	},
 });
