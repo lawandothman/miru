@@ -17,7 +17,7 @@
 		"@miru/db": "workspace:*",
 		"@miru/trpc": "workspace:*",
 		"@sentry/nextjs": "10.42.0",
-		"@t3-oss/env-nextjs": "0.13.10",
+		"@t3-oss/env-nextjs": "0.13.11",
 		"@tanstack/react-query": "catalog:trpc",
 		"@trpc/client": "catalog:trpc",
 		"@trpc/react-query": "catalog:trpc",
