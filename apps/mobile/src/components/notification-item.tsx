@@ -3,6 +3,7 @@ import { formatDistanceToNowStrict } from "date-fns";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { Pressable, StyleSheet, Text, View } from "react-native";
+import { match } from "ts-pattern";
 import { FollowButton } from "@/components/follow-button";
 import { UserAvatar } from "@/components/user-avatar";
 import {
@@ -35,14 +36,12 @@ export function NotificationItem({ item }: NotificationItemProps) {
 	const router = useRouter();
 
 	function handlePress() {
-		switch (item.type) {
-			case "new-follower":
-				router.push(`/user/${item.actor.id}`);
-				break;
-			case "watchlist-match":
-				router.push(`/movie/${item.data.movieId}`);
-				break;
-		}
+		match(item)
+			.with({ type: "new-follower" }, (n) => router.push(`/user/${n.actor.id}`))
+			.with({ type: "watchlist-match" }, (n) =>
+				router.push(`/movie/${n.data.movieId}`),
+			)
+			.exhaustive();
 	}
 
 	const time = (
