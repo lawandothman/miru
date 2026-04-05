@@ -1,6 +1,7 @@
 import { schema } from "@miru/db";
 import { and, count, desc, eq, lt } from "drizzle-orm";
 import { z } from "zod";
+import { annotateFollowStatus } from "../helpers";
 import { protectedProcedure, router } from "../trpc";
 import { unregisterPushTokenForUser } from "../utils/expo-push";
 
@@ -50,7 +51,17 @@ export const notificationRouter = router({
 				? notifications[notifications.length - 1]?.createdAt.toISOString()
 				: undefined;
 
-			return { notifications, nextCursor };
+			const actors = notifications.map((n) => n.actor);
+			const annotatedActors = await annotateFollowStatus(ctx, actors);
+			const actorMap = new Map(annotatedActors.map((a) => [a.id, a]));
+
+			return {
+				notifications: notifications.map((n) => ({
+					...n,
+					actor: actorMap.get(n.actor.id) ?? n.actor,
+				})),
+				nextCursor,
+			};
 		}),
 
 	getUnreadCount: protectedProcedure.query(async ({ ctx }) => {

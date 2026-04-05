@@ -19,6 +19,7 @@ interface NotificationActor {
 	id: string;
 	name: string;
 	image: string | null;
+	isFollowing?: boolean;
 }
 
 export type NotificationItemData = TypedNotificationData & {
@@ -78,7 +79,7 @@ export function NotificationItem({ item }: NotificationItemProps) {
 
 			<View style={styles.trailing}>
 				{item.type === "new-follower" ? (
-					<FollowButton userId={item.actor.id} isFollowing={false} />
+					<FollowButton userId={item.actor.id} isFollowing={item.actor.isFollowing ?? false} />
 				) : item.data.posterPath ? (
 					<Image
 						source={{ uri: posterUrl(item.data.posterPath) }}
