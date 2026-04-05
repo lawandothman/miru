@@ -17,3 +17,5 @@ jobs:
           configurationFile: renovate.json
         env:
           RENOVATE_REPOSITORIES: lawandothman/miru
+          RENOVATE_GIT_AUTHOR: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
+          RENOVATE_PLATFORM_COMMIT: "enabled"
