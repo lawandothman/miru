@@ -1,14 +1,14 @@
-import React from "react";
-import { View, Text, Image, StyleSheet } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import type React from "react";
+import { Image, StyleSheet, Text, View } from "react-native";
 import {
-	Colors,
 	backdropUrl,
-	posterUrl,
-	fontSize,
+	Colors,
 	fontFamily,
-	spacing,
+	fontSize,
+	posterUrl,
 	radius,
+	spacing,
 } from "@/lib/constants";
 
 const CARD_WIDTH = 360;
@@ -26,99 +26,103 @@ interface StoryCardMovie {
 	genres: { genre: { id: number; name: string } }[] | null;
 }
 
-export const StoryCard = React.forwardRef<View, { movie: StoryCardMovie }>(
-	function StoryCard({ movie }, ref) {
-		const year = movie.releaseDate?.slice(0, 4);
-		const hours = movie.runtime ? Math.floor(movie.runtime / 60) : null;
-		const mins = movie.runtime ? movie.runtime % 60 : null;
-		const rating = movie.tmdbVoteAverage
-			? movie.tmdbVoteAverage.toFixed(1)
-			: null;
+export function StoryCard({
+	movie,
+	ref,
+}: {
+	movie: StoryCardMovie;
+	ref?: React.Ref<View>;
+}) {
+	const year = movie.releaseDate?.slice(0, 4);
+	const hours = movie.runtime ? Math.floor(movie.runtime / 60) : null;
+	const mins = movie.runtime ? movie.runtime % 60 : null;
+	const rating = movie.tmdbVoteAverage
+		? movie.tmdbVoteAverage.toFixed(1)
+		: null;
 
-		return (
-			<View ref={ref} style={styles.card} collapsable={false}>
-				{/* Blurred backdrop */}
-				{movie.backdropPath ? (
-					<Image
-						source={{ uri: backdropUrl(movie.backdropPath) }}
-						style={[StyleSheet.absoluteFill, styles.backdrop]}
-						blurRadius={25}
-						resizeMode="cover"
-					/>
-				) : null}
-
-				{/* Dark overlay */}
-				<View style={styles.overlay} />
-
-				{/* Gradient for depth */}
-				<LinearGradient
-					colors={["rgba(0,0,0,0.05)", "rgba(0,0,0,0.3)", "rgba(0,0,0,0.6)"]}
-					locations={[0, 0.55, 1]}
-					style={StyleSheet.absoluteFill}
+	return (
+		<View ref={ref} style={styles.card} collapsable={false}>
+			{/* Blurred backdrop */}
+			{movie.backdropPath ? (
+				<Image
+					source={{ uri: backdropUrl(movie.backdropPath) }}
+					style={[StyleSheet.absoluteFill, styles.backdrop]}
+					blurRadius={25}
+					resizeMode="cover"
 				/>
+			) : null}
 
-				{/* Main content */}
-				<View style={styles.content}>
-					{/* Poster */}
-					<View style={styles.posterShadow}>
-						{movie.posterPath ? (
-							<Image
-								source={{ uri: posterUrl(movie.posterPath) }}
-								style={styles.poster}
-								resizeMode="cover"
-							/>
-						) : (
-							<View style={[styles.poster, styles.posterPlaceholder]}>
-								<Text style={styles.placeholderText}>{movie.title}</Text>
-							</View>
-						)}
-					</View>
+			{/* Dark overlay */}
+			<View style={styles.overlay} />
 
-					{/* Title */}
-					<Text style={styles.title} numberOfLines={2}>
-						{movie.title}
-					</Text>
+			{/* Gradient for depth */}
+			<LinearGradient
+				colors={["rgba(0,0,0,0.05)", "rgba(0,0,0,0.3)", "rgba(0,0,0,0.6)"]}
+				locations={[0, 0.55, 1]}
+				style={StyleSheet.absoluteFill}
+			/>
 
-					{/* Meta row */}
-					<View style={styles.metaRow}>
-						{year ? <Text style={styles.metaText}>{year}</Text> : null}
-						{hours !== null ? (
-							<>
-								<Text style={styles.dot}>·</Text>
-								<Text style={styles.metaText}>
-									{hours}h {mins}m
-								</Text>
-							</>
-						) : null}
-						{rating ? (
-							<>
-								<Text style={styles.dot}>·</Text>
-								<Text style={styles.ratingText}>★ {rating}</Text>
-							</>
-						) : null}
-					</View>
-
-					{/* Genres */}
-					{movie.genres && movie.genres.length > 0 ? (
-						<View style={styles.genres}>
-							{movie.genres.slice(0, 3).map((g) => (
-								<View key={g.genre.id} style={styles.genreBadge}>
-									<Text style={styles.genreText}>{g.genre.name}</Text>
-								</View>
-							))}
+			{/* Main content */}
+			<View style={styles.content}>
+				{/* Poster */}
+				<View style={styles.posterShadow}>
+					{movie.posterPath ? (
+						<Image
+							source={{ uri: posterUrl(movie.posterPath) }}
+							style={styles.poster}
+							resizeMode="cover"
+						/>
+					) : (
+						<View style={[styles.poster, styles.posterPlaceholder]}>
+							<Text style={styles.placeholderText}>{movie.title}</Text>
 						</View>
+					)}
+				</View>
+
+				{/* Title */}
+				<Text style={styles.title} numberOfLines={2}>
+					{movie.title}
+				</Text>
+
+				{/* Meta row */}
+				<View style={styles.metaRow}>
+					{year ? <Text style={styles.metaText}>{year}</Text> : null}
+					{hours !== null ? (
+						<>
+							<Text style={styles.dot}>·</Text>
+							<Text style={styles.metaText}>
+								{hours}h {mins}m
+							</Text>
+						</>
+					) : null}
+					{rating ? (
+						<>
+							<Text style={styles.dot}>·</Text>
+							<Text style={styles.ratingText}>★ {rating}</Text>
+						</>
 					) : null}
 				</View>
 
-				{/* Branding */}
-				<View style={styles.branding}>
-					<Text style={styles.brandName}>Miru</Text>
-					<Text style={styles.brandUrl}>watchmiru.app</Text>
-				</View>
+				{/* Genres */}
+				{movie.genres && movie.genres.length > 0 ? (
+					<View style={styles.genres}>
+						{movie.genres.slice(0, 3).map((g) => (
+							<View key={g.genre.id} style={styles.genreBadge}>
+								<Text style={styles.genreText}>{g.genre.name}</Text>
+							</View>
+						))}
+					</View>
+				) : null}
 			</View>
-		);
-	},
-);
+
+			{/* Branding */}
+			<View style={styles.branding}>
+				<Text style={styles.brandName}>Miru</Text>
+				<Text style={styles.brandUrl}>watchmiru.app</Text>
+			</View>
+		</View>
+	);
+}
 
 const styles = StyleSheet.create({
 	card: {
