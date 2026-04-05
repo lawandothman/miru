@@ -164,13 +164,21 @@ export async function sendWatchlistMatchPushNotifications({
 			},
 		} satisfies TypedNotificationData;
 
-		await db.insert(schema.notifications).values(
-			matchingFollowerIds.map(({ userId: recipientId }) => ({
-				userId: recipientId,
-				actorId: userId,
-				...notification,
-			})),
-		);
+		try {
+			await db.insert(schema.notifications).values(
+				matchingFollowerIds.map(({ userId: recipientId }) => ({
+					userId: recipientId,
+					actorId: userId,
+					...notification,
+				})),
+			);
+		} catch (error) {
+			captureException?.(error, {
+				context: "watchlist-match-notification-insert",
+				movieId: String(movieId),
+				userId,
+			});
+		}
 	}
 
 	if (pushRecipients.length === 0) {
@@ -215,11 +223,19 @@ export async function sendNewFollowerPushNotification({
 		data: null,
 	} satisfies TypedNotificationData;
 
-	await db.insert(schema.notifications).values({
-		userId,
-		actorId: followerId,
-		...notification,
-	});
+	try {
+		await db.insert(schema.notifications).values({
+			userId,
+			actorId: followerId,
+			...notification,
+		});
+	} catch (error) {
+		captureException?.(error, {
+			context: "new-follower-notification-insert",
+			followerId,
+			userId,
+		});
+	}
 
 	const recipient = await db.query.users.findFirst({
 		where: eq(schema.users.id, userId),

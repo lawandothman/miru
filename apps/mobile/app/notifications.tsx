@@ -66,8 +66,7 @@ export default function NotificationsScreen() {
 		trpc.notification.list.useInfiniteQuery(
 			{},
 			{
-				getNextPageParam: (lastPage) =>
-					lastPage.nextCursor ? { cursor: lastPage.nextCursor } : undefined,
+				getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
 			},
 		);
 
@@ -81,13 +80,16 @@ export default function NotificationsScreen() {
 
 	useEffect(() => {
 		markAllAsRead();
-		Notifications.setBadgeCountAsync(0);
+		Notifications.setBadgeCountAsync(0).catch(() => undefined);
 	}, [markAllAsRead]);
 
 	const sections = useMemo(() => {
 		const allNotifications =
 			data?.pages.flatMap((page) =>
-				page.notifications.map((n) => n as unknown as NotificationItemData),
+				page.notifications.map((n) => ({
+					...(n as unknown as NotificationItemData),
+					createdAt: new Date(n.createdAt),
+				})),
 			) ?? [];
 		return groupByTime(allNotifications);
 	}, [data]);

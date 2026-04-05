@@ -86,11 +86,11 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 	}, [session]);
 
 	useEffect(() => {
-		Notifications.setBadgeCountAsync(0);
+		Notifications.setBadgeCountAsync(0).catch(() => undefined);
 
 		const subscription = AppState.addEventListener("change", (state) => {
 			if (state === "active") {
-				Notifications.setBadgeCountAsync(0);
+				Notifications.setBadgeCountAsync(0).catch(() => undefined);
 			}
 		});
 
