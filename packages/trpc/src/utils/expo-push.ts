@@ -1,5 +1,5 @@
-import { and, eq } from "drizzle-orm";
 import { type Database, schema } from "@miru/db";
+import { and, eq } from "drizzle-orm";
 
 const EXPO_PUSH_API_URL = "https://exp.host/--/api/v2/push/send";
 
@@ -110,11 +110,24 @@ export async function sendWatchlistMatchPushNotifications({
 	userId,
 	userName,
 }: WatchlistMatchPushInput) {
-	const [movie, recipients] = await Promise.all([
+	const [movie, matchingFollowerIds, pushRecipients] = await Promise.all([
 		db.query.movies.findFirst({
 			where: eq(schema.movies.id, movieId),
-			columns: { title: true },
+			columns: { title: true, posterPath: true },
 		}),
+		// All followers with this movie in their watchlist (for in-app notifications)
+		db
+			.selectDistinct({ userId: schema.follows.followerId })
+			.from(schema.follows)
+			.innerJoin(
+				schema.watchlistEntries,
+				and(
+					eq(schema.watchlistEntries.userId, schema.follows.followerId),
+					eq(schema.watchlistEntries.movieId, movieId),
+				),
+			)
+			.where(eq(schema.follows.followingId, userId)),
+		// Push-eligible subset (notifications enabled + has tokens)
 		db
 			.select({ token: schema.pushTokens.token })
 			.from(schema.follows)
@@ -139,14 +152,34 @@ export async function sendWatchlistMatchPushNotifications({
 			.where(eq(schema.follows.followingId, userId)),
 	]);
 
-	if (!movie || recipients.length === 0) {
+	if (!movie) {
+		return;
+	}
+
+	// Insert in-app notifications for all matching followers
+	if (matchingFollowerIds.length > 0) {
+		await db.insert(schema.notifications).values(
+			matchingFollowerIds.map(({ userId: recipientId }) => ({
+				userId: recipientId,
+				actorId: userId,
+				type: "watchlist-match",
+				data: {
+					movieId: String(movieId),
+					movieTitle: movie.title,
+					posterPath: movie.posterPath,
+				},
+			})),
+		);
+	}
+
+	if (pushRecipients.length === 0) {
 		return;
 	}
 
 	try {
 		await sendExpoPushMessages(
 			db,
-			recipients.map(({ token }) => ({
+			pushRecipients.map(({ token }) => ({
 				to: token,
 				title: "New match",
 				body: `${userName} wants to watch ${movie.title} too!`,
@@ -176,6 +209,13 @@ export async function sendNewFollowerPushNotification({
 	followerName,
 	userId,
 }: NewFollowerPushInput) {
+	// Always insert in-app notification regardless of push settings
+	await db.insert(schema.notifications).values({
+		userId,
+		actorId: followerId,
+		type: "new-follower",
+	});
+
 	const recipient = await db.query.users.findFirst({
 		where: eq(schema.users.id, userId),
 		columns: {

@@ -1,10 +1,4 @@
 import { relations } from "drizzle-orm";
-import { accounts, sessions, users } from "./users";
-import { pushTokens } from "./notifications";
-import { blockedUsers, follows } from "./social";
-import { watchedEntries } from "./watched";
-import { watchlistEntries } from "./watchlist";
-import { userGenrePreferences, userStreamingServices } from "./preferences";
 import {
 	genres,
 	movieGenres,
@@ -12,6 +6,12 @@ import {
 	movies,
 	watchProviders,
 } from "./movies";
+import { notifications, pushTokens } from "./notifications";
+import { userGenrePreferences, userStreamingServices } from "./preferences";
+import { blockedUsers, follows } from "./social";
+import { accounts, sessions, users } from "./users";
+import { watchedEntries } from "./watched";
+import { watchlistEntries } from "./watchlist";
 
 export const usersRelations = relations(users, ({ many }) => ({
 	accounts: many(accounts),
@@ -20,11 +20,25 @@ export const usersRelations = relations(users, ({ many }) => ({
 	followers: many(follows, { relationName: "following" }),
 	following: many(follows, { relationName: "follower" }),
 	genrePreferences: many(userGenrePreferences),
+	notifications: many(notifications, { relationName: "recipient" }),
 	pushTokens: many(pushTokens),
 	sessions: many(sessions),
 	streamingServices: many(userStreamingServices),
 	watchedEntries: many(watchedEntries),
 	watchlistEntries: many(watchlistEntries),
+}));
+
+export const notificationsRelations = relations(notifications, ({ one }) => ({
+	actor: one(users, {
+		fields: [notifications.actorId],
+		references: [users.id],
+		relationName: "actor",
+	}),
+	recipient: one(users, {
+		fields: [notifications.userId],
+		references: [users.id],
+		relationName: "recipient",
+	}),
 }));
 
 export const pushTokensRelations = relations(pushTokens, ({ one }) => ({
