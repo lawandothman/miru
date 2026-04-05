@@ -1,3 +1,4 @@
+import type { TypedNotificationData } from "@miru/trpc";
 import { formatDistanceToNowStrict } from "date-fns";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
@@ -19,32 +20,36 @@ interface NotificationActor {
 	image: string | null;
 }
 
-interface NotificationData {
-	movieId?: string;
-	movieTitle?: string;
-	posterPath?: string | null;
-}
-
-export interface NotificationItemData {
+export type NotificationItemData = TypedNotificationData & {
 	id: string;
-	type: string;
 	read: boolean;
 	createdAt: Date;
-	data: NotificationData | null;
 	actor: NotificationActor;
+};
+
+interface NotificationItemProps {
+	item: NotificationItemData;
 }
 
-export function NotificationItem({ item }: { item: NotificationItemData }) {
+export function NotificationItem({ item }: NotificationItemProps) {
 	const router = useRouter();
-	const data = item.data as NotificationData | null;
 
 	function handlePress() {
-		if (item.type === "new-follower") {
-			router.push(`/user/${item.actor.id}`);
-		} else if (item.type === "watchlist-match" && data?.movieId) {
-			router.push(`/movie/${data.movieId}`);
+		switch (item.type) {
+			case "new-follower":
+				router.push(`/user/${item.actor.id}`);
+				break;
+			case "watchlist-match":
+				router.push(`/movie/${item.data.movieId}`);
+				break;
 		}
 	}
+
+	const time = (
+		<Text style={styles.time}>
+			{formatDistanceToNowStrict(item.createdAt, { addSuffix: true })}
+		</Text>
+	);
 
 	return (
 		<Pressable
@@ -61,19 +66,13 @@ export function NotificationItem({ item }: { item: NotificationItemData }) {
 				{item.type === "new-follower" ? (
 					<Text style={styles.text} numberOfLines={2}>
 						<Text style={styles.bold}>{item.actor.name}</Text> started following
-						you.{" "}
-						<Text style={styles.time}>
-							{formatDistanceToNowStrict(item.createdAt, { addSuffix: true })}
-						</Text>
+						you. {time}
 					</Text>
 				) : (
 					<Text style={styles.text} numberOfLines={2}>
 						<Text style={styles.bold}>{item.actor.name}</Text> also wants to
-						watch{" "}
-						<Text style={styles.bold}>{data?.movieTitle ?? "a movie"}</Text>!{" "}
-						<Text style={styles.time}>
-							{formatDistanceToNowStrict(item.createdAt, { addSuffix: true })}
-						</Text>
+						watch <Text style={styles.bold}>{item.data.movieTitle}</Text>!{" "}
+						{time}
 					</Text>
 				)}
 			</View>
@@ -81,9 +80,9 @@ export function NotificationItem({ item }: { item: NotificationItemData }) {
 			<View style={styles.trailing}>
 				{item.type === "new-follower" ? (
 					<FollowButton userId={item.actor.id} isFollowing={false} />
-				) : data?.posterPath ? (
+				) : item.data.posterPath ? (
 					<Image
-						source={{ uri: posterUrl(data.posterPath) }}
+						source={{ uri: posterUrl(item.data.posterPath) }}
 						style={styles.poster}
 						contentFit="cover"
 					/>

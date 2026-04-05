@@ -36,6 +36,7 @@ export default function HomeScreen() {
 	const firstName = session?.user?.name?.split(" ")[0] ?? "";
 
 	const { data: unreadCount } = trpc.notification.getUnreadCount.useQuery();
+	const hasUnread = (unreadCount?.count ?? 0) > 0;
 
 	const {
 		data: matches,
@@ -82,7 +83,7 @@ export default function HomeScreen() {
 						style={styles.bellButton}
 					>
 						<Bell size={24} color={Colors.foreground} />
-						{(unreadCount?.count ?? 0) > 0 && <View style={styles.badge} />}
+						{hasUnread && <View style={styles.badge} />}
 					</Pressable>
 				</View>
 

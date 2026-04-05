@@ -1,7 +1,7 @@
 import * as Notifications from "expo-notifications";
 import { Stack } from "expo-router";
 import { Bell } from "lucide-react-native";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
 	RefreshControl,
 	SectionList,
@@ -71,33 +71,36 @@ export default function NotificationsScreen() {
 			},
 		);
 
-	const markAllAsRead = trpc.notification.markAllAsRead.useMutation({
-		onSuccess: () => {
-			utils.notification.getUnreadCount.invalidate();
+	const { mutate: markAllAsRead } = trpc.notification.markAllAsRead.useMutation(
+		{
+			onSuccess: () => {
+				utils.notification.getUnreadCount.invalidate();
+			},
 		},
-	});
+	);
 
 	useEffect(() => {
-		markAllAsRead.mutate();
+		markAllAsRead();
 		Notifications.setBadgeCountAsync(0);
-	}, []);
+	}, [markAllAsRead]);
 
-	const allNotifications: NotificationItemData[] =
-		data?.pages.flatMap((page) =>
-			page.notifications.map((n) => ({
-				...n,
-				data: n.data as NotificationItemData["data"],
-			})),
-		) ?? [];
-	const sections = groupByTime(allNotifications);
+	const sections = useMemo(() => {
+		const allNotifications =
+			data?.pages.flatMap((page) =>
+				page.notifications.map((n) => n as unknown as NotificationItemData),
+			) ?? [];
+		return groupByTime(allNotifications);
+	}, [data]);
 
 	async function handleRefresh() {
 		triggerRefreshHaptic();
 		setRefreshing(true);
 		try {
-			await utils.notification.list.invalidate();
-			await utils.notification.getUnreadCount.invalidate();
-			markAllAsRead.mutate();
+			await Promise.all([
+				utils.notification.list.invalidate(),
+				utils.notification.getUnreadCount.invalidate(),
+			]);
+			markAllAsRead();
 		} finally {
 			setRefreshing(false);
 		}

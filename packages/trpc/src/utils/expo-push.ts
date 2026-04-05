@@ -1,4 +1,5 @@
 import { type Database, schema } from "@miru/db";
+import type { TypedNotificationData } from "@miru/db/schema";
 import { and, eq } from "drizzle-orm";
 
 const EXPO_PUSH_API_URL = "https://exp.host/--/api/v2/push/send";
@@ -83,19 +84,16 @@ async function sendExpoPushMessages(
 	}
 
 	const body = (await response.json()) as ExpoPushResponse;
-	const invalidTokens = (body.data ?? []).flatMap((ticket, index) => {
-		if (ticket.status !== "error") {
-			return [];
+	const invalidTokens: string[] = [];
+	for (const [index, ticket] of (body.data ?? []).entries()) {
+		if (
+			ticket.status === "error" &&
+			ticket.details?.error === "DeviceNotRegistered" &&
+			messages[index]
+		) {
+			invalidTokens.push(messages[index].to);
 		}
-
-		if (ticket.details?.error !== "DeviceNotRegistered") {
-			return [];
-		}
-
-		return [messages[index]?.to].filter((token): token is string =>
-			Boolean(token),
-		);
-	});
+	}
 
 	if (invalidTokens.length > 0) {
 		await deletePushTokens(db, invalidTokens);
@@ -156,18 +154,21 @@ export async function sendWatchlistMatchPushNotifications({
 		return;
 	}
 
-	// Insert in-app notifications for all matching followers
 	if (matchingFollowerIds.length > 0) {
+		const notification = {
+			type: "watchlist-match",
+			data: {
+				movieId: String(movieId),
+				movieTitle: movie.title,
+				posterPath: movie.posterPath,
+			},
+		} satisfies TypedNotificationData;
+
 		await db.insert(schema.notifications).values(
 			matchingFollowerIds.map(({ userId: recipientId }) => ({
 				userId: recipientId,
 				actorId: userId,
-				type: "watchlist-match",
-				data: {
-					movieId: String(movieId),
-					movieTitle: movie.title,
-					posterPath: movie.posterPath,
-				},
+				...notification,
 			})),
 		);
 	}
@@ -209,11 +210,15 @@ export async function sendNewFollowerPushNotification({
 	followerName,
 	userId,
 }: NewFollowerPushInput) {
-	// Always insert in-app notification regardless of push settings
+	const notification = {
+		type: "new-follower",
+		data: null,
+	} satisfies TypedNotificationData;
+
 	await db.insert(schema.notifications).values({
 		userId,
 		actorId: followerId,
-		type: "new-follower",
+		...notification,
 	});
 
 	const recipient = await db.query.users.findFirst({
