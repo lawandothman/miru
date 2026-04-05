@@ -41,23 +41,16 @@ export default function SettingsGenresScreen() {
 				options={{
 					...defaultHeaderOptions,
 					title: "Genre Preferences",
-					headerRight: () =>
-						hasChanges ? (
-							<Pressable
-								onPress={() =>
-									setPrefs.mutate({ genreIds: Array.from(selected) })
-								}
-								disabled={setPrefs.isPending || selected.size === 0}
-							>
-								{setPrefs.isPending ? (
-									<Spinner size={16} color={Colors.primary} />
-								) : (
-									<Text style={styles.saveHeaderText}>Save</Text>
-								)}
-							</Pressable>
-						) : null,
 				}}
 			/>
+			<Stack.Toolbar placement="right">
+				<Stack.Toolbar.Button
+					icon="checkmark"
+					variant="done"
+					hidden={!hasChanges || setPrefs.isPending || selected.size === 0}
+					onPress={() => setPrefs.mutate({ genreIds: Array.from(selected) })}
+				/>
+			</Stack.Toolbar>
 			<ScrollView
 				style={styles.container}
 				contentContainerStyle={styles.content}
@@ -151,10 +144,5 @@ const styles = StyleSheet.create({
 	},
 	chipTextSelected: {
 		color: Colors.primaryForeground,
-	},
-	saveHeaderText: {
-		fontSize: fontSize.base,
-		fontFamily: fontFamily.sansSemibold,
-		color: Colors.primary,
 	},
 });
