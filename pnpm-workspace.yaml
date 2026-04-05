@@ -13,8 +13,8 @@ catalog:
 
 catalogs:
   better-auth:
-    "@better-auth/expo": 1.5.5
-    better-auth: 1.5.5
+    "@better-auth/expo": 1.5.6
+    better-auth: 1.5.6
   react:
     "@types/react": 19.2.14
     "@types/react-dom": 19.2.3
