@@ -1,5 +1,12 @@
 import { useCallback } from "react";
-import { View, Text, Pressable, FlatList, Alert, StyleSheet } from "react-native";
+import {
+	View,
+	Text,
+	Pressable,
+	FlatList,
+	Alert,
+	StyleSheet,
+} from "react-native";
 import { Stack, useRouter } from "expo-router";
 import { Check } from "lucide-react-native";
 import { trpc } from "@/lib/trpc";

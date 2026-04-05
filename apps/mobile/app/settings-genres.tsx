@@ -7,7 +7,6 @@ import {
 	StyleSheet,
 } from "react-native";
 import { Stack, useRouter } from "expo-router";
-import { Check } from "lucide-react-native";
 import { Spinner } from "@/components/spinner";
 import { trpc } from "@/lib/trpc";
 import { useToggleSet } from "@/hooks/use-toggle-set";
@@ -75,9 +74,6 @@ export default function SettingsGenresScreen() {
 									style={[styles.chip, isSelected && styles.chipSelected]}
 									onPress={() => toggle(g.id)}
 								>
-									{isSelected && (
-										<Check size={14} color={Colors.primaryForeground} />
-									)}
 									<Text
 										style={[
 											styles.chipText,
@@ -123,9 +119,6 @@ const styles = StyleSheet.create({
 		gap: spacing[3],
 	},
 	chip: {
-		flexDirection: "row",
-		alignItems: "center",
-		gap: spacing[2],
 		paddingHorizontal: spacing[4],
 		paddingVertical: spacing[3],
 		borderRadius: radius.full,
