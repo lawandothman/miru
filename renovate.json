@@ -8,6 +8,7 @@
 		"enabled": true
 	},
 	"postUpdateOptions": ["pnpmDedupe"],
+	"prHourlyLimit": 0,
 	"packageRules": [
 		{
 			"matchDepTypes": ["devDependencies"],
