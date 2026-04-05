@@ -5,11 +5,9 @@
 	"labels": ["dependencies"],
 	"semanticCommits": "enabled",
 	"lockFileMaintenance": {
-		"enabled": false
+		"enabled": true
 	},
-	"postUpdateOptions": [],
-	"prConcurrentLimit": 3,
-	"branchConcurrentLimit": 3,
+	"postUpdateOptions": ["pnpmDedupe"],
 	"packageRules": [
 		{
 			"matchDepTypes": ["devDependencies"],

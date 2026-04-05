@@ -1,0 +1,17 @@
+name: Renovate
+
+on:
+  schedule:
+    - cron: "0 4 * * *" # daily at 4am UTC
+  workflow_dispatch:
+
+jobs:
+  renovate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - uses: renovatebot/github-action@v41.7.11
+        with:
+          token: ${{ secrets.RENOVATE_TOKEN }}
+          configurationFile: renovate.json
