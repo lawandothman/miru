@@ -50,18 +50,7 @@ export default function SettingsStreamingScreen() {
 		p.name.toLowerCase().includes(search.toLowerCase()),
 	);
 
-	// Sort: selected first, then alphabetical
-	const sorted = filtered?.slice().sort((a, b) => {
-		const aSelected = selected.has(a.id);
-		const bSelected = selected.has(b.id);
-		if (aSelected && !bSelected) {
-			return -1;
-		}
-		if (!aSelected && bSelected) {
-			return 1;
-		}
-		return a.name.localeCompare(b.name);
-	});
+	const sorted = filtered?.slice().sort((a, b) => a.name.localeCompare(b.name));
 
 	return (
 		<>
