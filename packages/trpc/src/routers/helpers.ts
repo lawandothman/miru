@@ -3,7 +3,7 @@ import { TMDBError } from "@lorenzopant/tmdb";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { hasBlockedKeyword } from "../blocked-keywords";
-import type { TMDB } from "../tmdb";
+import type { TMDB } from "@lorenzopant/tmdb";
 
 export async function ensureMovieExists(
 	db: Database,

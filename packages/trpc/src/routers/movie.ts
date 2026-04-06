@@ -25,7 +25,7 @@ import {
 import { z } from "zod";
 import { BLOCKED_KEYWORDS_PARAM, hasBlockedKeyword } from "../blocked-keywords";
 import { getBlockedUserIds, getMovieStatuses } from "../helpers";
-import type { TMDB } from "../tmdb";
+import type { TMDB } from "@lorenzopant/tmdb";
 import { protectedProcedure, publicProcedure, router } from "../trpc";
 import {
 	computeUserGenreWeights,

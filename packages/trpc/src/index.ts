@@ -7,4 +7,4 @@ export {
 } from "./context";
 export { type AppRouter, appRouter } from "./routers/index";
 export { createCallerFactory } from "./trpc";
-export { TMDB } from "./tmdb";
+export { TMDB } from "@lorenzopant/tmdb";
