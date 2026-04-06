@@ -1,6 +1,6 @@
 import type { Cache } from "@miru/cache";
 import type { Database, User } from "@miru/db";
-import type { TMDBClient } from "./tmdb";
+import type { TMDB } from "@lorenzopant/tmdb";
 
 export interface Session {
 	user: Pick<User, "id" | "email" | "name" | "image"> & {
@@ -17,7 +17,7 @@ export interface CreateContextOptions {
 	) => void;
 	db: Database;
 	expoAccessToken?: string;
-	tmdb: TMDBClient;
+	tmdb: TMDB;
 	session: Session | null;
 }
 

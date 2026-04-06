@@ -1,4 +1,5 @@
 import { TTL, keys } from "@miru/cache";
+import { endOfYear, formatISO, startOfYear } from "date-fns";
 import {
 	type Database,
 	compareWatchProviders,
@@ -23,9 +24,9 @@ import {
 	notInArray,
 } from "drizzle-orm";
 import { z } from "zod";
-import { hasBlockedKeyword } from "../blocked-keywords";
+import { BLOCKED_KEYWORDS_PARAM, hasBlockedKeyword } from "../blocked-keywords";
 import { getBlockedUserIds, getMovieStatuses } from "../helpers";
-import type { TMDBClient } from "../tmdb";
+import type { TMDB } from "@lorenzopant/tmdb";
 import { protectedProcedure, publicProcedure, router } from "../trpc";
 import {
 	computeUserGenreWeights,
@@ -642,7 +643,7 @@ export const movieRouter = router({
 				results: safeResults.map((r) => ({
 					id: r.id,
 					title: r.title,
-					posterPath: r.poster_path,
+					posterPath: r.poster_path ?? null,
 					releaseDate: r.release_date,
 					overview: r.overview,
 					inWatchlist: watchlistSet.has(r.id),
@@ -722,7 +723,7 @@ export const movieRouter = router({
 				.map((r) => ({
 					id: r.id,
 					title: r.title,
-					posterPath: r.poster_path,
+					posterPath: r.poster_path ?? null,
 					releaseDate: r.release_date,
 				}));
 		}),
@@ -828,12 +829,27 @@ export const movieRouter = router({
 
 			async function fetchDiscover() {
 				try {
-					return await ctx.tmdb.discoverMovies({
-						genres: input.genres,
-						yearGte: input.yearGte,
-						yearLte: input.yearLte,
-						sortBy: input.sortBy,
+					return await ctx.tmdb.discover.movie({
+						include_adult: false,
+						language: "en-US",
 						page,
+						sort_by: input.sortBy,
+						without_keywords: BLOCKED_KEYWORDS_PARAM,
+						...(input.genres?.length && {
+							with_genres: input.genres.join(","),
+						}),
+						...(input.yearGte && {
+							"primary_release_date.gte": formatISO(
+								startOfYear(new Date(input.yearGte, 0)),
+								{ representation: "date" },
+							),
+						}),
+						...(input.yearLte && {
+							"primary_release_date.lte": formatISO(
+								endOfYear(new Date(input.yearLte, 0)),
+								{ representation: "date" },
+							),
+						}),
 					});
 				} catch (error) {
 					throw new TRPCError({
@@ -888,7 +904,7 @@ export const movieRouter = router({
 				results: safeResults.map((r) => ({
 					id: r.id,
 					title: r.title,
-					posterPath: r.poster_path,
+					posterPath: r.poster_path ?? null,
 					releaseDate: r.release_date,
 					overview: r.overview,
 					inWatchlist: watchlistSet.has(r.id),
@@ -924,7 +940,7 @@ interface TMDBRegionProviders {
 }
 
 async function refreshMovie(
-	ctx: { db: Database; tmdb: TMDBClient },
+	ctx: { db: Database; tmdb: TMDB },
 	tmdbId: number,
 	country?: string,
 ) {
