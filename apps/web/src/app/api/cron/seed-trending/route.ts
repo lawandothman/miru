@@ -19,10 +19,10 @@ export async function GET(request: Request) {
 		// Fetch popular and now-playing movies (3 pages each)
 		const fetches = await Promise.all([
 			...Array.from({ length: PAGES_TO_FETCH }, (_, i) =>
-				tmdb.fetchPopular(i + 1),
+				tmdb.movie_lists.popular({ page: i + 1 }),
 			),
 			...Array.from({ length: PAGES_TO_FETCH }, (_, i) =>
-				tmdb.fetchNowPlaying(i + 1),
+				tmdb.movie_lists.now_playing({ page: i + 1 }),
 			),
 		]);
 

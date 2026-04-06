@@ -23,9 +23,9 @@ import {
 	notInArray,
 } from "drizzle-orm";
 import { z } from "zod";
-import { hasBlockedKeyword } from "../blocked-keywords";
+import { BLOCKED_KEYWORDS_PARAM, hasBlockedKeyword } from "../blocked-keywords";
 import { getBlockedUserIds, getMovieStatuses } from "../helpers";
-import type { TMDBClient } from "../tmdb";
+import type { TMDB } from "../tmdb";
 import { protectedProcedure, publicProcedure, router } from "../trpc";
 import {
 	computeUserGenreWeights,
@@ -828,12 +828,21 @@ export const movieRouter = router({
 
 			async function fetchDiscover() {
 				try {
-					return await ctx.tmdb.discoverMovies({
-						genres: input.genres,
-						yearGte: input.yearGte,
-						yearLte: input.yearLte,
-						sortBy: input.sortBy,
+					return await ctx.tmdb.discover.movie({
+						include_adult: false,
+						language: "en-US",
 						page,
+						sort_by: input.sortBy,
+						without_keywords: BLOCKED_KEYWORDS_PARAM,
+						...(input.genres?.length && {
+							with_genres: input.genres.join(","),
+						}),
+						...(input.yearGte && {
+							"primary_release_date.gte": `${input.yearGte}-01-01`,
+						}),
+						...(input.yearLte && {
+							"primary_release_date.lte": `${input.yearLte}-12-31`,
+						}),
 					});
 				} catch (error) {
 					throw new TRPCError({
@@ -924,7 +933,7 @@ interface TMDBRegionProviders {
 }
 
 async function refreshMovie(
-	ctx: { db: Database; tmdb: TMDBClient },
+	ctx: { db: Database; tmdb: TMDB },
 	tmdbId: number,
 	country?: string,
 ) {

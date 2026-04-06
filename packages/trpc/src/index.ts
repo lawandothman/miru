@@ -6,5 +6,5 @@ export {
 	type Session,
 } from "./context";
 export { type AppRouter, appRouter } from "./routers/index";
-export { TMDBClient } from "./tmdb";
 export { createCallerFactory } from "./trpc";
+export { TMDB } from "./tmdb";
