@@ -7,7 +7,6 @@ import {
 	StyleSheet,
 } from "react-native";
 import { Stack, useRouter } from "expo-router";
-import { Check } from "lucide-react-native";
 import { Spinner } from "@/components/spinner";
 import { trpc } from "@/lib/trpc";
 import { useToggleSet } from "@/hooks/use-toggle-set";
@@ -41,23 +40,16 @@ export default function SettingsGenresScreen() {
 				options={{
 					...defaultHeaderOptions,
 					title: "Genre Preferences",
-					headerRight: () =>
-						hasChanges ? (
-							<Pressable
-								onPress={() =>
-									setPrefs.mutate({ genreIds: Array.from(selected) })
-								}
-								disabled={setPrefs.isPending || selected.size === 0}
-							>
-								{setPrefs.isPending ? (
-									<Spinner size={16} color={Colors.primary} />
-								) : (
-									<Text style={styles.saveHeaderText}>Save</Text>
-								)}
-							</Pressable>
-						) : null,
 				}}
 			/>
+			<Stack.Toolbar placement="right">
+				<Stack.Toolbar.Button
+					icon="checkmark"
+					variant="done"
+					hidden={!hasChanges || setPrefs.isPending || selected.size === 0}
+					onPress={() => setPrefs.mutate({ genreIds: Array.from(selected) })}
+				/>
+			</Stack.Toolbar>
 			<ScrollView
 				style={styles.container}
 				contentContainerStyle={styles.content}
@@ -82,9 +74,6 @@ export default function SettingsGenresScreen() {
 									style={[styles.chip, isSelected && styles.chipSelected]}
 									onPress={() => toggle(g.id)}
 								>
-									{isSelected && (
-										<Check size={14} color={Colors.primaryForeground} />
-									)}
 									<Text
 										style={[
 											styles.chipText,
@@ -130,9 +119,6 @@ const styles = StyleSheet.create({
 		gap: spacing[3],
 	},
 	chip: {
-		flexDirection: "row",
-		alignItems: "center",
-		gap: spacing[2],
 		paddingHorizontal: spacing[4],
 		paddingVertical: spacing[3],
 		borderRadius: radius.full,
@@ -151,10 +137,5 @@ const styles = StyleSheet.create({
 	},
 	chipTextSelected: {
 		color: Colors.primaryForeground,
-	},
-	saveHeaderText: {
-		fontSize: fontSize.base,
-		fontFamily: fontFamily.sansSemibold,
-		color: Colors.primary,
 	},
 });

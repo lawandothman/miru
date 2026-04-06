@@ -85,6 +85,13 @@
 			"when": 1774222200000,
 			"tag": "0011_tidy_migration",
 			"breakpoints": true
+		},
+		{
+			"idx": 12,
+			"version": "7",
+			"when": 1775409347269,
+			"tag": "0012_crazy_ironclad",
+			"breakpoints": true
 		}
 	]
 }

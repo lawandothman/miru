@@ -1,6 +1,7 @@
 import { schema } from "@miru/db";
-import { eq } from "drizzle-orm";
+import { and, count, desc, eq, lt } from "drizzle-orm";
 import { z } from "zod";
+import { annotateFollowStatus } from "../helpers";
 import { protectedProcedure, router } from "../trpc";
 import { unregisterPushTokenForUser } from "../utils/expo-push";
 
@@ -9,7 +10,88 @@ const registerPushTokenInput = z.object({
 	token: z.string().min(1),
 });
 
+const LIST_PAGE_SIZE = 30;
+
 export const notificationRouter = router({
+	list: protectedProcedure
+		.input(
+			z
+				.object({
+					cursor: z.string().datetime().optional(),
+				})
+				.optional(),
+		)
+		.query(async ({ ctx, input }) => {
+			const conditions = [eq(schema.notifications.userId, ctx.session.user.id)];
+
+			if (input?.cursor) {
+				conditions.push(
+					lt(schema.notifications.createdAt, new Date(input.cursor)),
+				);
+			}
+
+			const items = await ctx.db.query.notifications.findMany({
+				where: and(...conditions),
+				orderBy: desc(schema.notifications.createdAt),
+				limit: LIST_PAGE_SIZE + 1,
+				with: {
+					actor: {
+						columns: {
+							id: true,
+							name: true,
+							image: true,
+						},
+					},
+				},
+			});
+
+			const hasMore = items.length > LIST_PAGE_SIZE;
+			const notifications = hasMore ? items.slice(0, LIST_PAGE_SIZE) : items;
+			const nextCursor = hasMore
+				? notifications[notifications.length - 1]?.createdAt.toISOString()
+				: undefined;
+
+			const actors = notifications.map((n) => n.actor);
+			const annotatedActors = await annotateFollowStatus(ctx, actors);
+			const actorMap = new Map(annotatedActors.map((a) => [a.id, a]));
+
+			return {
+				notifications: notifications.map((n) => ({
+					...n,
+					actor: actorMap.get(n.actor.id) ?? n.actor,
+				})),
+				nextCursor,
+			};
+		}),
+
+	getUnreadCount: protectedProcedure.query(async ({ ctx }) => {
+		const [result] = await ctx.db
+			.select({ count: count() })
+			.from(schema.notifications)
+			.where(
+				and(
+					eq(schema.notifications.userId, ctx.session.user.id),
+					eq(schema.notifications.read, false),
+				),
+			);
+
+		return { count: result?.count ?? 0 };
+	}),
+
+	markAllAsRead: protectedProcedure.mutation(async ({ ctx }) => {
+		await ctx.db
+			.update(schema.notifications)
+			.set({ read: true })
+			.where(
+				and(
+					eq(schema.notifications.userId, ctx.session.user.id),
+					eq(schema.notifications.read, false),
+				),
+			);
+
+		return { success: true };
+	}),
+
 	getPreferences: protectedProcedure.query(async ({ ctx }) => {
 		const user = await ctx.db.query.users.findFirst({
 			where: eq(schema.users.id, ctx.session.user.id),

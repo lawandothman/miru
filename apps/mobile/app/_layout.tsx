@@ -1,16 +1,3 @@
-import { useEffect, useRef } from "react";
-import { Platform } from "react-native";
-import {
-	Stack,
-	useNavigationContainerRef,
-	useRouter,
-	useSegments,
-} from "expo-router";
-import { StatusBar } from "expo-status-bar";
-import * as SplashScreen from "expo-splash-screen";
-import * as Notifications from "expo-notifications";
-import { isRunningInExpoGo } from "expo";
-import { useFonts } from "expo-font";
 import {
 	DMSans_400Regular,
 	DMSans_500Medium,
@@ -22,22 +9,35 @@ import {
 	PlusJakartaSans_600SemiBold,
 	PlusJakartaSans_700Bold,
 } from "@expo-google-fonts/plus-jakarta-sans";
+import { isRunningInExpoGo } from "expo";
+import { useFonts } from "expo-font";
+import * as Notifications from "expo-notifications";
 import {
-	SafeAreaProvider,
-	initialWindowMetrics,
-} from "react-native-safe-area-context";
+	Stack,
+	useNavigationContainerRef,
+	useRouter,
+	useSegments,
+} from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
+import { StatusBar } from "expo-status-bar";
 import { PostHogProvider } from "posthog-react-native";
-import { TRPCProvider } from "@/lib/trpc-provider";
-import { trpc } from "@/lib/trpc";
-import { useSession } from "@/lib/auth";
+import { useEffect, useRef } from "react";
+import { AppState, Platform } from "react-native";
+import {
+	initialWindowMetrics,
+	SafeAreaProvider,
+} from "react-native-safe-area-context";
+import { useScreenTracking } from "@/hooks/use-screen-tracking";
 import { posthog } from "@/lib/analytics";
+import { useSession } from "@/lib/auth";
 import {
 	getDevicePushToken,
 	getNotificationPermissionsStatus,
 	getNotificationRoute,
 } from "@/lib/notifications";
-import { useScreenTracking } from "@/hooks/use-screen-tracking";
-import { Sentry, navigationIntegration } from "@/lib/sentry";
+import { navigationIntegration, Sentry } from "@/lib/sentry";
+import { trpc } from "@/lib/trpc";
+import { TRPCProvider } from "@/lib/trpc-provider";
 
 if (!isRunningInExpoGo()) {
 	SplashScreen.preventAutoHideAsync();
@@ -84,6 +84,18 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 		Sentry.setUser(null);
 		posthog?.reset();
 	}, [session]);
+
+	useEffect(() => {
+		Notifications.setBadgeCountAsync(0).catch(() => undefined);
+
+		const subscription = AppState.addEventListener("change", (state) => {
+			if (state === "active") {
+				Notifications.setBadgeCountAsync(0).catch(() => undefined);
+			}
+		});
+
+		return () => subscription.remove();
+	}, []);
 
 	useEffect(() => {
 		Notifications.getLastNotificationResponseAsync()

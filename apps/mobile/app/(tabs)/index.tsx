@@ -1,22 +1,22 @@
-import {
-	View,
-	Text,
-	ScrollView,
-	RefreshControl,
-	Pressable,
-	StyleSheet,
-} from "react-native";
-import { useState } from "react";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Film } from "lucide-react-native";
 import { useRouter } from "expo-router";
-import { trpc } from "@/lib/trpc";
-import { useSession } from "@/lib/auth";
+import { Bell, Film } from "lucide-react-native";
+import { useState } from "react";
+import {
+	Pressable,
+	RefreshControl,
+	ScrollView,
+	StyleSheet,
+	Text,
+	View,
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { EmptyState } from "@/components/empty-state";
 import { MoviePoster } from "@/components/movie-poster";
 import { UserAvatar } from "@/components/user-avatar";
-import { EmptyState } from "@/components/empty-state";
-import { Colors, fontSize, fontFamily, spacing, radius } from "@/lib/constants";
+import { useSession } from "@/lib/auth";
+import { Colors, fontFamily, fontSize, radius, spacing } from "@/lib/constants";
 import { triggerRefreshHaptic } from "@/lib/haptics";
+import { trpc } from "@/lib/trpc";
 
 function getGreeting(): string {
 	const hour = new Date().getHours();
@@ -34,6 +34,9 @@ export default function HomeScreen() {
 	const router = useRouter();
 	const [refreshing, setRefreshing] = useState(false);
 	const firstName = session?.user?.name?.split(" ")[0] ?? "";
+
+	const { data: unreadCount } = trpc.notification.getUnreadCount.useQuery();
+	const hasUnread = (unreadCount?.count ?? 0) > 0;
 
 	const {
 		data: matches,
@@ -69,9 +72,20 @@ export default function HomeScreen() {
 					/>
 				}
 			>
-				<Text style={styles.greeting}>
-					{getGreeting()}, {firstName}
-				</Text>
+				<View style={styles.header}>
+					<Text style={styles.greeting}>
+						{getGreeting()}, {firstName}
+					</Text>
+					<Pressable
+						onPress={() => router.push("/notifications")}
+						accessibilityRole="button"
+						accessibilityLabel="Notifications"
+						style={styles.bellButton}
+					>
+						<Bell size={24} color={Colors.foreground} />
+						{hasUnread && <View style={styles.badge} />}
+					</Pressable>
+				</View>
 
 				{!isLoading && (!matches || matches.length === 0) ? (
 					<EmptyState
@@ -139,13 +153,33 @@ const styles = StyleSheet.create({
 	scroll: {
 		flexGrow: 1,
 	},
+	header: {
+		flexDirection: "row",
+		alignItems: "center",
+		justifyContent: "space-between",
+		paddingHorizontal: spacing[4],
+		paddingTop: spacing[4],
+		paddingBottom: spacing[6],
+	},
 	greeting: {
 		fontSize: fontSize["2xl"],
 		fontFamily: fontFamily.displayBold,
 		color: Colors.foreground,
-		paddingHorizontal: spacing[4],
-		paddingTop: spacing[4],
-		paddingBottom: spacing[6],
+		flex: 1,
+	},
+	bellButton: {
+		padding: spacing[2],
+	},
+	badge: {
+		position: "absolute",
+		top: 6,
+		right: 6,
+		width: 10,
+		height: 10,
+		borderRadius: 5,
+		backgroundColor: Colors.destructive,
+		borderWidth: 2,
+		borderColor: Colors.background,
 	},
 	matchList: {
 		gap: spacing[6],

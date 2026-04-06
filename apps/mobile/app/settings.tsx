@@ -17,8 +17,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import {
 	Bell,
 	ChevronRight,
-	ChevronDown,
-	Check,
 	User,
 	Clapperboard,
 	Tv,
@@ -110,7 +108,7 @@ export default function SettingsScreen() {
 
 				{/* Region */}
 				<SettingsSection title="Region" icon={Globe}>
-					<RegionPicker />
+					<RegionSummary />
 				</SettingsSection>
 
 				{/* Notifications */}
@@ -351,74 +349,30 @@ function StreamingSummary() {
 	);
 }
 
-/* ── Region picker ───────────────────────────────────────────────── */
+/* ── Region summary (tap to edit) ─────────────────────────────────── */
 
-function RegionPicker() {
+function RegionSummary() {
+	const router = useRouter();
 	const { data: state, isLoading } = trpc.onboarding.getState.useQuery();
-	const [editedCountry, setEditedCountry] = useState<string | null>(null);
-	const country = editedCountry ?? state?.country ?? "";
-	const [expanded, setExpanded] = useState(false);
-
-	const setCountryMut = trpc.onboarding.setCountry.useMutation({
-		onSuccess: () => Alert.alert("Region saved"),
-		onError: () => Alert.alert("Error", "Failed to save region"),
-	});
 
 	if (isLoading) {
 		return <Spinner />;
 	}
 
-	const current = COUNTRIES.find((c) => c.code === country);
+	const current = COUNTRIES.find((c) => c.code === state?.country);
 
 	return (
-		<View>
-			<Pressable
-				style={styles.regionTrigger}
-				onPress={() => setExpanded(!expanded)}
-			>
-				<Text style={styles.regionTriggerText}>
-					{current
-						? `${countryFlag(current.code)} ${current.name}`
-						: "Select a region"}
-				</Text>
-				<ChevronDown
-					size={16}
-					color={Colors.mutedForeground}
-					style={expanded ? { transform: [{ rotate: "180deg" }] } : undefined}
-				/>
-			</Pressable>
-			<Text style={styles.regionHint}>
-				This affects which streaming services are shown for movies.
+		<Pressable
+			style={({ pressed }) => [styles.summaryRow, pressed && styles.pressed]}
+			onPress={() => router.push("/settings-region")}
+		>
+			<Text style={styles.regionSummaryText}>
+				{current
+					? `${countryFlag(current.code)} ${current.name}`
+					: "Select a region"}
 			</Text>
-			{expanded && (
-				<View style={styles.regionList}>
-					{COUNTRIES.map((c) => {
-						const isSelected = country === c.code;
-						return (
-							<Pressable
-								key={c.code}
-								style={[
-									styles.regionItem,
-									isSelected && styles.regionItemSelected,
-								]}
-								onPress={() => {
-									setEditedCountry(c.code);
-									setExpanded(false);
-									if (c.code !== (state?.country ?? "")) {
-										setCountryMut.mutate({ country: c.code });
-									}
-								}}
-							>
-								<Text style={styles.regionItemText}>
-									{countryFlag(c.code)} {c.name}
-								</Text>
-								{isSelected && <Check size={16} color={Colors.primary} />}
-							</Pressable>
-						);
-					})}
-				</View>
-			)}
-		</View>
+			<ChevronRight size={18} color={Colors.mutedForeground} />
+		</Pressable>
 	);
 }
 
@@ -688,45 +642,7 @@ const styles = StyleSheet.create({
 	},
 
 	// Region
-	regionTrigger: {
-		flexDirection: "row",
-		alignItems: "center",
-		justifyContent: "space-between",
-		backgroundColor: Colors.secondary,
-		borderRadius: radius.lg,
-		paddingHorizontal: spacing[3],
-		paddingVertical: spacing[3],
-	},
-	regionTriggerText: {
-		fontSize: fontSize.base,
-		fontFamily: fontFamily.sans,
-		color: Colors.foreground,
-	},
-	regionHint: {
-		fontSize: fontSize.xs,
-		fontFamily: fontFamily.sans,
-		color: Colors.mutedForeground,
-		marginTop: spacing[2],
-	},
-	regionList: {
-		marginTop: spacing[2],
-		backgroundColor: Colors.secondary,
-		borderRadius: radius.lg,
-		overflow: "hidden",
-	},
-	regionItem: {
-		flexDirection: "row",
-		alignItems: "center",
-		justifyContent: "space-between",
-		paddingHorizontal: spacing[3],
-		paddingVertical: spacing[3],
-		borderBottomWidth: StyleSheet.hairlineWidth,
-		borderBottomColor: Colors.border,
-	},
-	regionItemSelected: {
-		backgroundColor: `${Colors.primary}15`,
-	},
-	regionItemText: {
+	regionSummaryText: {
 		fontSize: fontSize.base,
 		fontFamily: fontFamily.sans,
 		color: Colors.foreground,

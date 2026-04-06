@@ -1,5 +1,6 @@
-import { and, eq } from "drizzle-orm";
 import { type Database, schema } from "@miru/db";
+import type { TypedNotificationData } from "@miru/db/schema";
+import { and, eq } from "drizzle-orm";
 
 const EXPO_PUSH_API_URL = "https://exp.host/--/api/v2/push/send";
 
@@ -64,12 +65,12 @@ async function sendExpoPushMessages(
 		return;
 	}
 
-	const headers: Record<string, string> = {
+	const headers: { Authorization?: string; "Content-Type": string } = {
 		"Content-Type": "application/json",
 	};
 
 	if (expoAccessToken) {
-		headers["Authorization"] = `Bearer ${expoAccessToken}`;
+		headers.Authorization = `Bearer ${expoAccessToken}`;
 	}
 
 	const response = await fetch(EXPO_PUSH_API_URL, {
@@ -83,19 +84,16 @@ async function sendExpoPushMessages(
 	}
 
 	const body = (await response.json()) as ExpoPushResponse;
-	const invalidTokens = (body.data ?? []).flatMap((ticket, index) => {
-		if (ticket.status !== "error") {
-			return [];
+	const invalidTokens: string[] = [];
+	for (const [index, ticket] of (body.data ?? []).entries()) {
+		if (
+			ticket.status === "error" &&
+			ticket.details?.error === "DeviceNotRegistered" &&
+			messages[index]
+		) {
+			invalidTokens.push(messages[index].to);
 		}
-
-		if (ticket.details?.error !== "DeviceNotRegistered") {
-			return [];
-		}
-
-		return [messages[index]?.to].filter((token): token is string =>
-			Boolean(token),
-		);
-	});
+	}
 
 	if (invalidTokens.length > 0) {
 		await deletePushTokens(db, invalidTokens);
@@ -110,11 +108,24 @@ export async function sendWatchlistMatchPushNotifications({
 	userId,
 	userName,
 }: WatchlistMatchPushInput) {
-	const [movie, recipients] = await Promise.all([
+	const [movie, matchingFollowerIds, pushRecipients] = await Promise.all([
 		db.query.movies.findFirst({
 			where: eq(schema.movies.id, movieId),
-			columns: { title: true },
+			columns: { title: true, posterPath: true },
 		}),
+		// All followers with this movie in their watchlist (for in-app notifications)
+		db
+			.selectDistinct({ userId: schema.follows.followerId })
+			.from(schema.follows)
+			.innerJoin(
+				schema.watchlistEntries,
+				and(
+					eq(schema.watchlistEntries.userId, schema.follows.followerId),
+					eq(schema.watchlistEntries.movieId, movieId),
+				),
+			)
+			.where(eq(schema.follows.followingId, userId)),
+		// Push-eligible subset (notifications enabled + has tokens)
 		db
 			.select({ token: schema.pushTokens.token })
 			.from(schema.follows)
@@ -139,14 +150,45 @@ export async function sendWatchlistMatchPushNotifications({
 			.where(eq(schema.follows.followingId, userId)),
 	]);
 
-	if (!movie || recipients.length === 0) {
+	if (!movie) {
+		return;
+	}
+
+	if (matchingFollowerIds.length > 0) {
+		const notification = {
+			type: "watchlist-match",
+			data: {
+				movieId: String(movieId),
+				movieTitle: movie.title,
+				posterPath: movie.posterPath,
+			},
+		} satisfies TypedNotificationData;
+
+		try {
+			await db.insert(schema.notifications).values(
+				matchingFollowerIds.map(({ userId: recipientId }) => ({
+					userId: recipientId,
+					actorId: userId,
+					...notification,
+				})),
+			);
+		} catch (error) {
+			captureException?.(error, {
+				context: "watchlist-match-notification-insert",
+				movieId: String(movieId),
+				userId,
+			});
+		}
+	}
+
+	if (pushRecipients.length === 0) {
 		return;
 	}
 
 	try {
 		await sendExpoPushMessages(
 			db,
-			recipients.map(({ token }) => ({
+			pushRecipients.map(({ token }) => ({
 				to: token,
 				title: "New match",
 				body: `${userName} wants to watch ${movie.title} too!`,
@@ -176,6 +218,25 @@ export async function sendNewFollowerPushNotification({
 	followerName,
 	userId,
 }: NewFollowerPushInput) {
+	const notification = {
+		type: "new-follower",
+		data: null,
+	} satisfies TypedNotificationData;
+
+	try {
+		await db.insert(schema.notifications).values({
+			userId,
+			actorId: followerId,
+			...notification,
+		});
+	} catch (error) {
+		captureException?.(error, {
+			context: "new-follower-notification-insert",
+			followerId,
+			userId,
+		});
+	}
+
 	const recipient = await db.query.users.findFirst({
 		where: eq(schema.users.id, userId),
 		columns: {

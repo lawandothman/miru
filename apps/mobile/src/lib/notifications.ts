@@ -1,14 +1,14 @@
-import { Platform } from "react-native";
 import Constants from "expo-constants";
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
+import { Platform } from "react-native";
 import { match } from "ts-pattern";
 
 Notifications.setNotificationHandler({
 	handleNotification: () =>
 		Promise.resolve({
 			shouldPlaySound: true,
-			shouldSetBadge: false,
+			shouldSetBadge: true,
 			shouldShowBanner: true,
 			shouldShowList: true,
 		}),

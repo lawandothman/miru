@@ -50,18 +50,7 @@ export default function SettingsStreamingScreen() {
 		p.name.toLowerCase().includes(search.toLowerCase()),
 	);
 
-	// Sort: selected first, then alphabetical
-	const sorted = filtered?.slice().sort((a, b) => {
-		const aSelected = selected.has(a.id);
-		const bSelected = selected.has(b.id);
-		if (aSelected && !bSelected) {
-			return -1;
-		}
-		if (!aSelected && bSelected) {
-			return 1;
-		}
-		return a.name.localeCompare(b.name);
-	});
+	const sorted = filtered?.slice().sort((a, b) => a.name.localeCompare(b.name));
 
 	return (
 		<>
@@ -69,23 +58,18 @@ export default function SettingsStreamingScreen() {
 				options={{
 					...defaultHeaderOptions,
 					title: "Streaming Services",
-					headerRight: () =>
-						hasChanges ? (
-							<Pressable
-								onPress={() =>
-									setServices.mutate({ providerIds: Array.from(selected) })
-								}
-								disabled={setServices.isPending}
-							>
-								{setServices.isPending ? (
-									<Spinner size={16} color={Colors.primary} />
-								) : (
-									<Text style={styles.saveHeaderText}>Save</Text>
-								)}
-							</Pressable>
-						) : null,
 				}}
 			/>
+			<Stack.Toolbar placement="right">
+				<Stack.Toolbar.Button
+					icon="checkmark"
+					variant="done"
+					hidden={!hasChanges || setServices.isPending}
+					onPress={() =>
+						setServices.mutate({ providerIds: Array.from(selected) })
+					}
+				/>
+			</Stack.Toolbar>
 			<View style={styles.container}>
 				{/* Search bar */}
 				<View style={styles.searchContainer}>
@@ -240,10 +224,5 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 		borderWidth: 2,
 		borderColor: Colors.background,
-	},
-	saveHeaderText: {
-		fontSize: fontSize.base,
-		fontFamily: fontFamily.sansSemibold,
-		color: Colors.primary,
 	},
 });
