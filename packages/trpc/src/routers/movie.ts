@@ -642,7 +642,7 @@ export const movieRouter = router({
 				results: safeResults.map((r) => ({
 					id: r.id,
 					title: r.title,
-					posterPath: r.poster_path,
+					posterPath: r.poster_path ?? null,
 					releaseDate: r.release_date,
 					overview: r.overview,
 					inWatchlist: watchlistSet.has(r.id),
@@ -722,7 +722,7 @@ export const movieRouter = router({
 				.map((r) => ({
 					id: r.id,
 					title: r.title,
-					posterPath: r.poster_path,
+					posterPath: r.poster_path ?? null,
 					releaseDate: r.release_date,
 				}));
 		}),
@@ -888,7 +888,7 @@ export const movieRouter = router({
 				results: safeResults.map((r) => ({
 					id: r.id,
 					title: r.title,
-					posterPath: r.poster_path,
+					posterPath: r.poster_path ?? null,
 					releaseDate: r.release_date,
 					overview: r.overview,
 					inWatchlist: watchlistSet.has(r.id),

@@ -34,11 +34,11 @@ export interface TMDBDiscoverResponse {
 }
 
 export class TMDBClient extends TMDB {
-	private accessToken: string;
+	private token: string;
 
 	constructor(accessToken: string) {
 		super(accessToken);
-		this.accessToken = accessToken;
+		this.token = accessToken;
 	}
 
 	async fetchPopular(page = 1): Promise<TMDBDiscoverResponse> {
@@ -46,7 +46,7 @@ export class TMDBClient extends TMDB {
 			`${TMDB_BASE_URL}/movie/popular?language=en-US&include_adult=false&page=${page}`,
 			{
 				headers: {
-					Authorization: `Bearer ${this.accessToken}`,
+					Authorization: `Bearer ${this.token}`,
 					"Content-Type": "application/json",
 				},
 			},
@@ -67,7 +67,7 @@ export class TMDBClient extends TMDB {
 			`${TMDB_BASE_URL}/movie/now_playing?language=en-US&include_adult=false&page=${page}`,
 			{
 				headers: {
-					Authorization: `Bearer ${this.accessToken}`,
+					Authorization: `Bearer ${this.token}`,
 					"Content-Type": "application/json",
 				},
 			},
@@ -108,7 +108,7 @@ export class TMDBClient extends TMDB {
 			`${TMDB_BASE_URL}/discover/movie?${searchParams.toString()}`,
 			{
 				headers: {
-					Authorization: `Bearer ${this.accessToken}`,
+					Authorization: `Bearer ${this.token}`,
 					"Content-Type": "application/json",
 				},
 			},
