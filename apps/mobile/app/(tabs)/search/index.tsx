@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import {
 	View,
 	Text,
+	Platform,
 	Pressable,
 	ScrollView,
 	StyleSheet,
@@ -9,7 +10,8 @@ import {
 	type TextInputFocusEventData,
 } from "react-native";
 import { Image } from "expo-image";
-import { useRouter, Stack } from "expo-router";
+import { useRouter, Stack, useFocusEffect } from "expo-router";
+import type { SearchBarCommands } from "react-native-screens";
 import { Search } from "lucide-react-native";
 import { trpc } from "@/lib/trpc";
 import { capture } from "@/lib/analytics";
@@ -40,7 +42,18 @@ function useDebounce(value: string, delay: number) {
 export default function SearchScreen() {
 	const [query, setQuery] = useState("");
 	const [submittedQuery, setSubmittedQuery] = useState("");
+	const searchBarRef = useRef<SearchBarCommands>(null);
 	const router = useRouter();
+
+	useFocusEffect(
+		useCallback(() => {
+			if (Platform.OS === "android") return;
+			const id = setImmediate(() => {
+				searchBarRef.current?.focus();
+			});
+			return () => clearImmediate(id);
+		}, []),
+	);
 	const debouncedQuery = useDebounce(query, 300);
 
 	const { data: autocompleteResults } = trpc.movie.searchAutocomplete.useQuery(
@@ -98,6 +111,7 @@ export default function SearchScreen() {
 		<>
 			<Stack.Screen options={{ title: "Search" }} />
 			<Stack.SearchBar
+				ref={searchBarRef}
 				placement="automatic"
 				placeholder="Search"
 				onChangeText={handleChangeText}
