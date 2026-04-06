@@ -28,7 +28,7 @@
 		"eslint-plugin-react-hooks": "catalog:",
 		"oxfmt": "0.40.0",
 		"oxlint": "1.55.0",
-		"turbo": "2.8.16",
+		"turbo": "2.9.4",
 		"vitest": "4.0.18"
 	},
 	"engines": {
