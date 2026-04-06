@@ -14,8 +14,8 @@ catalogs:
       version: 1.5.6
   default:
     '@lorenzopant/tmdb':
-      specifier: 1.11.0
-      version: 1.11.0
+      specifier: 1.19.0
+      version: 1.19.0
     '@types/node':
       specifier: 25.5.2
       version: 25.5.2
@@ -269,7 +269,7 @@ importers:
         version: 1.5.6(@better-auth/core@1.5.6(@better-auth/utils@0.3.1)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.2(zod@4.3.6))(jose@6.2.0)(kysely@0.28.15)(nanostores@1.1.1))(better-auth@1.5.6(1a85ae1d300202155b1ac23e8de9b737))(expo-constants@55.0.11)(expo-linking@55.0.11)(expo-network@55.0.11(expo@55.0.11)(react@19.2.4))(expo-web-browser@55.0.12(expo@55.0.11)(react-native@0.83.4(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.4)))
       '@lorenzopant/tmdb':
         specifier: 'catalog:'
-        version: 1.11.0
+        version: 1.19.0
       '@miru/analytics':
         specifier: workspace:*
         version: link:../../packages/analytics
@@ -455,7 +455,7 @@ importers:
     dependencies:
       '@lorenzopant/tmdb':
         specifier: 'catalog:'
-        version: 1.11.0
+        version: 1.19.0
       '@miru/cache':
         specifier: workspace:*
         version: link:../cache
@@ -2120,8 +2120,8 @@ packages:
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
 
-  '@lorenzopant/tmdb@1.11.0':
-    resolution: {integrity: sha512-3IcshbKljVIvkgskA89rVU4A6ojxWghTHUJWyN/PhDd/X8e12MV/rolZZoB+5ILo4NDqXaC7HG5DdJqIrDjlWw==}
+  '@lorenzopant/tmdb@1.19.0':
+    resolution: {integrity: sha512-KictHAPbqFS8BUd+qzeWIH9Tf/G4FfV+PGSX8IA2COgfvmzGqfQobTHj+EYbZ/tGqFl/AjEivXUr1ciwx2IKtA==}
 
   '@modelcontextprotocol/sdk@1.27.1':
     resolution: {integrity: sha512-sr6GbP+4edBwFndLbM60gf07z0FQ79gaExpnsjMGePXqFcSSb7t6iscpjk9DhFhwd+mTEQrzNafGP8/iGGFYaA==}
@@ -10202,7 +10202,7 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
 
-  '@lorenzopant/tmdb@1.11.0': {}
+  '@lorenzopant/tmdb@1.19.0': {}
 
   '@modelcontextprotocol/sdk@1.27.1(zod@3.25.76)':
     dependencies:
