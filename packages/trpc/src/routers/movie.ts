@@ -1,4 +1,5 @@
 import { TTL, keys } from "@miru/cache";
+import { endOfYear, formatISO, startOfYear } from "date-fns";
 import {
 	type Database,
 	compareWatchProviders,
@@ -838,10 +839,16 @@ export const movieRouter = router({
 							with_genres: input.genres.join(","),
 						}),
 						...(input.yearGte && {
-							"primary_release_date.gte": `${input.yearGte}-01-01`,
+							"primary_release_date.gte": formatISO(
+								startOfYear(new Date(input.yearGte, 0)),
+								{ representation: "date" },
+							),
 						}),
 						...(input.yearLte && {
-							"primary_release_date.lte": `${input.yearLte}-12-31`,
+							"primary_release_date.lte": formatISO(
+								endOfYear(new Date(input.yearLte, 0)),
+								{ representation: "date" },
+							),
 						}),
 					});
 				} catch (error) {
