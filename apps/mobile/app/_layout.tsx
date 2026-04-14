@@ -83,17 +83,26 @@ function getBootState(
 
 function AuthGuard({ children }: { children: React.ReactNode }) {
 	useScreenTracking();
+	const utils = trpc.useUtils();
 	const { data: session, isPending: sessionPending } = useSession();
 	const segments = useSegments();
 	const router = useRouter();
+	const bootState = getBootState(session, sessionPending);
+	const { data: unreadCount } = trpc.notification.getUnreadCount.useQuery(
+		undefined,
+		{
+			enabled: bootState === "ready",
+		},
+	);
 	const { mutateAsync: registerPushToken } =
 		trpc.notification.registerPushToken.useMutation();
 	const promptedForPushPermissionUserId = useRef<string | null>(null);
 	const handledNotificationResponseId = useRef<string | null>(null);
 	const isNavigatingToNotificationRoute = useRef(false);
-	const [pendingNotificationRoute, setPendingNotificationRoute] =
-		useState<NotificationRoute | null>(null);
-	const bootState = getBootState(session, sessionPending);
+	const pendingNotificationRoute = useRef<NotificationRoute | null>(null);
+	const [pendingNotificationRouteVersion, setPendingNotificationRouteVersion] =
+		useState(0);
+	const unreadBadgeCount = Number(unreadCount?.count ?? 0);
 
 	useEffect(() => {
 		if (session?.user) {
@@ -114,16 +123,23 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 	}, [session]);
 
 	useEffect(() => {
-		Notifications.setBadgeCountAsync(0).catch(() => undefined);
-
 		const subscription = AppState.addEventListener("change", (state) => {
 			if (state === "active") {
-				Notifications.setBadgeCountAsync(0).catch(() => undefined);
+				utils.notification.getUnreadCount.invalidate().catch(() => undefined);
 			}
 		});
 
 		return () => subscription.remove();
-	}, []);
+	}, [utils]);
+
+	useEffect(() => {
+		if (!session?.user || bootState !== "ready") {
+			Notifications.setBadgeCountAsync(0).catch(() => undefined);
+			return;
+		}
+
+		Notifications.setBadgeCountAsync(unreadBadgeCount).catch(() => undefined);
+	}, [bootState, session?.user, unreadBadgeCount]);
 
 	useEffect(() => {
 		let cancelled = false;
@@ -147,7 +163,8 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 			handledNotificationResponseId.current = responseId;
 
 			if (!cancelled) {
-				setPendingNotificationRoute(route);
+				pendingNotificationRoute.current = route;
+				setPendingNotificationRouteVersion((version) => version + 1);
 			}
 
 			Notifications.clearLastNotificationResponseAsync().catch(() => undefined);
@@ -277,24 +294,24 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 		} else if (
 			bootState === "ready" &&
 			(inAuthGroup || inOnboardingGroup) &&
-			!pendingNotificationRoute &&
+			!pendingNotificationRoute.current &&
 			!isNavigatingToNotificationRoute.current
 		) {
 			router.replace("/(tabs)");
 		}
-	}, [bootState, pendingNotificationRoute, router, segments]);
+	}, [bootState, pendingNotificationRouteVersion, router, segments]);
 
 	useEffect(() => {
-		if (bootState !== "ready" || !pendingNotificationRoute) {
+		if (bootState !== "ready" || !pendingNotificationRoute.current) {
 			return;
 		}
 
 		const inAuthGroup = segments[0] === "(auth)";
 		const inOnboardingGroup = segments[0] === "(onboarding)";
-		const route = pendingNotificationRoute;
+		const route = pendingNotificationRoute.current;
 
 		isNavigatingToNotificationRoute.current = true;
-		setPendingNotificationRoute(null);
+		pendingNotificationRoute.current = null;
 
 		if (inAuthGroup || inOnboardingGroup) {
 			router.replace(route);
@@ -302,7 +319,7 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 		}
 
 		router.push(route);
-	}, [bootState, pendingNotificationRoute, router, segments]);
+	}, [bootState, pendingNotificationRouteVersion, router, segments]);
 
 	useEffect(() => {
 		if (isRunningInExpoGo() || bootState === "loading") {

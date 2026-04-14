@@ -105,32 +105,32 @@ export default function OnboardingScreen() {
 					break;
 			}
 
-				const stepNames = [
-					"region",
-					"genres",
-					"streaming",
-					"watchlist",
-					"friends",
-				] as const;
-				capture("onboarding_step_completed", {
-					step: stepNames[step - 1] ?? String(step),
-				});
+			const stepNames = [
+				"region",
+				"genres",
+				"streaming",
+				"watchlist",
+				"friends",
+			] as const;
+			capture("onboarding_step_completed", {
+				step: stepNames[step - 1] ?? String(step),
+			});
 
-				if (step < TOTAL_STEPS) {
-					triggerStepCompleteHaptic();
-					setStep(step + 1);
-				} else {
-					await completeMut.mutateAsync();
-					capture("onboarding_completed", {});
-					triggerStepCompleteHaptic();
-					utils.onboarding.getState.setData(undefined, (current) =>
-						current ? { ...current, isCompleted: true } : current,
-					);
-					utils.onboarding.getState.invalidate();
-					await refetchSession({
-						query: { disableCookieCache: true },
-					});
-				}
+			if (step < TOTAL_STEPS) {
+				triggerStepCompleteHaptic();
+				setStep(step + 1);
+			} else {
+				await completeMut.mutateAsync();
+				capture("onboarding_completed", {});
+				triggerStepCompleteHaptic();
+				utils.onboarding.getState.setData(undefined, (current) =>
+					current ? { ...current, isCompleted: true } : current,
+				);
+				utils.onboarding.getState.invalidate();
+				await refetchSession({
+					query: { disableCookieCache: true },
+				});
+			}
 		} finally {
 			setIsSaving(false);
 		}

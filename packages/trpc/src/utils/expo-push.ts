@@ -1,6 +1,6 @@
 import { type Database, schema } from "@miru/db";
 import type { TypedNotificationData } from "@miru/db/schema";
-import { and, eq } from "drizzle-orm";
+import { and, count, eq, inArray } from "drizzle-orm";
 
 const EXPO_PUSH_API_URL = "https://exp.host/--/api/v2/push/send";
 
@@ -16,12 +16,18 @@ interface ExpoPushResponse {
 }
 
 interface ExpoPushMessage {
+	badge?: number;
 	body: string;
 	data?: Record<string, string>;
 	priority?: "default" | "high" | "normal";
 	sound?: "default" | null;
 	to: string;
 	title: string;
+}
+
+interface PushRecipient {
+	token: string;
+	userId: string;
 }
 
 interface WatchlistMatchPushInput {
@@ -100,6 +106,71 @@ async function sendExpoPushMessages(
 	}
 }
 
+function normalizeBadgeCount(value: unknown) {
+	const badgeCount =
+		typeof value === "number" ? value : Number.parseInt(String(value), 10);
+
+	if (!Number.isFinite(badgeCount) || badgeCount <= 0) {
+		return undefined;
+	}
+
+	return badgeCount;
+}
+
+async function getUnreadBadgeCounts(db: Database, userIds: string[]) {
+	const uniqueUserIds = [...new Set(userIds)];
+
+	if (uniqueUserIds.length === 0) {
+		return new Map<string, number>();
+	}
+
+	const unreadCounts = await db
+		.select({
+			unreadCount: count(),
+			userId: schema.notifications.userId,
+		})
+		.from(schema.notifications)
+		.where(
+			and(
+				inArray(schema.notifications.userId, uniqueUserIds),
+				eq(schema.notifications.read, false),
+			),
+		)
+		.groupBy(schema.notifications.userId);
+
+	return new Map(
+		unreadCounts.flatMap(({ unreadCount, userId }) => {
+			const badgeCount = normalizeBadgeCount(unreadCount);
+
+			if (badgeCount === undefined) {
+				return [];
+			}
+
+			return [[userId, badgeCount] as const];
+		}),
+	);
+}
+
+export function buildBadgeAwarePushMessages(
+	recipients: PushRecipient[],
+	unreadBadgeCounts: ReadonlyMap<string, number>,
+	createMessage: (
+		recipient: PushRecipient,
+	) => Omit<ExpoPushMessage, "badge" | "to">,
+) {
+	return recipients.map((recipient) => {
+		const badgeCount = normalizeBadgeCount(
+			unreadBadgeCounts.get(recipient.userId),
+		);
+
+		return {
+			to: recipient.token,
+			...createMessage(recipient),
+			...(badgeCount === undefined ? {} : { badge: badgeCount }),
+		};
+	});
+}
+
 export async function sendWatchlistMatchPushNotifications({
 	captureException,
 	db,
@@ -127,7 +198,10 @@ export async function sendWatchlistMatchPushNotifications({
 			.where(eq(schema.follows.followingId, userId)),
 		// Push-eligible subset (notifications enabled + has tokens)
 		db
-			.select({ token: schema.pushTokens.token })
+			.select({
+				token: schema.pushTokens.token,
+				userId: schema.follows.followerId,
+			})
 			.from(schema.follows)
 			.innerJoin(
 				schema.watchlistEntries,
@@ -185,11 +259,25 @@ export async function sendWatchlistMatchPushNotifications({
 		return;
 	}
 
+	let unreadBadgeCounts = new Map<string, number>();
+
+	try {
+		unreadBadgeCounts = await getUnreadBadgeCounts(
+			db,
+			pushRecipients.map(({ userId: recipientUserId }) => recipientUserId),
+		);
+	} catch (error) {
+		captureException?.(error, {
+			context: "watchlist-match-badge-count",
+			movieId: String(movieId),
+			userId,
+		});
+	}
+
 	try {
 		await sendExpoPushMessages(
 			db,
-			pushRecipients.map(({ token }) => ({
-				to: token,
+			buildBadgeAwarePushMessages(pushRecipients, unreadBadgeCounts, () => ({
 				title: "New match",
 				body: `${userName} wants to watch ${movie.title} too!`,
 				sound: "default",
@@ -258,20 +346,35 @@ export async function sendNewFollowerPushNotification({
 		return;
 	}
 
+	let unreadBadgeCounts = new Map<string, number>();
+
+	try {
+		unreadBadgeCounts = await getUnreadBadgeCounts(db, [userId]);
+	} catch (error) {
+		captureException?.(error, {
+			context: "new-follower-badge-count",
+			followerId,
+			userId,
+		});
+	}
+
 	try {
 		await sendExpoPushMessages(
 			db,
-			recipient.pushTokens.map(({ token }) => ({
-				to: token,
-				title: "New follower",
-				body: `${followerName} started following you.`,
-				sound: "default",
-				priority: "high",
-				data: {
-					type: "new-follower",
-					userId: followerId,
-				},
-			})),
+			buildBadgeAwarePushMessages(
+				recipient.pushTokens.map(({ token }) => ({ token, userId })),
+				unreadBadgeCounts,
+				() => ({
+					title: "New follower",
+					body: `${followerName} started following you.`,
+					sound: "default",
+					priority: "high",
+					data: {
+						type: "new-follower",
+						userId: followerId,
+					},
+				}),
+			),
 			expoAccessToken,
 		);
 	} catch (error) {
