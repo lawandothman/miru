@@ -1,9 +1,9 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
-import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Spinner } from "@/components/spinner";
 import { trpc } from "@/lib/trpc";
+import { useSession } from "@/lib/auth";
 import { ProgressBar } from "@/components/onboarding/progress-bar";
 import { RegionStep } from "@/components/onboarding/region-step";
 import { GenreStep } from "@/components/onboarding/genre-step";
@@ -20,9 +20,9 @@ import {
 const TOTAL_STEPS = 5;
 
 export default function OnboardingScreen() {
-	const router = useRouter();
 	const insets = useSafeAreaInsets();
 	const utils = trpc.useUtils();
+	const { refetch: refetchSession } = useSession();
 
 	const [step, setStep] = useState(1);
 	const [country, setCountry] = useState<string | null>(null);
@@ -105,30 +105,32 @@ export default function OnboardingScreen() {
 					break;
 			}
 
-			const stepNames = [
-				"region",
-				"genres",
-				"streaming",
-				"watchlist",
-				"friends",
-			] as const;
-			capture("onboarding_step_completed", {
-				step: stepNames[step - 1] ?? String(step),
-			});
+				const stepNames = [
+					"region",
+					"genres",
+					"streaming",
+					"watchlist",
+					"friends",
+				] as const;
+				capture("onboarding_step_completed", {
+					step: stepNames[step - 1] ?? String(step),
+				});
 
-			if (step < TOTAL_STEPS) {
-				triggerStepCompleteHaptic();
-				setStep(step + 1);
-			} else {
-				await completeMut.mutateAsync();
-				capture("onboarding_completed", {});
-				triggerStepCompleteHaptic();
-				utils.onboarding.getState.setData(undefined, (current) =>
-					current ? { ...current, isCompleted: true } : current,
-				);
-				utils.onboarding.getState.invalidate();
-				router.replace("/(tabs)");
-			}
+				if (step < TOTAL_STEPS) {
+					triggerStepCompleteHaptic();
+					setStep(step + 1);
+				} else {
+					await completeMut.mutateAsync();
+					capture("onboarding_completed", {});
+					triggerStepCompleteHaptic();
+					utils.onboarding.getState.setData(undefined, (current) =>
+						current ? { ...current, isCompleted: true } : current,
+					);
+					utils.onboarding.getState.invalidate();
+					await refetchSession({
+						query: { disableCookieCache: true },
+					});
+				}
 		} finally {
 			setIsSaving(false);
 		}

@@ -21,7 +21,7 @@ import {
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { PostHogProvider } from "posthog-react-native";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AppState, Platform } from "react-native";
 import {
 	initialWindowMetrics,
@@ -46,6 +46,41 @@ if (!isRunningInExpoGo()) {
 const pushPlatform =
 	Platform.OS === "ios" ? ("ios" as const) : ("android" as const);
 
+type BootState = "loading" | "signed-out" | "onboarding" | "ready";
+type NotificationRoute = NonNullable<ReturnType<typeof getNotificationRoute>>;
+
+function hasCompletedOnboardingInCachedSession(
+	session: { user?: unknown } | null | undefined,
+) {
+	if (!session?.user || typeof session.user !== "object") {
+		return false;
+	}
+
+	const onboardingCompletedAt =
+		"onboardingCompletedAt" in session.user
+			? session.user.onboardingCompletedAt
+			: null;
+
+	return Boolean(onboardingCompletedAt);
+}
+
+function getBootState(
+	session: { user?: unknown } | null | undefined,
+	sessionPending: boolean,
+): BootState {
+	if (!session && sessionPending) {
+		return "loading";
+	}
+
+	if (!session) {
+		return "signed-out";
+	}
+
+	return hasCompletedOnboardingInCachedSession(session)
+		? "ready"
+		: "onboarding";
+}
+
 function AuthGuard({ children }: { children: React.ReactNode }) {
 	useScreenTracking();
 	const { data: session, isPending: sessionPending } = useSession();
@@ -54,18 +89,11 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 	const { mutateAsync: registerPushToken } =
 		trpc.notification.registerPushToken.useMutation();
 	const promptedForPushPermissionUserId = useRef<string | null>(null);
-
-	const { data: onboardingState } = trpc.onboarding.getState.useQuery(
-		undefined,
-		{ enabled: Boolean(session) },
-	);
-
-	const hasLocalSession = Boolean(session);
-	// Trust the cached session from SecureStore to skip waiting for network
-	// revalidation. If the session is invalid, the tRPC 401 handler will
-	// redirect to sign-in. Onboarding state resolves in the background and
-	// redirects if needed (rare for returning users).
-	const isPending = !hasLocalSession && sessionPending;
+	const handledNotificationResponseId = useRef<string | null>(null);
+	const isNavigatingToNotificationRoute = useRef(false);
+	const [pendingNotificationRoute, setPendingNotificationRoute] =
+		useState<NotificationRoute | null>(null);
+	const bootState = getBootState(session, sessionPending);
 
 	useEffect(() => {
 		if (session?.user) {
@@ -98,32 +126,48 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 	}, []);
 
 	useEffect(() => {
-		Notifications.getLastNotificationResponseAsync()
-			.then((response) => {
-				const route = getNotificationRoute(
-					response?.notification.request.content.data,
-				);
+		let cancelled = false;
 
-				if (route) {
-					router.push(route);
-				}
-			})
+		async function queueNotificationRoute(
+			response: Notifications.NotificationResponse | null,
+		) {
+			const route = getNotificationRoute(
+				response?.notification.request.content.data,
+			);
+
+			if (!route) {
+				return;
+			}
+
+			const responseId = response?.notification.request.identifier ?? null;
+			if (responseId && handledNotificationResponseId.current === responseId) {
+				return;
+			}
+
+			handledNotificationResponseId.current = responseId;
+
+			if (!cancelled) {
+				setPendingNotificationRoute(route);
+			}
+
+			Notifications.clearLastNotificationResponseAsync().catch(() => undefined);
+		}
+
+		Notifications.getLastNotificationResponseAsync()
+			.then((response) => queueNotificationRoute(response))
 			.catch(() => undefined);
 
 		const subscription = Notifications.addNotificationResponseReceivedListener(
 			(response) => {
-				const route = getNotificationRoute(
-					response.notification.request.content.data,
-				);
-
-				if (route) {
-					router.push(route);
-				}
+				void queueNotificationRoute(response);
 			},
 		);
 
-		return () => subscription.remove();
-	}, [router]);
+		return () => {
+			cancelled = true;
+			subscription.remove();
+		};
+	}, []);
 
 	useEffect(() => {
 		let cancelled = false;
@@ -160,13 +204,11 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 	useEffect(() => {
 		let cancelled = false;
 		const user = session?.user;
-		const onboardingCompleted = onboardingState?.isCompleted;
 
 		async function promptForPushPermission() {
 			if (
 				!user ||
-				onboardingCompleted !== true ||
-				isPending ||
+				bootState !== "ready" ||
 				isRunningInExpoGo() ||
 				segments[0] === "(auth)" ||
 				segments[0] === "(onboarding)" ||
@@ -204,36 +246,73 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 		return () => {
 			cancelled = true;
 		};
-	}, [isPending, onboardingState?.isCompleted, segments, session?.user]);
+	}, [bootState, segments, session?.user]);
 
 	useEffect(() => {
-		if (isPending) {
+		if (bootState !== "ready") {
+			isNavigatingToNotificationRoute.current = false;
 			return;
 		}
 
 		const inAuthGroup = segments[0] === "(auth)";
 		const inOnboardingGroup = segments[0] === "(onboarding)";
-		const onboardingCompleted = onboardingState?.isCompleted;
 
-		if (!session && !inAuthGroup) {
+		if (!inAuthGroup && !inOnboardingGroup) {
+			isNavigatingToNotificationRoute.current = false;
+		}
+	}, [bootState, segments]);
+
+	useEffect(() => {
+		if (bootState === "loading") {
+			return;
+		}
+
+		const inAuthGroup = segments[0] === "(auth)";
+		const inOnboardingGroup = segments[0] === "(onboarding)";
+
+		if (bootState === "signed-out" && !inAuthGroup) {
 			router.replace("/(auth)/sign-in");
-		} else if (session && onboardingCompleted === false && !inOnboardingGroup) {
+		} else if (bootState === "onboarding" && !inOnboardingGroup) {
 			router.replace("/(onboarding)");
 		} else if (
-			session &&
-			onboardingCompleted === true &&
-			(inAuthGroup || inOnboardingGroup)
+			bootState === "ready" &&
+			(inAuthGroup || inOnboardingGroup) &&
+			!pendingNotificationRoute &&
+			!isNavigatingToNotificationRoute.current
 		) {
 			router.replace("/(tabs)");
 		}
+	}, [bootState, pendingNotificationRoute, router, segments]);
 
-		const canHideSplash = !session || onboardingCompleted !== undefined;
-		if (!isRunningInExpoGo() && canHideSplash) {
-			SplashScreen.hideAsync();
+	useEffect(() => {
+		if (bootState !== "ready" || !pendingNotificationRoute) {
+			return;
 		}
-	}, [session, isPending, onboardingState, segments, router]);
 
-	if (isPending || (session && onboardingState === undefined)) {
+		const inAuthGroup = segments[0] === "(auth)";
+		const inOnboardingGroup = segments[0] === "(onboarding)";
+		const route = pendingNotificationRoute;
+
+		isNavigatingToNotificationRoute.current = true;
+		setPendingNotificationRoute(null);
+
+		if (inAuthGroup || inOnboardingGroup) {
+			router.replace(route);
+			return;
+		}
+
+		router.push(route);
+	}, [bootState, pendingNotificationRoute, router, segments]);
+
+	useEffect(() => {
+		if (isRunningInExpoGo() || bootState === "loading") {
+			return;
+		}
+
+		SplashScreen.hideAsync();
+	}, [bootState]);
+
+	if (bootState === "loading") {
 		return null;
 	}
 
