@@ -8,6 +8,11 @@ const config = getSentryExpoConfig(projectRoot, {
 	annotateReactComponents: true,
 });
 
+// Expo Doctor for SDK 55 flags this Metro option as unknown.
+if (config.watcher) {
+	delete config.watcher.unstable_workerThreads;
+}
+
 // Allow Metro to resolve files from the monorepo root
 config.watchFolders = [
 	...new Set([...(config.watchFolders ?? []), monorepoRoot]),

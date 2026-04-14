@@ -10,6 +10,7 @@ const plugins: NonNullable<ExpoConfig["plugins"]> = [
 	"expo-updates",
 	"expo-web-browser",
 	"expo-sharing",
+	"posthog-react-native/expo",
 ];
 
 function getVersionFromGitTag(): string {

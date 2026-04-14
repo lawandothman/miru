@@ -10,7 +10,7 @@ export const posthog = posthogKey
 			errorTracking: {
 				autocapture: true,
 			},
-			enableSessionReplay: true,
+			enableSessionReplay: !__DEV__,
 			sessionReplayConfig: {
 				maskAllTextInputs: true,
 				maskAllImages: false,
