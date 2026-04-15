@@ -22,7 +22,7 @@
 		"@expo/vector-icons": "15.1.1",
 		"@miru/analytics": "workspace:*",
 		"@react-navigation/native": "7.2.2",
-		"@sentry/react-native": "7.11.0",
+		"@sentry/react-native": "7.13.0",
 		"@tanstack/react-query": "catalog:trpc",
 		"@trpc/client": "catalog:trpc",
 		"@trpc/react-query": "catalog:trpc",
@@ -69,7 +69,7 @@
 		"@miru/design-tokens": "workspace:*",
 		"@miru/trpc": "workspace:*",
 		"@posthog/cli": "0.7.5",
-		"@sentry/cli": "3.3.0",
+		"@sentry/cli": "3.3.5",
 		"@types/react": "catalog:react",
 		"babel-plugin-module-resolver": "5.0.3",
 		"babel-plugin-react-compiler": "1.0.0",
@@ -80,6 +80,7 @@
 		"install": {
 			"exclude": [
 				"@react-navigation/native",
+				"@sentry/react-native",
 				"@expo/ui",
 				"react",
 				"react-dom"
