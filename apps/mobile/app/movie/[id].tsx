@@ -7,6 +7,9 @@ import {
 	Dimensions,
 	Share,
 	ActivityIndicator,
+	Platform,
+	ActionSheetIOS,
+	Alert,
 } from "react-native";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
@@ -87,27 +90,54 @@ export default function MovieDetailScreen() {
 	const storyCardRef = useRef<View>(null);
 	const [isSharing, setIsSharing] = useState(false);
 
-	const handleShare = useCallback(async () => {
+	const handleShare = useCallback(() => {
 		if (!movie || isSharing) return;
-		setIsSharing(true);
-		try {
-			const uri = await captureRef(storyCardRef, {
-				format: "png",
-				quality: 1,
-			});
-			await Sharing.shareAsync(uri, {
-				mimeType: "image/png",
-				UTI: "public.png",
-			});
-		} catch {
-			// Fallback to text share
-			const url = `${WEB_BASE}/movie/${movieSlug(movie.title, movie.id)}`;
-			Share.share({
-				message: `Check out ${movie.title} on Miru\n${url}`,
-				url,
-			}).catch(() => undefined);
-		} finally {
-			setIsSharing(false);
+
+		const url = `${WEB_BASE}/movie/${movieSlug(movie.title, movie.id)}`;
+
+		const shareText = () => {
+			Share.share(
+				Platform.OS === "ios"
+					? { message: `Check out ${movie.title} on Miru`, url }
+					: { message: `Check out ${movie.title} on Miru\n${url}` },
+			).catch(() => undefined);
+		};
+
+		const shareStory = async () => {
+			setIsSharing(true);
+			try {
+				const uri = await captureRef(storyCardRef, {
+					format: "png",
+					quality: 1,
+				});
+				await Sharing.shareAsync(uri, {
+					mimeType: "image/png",
+					UTI: "public.png",
+				});
+			} catch {
+				shareText();
+			} finally {
+				setIsSharing(false);
+			}
+		};
+
+		if (Platform.OS === "ios") {
+			ActionSheetIOS.showActionSheetWithOptions(
+				{
+					options: ["Cancel", "Share", "Instagram Stories"],
+					cancelButtonIndex: 0,
+				},
+				(index: number) => {
+					if (index === 1) shareText();
+					else if (index === 2) void shareStory();
+				},
+			);
+		} else {
+			Alert.alert("Share", undefined, [
+				{ text: "Cancel", style: "cancel" },
+				{ text: "Share", onPress: shareText },
+				{ text: "Instagram Stories", onPress: () => void shareStory() },
+			]);
 		}
 	}, [movie, isSharing]);
 
