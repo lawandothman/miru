@@ -22,6 +22,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { PostHogProvider } from "posthog-react-native";
 import { useEffect, useRef, useState } from "react";
+import { ThemeProvider } from "@react-navigation/native";
 import { AppState, Platform } from "react-native";
 import {
 	initialWindowMetrics,
@@ -35,9 +36,13 @@ import {
 	getNotificationPermissionsStatus,
 	getNotificationRoute,
 } from "@/lib/notifications";
+import {
+	getNavigationTheme,
+} from "@/lib/navigation";
 import { navigationIntegration, Sentry } from "@/lib/sentry";
 import { trpc } from "@/lib/trpc";
 import { TRPCProvider } from "@/lib/trpc-provider";
+import { useResolvedColorScheme } from "@/lib/constants";
 
 if (!isRunningInExpoGo()) {
 	SplashScreen.preventAutoHideAsync();
@@ -346,6 +351,7 @@ function RootLayout() {
 		PlusJakartaSans_600SemiBold,
 		PlusJakartaSans_700Bold,
 	});
+	const resolvedScheme = useResolvedColorScheme();
 	const navigationRef = useNavigationContainerRef();
 
 	useEffect(() => {
@@ -358,17 +364,19 @@ function RootLayout() {
 
 	const content = (
 		<SafeAreaProvider initialMetrics={initialWindowMetrics}>
-			<TRPCProvider>
-				<AuthGuard>
-					<StatusBar style="light" />
-					<Stack
-						screenOptions={{
-							headerShown: false,
-							headerBackButtonDisplayMode: "minimal",
-						}}
-					/>
-				</AuthGuard>
-			</TRPCProvider>
+			<ThemeProvider value={getNavigationTheme(resolvedScheme)}>
+				<TRPCProvider>
+					<AuthGuard>
+						<StatusBar style="auto" />
+						<Stack
+							screenOptions={{
+								headerShown: false,
+								headerBackButtonDisplayMode: "minimal",
+							}}
+						/>
+					</AuthGuard>
+				</TRPCProvider>
+			</ThemeProvider>
 		</SafeAreaProvider>
 	);
 

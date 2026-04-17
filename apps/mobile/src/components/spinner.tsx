@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import { Animated, Easing } from "react-native";
+import { Animated, Easing, type ColorValue } from "react-native";
 import Svg, { Circle } from "react-native-svg";
 import { Colors } from "@/lib/constants";
 
 interface SpinnerProps {
 	size?: number;
-	color?: string;
+	color?: ColorValue;
 	strokeWidth?: number;
 }
 

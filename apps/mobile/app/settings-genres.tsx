@@ -10,12 +10,13 @@ import { Stack, useRouter } from "expo-router";
 import { Spinner } from "@/components/spinner";
 import { trpc } from "@/lib/trpc";
 import { useToggleSet } from "@/hooks/use-toggle-set";
-import { defaultHeaderOptions } from "@/lib/navigation";
+import { useDefaultHeaderOptions } from "@/lib/navigation";
 import { Colors, fontSize, fontFamily, spacing, radius } from "@/lib/constants";
 
 export default function SettingsGenresScreen() {
 	const router = useRouter();
 	const utils = trpc.useUtils();
+	const headerOptions = useDefaultHeaderOptions();
 	const { data: genres, isLoading: genresLoading } =
 		trpc.movie.getGenres.useQuery();
 	const { data: state, isLoading: stateLoading } =
@@ -38,7 +39,7 @@ export default function SettingsGenresScreen() {
 		<>
 			<Stack.Screen
 				options={{
-					...defaultHeaderOptions,
+					...headerOptions,
 					title: "Genre Preferences",
 				}}
 			/>

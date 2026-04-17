@@ -7,7 +7,7 @@ import { trpc } from "@/lib/trpc";
 import { useSession } from "@/lib/auth";
 import { UserAvatar } from "@/components/user-avatar";
 import { FollowButton } from "@/components/follow-button";
-import { defaultHeaderOptions } from "@/lib/navigation";
+import { useDefaultHeaderOptions } from "@/lib/navigation";
 import { Colors, fontSize, fontFamily, spacing } from "@/lib/constants";
 
 type Tab = "followers" | "following";
@@ -69,12 +69,13 @@ export default function FollowersScreen() {
 	const activeData = activeTab === "followers" ? followers : following;
 	const isLoading =
 		activeTab === "followers" ? followersLoading : followingLoading;
+	const headerOptions = useDefaultHeaderOptions();
 
 	return (
 		<>
 			<Stack.Screen
 				options={{
-					...defaultHeaderOptions,
+					...headerOptions,
 					title: profile?.name ?? "",
 				}}
 			/>

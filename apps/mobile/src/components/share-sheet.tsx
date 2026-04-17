@@ -19,6 +19,7 @@ import { presentationDragIndicator } from "@expo/ui/swift-ui/modifiers";
 import { captureRef } from "react-native-view-shot";
 import RNShare, { Social } from "react-native-share";
 import { Linking } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 import { Link, Instagram } from "lucide-react-native";
 import { StoryCard } from "./story-card";
 import { Colors, fontFamily, fontSize, spacing, radius } from "@/lib/constants";
@@ -67,13 +68,12 @@ export function ShareSheet({
 	const url = `${WEB_BASE}/movie/${movieSlug(movie.title, movie.id)}`;
 
 	const handleShareLink = useCallback(() => {
+		onClose();
 		Share.share(
 			Platform.OS === "ios"
 				? { message: `Check out ${movie.title} on Miru`, url }
 				: { message: `Check out ${movie.title} on Miru\n${url}` },
-		)
-			.then(() => onClose())
-			.catch(() => undefined);
+		).catch(() => undefined);
 	}, [movie.title, url, onClose]);
 
 	const handleShareStory = useCallback(async () => {
@@ -153,13 +153,22 @@ export function ShareSheet({
 													/>
 												</View>
 											) : (
-												<View
+												<LinearGradient
+													colors={[
+														"#feda75",
+														"#fa7e1e",
+														"#d62976",
+														"#962fbf",
+														"#4f5bd5",
+													]}
+													start={{ x: 0, y: 1 }}
+													end={{ x: 1, y: 0 }}
 													style={[styles.actionIcon, styles.instagramIcon]}
 												>
 													<Instagram size={22} color="#fff" />
-												</View>
+												</LinearGradient>
 											)}
-											<Text style={styles.actionLabel}>Stories</Text>
+											<Text style={styles.actionLabel}>Instagram stories</Text>
 										</Pressable>
 
 										<Pressable
@@ -236,8 +245,8 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 	},
 	instagramIcon: {
-		backgroundColor: "#E1306C",
 		borderWidth: 0,
+		overflow: "hidden",
 	},
 	actionLabel: {
 		fontSize: fontSize.xs,

@@ -28,16 +28,18 @@ import { MovieActions } from "@/components/movie-actions";
 import { UserAvatar } from "@/components/user-avatar";
 import { MovieDetailSkeleton } from "@/components/movie-detail-skeleton";
 import { EmptyState } from "@/components/empty-state";
-import { defaultHeaderOptions } from "@/lib/navigation";
+import { useDefaultHeaderOptions } from "@/lib/navigation";
 import {
 	Colors,
 	backdropUrl,
+	getThemePalette,
 	posterUrl,
 	providerLogoUrl,
 	fontSize,
 	fontFamily,
 	spacing,
 	radius,
+	useResolvedColorScheme,
 } from "@/lib/constants";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
@@ -55,6 +57,9 @@ export default function MovieDetailScreen() {
 	const { id } = useLocalSearchParams<{ id: string }>();
 	const router = useRouter();
 	const insets = useSafeAreaInsets();
+	const headerOptions = useDefaultHeaderOptions();
+	const resolvedScheme = useResolvedColorScheme();
+	const palette = getThemePalette(resolvedScheme);
 	const tmdbId = Number(id);
 
 	const {
@@ -94,7 +99,7 @@ export default function MovieDetailScreen() {
 	if (isMissingMovie) {
 		return (
 			<>
-				<Stack.Screen options={{ ...defaultHeaderOptions, title: "Movie" }} />
+				<Stack.Screen options={{ ...headerOptions, title: "Movie" }} />
 				<View style={styles.emptyScreen}>
 					<EmptyState
 						icon={Film}
@@ -111,7 +116,7 @@ export default function MovieDetailScreen() {
 	if (error || !movie) {
 		return (
 			<>
-				<Stack.Screen options={{ ...defaultHeaderOptions, title: "Movie" }} />
+				<Stack.Screen options={{ ...headerOptions, title: "Movie" }} />
 				<View style={styles.emptyScreen}>
 					<EmptyState
 						icon={RefreshCw}
@@ -160,7 +165,13 @@ export default function MovieDetailScreen() {
 
 					{/* Gradient fade into background */}
 					<LinearGradient
-						colors={["transparent", "rgba(1,1,1,0.6)", Colors.background]}
+						colors={[
+							"transparent",
+							resolvedScheme === "light"
+								? "rgba(250, 250, 250, 0.6)"
+								: "rgba(1, 1, 1, 0.6)",
+							palette.background,
+						]}
 						locations={[0, 0.55, 1]}
 						style={styles.heroGradient}
 					/>

@@ -1,6 +1,8 @@
 import { Stack } from "expo-router";
-import { defaultHeaderOptions } from "@/lib/navigation";
+import { useDefaultHeaderOptions } from "@/lib/navigation";
 
 export default function SearchLayout() {
-	return <Stack screenOptions={defaultHeaderOptions} />;
+	const headerOptions = useDefaultHeaderOptions();
+
+	return <Stack screenOptions={headerOptions} />;
 }

@@ -1,24 +1,34 @@
-import { View, Text, ScrollView, StyleSheet, Alert, Share } from "react-native";
+import {
+	View,
+	Text,
+	StyleSheet,
+	Alert,
+	Share,
+	Pressable,
+} from "react-native";
 import { useLocalSearchParams, Stack } from "expo-router";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { useSession } from "@/lib/auth";
 import { capture } from "@/lib/analytics";
 import { UserAvatar } from "@/components/user-avatar";
 import { UserStats } from "@/components/user-stats";
 import { FollowButton } from "@/components/follow-button";
+import { MovieGrid } from "@/components/movie-grid";
 import { MovieCarousel } from "@/components/movie-carousel";
 import { UserProfileSkeleton } from "@/components/user-profile-skeleton";
-import { defaultHeaderOptions } from "@/lib/navigation";
-import { Colors, fontSize, fontFamily, spacing } from "@/lib/constants";
+import { useDefaultHeaderOptions } from "@/lib/navigation";
+import { Colors, fontSize, fontFamily, spacing, radius } from "@/lib/constants";
+
+type Tab = "watchlist" | "watched";
 
 export default function UserProfileScreen() {
 	const { id } = useLocalSearchParams<{ id: string }>();
 	const { data: session } = useSession();
 	const isOwnProfile = session?.user?.id === id;
-
 	const userId = id ?? "";
+	const [activeTab, setActiveTab] = useState<Tab>("watchlist");
+	const headerOptions = useDefaultHeaderOptions();
 
 	const tracked = useRef(false);
 	useEffect(() => {
@@ -33,13 +43,13 @@ export default function UserProfileScreen() {
 		{ enabled: Boolean(id) },
 	);
 
-	const { data: watchlist } = trpc.watchlist.getUserWatchlist.useQuery(
-		{ userId, limit: 15 },
+	const watchlistQuery = trpc.watchlist.getUserWatchlist.useQuery(
+		{ userId, limit: 60 },
 		{ enabled: Boolean(id) },
 	);
 
-	const { data: watched } = trpc.watched.getUserWatched.useQuery(
-		{ userId, limit: 15 },
+	const watchedQuery = trpc.watched.getUserWatched.useQuery(
+		{ userId, limit: 60 },
 		{ enabled: Boolean(id) },
 	);
 
@@ -135,17 +145,20 @@ export default function UserProfileScreen() {
 	if (isLoading || !profile) {
 		return (
 			<>
-				<Stack.Screen options={{ ...defaultHeaderOptions, title: "" }} />
+				<Stack.Screen options={{ ...headerOptions, title: "" }} />
 				<UserProfileSkeleton />
 			</>
 		);
 	}
 
+	const activeQuery = activeTab === "watchlist" ? watchlistQuery : watchedQuery;
+	const movies = activeQuery.data ?? [];
+
 	return (
 		<>
 			<Stack.Screen
 				options={{
-					...defaultHeaderOptions,
+					...headerOptions,
 					title: profile.name ?? "",
 				}}
 			/>
@@ -170,44 +183,88 @@ export default function UserProfileScreen() {
 				</Stack.Toolbar>
 			)}
 
-			<SafeAreaView style={styles.container} edges={[]}>
-				<ScrollView contentContainerStyle={styles.scroll}>
-					<View style={styles.header}>
-						<UserAvatar
-							imageUrl={profile.image}
-							name={profile.name}
-							size={80}
-						/>
-						<Text style={styles.name}>{profile.name}</Text>
+			<View style={styles.container}>
+				<MovieGrid
+					movies={profile.isBlocked ? [] : movies}
+					isLoading={!profile.isBlocked && activeQuery.isLoading}
+					onRefresh={() => activeQuery.refetch()}
+					ListHeaderComponent={
+						<View style={styles.headerWrapper}>
+							<View style={styles.header}>
+								<UserAvatar
+									imageUrl={profile.image}
+									name={profile.name}
+									size={80}
+								/>
+								<Text style={styles.name}>{profile.name}</Text>
+								<UserStats
+									userId={userId}
+									followerCount={profile.followerCount}
+									followingCount={profile.followingCount}
+								/>
+								{!isOwnProfile && !profile.isBlocked && (
+									<FollowButton
+										userId={userId}
+										isFollowing={profile.isFollowing}
+									/>
+								)}
+								{profile.isBlocked && (
+									<Text style={styles.blockedText}>
+										You blocked this user
+									</Text>
+								)}
+							</View>
 
-						<UserStats
-							userId={userId}
-							followerCount={profile.followerCount}
-							followingCount={profile.followingCount}
-						/>
+							{!profile.isBlocked && matches && matches.length > 0 && (
+								<MovieCarousel title="Matches" movies={matches} />
+							)}
 
-						{!isOwnProfile && !profile.isBlocked && (
-							<FollowButton userId={userId} isFollowing={profile.isFollowing} />
-						)}
-
-						{profile.isBlocked && (
-							<Text style={styles.blockedText}>You blocked this user</Text>
-						)}
-					</View>
-
-					{!profile.isBlocked && matches && (
-						<MovieCarousel title="Matches" movies={matches} />
-					)}
-
-					{!profile.isBlocked && watchlist && (
-						<MovieCarousel title="Watchlist" movies={watchlist} />
-					)}
-
-					{!profile.isBlocked && watched && (
-						<MovieCarousel title="Watched" movies={watched} />
-					)}
-				</ScrollView>
-			</SafeAreaView>
+							{!profile.isBlocked && (
+								<View style={styles.tabs} accessibilityRole="tablist">
+									<Pressable
+										style={[
+											styles.tab,
+											activeTab === "watchlist" && styles.tabActive,
+										]}
+										onPress={() => setActiveTab("watchlist")}
+										accessibilityRole="tab"
+										accessibilityLabel="Watchlist"
+										accessibilityState={{ selected: activeTab === "watchlist" }}
+									>
+										<Text
+											style={[
+												styles.tabText,
+												activeTab === "watchlist" && styles.tabTextActive,
+											]}
+										>
+											Watchlist
+										</Text>
+									</Pressable>
+									<Pressable
+										style={[
+											styles.tab,
+											activeTab === "watched" && styles.tabActive,
+										]}
+										onPress={() => setActiveTab("watched")}
+										accessibilityRole="tab"
+										accessibilityLabel="Watched"
+										accessibilityState={{ selected: activeTab === "watched" }}
+									>
+										<Text
+											style={[
+												styles.tabText,
+												activeTab === "watched" && styles.tabTextActive,
+											]}
+										>
+											Watched
+										</Text>
+									</Pressable>
+								</View>
+							)}
+						</View>
+					}
+				/>
+			</View>
 		</>
 	);
 }
@@ -217,13 +274,13 @@ const styles = StyleSheet.create({
 		flex: 1,
 		backgroundColor: Colors.background,
 	},
-	scroll: {
-		paddingBottom: spacing[8],
+	headerWrapper: {
 		gap: spacing[6],
+		paddingTop: spacing[6],
+		paddingBottom: spacing[4],
 	},
 	header: {
 		alignItems: "center",
-		paddingTop: spacing[6],
 		gap: spacing[3],
 	},
 	name: {
@@ -235,5 +292,30 @@ const styles = StyleSheet.create({
 		fontSize: fontSize.sm,
 		fontFamily: fontFamily.sans,
 		color: Colors.mutedForeground,
+	},
+	tabs: {
+		flexDirection: "row",
+		marginHorizontal: spacing[4],
+		backgroundColor: Colors.secondary,
+		borderRadius: radius.lg,
+		padding: 4,
+	},
+	tab: {
+		flex: 1,
+		paddingVertical: spacing[2],
+		alignItems: "center",
+		borderRadius: radius.md,
+	},
+	tabActive: {
+		backgroundColor: Colors.background,
+	},
+	tabText: {
+		fontSize: fontSize.sm,
+		fontFamily: fontFamily.sansMedium,
+		color: Colors.mutedForeground,
+	},
+	tabTextActive: {
+		color: Colors.foreground,
+		fontFamily: fontFamily.sansSemibold,
 	},
 });

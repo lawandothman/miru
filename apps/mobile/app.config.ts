@@ -44,7 +44,7 @@ const config: ExpoConfig = {
 	orientation: "portrait",
 	icon: "./assets/icon.png",
 	scheme: "miru",
-	userInterfaceStyle: "dark",
+	userInterfaceStyle: "automatic",
 	runtimeVersion: {
 		policy: "appVersion",
 	},
