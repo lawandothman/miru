@@ -221,6 +221,9 @@ importers:
       react-native-screens:
         specifier: 4.23.0
         version: 4.23.0(react-native@0.83.4(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.4))(react@19.2.4)
+      react-native-share:
+        specifier: 11.0.4
+        version: 11.0.4
       react-native-svg:
         specifier: 15.15.3
         version: 15.15.3(react-native@0.83.4(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.4))(react@19.2.4)
@@ -7572,6 +7575,10 @@ packages:
     peerDependencies:
       react: '*'
       react-native: '*'
+
+  react-native-share@11.0.4:
+    resolution: {integrity: sha512-i91n1Pcdaxxr39uxR5KduXjqi5FSEXuEO6rmeHl8OPs5rqo4No36qJXUU6du4TZUI6tFSENdxnzZMh3OsMF+ug==}
+    engines: {node: '>=16'}
 
   react-native-svg@15.15.3:
     resolution: {integrity: sha512-/k4KYwPBLGcx2f5d4FjE+vCScK7QOX14cl2lIASJ28u4slHHtIhL0SZKU7u9qmRBHxTCKPoPBtN6haT1NENJNA==}
@@ -16015,6 +16022,8 @@ snapshots:
       react-freeze: 1.0.4(react@19.2.4)
       react-native: 0.83.4(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.4)
       warn-once: 0.1.1
+
+  react-native-share@11.0.4: {}
 
   react-native-svg@15.15.3(react-native@0.83.4(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.4))(react@19.2.4):
     dependencies:

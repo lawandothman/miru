@@ -44,7 +44,7 @@ const config: ExpoConfig = {
 	orientation: "portrait",
 	icon: "./assets/icon.png",
 	scheme: "miru",
-	userInterfaceStyle: "automatic",
+	userInterfaceStyle: "dark",
 	runtimeVersion: {
 		policy: "appVersion",
 	},
@@ -62,6 +62,7 @@ const config: ExpoConfig = {
 		associatedDomains: ["applinks:watchmiru.app"],
 		infoPlist: {
 			ITSAppUsesNonExemptEncryption: false,
+			LSApplicationQueriesSchemes: ["instagram-stories", "instagram"],
 		},
 	},
 	android: {

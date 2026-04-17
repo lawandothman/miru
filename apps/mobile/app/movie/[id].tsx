@@ -5,11 +5,7 @@ import {
 	Pressable,
 	StyleSheet,
 	Dimensions,
-	Share,
-	ActivityIndicator,
-	Platform,
-	ActionSheetIOS,
-	Alert,
+	Linking,
 } from "react-native";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
@@ -23,12 +19,9 @@ import {
 	Share2,
 } from "lucide-react-native";
 import { ImdbLogo } from "@/components/imdb-logo";
-import { Linking } from "react-native";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { TRPCClientError } from "@trpc/client";
-import { captureRef } from "react-native-view-shot";
-import * as Sharing from "expo-sharing";
-import { StoryCard } from "@/components/story-card";
+import { ShareSheet } from "@/components/share-sheet";
 import { trpc } from "@/lib/trpc";
 import { capture } from "@/lib/analytics";
 import { MovieActions } from "@/components/movie-actions";
@@ -51,18 +44,6 @@ const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const HERO_HEIGHT = SCREEN_WIDTH * 0.75;
 const POSTER_WIDTH = 110;
 const POSTER_HEIGHT = 165;
-const WEB_BASE = "https://watchmiru.app";
-
-function movieSlug(title: string, tmdbId: number): string {
-	const slug = title
-		.toLowerCase()
-		.normalize("NFD")
-		.replace(/[\u0300-\u036f]/g, "")
-		.replace(/[^a-z0-9]+/g, "-")
-		.replace(/^-+|-+$/g, "");
-	return `${slug}-${tmdbId}`;
-}
-
 function isNotFoundError(error: unknown): boolean {
 	return (
 		error instanceof TRPCClientError &&
@@ -87,59 +68,7 @@ export default function MovieDetailScreen() {
 		{ enabled: !Number.isNaN(tmdbId) },
 	);
 
-	const storyCardRef = useRef<View>(null);
-	const [isSharing, setIsSharing] = useState(false);
-
-	const handleShare = useCallback(() => {
-		if (!movie || isSharing) return;
-
-		const url = `${WEB_BASE}/movie/${movieSlug(movie.title, movie.id)}`;
-
-		const shareText = () => {
-			Share.share(
-				Platform.OS === "ios"
-					? { message: `Check out ${movie.title} on Miru`, url }
-					: { message: `Check out ${movie.title} on Miru\n${url}` },
-			).catch(() => undefined);
-		};
-
-		const shareStory = async () => {
-			setIsSharing(true);
-			try {
-				const uri = await captureRef(storyCardRef, {
-					format: "png",
-					quality: 1,
-				});
-				await Sharing.shareAsync(uri, {
-					mimeType: "image/png",
-					UTI: "public.png",
-				});
-			} catch {
-				shareText();
-			} finally {
-				setIsSharing(false);
-			}
-		};
-
-		if (Platform.OS === "ios") {
-			ActionSheetIOS.showActionSheetWithOptions(
-				{
-					options: ["Cancel", "Share", "Instagram Stories"],
-					cancelButtonIndex: 0,
-				},
-				(index: number) => {
-					if (index === 1) shareText();
-					else if (index === 2) void shareStory();
-				},
-			);
-		} else {
-			Alert.alert("Share", undefined, [
-				{ text: "Cancel", style: "cancel" },
-				{ text: "Share", onPress: shareText },
-				{ text: "Instagram Stories", onPress: () => void shareStory() },
-			]);
-		}
-	}, [movie, isSharing]);
+	const [shareVisible, setShareVisible] = useState(false);
 
 	const tracked = useRef(false);
 	useEffect(() => {
@@ -260,14 +189,9 @@ export default function MovieDetailScreen() {
 							]}
 							accessibilityRole="button"
 							accessibilityLabel="Share movie"
-							onPress={handleShare}
-							disabled={isSharing}
+							onPress={() => setShareVisible(true)}
 						>
-							{isSharing ? (
-								<ActivityIndicator size="small" color="#fff" />
-							) : (
-								<Share2 size={18} color="#fff" />
-							)}
+							<Share2 size={18} color="#fff" />
 						</Pressable>
 					</View>
 				</View>
@@ -453,9 +377,15 @@ export default function MovieDetailScreen() {
 				</View>
 			</ScrollView>
 
-			{/* Off-screen story card for share capture */}
-			<View style={styles.offscreen} pointerEvents="none">
-				<StoryCard ref={storyCardRef} movie={movie} />
+			<View
+				style={StyleSheet.absoluteFill}
+				pointerEvents={shareVisible ? "auto" : "none"}
+			>
+				<ShareSheet
+					movie={movie}
+					visible={shareVisible}
+					onClose={() => setShareVisible(false)}
+				/>
 			</View>
 		</>
 	);
@@ -474,11 +404,6 @@ const styles = StyleSheet.create({
 	emptyScreen: {
 		flex: 1,
 		paddingBottom: spacing[8],
-	},
-	offscreen: {
-		position: "absolute",
-		left: -9999,
-		top: 0,
 	},
 
 	/* Hero */
