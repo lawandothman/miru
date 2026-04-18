@@ -4,11 +4,9 @@ import {
 	Text,
 	Pressable,
 	StyleSheet,
-	Alert,
 	Share,
 	Platform,
 	ActivityIndicator,
-	Image as RNImage,
 	Linking,
 } from "react-native";
 import {
@@ -19,12 +17,11 @@ import {
 	VStack,
 } from "@expo/ui/swift-ui";
 import { presentationDragIndicator } from "@expo/ui/swift-ui/modifiers";
-import * as Clipboard from "expo-clipboard";
 import { captureRef } from "react-native-view-shot";
 import RNShare, { Social } from "react-native-share";
-import { SvgUri } from "react-native-svg";
-import { Copy } from "lucide-react-native";
+import { Link as LinkIcon } from "lucide-react-native";
 import { StoryCard } from "./story-card";
+import { InstagramIcon } from "./icons/instagram-icon";
 import { Colors, fontFamily, fontSize, spacing, radius } from "@/lib/constants";
 
 interface ShareSheetMovie {
@@ -41,9 +38,8 @@ interface ShareSheetMovie {
 const WEB_BASE = "https://watchmiru.app";
 const INSTAGRAM_STORIES_APP_ID =
 	process.env.EXPO_PUBLIC_INSTAGRAM_STORIES_APP_ID?.trim();
-const INSTAGRAM_GLYPH_URI = RNImage.resolveAssetSource(
-	require("../../assets/instagram-glyph-gradient.svg"),
-).uri;
+const ACTION_ICON_SIZE = 52;
+const INSTAGRAM_ICON_SIZE = 48;
 
 function movieSlug(title: string, tmdbId: number): string {
 	const slug = title
@@ -76,6 +72,10 @@ export async function canShareToInstagramStories() {
 		return false;
 	}
 
+	if (__DEV__) {
+		return true;
+	}
+
 	try {
 		return await Linking.canOpenURL("instagram-stories://share");
 	} catch {
@@ -104,15 +104,14 @@ export function ShareSheet({
 
 	const url = getMovieShareUrl(movie);
 
-	const handleCopyLink = useCallback(async () => {
+	const handleShareMore = useCallback(async () => {
 		onClose();
 		try {
-			await Clipboard.setStringAsync(url);
-			Alert.alert("Link copied");
+			await shareMovieLink(movie);
 		} catch {
-			Alert.alert("Couldn't copy link", "Try again in a moment.");
+			// user cancelled native share sheet
 		}
-	}, [url, onClose]);
+	}, [movie, onClose]);
 
 	const handleShareStory = useCallback(async () => {
 		if (sharing) return;
@@ -176,26 +175,14 @@ export function ShareSheet({
 												styles.actionButton,
 												pressed && styles.pressed,
 											]}
-											onPress={handleShareStory}
-											disabled={sharing}
+											onPress={() => {
+												void handleShareMore();
+											}}
 										>
-											{sharing ? (
-												<View style={styles.actionIcon}>
-													<ActivityIndicator
-														size="small"
-														color={Colors.foreground}
-													/>
-												</View>
-											) : (
-												<View style={[styles.actionIcon, styles.instagramIcon]}>
-													<SvgUri
-														uri={INSTAGRAM_GLYPH_URI}
-														width={22}
-														height={22}
-													/>
-												</View>
-											)}
-											<Text style={styles.actionLabel}>{storyActionLabel}</Text>
+											<View style={styles.actionIcon}>
+												<LinkIcon size={22} color={Colors.foreground} />
+											</View>
+											<Text style={styles.actionLabel}>Share link</Text>
 										</Pressable>
 
 										<Pressable
@@ -203,14 +190,20 @@ export function ShareSheet({
 												styles.actionButton,
 												pressed && styles.pressed,
 											]}
-											onPress={() => {
-												void handleCopyLink();
-											}}
+											onPress={handleShareStory}
+											disabled={sharing}
 										>
-											<View style={styles.actionIcon}>
-												<Copy size={22} color={Colors.foreground} />
+											<View style={styles.instagramWrap}>
+												{sharing ? (
+													<ActivityIndicator
+														size="small"
+														color={Colors.foreground}
+													/>
+												) : (
+													<InstagramIcon size={INSTAGRAM_ICON_SIZE} />
+												)}
 											</View>
-											<Text style={styles.actionLabel}>Copy link</Text>
+											<Text style={styles.actionLabel}>{storyActionLabel}</Text>
 										</Pressable>
 									</View>
 								</View>
@@ -264,18 +257,22 @@ const styles = StyleSheet.create({
 		opacity: 0.6,
 	},
 	actionIcon: {
-		width: 52,
-		height: 52,
-		borderRadius: 26,
+		width: ACTION_ICON_SIZE,
+		height: ACTION_ICON_SIZE,
+		borderRadius: ACTION_ICON_SIZE / 2,
 		backgroundColor: Colors.secondary,
 		borderWidth: StyleSheet.hairlineWidth,
 		borderColor: Colors.border,
 		justifyContent: "center",
 		alignItems: "center",
 	},
-	instagramIcon: {
-		backgroundColor: "transparent",
-		borderWidth: 0,
+	instagramWrap: {
+		width: ACTION_ICON_SIZE,
+		height: ACTION_ICON_SIZE,
+		borderRadius: ACTION_ICON_SIZE / 2,
+		overflow: "hidden",
+		justifyContent: "center",
+		alignItems: "center",
 	},
 	actionLabel: {
 		fontSize: fontSize.xs,

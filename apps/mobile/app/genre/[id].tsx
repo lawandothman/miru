@@ -11,14 +11,16 @@ import { Colors } from "@/lib/constants";
 const PAGE_SIZE = 30;
 
 export default function GenreScreen() {
-	const { id } = useLocalSearchParams<{ id: string }>();
+	const { id, name } = useLocalSearchParams<{ id: string; name?: string }>();
 	const genreId = Number(id);
 	const headerOptions = useDefaultHeaderOptions();
 
 	const { data: genre } = trpc.movie.getGenreById.useQuery(
 		{ id: genreId },
-		{ enabled: !Number.isNaN(genreId) },
+		{ enabled: !Number.isNaN(genreId) && !name },
 	);
+
+	const title = name ?? genre?.name ?? "";
 
 	const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
 		trpc.movie.getByGenre.useInfiniteQuery(
@@ -36,7 +38,7 @@ export default function GenreScreen() {
 			<Stack.Screen
 				options={{
 					...headerOptions,
-					title: genre?.name ?? "Genre",
+					title,
 				}}
 			/>
 			<SafeAreaView style={styles.container} edges={[]}>

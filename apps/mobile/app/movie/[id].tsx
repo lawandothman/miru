@@ -337,7 +337,12 @@ export default function MovieDetailScreen() {
 										styles.genreBadge,
 										pressed && styles.pressed,
 									]}
-									onPress={() => router.push(`/genre/${g.genre.id}`)}
+									onPress={() =>
+										router.push({
+											pathname: "/genre/[id]",
+											params: { id: String(g.genre.id), name: g.genre.name },
+										})
+									}
 								>
 									<Text style={styles.genreText}>{g.genre.name}</Text>
 								</Pressable>

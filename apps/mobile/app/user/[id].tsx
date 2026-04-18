@@ -1,7 +1,17 @@
-import { View, Text, ScrollView, StyleSheet, Alert, Share } from "react-native";
+import {
+	View,
+	Text,
+	ScrollView,
+	StyleSheet,
+	Alert,
+	Share,
+	type LayoutChangeEvent,
+	type NativeScrollEvent,
+	type NativeSyntheticEvent,
+} from "react-native";
 import { useLocalSearchParams, Stack } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Film } from "lucide-react-native";
 import { trpc } from "@/lib/trpc";
 import { useSession } from "@/lib/auth";
@@ -52,6 +62,22 @@ export default function UserProfileScreen() {
 			{ friendId: userId },
 			{ enabled: canLoadMovies && !isOwnProfile },
 		);
+
+	const [showHeaderTitle, setShowHeaderTitle] = useState(false);
+	const nameBottomRef = useRef(0);
+
+	const handleNameLayout = useCallback((event: LayoutChangeEvent) => {
+		const { y, height } = event.nativeEvent.layout;
+		nameBottomRef.current = y + height;
+	}, []);
+
+	const handleScroll = useCallback(
+		(event: NativeSyntheticEvent<NativeScrollEvent>) => {
+			const scrollY = event.nativeEvent.contentOffset.y;
+			setShowHeaderTitle(scrollY > nameBottomRef.current);
+		},
+		[],
+	);
 
 	const utils = trpc.useUtils();
 	const queryKey = { id: userId };
@@ -164,7 +190,7 @@ export default function UserProfileScreen() {
 			<Stack.Screen
 				options={{
 					...headerOptions,
-					title: profile.name ?? "",
+					title: showHeaderTitle ? (profile.name ?? "") : "",
 				}}
 			/>
 
@@ -189,14 +215,20 @@ export default function UserProfileScreen() {
 			)}
 
 			<SafeAreaView style={styles.container} edges={[]}>
-				<ScrollView contentContainerStyle={styles.scroll}>
+				<ScrollView
+					contentContainerStyle={styles.scroll}
+					onScroll={handleScroll}
+					scrollEventThrottle={16}
+				>
 					<View style={styles.header}>
 						<UserAvatar
 							imageUrl={profile.image}
 							name={profile.name}
 							size={80}
 						/>
-						<Text style={styles.name}>{profile.name}</Text>
+						<Text style={styles.name} onLayout={handleNameLayout}>
+							{profile.name}
+						</Text>
 						<UserStats
 							userId={userId}
 							followerCount={profile.followerCount}
