@@ -6,7 +6,8 @@
 	"exports": {
 		".": "./src/index.ts",
 		"./blocked-keywords": "./src/blocked-keywords.ts",
-		"./context": "./src/context.ts"
+		"./context": "./src/context.ts",
+		"./jobs": "./src/jobs.ts"
 	},
 	"scripts": {
 		"test": "vitest run",
@@ -17,6 +18,7 @@
 		"@miru/cache": "workspace:*",
 		"@miru/db": "workspace:*",
 		"@trpc/server": "catalog:trpc",
+		"@upstash/qstash": "^2.10.1",
 		"date-fns": "4.1.0",
 		"drizzle-orm": "catalog:",
 		"superjson": "catalog:trpc",

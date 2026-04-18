@@ -6,6 +6,7 @@ import { z } from "zod";
 import { annotateFollowStatus, getBlockedUserIds } from "../helpers";
 import { protectedProcedure, publicProcedure, router } from "../trpc";
 import { sendNewFollowerPushNotification } from "../utils/expo-push";
+import { publishJob } from "../utils/qstash";
 
 type DashboardMatch = {
 	id: number;
@@ -209,18 +210,31 @@ export const socialRouter = router({
 				.returning();
 
 			if (follow) {
-				sendNewFollowerPushNotification({
-					...(ctx.captureException
-						? { captureException: ctx.captureException }
-						: {}),
-					db: ctx.db,
-					...(ctx.expoAccessToken
-						? { expoAccessToken: ctx.expoAccessToken }
-						: {}),
+				const payload = {
+					type: "new-follower" as const,
 					followerId: ctx.session.user.id,
 					followerName: ctx.session.user.name,
 					userId: input.friendId,
-				}).catch(() => undefined);
+				};
+				void publishJob(payload)
+					.then((published) => {
+						if (published) return;
+						// QStash unavailable — fall back to inline so the
+						// notification isn't lost. Slower but preserves existing behavior.
+						return sendNewFollowerPushNotification({
+							...(ctx.captureException
+								? { captureException: ctx.captureException }
+								: {}),
+							db: ctx.db,
+							...(ctx.expoAccessToken
+								? { expoAccessToken: ctx.expoAccessToken }
+								: {}),
+							followerId: payload.followerId,
+							followerName: payload.followerName,
+							userId: payload.userId,
+						});
+					})
+					.catch(() => undefined);
 			}
 
 			return { success: true };
