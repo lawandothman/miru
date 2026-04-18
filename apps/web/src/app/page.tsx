@@ -18,20 +18,27 @@ function PhoneFrame({
 }) {
 	return (
 		<div className={className}>
-			<div className="relative mx-auto w-[280px] sm:w-[320px]">
-				<div className="absolute inset-x-4 -bottom-8 top-8 rounded-[3rem] bg-primary/5 blur-3xl" />
-				<div className="relative rounded-[3rem] bg-gradient-to-b from-white/20 to-white/10 p-[3px] shadow-[0_20px_60px_rgba(0,0,0,0.4)]">
-					<div className="overflow-hidden rounded-[calc(3rem-3px)] bg-black p-1.5 pt-2">
-						<Image
-							src={src}
-							alt={alt}
-							width={390}
-							height={844}
-							className="w-full rounded-[calc(3rem-8px)]"
-							priority={priority ?? false}
-						/>
-					</div>
+			<div className="relative mx-auto aspect-[1359/2736] w-[280px] sm:w-[320px]">
+				<div className="-z-10 absolute inset-x-4 -bottom-8 top-8 rounded-[3rem] bg-primary/5 blur-3xl" />
+				<div className="absolute inset-x-[6.623%] inset-y-[3.289%] overflow-hidden">
+					<Image
+						src={src}
+						alt={alt}
+						fill
+						sizes="(min-width: 640px) 320px, 280px"
+						className="object-cover"
+						priority={priority ?? false}
+					/>
 				</div>
+				<Image
+					src="/iphone-16-bezel.png"
+					alt=""
+					aria-hidden
+					fill
+					sizes="(min-width: 640px) 320px, 280px"
+					className="pointer-events-none select-none drop-shadow-[0_20px_60px_rgba(0,0,0,0.4)]"
+					priority={priority ?? false}
+				/>
 			</div>
 		</div>
 	);
