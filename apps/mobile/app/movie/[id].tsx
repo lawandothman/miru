@@ -10,6 +10,7 @@ import {
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams, useRouter, Stack } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
 	ChevronLeft,
@@ -21,7 +22,11 @@ import {
 import { ImdbLogo } from "@/components/imdb-logo";
 import { useEffect, useRef, useState } from "react";
 import { TRPCClientError } from "@trpc/client";
-import { ShareSheet } from "@/components/share-sheet";
+import {
+	canShareToInstagramStories,
+	ShareSheet,
+	shareMovieLink,
+} from "@/components/share-sheet";
 import { trpc } from "@/lib/trpc";
 import { capture } from "@/lib/analytics";
 import { MovieActions } from "@/components/movie-actions";
@@ -74,6 +79,7 @@ export default function MovieDetailScreen() {
 	);
 
 	const [shareVisible, setShareVisible] = useState(false);
+	const [sharePending, setSharePending] = useState(false);
 
 	const tracked = useRef(false);
 	useEffect(() => {
@@ -90,6 +96,7 @@ export default function MovieDetailScreen() {
 	if (isLoading) {
 		return (
 			<>
+				<StatusBar style="light" />
 				<Stack.Screen options={{ headerShown: false }} />
 				<MovieDetailSkeleton />
 			</>
@@ -142,9 +149,32 @@ export default function MovieDetailScreen() {
 		movie.trailerKey && movie.trailerSite === "YouTube"
 			? `https://www.youtube.com/watch?v=${movie.trailerKey}`
 			: null;
+	const shareTarget = { id: movie.id, title: movie.title };
+
+	async function handleSharePress() {
+		if (sharePending) {
+			return;
+		}
+
+		setSharePending(true);
+
+		try {
+			if (await canShareToInstagramStories()) {
+				setShareVisible(true);
+				return;
+			}
+
+			await shareMovieLink(shareTarget);
+		} catch {
+			// Ignore native share cancellations.
+		} finally {
+			setSharePending(false);
+		}
+	}
 
 	return (
 		<>
+			<StatusBar style="light" />
 			<Stack.Screen options={{ headerShown: false }} />
 			<ScrollView
 				style={styles.container}
@@ -200,7 +230,10 @@ export default function MovieDetailScreen() {
 							]}
 							accessibilityRole="button"
 							accessibilityLabel="Share movie"
-							onPress={() => setShareVisible(true)}
+							onPress={() => {
+								void handleSharePress();
+							}}
+							disabled={sharePending}
 						>
 							<Share2 size={18} color="#fff" />
 						</Pressable>
@@ -388,16 +421,15 @@ export default function MovieDetailScreen() {
 				</View>
 			</ScrollView>
 
-			<View
-				style={StyleSheet.absoluteFill}
-				pointerEvents={shareVisible ? "auto" : "none"}
-			>
-				<ShareSheet
-					movie={movie}
-					visible={shareVisible}
-					onClose={() => setShareVisible(false)}
-				/>
-			</View>
+			{shareVisible ? (
+				<View style={StyleSheet.absoluteFill}>
+					<ShareSheet
+						movie={movie}
+						visible={shareVisible}
+						onClose={() => setShareVisible(false)}
+					/>
+				</View>
+			) : null}
 		</>
 	);
 }

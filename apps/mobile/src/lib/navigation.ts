@@ -36,9 +36,6 @@ export function useDefaultHeaderOptions() {
 	);
 }
 
-// Legacy static export kept for non-React-component consumers.
-export const defaultHeaderOptions = createDefaultHeaderOptions("dark");
-
 export function getNavigationTheme(scheme: ResolvedColorScheme): Theme {
 	const palette = getThemePalette(scheme);
 	const baseTheme =

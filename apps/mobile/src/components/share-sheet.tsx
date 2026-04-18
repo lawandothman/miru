@@ -4,9 +4,12 @@ import {
 	Text,
 	Pressable,
 	StyleSheet,
+	Alert,
 	Share,
 	Platform,
 	ActivityIndicator,
+	Image as RNImage,
+	Linking,
 } from "react-native";
 import {
 	BottomSheet,
@@ -16,11 +19,11 @@ import {
 	VStack,
 } from "@expo/ui/swift-ui";
 import { presentationDragIndicator } from "@expo/ui/swift-ui/modifiers";
+import * as Clipboard from "expo-clipboard";
 import { captureRef } from "react-native-view-shot";
 import RNShare, { Social } from "react-native-share";
-import { Linking } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
-import { Link, Instagram } from "lucide-react-native";
+import { SvgUri } from "react-native-svg";
+import { Copy } from "lucide-react-native";
 import { StoryCard } from "./story-card";
 import { Colors, fontFamily, fontSize, spacing, radius } from "@/lib/constants";
 
@@ -36,6 +39,11 @@ interface ShareSheetMovie {
 }
 
 const WEB_BASE = "https://watchmiru.app";
+const INSTAGRAM_STORIES_APP_ID =
+	process.env.EXPO_PUBLIC_INSTAGRAM_STORIES_APP_ID?.trim();
+const INSTAGRAM_GLYPH_URI = RNImage.resolveAssetSource(
+	require("../../assets/instagram-glyph-gradient.svg"),
+).uri;
 
 function movieSlug(title: string, tmdbId: number): string {
 	const slug = title
@@ -47,11 +55,40 @@ function movieSlug(title: string, tmdbId: number): string {
 	return `${slug}-${tmdbId}`;
 }
 
+export function getMovieShareUrl(movie: Pick<ShareSheetMovie, "id" | "title">) {
+	return `${WEB_BASE}/movie/${movieSlug(movie.title, movie.id)}`;
+}
+
+export async function shareMovieLink(
+	movie: Pick<ShareSheetMovie, "id" | "title">,
+) {
+	const url = getMovieShareUrl(movie);
+
+	return Share.share(
+		Platform.OS === "ios"
+			? { message: `Check out ${movie.title} on Miru`, url }
+			: { message: `Check out ${movie.title} on Miru\n${url}` },
+	);
+}
+
+export async function canShareToInstagramStories() {
+	if (Platform.OS !== "ios") {
+		return false;
+	}
+
+	try {
+		return await Linking.canOpenURL("instagram-stories://share");
+	} catch {
+		return false;
+	}
+}
+
 const CARD_WIDTH = 360;
 const CARD_HEIGHT = 640;
 const PREVIEW_HEIGHT = 280;
 const PREVIEW_WIDTH = (CARD_WIDTH / CARD_HEIGHT) * PREVIEW_HEIGHT;
 const previewScale = PREVIEW_HEIGHT / CARD_HEIGHT;
+const storyActionLabel = "Instagram stories";
 
 export function ShareSheet({
 	movie,
@@ -65,16 +102,17 @@ export function ShareSheet({
 	const storyCardRef = useRef<View>(null);
 	const [sharing, setSharing] = useState(false);
 
-	const url = `${WEB_BASE}/movie/${movieSlug(movie.title, movie.id)}`;
+	const url = getMovieShareUrl(movie);
 
-	const handleShareLink = useCallback(() => {
+	const handleCopyLink = useCallback(async () => {
 		onClose();
-		Share.share(
-			Platform.OS === "ios"
-				? { message: `Check out ${movie.title} on Miru`, url }
-				: { message: `Check out ${movie.title} on Miru\n${url}` },
-		).catch(() => undefined);
-	}, [movie.title, url, onClose]);
+		try {
+			await Clipboard.setStringAsync(url);
+			Alert.alert("Link copied");
+		} catch {
+			Alert.alert("Couldn't copy link", "Try again in a moment.");
+		}
+	}, [url, onClose]);
 
 	const handleShareStory = useCallback(async () => {
 		if (sharing) return;
@@ -85,19 +123,15 @@ export function ShareSheet({
 				quality: 1,
 			});
 
-			const canOpen = await Linking.canOpenURL("instagram-stories://share");
-			if (canOpen) {
+			if (INSTAGRAM_STORIES_APP_ID) {
 				await RNShare.shareSingle({
 					social: Social.InstagramStories,
-					appId: "",
+					appId: INSTAGRAM_STORIES_APP_ID,
 					backgroundImage: uri,
 					attributionURL: url,
 				});
 			} else {
-				await RNShare.open({
-					url: uri,
-					type: "image/png",
-				});
+				await shareMovieLink(movie);
 			}
 			onClose();
 		} catch {
@@ -153,22 +187,15 @@ export function ShareSheet({
 													/>
 												</View>
 											) : (
-												<LinearGradient
-													colors={[
-														"#feda75",
-														"#fa7e1e",
-														"#d62976",
-														"#962fbf",
-														"#4f5bd5",
-													]}
-													start={{ x: 0, y: 1 }}
-													end={{ x: 1, y: 0 }}
-													style={[styles.actionIcon, styles.instagramIcon]}
-												>
-													<Instagram size={22} color="#fff" />
-												</LinearGradient>
+												<View style={[styles.actionIcon, styles.instagramIcon]}>
+													<SvgUri
+														uri={INSTAGRAM_GLYPH_URI}
+														width={22}
+														height={22}
+													/>
+												</View>
 											)}
-											<Text style={styles.actionLabel}>Instagram stories</Text>
+											<Text style={styles.actionLabel}>{storyActionLabel}</Text>
 										</Pressable>
 
 										<Pressable
@@ -176,12 +203,14 @@ export function ShareSheet({
 												styles.actionButton,
 												pressed && styles.pressed,
 											]}
-											onPress={handleShareLink}
+											onPress={() => {
+												void handleCopyLink();
+											}}
 										>
 											<View style={styles.actionIcon}>
-												<Link size={22} color={Colors.foreground} />
+												<Copy size={22} color={Colors.foreground} />
 											</View>
-											<Text style={styles.actionLabel}>Share link</Text>
+											<Text style={styles.actionLabel}>Copy link</Text>
 										</Pressable>
 									</View>
 								</View>
@@ -245,8 +274,8 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 	},
 	instagramIcon: {
+		backgroundColor: "transparent",
 		borderWidth: 0,
-		overflow: "hidden",
 	},
 	actionLabel: {
 		fontSize: fontSize.xs,
