@@ -8,13 +8,8 @@ import Animated, {
 	withDelay,
 	withTiming,
 } from "react-native-reanimated";
-import {
-	Colors,
-	fontFamily,
-	fontSize,
-	spacing,
-	useResolvedColorScheme,
-} from "@/lib/constants";
+import { Colors, fontFamily, fontSize, spacing } from "@/lib/constants";
+import { useSplashScheme } from "@/hooks/use-splash-scheme";
 import { splashBackgroundFor, SplashMark } from "@/components/splash-mark";
 
 const INTRO_DURATION_MS = 820;
@@ -26,7 +21,7 @@ type Props = {
 };
 
 export function AnimatedSplash({ ready, onExit }: Props) {
-	const scheme = useResolvedColorScheme();
+	const scheme = useSplashScheme();
 	const background = splashBackgroundFor(scheme);
 
 	const [introCompleted, setIntroCompleted] = useState(false);
