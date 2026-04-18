@@ -5,7 +5,7 @@ import { alias } from "drizzle-orm/pg-core";
 import { z } from "zod";
 import { annotateFollowStatus, getBlockedUserIds } from "../helpers";
 import { protectedProcedure, publicProcedure, router } from "../trpc";
-import { sendNewFollowerPushNotification } from "../utils/expo-push";
+import { newFollowerJob } from "../jobs";
 
 type DashboardMatch = {
 	id: number;
@@ -209,18 +209,24 @@ export const socialRouter = router({
 				.returning();
 
 			if (follow) {
-				sendNewFollowerPushNotification({
-					...(ctx.captureException
-						? { captureException: ctx.captureException }
-						: {}),
-					db: ctx.db,
-					...(ctx.expoAccessToken
-						? { expoAccessToken: ctx.expoAccessToken }
-						: {}),
+				const payload = {
 					followerId: ctx.session.user.id,
 					followerName: ctx.session.user.name,
 					userId: input.friendId,
-				}).catch(() => undefined);
+				};
+				void newFollowerJob
+					.publish(payload)
+					.then((published) => {
+						if (!published) {
+							ctx.captureException?.(
+								new Error("Failed to publish new-follower job"),
+								payload,
+							);
+						}
+					})
+					.catch((error) => {
+						ctx.captureException?.(error, payload);
+					});
 			}
 
 			return { success: true };

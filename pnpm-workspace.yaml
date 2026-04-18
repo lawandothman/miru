@@ -5,6 +5,7 @@ packages:
 catalog:
   "@lorenzopant/tmdb": 1.19.0
   "@types/node": 25.5.2
+  "@upstash/qstash": 2.10.1
   drizzle-orm: 0.45.2
   eslint-plugin-react-hooks: 7.0.1
   ts-pattern: 5.9.0
