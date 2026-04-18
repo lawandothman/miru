@@ -19,6 +19,9 @@ catalogs:
     '@types/node':
       specifier: 25.5.2
       version: 25.5.2
+    '@upstash/qstash':
+      specifier: 2.10.1
+      version: 2.10.1
     drizzle-orm:
       specifier: 0.45.2
       version: 0.45.2
@@ -313,7 +316,7 @@ importers:
         specifier: catalog:trpc
         version: 11.16.0(typescript@5.9.3)
       '@upstash/qstash':
-        specifier: ^2.10.1
+        specifier: 'catalog:'
         version: 2.10.1
       '@vercel/blob':
         specifier: 2.3.3
@@ -481,7 +484,7 @@ importers:
         specifier: catalog:trpc
         version: 11.16.0(typescript@5.9.3)
       '@upstash/qstash':
-        specifier: ^2.10.1
+        specifier: 'catalog:'
         version: 2.10.1
       date-fns:
         specifier: 4.1.0
