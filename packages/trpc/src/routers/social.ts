@@ -5,8 +5,7 @@ import { alias } from "drizzle-orm/pg-core";
 import { z } from "zod";
 import { annotateFollowStatus, getBlockedUserIds } from "../helpers";
 import { protectedProcedure, publicProcedure, router } from "../trpc";
-import { sendNewFollowerPushNotification } from "../utils/expo-push";
-import { publishJob } from "../utils/qstash";
+import { newFollowerJob } from "../jobs";
 
 type DashboardMatch = {
 	id: number;
@@ -211,30 +210,23 @@ export const socialRouter = router({
 
 			if (follow) {
 				const payload = {
-					type: "new-follower" as const,
 					followerId: ctx.session.user.id,
 					followerName: ctx.session.user.name,
 					userId: input.friendId,
 				};
-				void publishJob(payload)
+				void newFollowerJob
+					.publish(payload)
 					.then((published) => {
-						if (published) return;
-						// QStash unavailable — fall back to inline so the
-						// notification isn't lost. Slower but preserves existing behavior.
-						return sendNewFollowerPushNotification({
-							...(ctx.captureException
-								? { captureException: ctx.captureException }
-								: {}),
-							db: ctx.db,
-							...(ctx.expoAccessToken
-								? { expoAccessToken: ctx.expoAccessToken }
-								: {}),
-							followerId: payload.followerId,
-							followerName: payload.followerName,
-							userId: payload.userId,
-						});
+						if (!published) {
+							ctx.captureException?.(
+								new Error("Failed to publish new-follower job"),
+								payload,
+							);
+						}
 					})
-					.catch(() => undefined);
+					.catch((error) => {
+						ctx.captureException?.(error, payload);
+					});
 			}
 
 			return { success: true };
