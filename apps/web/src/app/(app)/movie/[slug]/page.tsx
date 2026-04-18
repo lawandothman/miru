@@ -41,8 +41,9 @@ export async function generateMetadata({
 				title,
 				type: "video.movie",
 			},
-			other: {
-				"apple-itunes-app": `app-id=6759829491, app-argument=miru://movie/${tmdbId}`,
+			itunes: {
+				appId: "6759829491",
+				appArgument: `miru://movie/${tmdbId}`,
 			},
 			title,
 		};

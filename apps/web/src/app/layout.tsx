@@ -29,6 +29,9 @@ export const metadata: Metadata = {
 			{ sizes: "32x32", type: "image/png", url: "/favicon-32x32.png" },
 		],
 	},
+	itunes: {
+		appId: "6759829491",
+	},
 	keywords: [
 		"movies",
 		"watchlist",

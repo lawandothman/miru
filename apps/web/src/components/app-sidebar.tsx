@@ -28,7 +28,7 @@ export function AppSidebar({ user }: AppSidebarProps) {
 
 	return (
 		<Sidebar>
-			<SidebarHeader className="px-4 py-3">
+			<SidebarHeader className="px-7 py-3">
 				<Link
 					href={user ? "/dashboard" : "/"}
 					className="font-display text-lg font-bold tracking-tight"
@@ -38,7 +38,7 @@ export function AppSidebar({ user }: AppSidebarProps) {
 			</SidebarHeader>
 
 			{/* Navigation */}
-			<SidebarContent className="px-3 pt-1">
+			<SidebarContent className="justify-center px-3">
 				<nav className="flex flex-col gap-1">
 					{navItems.map((item) => {
 						const isActive =

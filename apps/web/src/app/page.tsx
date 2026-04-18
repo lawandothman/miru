@@ -3,6 +3,7 @@ import Link from "next/link";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
+import { Button } from "@/components/ui/button";
 import { AppStoreButton } from "./_components/landing/app-store-button";
 
 function PhoneFrame({
@@ -56,16 +57,18 @@ export default async function Home() {
 	return (
 		<div className="min-h-svh bg-background text-foreground">
 			{/* ── Nav ── */}
-			<nav className="fixed inset-x-0 top-0 z-50 flex items-center justify-between bg-background px-6 py-6 lg:px-16">
-				<span className="font-display text-lg font-bold tracking-tight">
-					Miru
-				</span>
-				<Link
-					href="/signin"
-					className="text-sm text-muted-foreground transition-colors hover:text-foreground"
-				>
-					Sign in
-				</Link>
+			<nav className="fixed inset-x-0 top-0 z-50 bg-background px-6 py-6 lg:px-16">
+				<div className="mx-auto flex max-w-6xl items-center justify-between">
+					<span className="font-display text-lg font-bold tracking-tight">
+						Miru
+					</span>
+					<Button
+						asChild
+						className="bg-foreground text-base text-background hover:bg-foreground/90"
+					>
+						<Link href="/signin">Sign up</Link>
+					</Button>
+				</div>
 			</nav>
 
 			<div className="pt-[72px]">
@@ -85,14 +88,8 @@ export default async function Home() {
 									Build your watchlist, follow friends, and instantly see which
 									movies you both want to watch.
 								</p>
-								<div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row lg:justify-start">
+								<div className="mt-10 flex justify-center lg:justify-start">
 									<AppStoreButton />
-									<Link
-										href="/signin"
-										className="inline-flex h-12 items-center rounded-lg bg-foreground px-8 text-sm font-semibold text-background transition-opacity hover:opacity-90"
-									>
-										Join for free
-									</Link>
 								</div>
 							</div>
 
@@ -198,30 +195,11 @@ export default async function Home() {
 							Ready to join?
 						</h2>
 						<p className="mt-5 max-w-sm text-base leading-relaxed text-muted-foreground">
-							Miru is free. Create an account, build your watchlist, and start
-							finding movies to watch with friends.
+							Download Miru and see which movies your friends actually want to
+							watch.
 						</p>
-						<div className="mt-10 flex flex-col items-center gap-4 sm:flex-row">
+						<div className="mt-10">
 							<AppStoreButton />
-							<Link
-								href="/signin"
-								className="group inline-flex h-12 items-center gap-2 rounded-lg bg-foreground px-10 text-sm font-semibold text-background transition-opacity hover:opacity-90"
-							>
-								Create a free account
-								<svg
-									className="size-3.5 transition-transform group-hover:translate-x-0.5"
-									viewBox="0 0 16 16"
-									fill="none"
-								>
-									<path
-										d="M6 3l5 5-5 5"
-										stroke="currentColor"
-										strokeWidth="1.5"
-										strokeLinecap="round"
-										strokeLinejoin="round"
-									/>
-								</svg>
-							</Link>
 						</div>
 					</div>
 				</section>

@@ -35,8 +35,9 @@ export async function generateMetadata({
 				title: `${user.name} on Miru`,
 				type: "profile",
 			},
-			other: {
-				"apple-itunes-app": `app-id=6759829491, app-argument=miru://user/${id}`,
+			itunes: {
+				appId: "6759829491",
+				appArgument: `miru://user/${id}`,
 			},
 			title: user.name,
 		};

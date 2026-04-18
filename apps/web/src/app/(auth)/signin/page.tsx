@@ -16,7 +16,6 @@ export default function SignInPage() {
 					>
 						Miru
 					</Link>
-					<p className="text-sm text-muted-foreground">Sign in to continue</p>
 				</div>
 
 				<div className="flex w-full flex-col gap-3">
@@ -29,7 +28,7 @@ export default function SignInPage() {
 							});
 							capture("signed_in", { method: "apple" });
 						}}
-						className="h-12 w-full gap-3 rounded-full"
+						className="h-12 w-full gap-3 rounded-xl"
 					>
 						<svg
 							className="size-5"
@@ -50,7 +49,7 @@ export default function SignInPage() {
 							});
 							capture("signed_in", { method: "google" });
 						}}
-						className="h-12 w-full gap-3 rounded-full"
+						className="h-12 w-full gap-3 rounded-xl"
 					>
 						<svg className="size-5" viewBox="0 0 24 24">
 							<path
