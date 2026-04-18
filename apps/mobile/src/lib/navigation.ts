@@ -42,9 +42,7 @@ export const defaultHeaderOptions = createDefaultHeaderOptions("dark");
 export function getNavigationTheme(scheme: ResolvedColorScheme): Theme {
 	const palette = getThemePalette(scheme);
 	const baseTheme =
-		scheme === "light"
-			? ReactNavigationDefaultTheme
-			: ReactNavigationDarkTheme;
+		scheme === "light" ? ReactNavigationDefaultTheme : ReactNavigationDarkTheme;
 
 	return {
 		...baseTheme,

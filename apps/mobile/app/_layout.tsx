@@ -36,9 +36,7 @@ import {
 	getNotificationPermissionsStatus,
 	getNotificationRoute,
 } from "@/lib/notifications";
-import {
-	getNavigationTheme,
-} from "@/lib/navigation";
+import { getNavigationTheme } from "@/lib/navigation";
 import { navigationIntegration, Sentry } from "@/lib/sentry";
 import { trpc } from "@/lib/trpc";
 import { TRPCProvider } from "@/lib/trpc-provider";

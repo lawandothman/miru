@@ -1,11 +1,4 @@
-import {
-	View,
-	Text,
-	StyleSheet,
-	Alert,
-	Share,
-	Pressable,
-} from "react-native";
+import { View, Text, StyleSheet, Alert, Share, Pressable } from "react-native";
 import { useLocalSearchParams, Stack } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { trpc } from "@/lib/trpc";
@@ -209,9 +202,7 @@ export default function UserProfileScreen() {
 									/>
 								)}
 								{profile.isBlocked && (
-									<Text style={styles.blockedText}>
-										You blocked this user
-									</Text>
+									<Text style={styles.blockedText}>You blocked this user</Text>
 								)}
 							</View>
 

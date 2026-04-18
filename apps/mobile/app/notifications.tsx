@@ -117,9 +117,7 @@ export default function NotificationsScreen() {
 
 	return (
 		<>
-			<Stack.Screen
-				options={{ ...headerOptions, title: "Notifications" }}
-			/>
+			<Stack.Screen options={{ ...headerOptions, title: "Notifications" }} />
 			<View style={styles.container}>
 				<SectionList
 					sections={sections}

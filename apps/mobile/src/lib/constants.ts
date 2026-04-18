@@ -68,10 +68,7 @@ export const Colors = colorKeys.reduce(
  * Combines a design-token color with an alpha hex (e.g. "80" for 50%) while
  * keeping the result light/dark-reactive on iOS.
  */
-export function dynamicColorAlpha(
-	key: ColorKey,
-	alphaHex: string,
-): ColorValue {
+export function dynamicColorAlpha(key: ColorKey, alphaHex: string): ColorValue {
 	if (Platform.OS === "ios") {
 		return DynamicColorIOS({
 			light: `${lightColors[key]}${alphaHex}`,
