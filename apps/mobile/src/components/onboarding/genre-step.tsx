@@ -1,5 +1,4 @@
 import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
-import { Check } from "lucide-react-native";
 import { Spinner } from "@/components/spinner";
 import { trpc } from "@/lib/trpc";
 import { Colors, fontSize, fontFamily, spacing, radius } from "@/lib/constants";
@@ -53,9 +52,6 @@ export function GenreStep({
 								accessibilityLabel={g.name}
 								accessibilityState={{ checked: isSelected }}
 							>
-								{isSelected && (
-									<Check size={14} color={Colors.primaryForeground} />
-								)}
 								<Text
 									style={[
 										styles.chipText,
@@ -103,9 +99,6 @@ const styles = StyleSheet.create({
 		gap: spacing[3],
 	},
 	chip: {
-		flexDirection: "row",
-		alignItems: "center",
-		gap: spacing[2],
 		paddingHorizontal: spacing[4],
 		paddingVertical: spacing[3],
 		borderRadius: radius.full,

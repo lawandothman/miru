@@ -62,6 +62,7 @@ const config: ExpoConfig = {
 		associatedDomains: ["applinks:watchmiru.app"],
 		infoPlist: {
 			ITSAppUsesNonExemptEncryption: false,
+			LSApplicationQueriesSchemes: ["instagram-stories", "instagram"],
 		},
 	},
 	android: {

@@ -10,15 +10,23 @@ import {
 import { Stack, useRouter } from "expo-router";
 import { Check } from "lucide-react-native";
 import { trpc } from "@/lib/trpc";
-import { defaultHeaderOptions } from "@/lib/navigation";
+import { useDefaultHeaderOptions } from "@/lib/navigation";
 import { COUNTRIES, countryFlag } from "@/lib/region-data";
-import { Colors, fontSize, fontFamily, spacing, radius } from "@/lib/constants";
+import {
+	Colors,
+	dynamicColorAlpha,
+	fontSize,
+	fontFamily,
+	spacing,
+	radius,
+} from "@/lib/constants";
 
 const ITEM_HEIGHT = 49;
 
 export default function SettingsRegionScreen() {
 	const router = useRouter();
 	const utils = trpc.useUtils();
+	const headerOptions = useDefaultHeaderOptions();
 	const { data: state } = trpc.onboarding.getState.useQuery();
 
 	const current = state?.country ?? null;
@@ -63,7 +71,7 @@ export default function SettingsRegionScreen() {
 		<>
 			<Stack.Screen
 				options={{
-					...defaultHeaderOptions,
+					...headerOptions,
 					title: "Region",
 				}}
 			/>
@@ -119,7 +127,7 @@ const styles = StyleSheet.create({
 		borderBottomColor: Colors.border,
 	},
 	itemSelected: {
-		backgroundColor: `${Colors.primary}15`,
+		backgroundColor: dynamicColorAlpha("primary", "15"),
 	},
 	flag: {
 		fontSize: fontSize.xl,

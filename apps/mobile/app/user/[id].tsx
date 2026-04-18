@@ -2,6 +2,7 @@ import { View, Text, ScrollView, StyleSheet, Alert, Share } from "react-native";
 import { useLocalSearchParams, Stack } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useEffect, useRef } from "react";
+import { Film } from "lucide-react-native";
 import { trpc } from "@/lib/trpc";
 import { useSession } from "@/lib/auth";
 import { capture } from "@/lib/analytics";
@@ -10,15 +11,17 @@ import { UserStats } from "@/components/user-stats";
 import { FollowButton } from "@/components/follow-button";
 import { MovieCarousel } from "@/components/movie-carousel";
 import { UserProfileSkeleton } from "@/components/user-profile-skeleton";
-import { defaultHeaderOptions } from "@/lib/navigation";
+import { EmptyState } from "@/components/empty-state";
+import { Spinner } from "@/components/spinner";
+import { useDefaultHeaderOptions } from "@/lib/navigation";
 import { Colors, fontSize, fontFamily, spacing } from "@/lib/constants";
 
 export default function UserProfileScreen() {
 	const { id } = useLocalSearchParams<{ id: string }>();
 	const { data: session } = useSession();
 	const isOwnProfile = session?.user?.id === id;
-
 	const userId = id ?? "";
+	const headerOptions = useDefaultHeaderOptions();
 
 	const tracked = useRef(false);
 	useEffect(() => {
@@ -32,21 +35,23 @@ export default function UserProfileScreen() {
 		{ id: userId },
 		{ enabled: Boolean(id) },
 	);
+	const canLoadMovies = Boolean(id) && (profile ? !profile.isBlocked : false);
 
-	const { data: watchlist } = trpc.watchlist.getUserWatchlist.useQuery(
+	const watchlistQuery = trpc.watchlist.getUserWatchlist.useQuery(
 		{ userId, limit: 15 },
-		{ enabled: Boolean(id) },
+		{ enabled: canLoadMovies },
 	);
 
-	const { data: watched } = trpc.watched.getUserWatched.useQuery(
+	const watchedQuery = trpc.watched.getUserWatched.useQuery(
 		{ userId, limit: 15 },
-		{ enabled: Boolean(id) },
+		{ enabled: canLoadMovies },
 	);
 
-	const { data: matches } = trpc.social.getMatchesWith.useQuery(
-		{ friendId: userId },
-		{ enabled: Boolean(id) && !isOwnProfile },
-	);
+	const { data: matches, isLoading: matchesLoading } =
+		trpc.social.getMatchesWith.useQuery(
+			{ friendId: userId },
+			{ enabled: canLoadMovies && !isOwnProfile },
+		);
 
 	const utils = trpc.useUtils();
 	const queryKey = { id: userId };
@@ -135,17 +140,30 @@ export default function UserProfileScreen() {
 	if (isLoading || !profile) {
 		return (
 			<>
-				<Stack.Screen options={{ ...defaultHeaderOptions, title: "" }} />
+				<Stack.Screen options={{ ...headerOptions, title: "" }} />
 				<UserProfileSkeleton />
 			</>
 		);
 	}
 
+	const matchMovies = matches ?? [];
+	const watchlistMovies = watchlistQuery.data ?? [];
+	const watchedMovies = watchedQuery.data ?? [];
+	const isSectionLoading =
+		!profile.isBlocked &&
+		(watchlistQuery.isLoading ||
+			watchedQuery.isLoading ||
+			(!isOwnProfile && matchesLoading));
+	const hasSections =
+		matchMovies.length > 0 ||
+		watchlistMovies.length > 0 ||
+		watchedMovies.length > 0;
+
 	return (
 		<>
 			<Stack.Screen
 				options={{
-					...defaultHeaderOptions,
+					...headerOptions,
 					title: profile.name ?? "",
 				}}
 			/>
@@ -179,32 +197,43 @@ export default function UserProfileScreen() {
 							size={80}
 						/>
 						<Text style={styles.name}>{profile.name}</Text>
-
 						<UserStats
 							userId={userId}
 							followerCount={profile.followerCount}
 							followingCount={profile.followingCount}
 						/>
-
 						{!isOwnProfile && !profile.isBlocked && (
 							<FollowButton userId={userId} isFollowing={profile.isFollowing} />
 						)}
-
 						{profile.isBlocked && (
 							<Text style={styles.blockedText}>You blocked this user</Text>
 						)}
 					</View>
 
-					{!profile.isBlocked && matches && (
-						<MovieCarousel title="Matches" movies={matches} />
+					{!profile.isBlocked && matchMovies.length > 0 && (
+						<MovieCarousel title="Matches" movies={matchMovies} />
 					)}
 
-					{!profile.isBlocked && watchlist && (
-						<MovieCarousel title="Watchlist" movies={watchlist} />
+					{!profile.isBlocked && watchlistMovies.length > 0 && (
+						<MovieCarousel title="Watchlist" movies={watchlistMovies} />
 					)}
 
-					{!profile.isBlocked && watched && (
-						<MovieCarousel title="Watched" movies={watched} />
+					{!profile.isBlocked && watchedMovies.length > 0 && (
+						<MovieCarousel title="Watched" movies={watchedMovies} />
+					)}
+
+					{!profile.isBlocked && isSectionLoading && !hasSections && (
+						<View style={styles.loadingState}>
+							<Spinner />
+						</View>
+					)}
+
+					{!profile.isBlocked && !isSectionLoading && !hasSections && (
+						<EmptyState
+							icon={Film}
+							title="No movies here yet"
+							description="This user hasn't added any matches, watchlist titles, or watched movies yet."
+						/>
 					)}
 				</ScrollView>
 			</SafeAreaView>
@@ -235,5 +264,9 @@ const styles = StyleSheet.create({
 		fontSize: fontSize.sm,
 		fontFamily: fontFamily.sans,
 		color: Colors.mutedForeground,
+	},
+	loadingState: {
+		paddingVertical: spacing[8],
+		alignItems: "center",
 	},
 });

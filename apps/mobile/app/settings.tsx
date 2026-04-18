@@ -31,7 +31,7 @@ import {
 } from "@/lib/notifications";
 import { trpc } from "@/lib/trpc";
 import { capture } from "@/lib/analytics";
-import { defaultHeaderOptions } from "@/lib/navigation";
+import { useDefaultHeaderOptions } from "@/lib/navigation";
 import { AvatarUpload } from "@/components/avatar-upload";
 import { Spinner } from "@/components/spinner";
 import {
@@ -41,11 +41,13 @@ import {
 	spacing,
 	radius,
 	providerLogoUrl,
+	dynamicColorAlpha,
 } from "@/lib/constants";
 import { COUNTRIES, countryFlag } from "@/lib/region-data";
 
 export default function SettingsScreen() {
 	const { data: session } = useSession();
+	const headerOptions = useDefaultHeaderOptions();
 
 	const queryClient = useQueryClient();
 	const unregisterPushToken =
@@ -69,7 +71,7 @@ export default function SettingsScreen() {
 		<>
 			<Stack.Screen
 				options={{
-					...defaultHeaderOptions,
+					...headerOptions,
 					title: "Settings",
 				}}
 			/>
@@ -482,7 +484,7 @@ function NotificationPreferences() {
 					disabled={isUpdating}
 					trackColor={{
 						false: Colors.secondary,
-						true: `${Colors.primary}80`,
+						true: dynamicColorAlpha("primary", "80") as string,
 					}}
 					thumbColor={enabled ? Colors.primary : Colors.mutedForeground}
 					accessibilityLabel="Push notifications"
@@ -621,7 +623,7 @@ const styles = StyleSheet.create({
 		paddingHorizontal: spacing[2],
 		paddingVertical: spacing[1],
 		borderRadius: radius.full,
-		backgroundColor: `${Colors.primary}20`,
+		backgroundColor: dynamicColorAlpha("primary", "20"),
 	},
 	chipSmallText: {
 		fontSize: fontSize.xs,

@@ -6,7 +6,14 @@ import {
 	countryFlag,
 	detectCountryFromTimezone,
 } from "@/lib/region-data";
-import { Colors, fontSize, fontFamily, spacing, radius } from "@/lib/constants";
+import {
+	Colors,
+	dynamicColorAlpha,
+	fontSize,
+	fontFamily,
+	spacing,
+	radius,
+} from "@/lib/constants";
 
 interface RegionStepProps {
 	country: string | null;
@@ -115,7 +122,7 @@ const styles = StyleSheet.create({
 		borderBottomColor: Colors.border,
 	},
 	itemSelected: {
-		backgroundColor: `${Colors.primary}15`,
+		backgroundColor: dynamicColorAlpha("primary", "15"),
 	},
 	flag: {
 		fontSize: fontSize.xl,

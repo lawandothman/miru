@@ -14,7 +14,7 @@ import { Check, Search } from "lucide-react-native";
 import { Spinner } from "@/components/spinner";
 import { trpc } from "@/lib/trpc";
 import { useToggleSet } from "@/hooks/use-toggle-set";
-import { defaultHeaderOptions } from "@/lib/navigation";
+import { useDefaultHeaderOptions } from "@/lib/navigation";
 import {
 	Colors,
 	fontSize,
@@ -27,6 +27,7 @@ import {
 export default function SettingsStreamingScreen() {
 	const router = useRouter();
 	const utils = trpc.useUtils();
+	const headerOptions = useDefaultHeaderOptions();
 	const { data: providers, isLoading: providersLoading } =
 		trpc.movie.getWatchProviders.useQuery();
 	const { data: state, isLoading: stateLoading } =
@@ -56,7 +57,7 @@ export default function SettingsStreamingScreen() {
 		<>
 			<Stack.Screen
 				options={{
-					...defaultHeaderOptions,
+					...headerOptions,
 					title: "Streaming Services",
 				}}
 			/>

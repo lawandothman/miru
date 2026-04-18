@@ -62,8 +62,15 @@ export function StreamingStep({
 		return filtered?.slice().sort((a, b) => {
 			const aSelected = selectedProviders.has(a.id);
 			const bSelected = selectedProviders.has(b.id);
-			if (aSelected && !bSelected) return -1;
-			if (!aSelected && bSelected) return 1;
+
+			if (aSelected && !bSelected) {
+				return -1;
+			}
+
+			if (!aSelected && bSelected) {
+				return 1;
+			}
+
 			return a.name.localeCompare(b.name);
 		});
 	}, [providers, search, selectedProviders]);

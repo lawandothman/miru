@@ -17,7 +17,7 @@ import {
 import { Spinner } from "@/components/spinner";
 import { Colors, fontFamily, fontSize, spacing } from "@/lib/constants";
 import { triggerRefreshHaptic } from "@/lib/haptics";
-import { defaultHeaderOptions } from "@/lib/navigation";
+import { useDefaultHeaderOptions } from "@/lib/navigation";
 import { trpc } from "@/lib/trpc";
 
 interface Section {
@@ -61,6 +61,7 @@ function groupByTime(items: NotificationItemData[]): Section[] {
 export default function NotificationsScreen() {
 	const utils = trpc.useUtils();
 	const [refreshing, setRefreshing] = useState(false);
+	const headerOptions = useDefaultHeaderOptions();
 
 	const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
 		trpc.notification.list.useInfiniteQuery(
@@ -116,9 +117,7 @@ export default function NotificationsScreen() {
 
 	return (
 		<>
-			<Stack.Screen
-				options={{ ...defaultHeaderOptions, title: "Notifications" }}
-			/>
+			<Stack.Screen options={{ ...headerOptions, title: "Notifications" }} />
 			<View style={styles.container}>
 				<SectionList
 					sections={sections}

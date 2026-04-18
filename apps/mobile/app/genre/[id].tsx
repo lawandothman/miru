@@ -4,7 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { trpc } from "@/lib/trpc";
 import { MovieGrid } from "@/components/movie-grid";
 import { MovieGridSkeleton } from "@/components/movie-grid-skeleton";
-import { defaultHeaderOptions } from "@/lib/navigation";
+import { useDefaultHeaderOptions } from "@/lib/navigation";
 import { offsetPageParam } from "@/lib/pagination";
 import { Colors } from "@/lib/constants";
 
@@ -13,6 +13,7 @@ const PAGE_SIZE = 30;
 export default function GenreScreen() {
 	const { id } = useLocalSearchParams<{ id: string }>();
 	const genreId = Number(id);
+	const headerOptions = useDefaultHeaderOptions();
 
 	const { data: genre } = trpc.movie.getGenreById.useQuery(
 		{ id: genreId },
@@ -34,7 +35,7 @@ export default function GenreScreen() {
 		<>
 			<Stack.Screen
 				options={{
-					...defaultHeaderOptions,
+					...headerOptions,
 					title: genre?.name ?? "Genre",
 				}}
 			/>
