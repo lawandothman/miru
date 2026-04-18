@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import Animated, {
 	Easing,
@@ -8,14 +8,16 @@ import Animated, {
 	withDelay,
 	withTiming,
 } from "react-native-reanimated";
-import { fontFamily, fontSize } from "@/lib/constants";
-import { SPLASH_BACKGROUND, SplashMark } from "@/components/splash-mark";
+import {
+	Colors,
+	fontFamily,
+	fontSize,
+	spacing,
+	useResolvedColorScheme,
+} from "@/lib/constants";
+import { splashBackgroundFor, SplashMark } from "@/components/splash-mark";
 
-const WORDMARK_COLOR = "#ffffff";
-const TAGLINE_COLOR = "rgba(255, 255, 255, 0.55)";
-const RULE_COLOR = "rgba(255, 255, 255, 0.28)";
-
-const INTRO_DURATION_MS = 880;
+const INTRO_DURATION_MS = 820;
 const EXIT_DURATION_MS = 420;
 
 type Props = {
@@ -24,6 +26,9 @@ type Props = {
 };
 
 export function AnimatedSplash({ ready, onExit }: Props) {
+	const scheme = useResolvedColorScheme();
+	const background = splashBackgroundFor(scheme);
+
 	const [introCompleted, setIntroCompleted] = useState(false);
 
 	const overlayOpacity = useSharedValue(1);
@@ -31,48 +36,30 @@ export function AnimatedSplash({ ready, onExit }: Props) {
 	const wordmarkOffset = useSharedValue(10);
 	const taglineOpacity = useSharedValue(0);
 	const taglineOffset = useSharedValue(6);
-	const ruleScale = useSharedValue(0);
-	const ruleOpacity = useSharedValue(0);
 
 	useEffect(() => {
-		const easeOutExpo = Easing.out(Easing.exp);
-		const easeOutQuad = Easing.out(Easing.quad);
+		const ease = Easing.out(Easing.exp);
 
 		wordmarkOpacity.value = withDelay(
 			200,
-			withTiming(1, { duration: 360, easing: easeOutExpo }),
+			withTiming(1, { duration: 360, easing: ease }),
 		);
 		wordmarkOffset.value = withDelay(
 			200,
-			withTiming(0, { duration: 360, easing: easeOutExpo }),
+			withTiming(0, { duration: 360, easing: ease }),
 		);
 		taglineOpacity.value = withDelay(
 			340,
-			withTiming(1, { duration: 320, easing: easeOutExpo }),
+			withTiming(1, { duration: 320, easing: ease }),
 		);
 		taglineOffset.value = withDelay(
 			340,
-			withTiming(0, { duration: 320, easing: easeOutExpo }),
-		);
-		ruleScale.value = withDelay(
-			540,
-			withTiming(1, { duration: 340, easing: easeOutQuad }),
-		);
-		ruleOpacity.value = withDelay(
-			540,
-			withTiming(1, { duration: 340, easing: easeOutQuad }),
+			withTiming(0, { duration: 320, easing: ease }),
 		);
 
 		const timer = setTimeout(() => setIntroCompleted(true), INTRO_DURATION_MS);
 		return () => clearTimeout(timer);
-	}, [
-		ruleOpacity,
-		ruleScale,
-		taglineOffset,
-		taglineOpacity,
-		wordmarkOffset,
-		wordmarkOpacity,
-	]);
+	}, [taglineOffset, taglineOpacity, wordmarkOffset, wordmarkOpacity]);
 
 	useEffect(() => {
 		if (!ready || !introCompleted) {
@@ -100,36 +87,33 @@ export function AnimatedSplash({ ready, onExit }: Props) {
 		opacity: taglineOpacity.value,
 		transform: [{ translateY: taglineOffset.value }],
 	}));
-	const ruleStyle = useAnimatedStyle(() => ({
-		opacity: ruleOpacity.value,
-		transform: [{ scaleX: ruleScale.value }],
-	}));
+
+	const rootStyle = useMemo(
+		() => ({ backgroundColor: background }),
+		[background],
+	);
 
 	return (
 		<Animated.View
 			pointerEvents="none"
-			style={[StyleSheet.absoluteFill, styles.root, overlayStyle]}
+			style={[StyleSheet.absoluteFill, rootStyle, overlayStyle]}
 		>
 			<View style={StyleSheet.absoluteFill}>
 				<SplashMark />
 			</View>
 			<View style={styles.title}>
 				<Animated.Text style={[styles.wordmark, wordmarkStyle]}>
-					MIRU
+					Miru
 				</Animated.Text>
 				<Animated.Text style={[styles.tagline, taglineStyle]}>
 					Watch together
 				</Animated.Text>
-				<Animated.View style={[styles.rule, ruleStyle]} />
 			</View>
 		</Animated.View>
 	);
 }
 
 const styles = StyleSheet.create({
-	root: {
-		backgroundColor: SPLASH_BACKGROUND,
-	},
 	title: {
 		position: "absolute",
 		left: 0,
@@ -138,23 +122,15 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 	},
 	wordmark: {
+		fontSize: fontSize["5xl"],
 		fontFamily: fontFamily.displayBold,
-		fontSize: fontSize["3xl"],
-		color: WORDMARK_COLOR,
-		letterSpacing: 10,
+		color: Colors.foreground,
+		letterSpacing: -2,
 	},
 	tagline: {
-		fontFamily: fontFamily.sansMedium,
-		fontSize: fontSize.xs,
-		color: TAGLINE_COLOR,
-		letterSpacing: 3,
-		marginTop: 10,
-		textTransform: "uppercase",
-	},
-	rule: {
-		width: 64,
-		height: 1,
-		backgroundColor: RULE_COLOR,
-		marginTop: 22,
+		fontSize: fontSize.lg,
+		fontFamily: fontFamily.sans,
+		color: Colors.mutedForeground,
+		marginTop: spacing[2],
 	},
 });

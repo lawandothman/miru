@@ -51,9 +51,14 @@ const config: ExpoConfig = {
 		url: "https://u.expo.dev/9f32c09b-90b8-455b-a800-068f06d24f1e",
 	},
 	splash: {
-		image: "./assets/splash-icon.png",
+		image: "./assets/splash-icon-light.png",
 		resizeMode: "contain",
-		backgroundColor: "#000000",
+		backgroundColor: "#fafafa",
+		dark: {
+			image: "./assets/splash-icon-dark.png",
+			resizeMode: "contain",
+			backgroundColor: "#000000",
+		},
 	},
 	ios: {
 		supportsTablet: true,
