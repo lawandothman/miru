@@ -9,6 +9,7 @@
 		"ios": "expo run:ios",
 		"ios:device": "expo run:ios --device",
 		"android": "expo run:android",
+		"build:splash": "node scripts/build-splash.mjs",
 		"sentry:upload-sourcemaps": "sentry-cli sourcemaps upload --org lwnd --project miru-mobile dist",
 		"typecheck": "tsc --noEmit"
 	},

@@ -21,13 +21,14 @@ import {
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { PostHogProvider } from "posthog-react-native";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ThemeProvider } from "@react-navigation/native";
 import { AppState, Platform } from "react-native";
 import {
 	initialWindowMetrics,
 	SafeAreaProvider,
 } from "react-native-safe-area-context";
+import { AnimatedSplash } from "@/components/animated-splash";
 import { useScreenTracking } from "@/hooks/use-screen-tracking";
 import { posthog } from "@/lib/analytics";
 import { useSession } from "@/lib/auth";
@@ -84,7 +85,13 @@ function getBootState(
 		: "onboarding";
 }
 
-function AuthGuard({ children }: { children: React.ReactNode }) {
+function AuthGuard({
+	children,
+	onBootReady,
+}: {
+	children: React.ReactNode;
+	onBootReady: () => void;
+}) {
 	useScreenTracking();
 	const utils = trpc.useUtils();
 	const { data: session, isPending: sessionPending } = useSession();
@@ -325,12 +332,15 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 	}, [bootState, pendingNotificationRouteVersion, router, segments]);
 
 	useEffect(() => {
-		if (isRunningInExpoGo() || bootState === "loading") {
+		if (bootState === "loading") {
 			return;
 		}
 
-		SplashScreen.hideAsync();
-	}, [bootState]);
+		if (!isRunningInExpoGo()) {
+			SplashScreen.hideAsync();
+		}
+		onBootReady();
+	}, [bootState, onBootReady]);
 
 	if (bootState === "loading") {
 		return null;
@@ -349,12 +359,17 @@ function RootLayout() {
 		PlusJakartaSans_600SemiBold,
 		PlusJakartaSans_700Bold,
 	});
+	const [bootReady, setBootReady] = useState(false);
+	const [splashDismissed, setSplashDismissed] = useState(false);
 	const resolvedScheme = useResolvedColorScheme();
 	const navigationRef = useNavigationContainerRef();
 
 	useEffect(() => {
 		navigationIntegration.registerNavigationContainer(navigationRef);
 	}, [navigationRef]);
+
+	const handleBootReady = useCallback(() => setBootReady(true), []);
+	const handleSplashExit = useCallback(() => setSplashDismissed(true), []);
 
 	if (!fontsLoaded) {
 		return null;
@@ -364,7 +379,7 @@ function RootLayout() {
 		<SafeAreaProvider initialMetrics={initialWindowMetrics}>
 			<ThemeProvider value={getNavigationTheme(resolvedScheme)}>
 				<TRPCProvider>
-					<AuthGuard>
+					<AuthGuard onBootReady={handleBootReady}>
 						<StatusBar style="auto" />
 						<Stack
 							screenOptions={{
@@ -378,13 +393,22 @@ function RootLayout() {
 		</SafeAreaProvider>
 	);
 
+	const tree = (
+		<>
+			{content}
+			{!splashDismissed ? (
+				<AnimatedSplash ready={bootReady} onExit={handleSplashExit} />
+			) : null}
+		</>
+	);
+
 	if (!posthog) {
-		return content;
+		return tree;
 	}
 
 	return (
 		<PostHogProvider client={posthog} autocapture={{ captureScreens: false }}>
-			{content}
+			{tree}
 		</PostHogProvider>
 	);
 }
