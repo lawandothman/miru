@@ -3,7 +3,7 @@ packages:
   - packages/*
 
 catalog:
-  "@lorenzopant/tmdb": 1.19.0
+  "@lorenzopant/tmdb": 1.21.1
   "@types/node": 25.5.2
   "@upstash/qstash": 2.10.1
   drizzle-orm: 0.45.2
