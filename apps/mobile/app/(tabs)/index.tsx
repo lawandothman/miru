@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { EmptyState } from "@/components/empty-state";
-import { MoviePoster } from "@/components/movie-poster";
+import { HorizontalMovieList } from "@/components/horizontal-movie-list";
 import { UserAvatar } from "@/components/user-avatar";
 import { useSession } from "@/lib/auth";
 import { Colors, fontFamily, fontSize, radius, spacing } from "@/lib/constants";
@@ -120,22 +120,12 @@ export default function HomeScreen() {
 									</View>
 								</View>
 
-								<ScrollView
-									horizontal
-									showsHorizontalScrollIndicator={false}
-									contentContainerStyle={styles.posterRow}
-								>
-									{friend.matches.map((m) => (
-										<MoviePoster
-											key={m.id}
-											id={m.id}
-											posterPath={m.posterPath}
-											title={m.title}
-											width={100}
-											height={150}
-										/>
-									))}
-								</ScrollView>
+								<HorizontalMovieList
+									movies={friend.matches}
+									posterWidth={100}
+									posterHeight={150}
+									contentPaddingHorizontal={0}
+								/>
 							</Pressable>
 						))}
 					</View>
@@ -204,8 +194,5 @@ const styles = StyleSheet.create({
 	matchCount: {
 		fontSize: fontSize.xs,
 		color: Colors.mutedForeground,
-	},
-	posterRow: {
-		gap: spacing[3],
 	},
 });
