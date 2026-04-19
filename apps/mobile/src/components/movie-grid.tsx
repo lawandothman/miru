@@ -1,5 +1,6 @@
-import { FlatList, StyleSheet, View, RefreshControl } from "react-native";
-import { useState } from "react";
+import { useCallback, useState } from "react";
+import { RefreshControl, StyleSheet, View } from "react-native";
+import { FlashList, type ListRenderItem } from "@shopify/flash-list";
 import { MoviePoster } from "./movie-poster";
 import { MovieGridSkeleton } from "./movie-grid-skeleton";
 import { Spinner } from "./spinner";
@@ -20,6 +21,21 @@ interface MovieGridProps {
 
 const NUM_COLUMNS = 3;
 const ITEM_GAP = spacing[2];
+const HALF_GAP = ITEM_GAP / 2;
+
+const keyExtractor = (item: MovieSummary) => String(item.id);
+
+const renderItem: ListRenderItem<MovieSummary> = ({ item }) => (
+	<View style={styles.item}>
+		<MoviePoster
+			id={item.id}
+			posterPath={item.posterPath}
+			title={item.title}
+			width="100%"
+			aspectRatio={2 / 3}
+		/>
+	</View>
+);
 
 export function MovieGrid({
 	movies,
@@ -33,13 +49,13 @@ export function MovieGrid({
 }: MovieGridProps) {
 	const [refreshing, setRefreshing] = useState(false);
 
-	function handleEndReached() {
+	const handleEndReached = useCallback(() => {
 		if (fetchNextPage && hasNextPage && !isFetchingNextPage) {
 			fetchNextPage();
 		}
-	}
+	}, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
-	async function handleRefresh() {
+	const handleRefresh = useCallback(async () => {
 		if (!onRefresh) {
 			return;
 		}
@@ -51,24 +67,20 @@ export function MovieGrid({
 		} finally {
 			setRefreshing(false);
 		}
-	}
+	}, [onRefresh]);
 
 	return (
-		<FlatList
+		<FlashList
 			data={movies}
-			keyExtractor={(item) => String(item.id)}
+			keyExtractor={keyExtractor}
+			renderItem={renderItem}
 			numColumns={NUM_COLUMNS}
 			contentContainerStyle={styles.list}
-			columnWrapperStyle={styles.row}
 			contentInsetAdjustmentBehavior="automatic"
 			showsVerticalScrollIndicator={false}
 			alwaysBounceVertical={movies.length > 0}
 			onEndReached={handleEndReached}
 			onEndReachedThreshold={0.5}
-			removeClippedSubviews
-			initialNumToRender={9}
-			maxToRenderPerBatch={9}
-			windowSize={5}
 			ListEmptyComponent={
 				isLoading ? <MovieGridSkeleton /> : ListEmptyComponent
 			}
@@ -89,34 +101,18 @@ export function MovieGrid({
 					/>
 				) : undefined
 			}
-			renderItem={({ item }) => (
-				<View style={styles.item}>
-					<MoviePoster
-						id={item.id}
-						posterPath={item.posterPath}
-						title={item.title}
-						width="100%"
-						aspectRatio={2 / 3}
-					/>
-				</View>
-			)}
 		/>
 	);
 }
 
 const styles = StyleSheet.create({
 	list: {
-		paddingHorizontal: spacing[4],
+		paddingHorizontal: spacing[4] - HALF_GAP,
 		paddingBottom: spacing[8],
-		flexGrow: 1,
-	},
-	row: {
-		gap: ITEM_GAP,
 	},
 	item: {
 		flex: 1,
-		maxWidth: `${100 / NUM_COLUMNS}%`,
-		marginBottom: ITEM_GAP,
+		padding: HALF_GAP,
 	},
 	footer: {
 		paddingVertical: spacing[4],

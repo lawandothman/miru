@@ -49,6 +49,7 @@ export default function DiscoverScreen() {
 					{ paddingBottom: spacing[8] + insets.bottom },
 				]}
 				keyboardShouldPersistTaps="handled"
+				directionalLockEnabled
 				refreshControl={
 					<RefreshControl
 						refreshing={refreshing}

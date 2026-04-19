@@ -17,6 +17,7 @@ interface MoviePosterProps {
 	width?: number | "100%";
 	height?: number;
 	aspectRatio?: number;
+	transition?: number;
 }
 
 export function MoviePoster({
@@ -26,6 +27,7 @@ export function MoviePoster({
 	width = 120,
 	height,
 	aspectRatio,
+	transition = 200,
 }: MoviePosterProps) {
 	const sizeStyle = aspectRatio
 		? { width, aspectRatio }
@@ -46,7 +48,7 @@ export function MoviePoster({
 					style={[styles.image, sizeStyle]}
 					contentFit="cover"
 					recyclingKey={`poster-${id}`}
-					transition={200}
+					transition={transition}
 				/>
 			) : (
 				<View style={[styles.placeholder, sizeStyle]}>
