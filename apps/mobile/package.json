@@ -72,7 +72,7 @@
 	"devDependencies": {
 		"@miru/design-tokens": "workspace:*",
 		"@miru/trpc": "workspace:*",
-		"@posthog/cli": "0.7.7",
+		"@posthog/cli": "0.7.8",
 		"@sentry/cli": "3.3.5",
 		"@types/react": "catalog:react",
 		"babel-plugin-module-resolver": "5.0.3",
