@@ -26,8 +26,8 @@
 	},
 	"devDependencies": {
 		"eslint-plugin-react-hooks": "catalog:",
-		"oxfmt": "0.44.0",
-		"oxlint": "1.59.0",
+		"oxfmt": "0.45.0",
+		"oxlint": "1.60.0",
 		"turbo": "2.9.6",
 		"vitest": "4.1.4"
 	},
