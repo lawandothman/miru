@@ -264,6 +264,9 @@ importers:
       '@sentry/cli':
         specifier: 3.3.5
         version: 3.3.5
+      '@types/node':
+        specifier: 'catalog:'
+        version: 25.6.0
       '@types/react':
         specifier: catalog:react
         version: 19.2.14
