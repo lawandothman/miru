@@ -24,7 +24,7 @@
 		"@miru/analytics": "workspace:*",
 		"@react-navigation/native": "7.2.2",
 		"@sentry/react-native": "7.13.0",
-		"@shopify/flash-list": "2.0.2",
+		"@shopify/flash-list": "2.3.1",
 		"@tanstack/react-query": "catalog:trpc",
 		"@trpc/client": "catalog:trpc",
 		"@trpc/react-query": "catalog:trpc",
@@ -87,6 +87,7 @@
 				"@react-navigation/native",
 				"@sentry/react-native",
 				"@expo/ui",
+				"@shopify/flash-list",
 				"react",
 				"react-dom"
 			]
