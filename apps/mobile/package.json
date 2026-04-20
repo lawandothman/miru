@@ -74,6 +74,7 @@
 		"@miru/trpc": "workspace:*",
 		"@posthog/cli": "0.7.8",
 		"@sentry/cli": "3.3.5",
+		"@types/node": "catalog:",
 		"@types/react": "catalog:react",
 		"babel-plugin-module-resolver": "5.0.3",
 		"babel-plugin-react-compiler": "1.0.0",
