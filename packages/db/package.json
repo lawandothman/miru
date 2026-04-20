@@ -17,7 +17,7 @@
 		"typecheck": "tsc --noEmit"
 	},
 	"dependencies": {
-		"@neondatabase/serverless": "1.0.2",
+		"@neondatabase/serverless": "1.1.0",
 		"drizzle-orm": "catalog:",
 		"postgres": "3.4.9"
 	},
