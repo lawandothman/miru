@@ -23,7 +23,7 @@
 		"@expo/vector-icons": "15.1.1",
 		"@miru/analytics": "workspace:*",
 		"@react-navigation/native": "7.2.2",
-		"@sentry/react-native": "7.13.0",
+		"@sentry/react-native": "8.8.0",
 		"@shopify/flash-list": "2.3.1",
 		"@tanstack/react-query": "catalog:trpc",
 		"@trpc/client": "catalog:trpc",
