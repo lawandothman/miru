@@ -1,6 +1,8 @@
+import { useEffect } from "react";
 import { ScrollView } from "react-native";
+import { Image } from "expo-image";
 import { MoviePoster } from "./movie-poster";
-import { spacing } from "@/lib/constants";
+import { posterUrl, spacing } from "@/lib/constants";
 import type { MovieSummary } from "@/lib/types";
 
 interface HorizontalMovieListProps {
@@ -18,11 +20,21 @@ export function HorizontalMovieList({
 	gap = spacing[3],
 	contentPaddingHorizontal = spacing[4],
 }: HorizontalMovieListProps) {
+	useEffect(() => {
+		const uris = movies
+			.map((m) => posterUrl(m.posterPath))
+			.filter((u): u is string => Boolean(u));
+		if (uris.length > 0) {
+			Image.prefetch(uris, "memory-disk");
+		}
+	}, [movies]);
+
 	return (
 		<ScrollView
 			horizontal
 			showsHorizontalScrollIndicator={false}
 			decelerationRate="fast"
+			removeClippedSubviews
 			contentContainerStyle={{
 				paddingHorizontal: contentPaddingHorizontal,
 				gap,
@@ -36,7 +48,6 @@ export function HorizontalMovieList({
 					title={movie.title}
 					width={posterWidth}
 					height={posterHeight}
-					transition={0}
 				/>
 			))}
 		</ScrollView>

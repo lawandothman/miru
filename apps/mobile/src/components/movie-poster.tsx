@@ -27,7 +27,7 @@ export function MoviePoster({
 	width = 120,
 	height,
 	aspectRatio,
-	transition = 200,
+	transition = 0,
 }: MoviePosterProps) {
 	const sizeStyle = aspectRatio
 		? { width, aspectRatio }
@@ -37,7 +37,6 @@ export function MoviePoster({
 
 	return (
 		<Pressable
-			style={({ pressed }) => [pressed && styles.pressed]}
 			onPress={() => router.push(`/movie/${id}`)}
 			accessibilityRole="button"
 			accessibilityLabel={title ? `View ${title}` : `View movie`}
@@ -49,6 +48,7 @@ export function MoviePoster({
 					contentFit="cover"
 					recyclingKey={`poster-${id}`}
 					transition={transition}
+					cachePolicy="memory-disk"
 				/>
 			) : (
 				<View style={[styles.placeholder, sizeStyle]}>
@@ -65,9 +65,6 @@ const styles = StyleSheet.create({
 	image: {
 		borderRadius: radius.md,
 		backgroundColor: Colors.secondary,
-	},
-	pressed: {
-		opacity: 0.8,
 	},
 	placeholder: {
 		borderRadius: radius.md,
