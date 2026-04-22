@@ -33,7 +33,6 @@ export function HorizontalMovieList({
 		<ScrollView
 			horizontal
 			showsHorizontalScrollIndicator={false}
-			decelerationRate="fast"
 			removeClippedSubviews
 			contentContainerStyle={{
 				paddingHorizontal: contentPaddingHorizontal,

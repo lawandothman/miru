@@ -1,10 +1,10 @@
-import { FlashList } from "@shopify/flash-list";
 import { useRouter } from "expo-router";
 import { Bell, Film } from "lucide-react-native";
 import { useState } from "react";
 import {
 	Pressable,
 	RefreshControl,
+	ScrollView,
 	StyleSheet,
 	Text,
 	View,
@@ -28,8 +28,6 @@ function getGreeting(): string {
 	}
 	return "Good evening";
 }
-
-const ItemSeparator = () => <View style={styles.separator} />;
 
 export default function HomeScreen() {
 	const { data: session } = useSession();
@@ -57,48 +55,15 @@ export default function HomeScreen() {
 	}
 
 	const insets = useSafeAreaInsets();
-
-	const header = (
-		<View style={styles.header}>
-			<Text style={styles.greeting}>
-				{getGreeting()}, {firstName}
-			</Text>
-			<Pressable
-				onPress={() => router.push("/notifications")}
-				accessibilityRole="button"
-				accessibilityLabel="Notifications"
-				style={styles.bellButton}
-			>
-				<Bell size={24} color={Colors.foreground} />
-				{hasUnread && <View style={styles.badge} />}
-			</Pressable>
-		</View>
-	);
-
 	const showEmpty = !isLoading && (!matches || matches.length === 0);
 
 	return (
 		<View style={[styles.container, { paddingTop: insets.top }]}>
-			<FlashList
-				data={matches ?? []}
-				keyExtractor={(friend) => friend.id}
-				ListHeaderComponent={header}
-				ListEmptyComponent={
-					showEmpty ? (
-						<EmptyState
-							icon={Film}
-							title="No matches yet"
-							description="Follow friends and add movies to your watchlist to see what you can watch together."
-							actionLabel="Discover movies"
-							onAction={() => router.push("/(tabs)/discover")}
-						/>
-					) : null
-				}
-				ItemSeparatorComponent={ItemSeparator}
-				contentContainerStyle={{
-					paddingHorizontal: spacing[4],
-					paddingBottom: spacing[8] + insets.bottom,
-				}}
+			<ScrollView
+				contentContainerStyle={[
+					styles.scroll,
+					{ paddingBottom: spacing[8] + insets.bottom },
+				]}
 				refreshControl={
 					<RefreshControl
 						refreshing={refreshing}
@@ -106,37 +71,65 @@ export default function HomeScreen() {
 						tintColor={Colors.mutedForeground}
 					/>
 				}
-				renderItem={({ item: friend }) => (
-					<View style={styles.friendCard}>
-						<Pressable
-							onPress={() => router.push(`/user/${friend.id}`)}
-							accessibilityRole="button"
-							accessibilityLabel={`${friend.name} profile`}
-							style={styles.friendHeader}
-						>
-							<UserAvatar
-								imageUrl={friend.image}
-								name={friend.name}
-								size={44}
-							/>
-							<View>
-								<Text style={styles.friendName}>{friend.name}</Text>
-								<Text style={styles.matchCount}>
-									{friend.matches.length} match
-									{friend.matches.length !== 1 ? "es" : ""}
-								</Text>
-							</View>
-						</Pressable>
+			>
+				<View style={styles.header}>
+					<Text style={styles.greeting}>
+						{getGreeting()}, {firstName}
+					</Text>
+					<Pressable
+						onPress={() => router.push("/notifications")}
+						accessibilityRole="button"
+						accessibilityLabel="Notifications"
+						style={styles.bellButton}
+					>
+						<Bell size={24} color={Colors.foreground} />
+						{hasUnread && <View style={styles.badge} />}
+					</Pressable>
+				</View>
 
-						<HorizontalMovieList
-							movies={friend.matches}
-							posterWidth={100}
-							posterHeight={150}
-							contentPaddingHorizontal={0}
-						/>
+				{showEmpty ? (
+					<EmptyState
+						icon={Film}
+						title="No matches yet"
+						description="Follow friends and add movies to your watchlist to see what you can watch together."
+						actionLabel="Discover movies"
+						onAction={() => router.push("/(tabs)/discover")}
+					/>
+				) : (
+					<View style={styles.matchList}>
+						{matches?.map((friend) => (
+							<View key={friend.id} style={styles.friendCard}>
+								<Pressable
+									onPress={() => router.push(`/user/${friend.id}`)}
+									accessibilityRole="button"
+									accessibilityLabel={`${friend.name} profile`}
+									style={styles.friendHeader}
+								>
+									<UserAvatar
+										imageUrl={friend.image}
+										name={friend.name}
+										size={44}
+									/>
+									<View>
+										<Text style={styles.friendName}>{friend.name}</Text>
+										<Text style={styles.matchCount}>
+											{friend.matches.length} match
+											{friend.matches.length !== 1 ? "es" : ""}
+										</Text>
+									</View>
+								</Pressable>
+
+								<HorizontalMovieList
+									movies={friend.matches}
+									posterWidth={100}
+									posterHeight={150}
+									contentPaddingHorizontal={0}
+								/>
+							</View>
+						))}
 					</View>
 				)}
-			/>
+			</ScrollView>
 		</View>
 	);
 }
@@ -145,6 +138,10 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		backgroundColor: Colors.background,
+	},
+	scroll: {
+		flexGrow: 1,
+		paddingHorizontal: spacing[4],
 	},
 	header: {
 		flexDirection: "row",
@@ -173,8 +170,8 @@ const styles = StyleSheet.create({
 		borderWidth: 2,
 		borderColor: Colors.background,
 	},
-	separator: {
-		height: spacing[6],
+	matchList: {
+		gap: spacing[6],
 	},
 	friendCard: {
 		backgroundColor: Colors.card,
