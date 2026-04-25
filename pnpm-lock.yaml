@@ -259,8 +259,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/trpc
       '@posthog/cli':
-        specifier: 0.7.8
-        version: 0.7.8
+        specifier: 0.7.10
+        version: 0.7.10
       '@sentry/cli':
         specifier: 3.4.0
         version: 3.4.0
@@ -2764,8 +2764,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@posthog/cli@0.7.8':
-    resolution: {integrity: sha512-rA4Sl7eAZ6XuNUK5/KoAwsU6U8dLDU3MfUEehyCdj5BRkcP+RlL1Z7XLiuNtDS7W5w5D60eDiKRSu0p7V+YWsQ==}
+  '@posthog/cli@0.7.10':
+    resolution: {integrity: sha512-0cETIj8Q7ciiKjU3jz5wfoAk3xLsgixIVPu9rh+ExmvuQkTatVderGttvjQQni7aPqiyP8bfnUWLMB5SGutyrQ==}
     engines: {node: '>=14', npm: '>=6'}
     hasBin: true
 
@@ -10881,7 +10881,7 @@ snapshots:
   '@oxlint/binding-win32-x64-msvc@1.61.0':
     optional: true
 
-  '@posthog/cli@0.7.8':
+  '@posthog/cli@0.7.10':
     dependencies:
       axios: 1.15.0
       axios-proxy-builder: 0.1.2
