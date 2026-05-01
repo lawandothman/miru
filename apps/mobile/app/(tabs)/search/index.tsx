@@ -76,6 +76,7 @@ export default function SearchScreen() {
 	);
 
 	const movies = fullSearch.data?.pages.flatMap((p) => p.results) ?? [];
+	const hasUsers = (users.data?.length ?? 0) > 0;
 
 	const showAutocomplete =
 		submittedQuery.length === 0 &&
@@ -179,11 +180,13 @@ export default function SearchScreen() {
 							</>
 						}
 						ListEmptyComponent={
-							<EmptyState
-								icon={Search}
-								title="No results"
-								description="Try a different search term."
-							/>
+							hasUsers ? undefined : (
+								<EmptyState
+									icon={Search}
+									title="No results"
+									description="Try a different search term."
+								/>
+							)
 						}
 					/>
 				)}
