@@ -268,11 +268,7 @@ function EditNameForm({ currentName }: { currentName: string }) {
 function GenreSummary() {
 	const router = useRouter();
 	const { data: genres } = trpc.movie.getGenres.useQuery();
-	const { data: state, isLoading } = trpc.onboarding.getState.useQuery();
-
-	if (isLoading) {
-		return <Spinner />;
-	}
+	const { data: state } = trpc.onboarding.getState.useQuery();
 
 	const selectedGenres =
 		genres?.filter((g) => state?.genreIds.includes(g.id)) ?? [];
@@ -310,11 +306,7 @@ function GenreSummary() {
 function StreamingSummary() {
 	const router = useRouter();
 	const { data: providers } = trpc.movie.getWatchProviders.useQuery();
-	const { data: state, isLoading } = trpc.onboarding.getState.useQuery();
-
-	if (isLoading) {
-		return <Spinner />;
-	}
+	const { data: state } = trpc.onboarding.getState.useQuery();
 
 	const selectedProviders =
 		providers?.filter((p) => state?.providerIds.includes(p.id)) ?? [];
@@ -357,11 +349,7 @@ function StreamingSummary() {
 
 function RegionSummary() {
 	const router = useRouter();
-	const { data: state, isLoading } = trpc.onboarding.getState.useQuery();
-
-	if (isLoading) {
-		return <Spinner />;
-	}
+	const { data: state } = trpc.onboarding.getState.useQuery();
 
 	const current = COUNTRIES.find((c) => c.code === state?.country);
 
@@ -382,8 +370,7 @@ function RegionSummary() {
 
 function NotificationPreferences() {
 	const utils = trpc.useUtils();
-	const { data: preferences, isLoading } =
-		trpc.notification.getPreferences.useQuery();
+	const { data: preferences } = trpc.notification.getPreferences.useQuery();
 	const registerPushToken = trpc.notification.registerPushToken.useMutation();
 	const setPreferences = trpc.notification.setPreferences.useMutation({
 		onSuccess: async () => {
@@ -466,10 +453,6 @@ function NotificationPreferences() {
 			: systemStatus === Notifications.PermissionStatus.DENIED
 				? "Blocked in system settings"
 				: "System permission not requested yet";
-
-	if (isLoading) {
-		return <Spinner />;
-	}
 
 	return (
 		<View style={styles.notificationBlock}>

@@ -383,16 +383,17 @@ function RootLayout() {
 		<SafeAreaProvider initialMetrics={initialWindowMetrics}>
 			<ThemeProvider value={getNavigationTheme(resolvedScheme)}>
 				<TRPCProvider>
-					<AuthGuard onBootReady={handleBootReady}>
-						<StatusBar style="auto" />
-						<Stack
-							screenOptions={{
-								headerShown: false,
-								headerBackButtonDisplayMode: "minimal",
-							}}
-						/>
-					</AuthGuard>
-					<OfflineBanner />
+					<OfflineBanner>
+						<AuthGuard onBootReady={handleBootReady}>
+							<StatusBar style="auto" />
+							<Stack
+								screenOptions={{
+									headerShown: false,
+									headerBackButtonDisplayMode: "minimal",
+								}}
+							/>
+						</AuthGuard>
+					</OfflineBanner>
 				</TRPCProvider>
 			</ThemeProvider>
 		</SafeAreaProvider>
