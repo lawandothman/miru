@@ -22,11 +22,15 @@ export function useIsOnline(): boolean {
 			}
 		}
 
-		getNetworkStateAsync().then(apply).catch(() => undefined);
+		getNetworkStateAsync()
+			.then(apply)
+			.catch(() => undefined);
 
 		const subscription = addNetworkStateListener(apply);
 		const interval = setInterval(() => {
-			getNetworkStateAsync().then(apply).catch(() => undefined);
+			getNetworkStateAsync()
+				.then(apply)
+				.catch(() => undefined);
 		}, POLL_INTERVAL_MS);
 
 		return () => {
