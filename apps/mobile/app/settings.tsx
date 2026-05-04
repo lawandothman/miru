@@ -30,6 +30,7 @@ import {
 	getNotificationPermissionsStatus,
 } from "@/lib/notifications";
 import { trpc } from "@/lib/trpc";
+import { queryPersister } from "@/lib/trpc-provider";
 import { capture } from "@/lib/analytics";
 import { useDefaultHeaderOptions } from "@/lib/navigation";
 import { AvatarUpload } from "@/components/avatar-upload";
@@ -95,7 +96,10 @@ export default function SettingsScreen() {
 
 				{/* Display name */}
 				<SettingsSection title="Profile" icon={User}>
-					<EditNameForm currentName={session?.user?.name ?? ""} />
+					<EditNameForm
+						key={session?.user?.name ?? ""}
+						currentName={session?.user?.name ?? ""}
+					/>
 				</SettingsSection>
 
 				{/* Genre preferences */}
@@ -133,6 +137,7 @@ export default function SettingsScreen() {
 								await signOut();
 								capture("signed_out", {});
 								queryClient.clear();
+								await queryPersister.removeClient();
 							} catch {
 								Alert.alert("Error", "Failed to sign out. Please try again.");
 							}
@@ -163,6 +168,7 @@ export default function SettingsScreen() {
 												await unregisterCurrentPushToken();
 												await authClient.deleteUser({ callbackURL: "/" });
 												queryClient.clear();
+												await queryPersister.removeClient();
 											} catch {
 												Alert.alert(
 													"Error",
@@ -211,10 +217,6 @@ function SettingsSection({
 function EditNameForm({ currentName }: { currentName: string }) {
 	const [name, setName] = useState(currentName);
 	const [isPending, setIsPending] = useState(false);
-
-	useEffect(() => {
-		setName(currentName);
-	}, [currentName]);
 
 	const hasChanged = name.trim() !== currentName && name.trim().length > 0;
 

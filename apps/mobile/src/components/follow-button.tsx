@@ -1,10 +1,11 @@
-import { Pressable, Text, StyleSheet } from "react-native";
+import { Alert, Pressable, Text, StyleSheet } from "react-native";
 import { UserPlus, UserMinus } from "lucide-react-native";
 import { trpc } from "@/lib/trpc";
 import { useSession } from "@/lib/auth";
 import { capture } from "@/lib/analytics";
 import { Colors, fontSize, fontFamily, spacing, radius } from "@/lib/constants";
 import { triggerFollowHaptic } from "@/lib/haptics";
+import { useIsOnline } from "@/lib/network";
 
 interface FollowButtonProps {
 	userId: string;
@@ -14,6 +15,7 @@ interface FollowButtonProps {
 export function FollowButton({ userId, isFollowing }: FollowButtonProps) {
 	const utils = trpc.useUtils();
 	const { data: session } = useSession();
+	const isOnline = useIsOnline();
 
 	const queryKey = { id: userId };
 
@@ -83,6 +85,14 @@ export function FollowButton({ userId, isFollowing }: FollowButtonProps) {
 	const isPending = follow.isPending || unfollow.isPending;
 
 	function handlePress() {
+		if (!isOnline) {
+			Alert.alert(
+				"No internet",
+				"Connect to the internet to update who you follow.",
+			);
+			return;
+		}
+
 		triggerFollowHaptic();
 
 		if (isFollowing) {
@@ -101,6 +111,7 @@ export function FollowButton({ userId, isFollowing }: FollowButtonProps) {
 				styles.button,
 				isFollowing ? styles.following : styles.notFollowing,
 				pressed && styles.pressed,
+				!isOnline && styles.offline,
 			]}
 			onPress={handlePress}
 			disabled={isPending}
@@ -139,6 +150,9 @@ const styles = StyleSheet.create({
 	},
 	pressed: {
 		opacity: 0.8,
+	},
+	offline: {
+		opacity: 0.5,
 	},
 	text: {
 		fontSize: fontSize.sm,
