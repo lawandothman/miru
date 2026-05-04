@@ -1,9 +1,10 @@
-import { View, Pressable, Text, StyleSheet } from "react-native";
+import { Alert, View, Pressable, Text, StyleSheet } from "react-native";
 import { Bookmark, BookmarkPlus, Eye } from "lucide-react-native";
 import { trpc } from "@/lib/trpc";
 import { capture } from "@/lib/analytics";
 import { Colors, fontSize, fontFamily, spacing, radius } from "@/lib/constants";
 import { triggerWatchlistHaptic, triggerWatchedHaptic } from "@/lib/haptics";
+import { useIsOnline } from "@/lib/network";
 
 interface MovieActionsProps {
 	movieId: number;
@@ -17,6 +18,7 @@ export function MovieActions({
 	isWatched,
 }: MovieActionsProps) {
 	const utils = trpc.useUtils();
+	const isOnline = useIsOnline();
 
 	const queryKey = { tmdbId: movieId };
 
@@ -109,6 +111,14 @@ export function MovieActions({
 	});
 
 	function handleWatchlistToggle() {
+		if (!isOnline) {
+			Alert.alert(
+				"No internet",
+				"Connect to the internet to update your watchlist.",
+			);
+			return;
+		}
+
 		triggerWatchlistHaptic();
 
 		if (inWatchlist) {
@@ -119,6 +129,14 @@ export function MovieActions({
 	}
 
 	function handleWatchedToggle() {
+		if (!isOnline) {
+			Alert.alert(
+				"No internet",
+				"Connect to the internet to update your watched list.",
+			);
+			return;
+		}
+
 		triggerWatchedHaptic();
 
 		if (isWatched) {
@@ -135,6 +153,7 @@ export function MovieActions({
 					styles.button,
 					inWatchlist && styles.buttonActive,
 					pressed && styles.pressed,
+					!isOnline && styles.offline,
 				]}
 				onPress={handleWatchlistToggle}
 				accessibilityRole="button"
@@ -163,6 +182,7 @@ export function MovieActions({
 					styles.button,
 					isWatched && styles.buttonActive,
 					pressed && styles.pressed,
+					!isOnline && styles.offline,
 				]}
 				onPress={handleWatchedToggle}
 				accessibilityRole="button"
@@ -202,6 +222,9 @@ const styles = StyleSheet.create({
 	},
 	pressed: {
 		opacity: 0.8,
+	},
+	offline: {
+		opacity: 0.5,
 	},
 	buttonText: {
 		fontSize: fontSize.sm,

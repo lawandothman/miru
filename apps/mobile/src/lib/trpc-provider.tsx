@@ -1,10 +1,12 @@
 import { useState } from "react";
+import { QueryClient, QueryCache, MutationCache } from "@tanstack/react-query";
 import {
-	QueryClient,
-	QueryClientProvider,
-	QueryCache,
-	MutationCache,
-} from "@tanstack/react-query";
+	PersistQueryClientProvider,
+	type PersistQueryClientOptions,
+} from "@tanstack/react-query-persist-client";
+import { createAsyncStoragePersister } from "@tanstack/query-async-storage-persister";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import Constants from "expo-constants";
 import { httpBatchLink, TRPCClientError } from "@trpc/client";
 import superjson from "superjson";
 import { trpc } from "./trpc";
@@ -68,6 +70,21 @@ function captureTrpcError(
 	});
 }
 
+export const queryPersister = createAsyncStoragePersister({
+	storage: AsyncStorage,
+	key: "miru-query-cache",
+	throttleTime: 1000,
+});
+
+const PERSIST_OPTIONS: Omit<PersistQueryClientOptions, "queryClient"> = {
+	persister: queryPersister,
+	maxAge: 7 * 24 * 60 * 60 * 1000,
+	buster: Constants.expoConfig?.version ?? "dev",
+	dehydrateOptions: {
+		shouldDehydrateQuery: (query) => query.state.status === "success",
+	},
+};
+
 export function TRPCProvider({ children }: { children: React.ReactNode }) {
 	const [queryClient] = useState(
 		() =>
@@ -101,6 +118,7 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
 				defaultOptions: {
 					queries: {
 						staleTime: 5 * 60 * 1000,
+						gcTime: 24 * 60 * 60 * 1000,
 						retry: (failureCount, error) => {
 							if (isUnauthorized(error)) {
 								return false;
@@ -135,7 +153,12 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
 
 	return (
 		<trpc.Provider client={trpcClient} queryClient={queryClient}>
-			<QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+			<PersistQueryClientProvider
+				client={queryClient}
+				persistOptions={PERSIST_OPTIONS}
+			>
+				{children}
+			</PersistQueryClientProvider>
 		</trpc.Provider>
 	);
 }

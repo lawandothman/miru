@@ -28,7 +28,9 @@ import {
 	initialWindowMetrics,
 	SafeAreaProvider,
 } from "react-native-safe-area-context";
+import { useIsRestoring } from "@tanstack/react-query";
 import { AnimatedSplash } from "@/components/animated-splash";
+import { OfflineBanner } from "@/components/offline-banner";
 import { useScreenTracking } from "@/hooks/use-screen-tracking";
 import { posthog } from "@/lib/analytics";
 import { useSession } from "@/lib/auth";
@@ -71,8 +73,9 @@ function hasCompletedOnboardingInCachedSession(
 function getBootState(
 	session: { user?: unknown } | null | undefined,
 	sessionPending: boolean,
+	cacheRestoring: boolean,
 ): BootState {
-	if (!session && sessionPending) {
+	if (cacheRestoring || (!session && sessionPending)) {
 		return "loading";
 	}
 
@@ -97,7 +100,8 @@ function AuthGuard({
 	const { data: session, isPending: sessionPending } = useSession();
 	const segments = useSegments();
 	const router = useRouter();
-	const bootState = getBootState(session, sessionPending);
+	const cacheRestoring = useIsRestoring();
+	const bootState = getBootState(session, sessionPending, cacheRestoring);
 	const { data: unreadCount } = trpc.notification.getUnreadCount.useQuery(
 		undefined,
 		{
@@ -379,15 +383,17 @@ function RootLayout() {
 		<SafeAreaProvider initialMetrics={initialWindowMetrics}>
 			<ThemeProvider value={getNavigationTheme(resolvedScheme)}>
 				<TRPCProvider>
-					<AuthGuard onBootReady={handleBootReady}>
-						<StatusBar style="auto" />
-						<Stack
-							screenOptions={{
-								headerShown: false,
-								headerBackButtonDisplayMode: "minimal",
-							}}
-						/>
-					</AuthGuard>
+					<OfflineBanner>
+						<AuthGuard onBootReady={handleBootReady}>
+							<StatusBar style="auto" />
+							<Stack
+								screenOptions={{
+									headerShown: false,
+									headerBackButtonDisplayMode: "minimal",
+								}}
+							/>
+						</AuthGuard>
+					</OfflineBanner>
 				</TRPCProvider>
 			</ThemeProvider>
 		</SafeAreaProvider>
