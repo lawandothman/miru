@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useRef, useCallback } from "react";
 import {
 	View,
 	Text,
@@ -14,6 +14,7 @@ import { useRouter, Stack, useFocusEffect } from "expo-router";
 import type { SearchBarCommands } from "react-native-screens";
 import { Search } from "lucide-react-native";
 import { trpc } from "@/lib/trpc";
+import { useDebounce } from "@/hooks/use-debounce";
 import { capture } from "@/lib/analytics";
 import { MovieGrid } from "@/components/movie-grid";
 import { EmptyState } from "@/components/empty-state";
@@ -27,17 +28,6 @@ import {
 	spacing,
 	radius,
 } from "@/lib/constants";
-
-function useDebounce(value: string, delay: number) {
-	const [debounced, setDebounced] = useState(value);
-
-	useEffect(() => {
-		const timer = setTimeout(() => setDebounced(value), delay);
-		return () => clearTimeout(timer);
-	}, [value, delay]);
-
-	return debounced;
-}
 
 export default function SearchScreen() {
 	const [query, setQuery] = useState("");

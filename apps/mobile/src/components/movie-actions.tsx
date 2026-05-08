@@ -1,7 +1,7 @@
 import { Alert, View, Pressable, Text, StyleSheet } from "react-native";
 import { Bookmark, BookmarkPlus, Eye } from "lucide-react-native";
 import { trpc } from "@/lib/trpc";
-import { capture } from "@/lib/analytics";
+import { useOptimisticMovieMutation } from "@/hooks/use-optimistic-movie-mutation";
 import { Colors, fontSize, fontFamily, spacing, radius } from "@/lib/constants";
 import { triggerWatchlistHaptic, triggerWatchedHaptic } from "@/lib/haptics";
 import { useIsOnline } from "@/lib/network";
@@ -17,98 +17,39 @@ export function MovieActions({
 	inWatchlist,
 	isWatched,
 }: MovieActionsProps) {
-	const utils = trpc.useUtils();
 	const isOnline = useIsOnline();
 
-	const queryKey = { tmdbId: movieId };
+	const addToWatchlist = trpc.watchlist.add.useMutation(
+		useOptimisticMovieMutation({
+			movieId,
+			patch: (m) => ({ ...m, inWatchlist: true }),
+			analyticsEvent: "movie_added_to_watchlist",
+		}),
+	);
 
-	function invalidate() {
-		utils.movie.getById.invalidate(queryKey);
-		utils.watchlist.getMyWatchlist.invalidate();
-		utils.watched.getMyWatched.invalidate();
-		utils.social.getDashboardMatches.invalidate();
-		utils.social.getMatchesWith.invalidate();
-	}
+	const removeFromWatchlist = trpc.watchlist.remove.useMutation(
+		useOptimisticMovieMutation({
+			movieId,
+			patch: (m) => ({ ...m, inWatchlist: false }),
+			analyticsEvent: "movie_removed_from_watchlist",
+		}),
+	);
 
-	const addToWatchlist = trpc.watchlist.add.useMutation({
-		onMutate: async () => {
-			await utils.movie.getById.cancel(queryKey);
-			const previous = utils.movie.getById.getData(queryKey);
-			utils.movie.getById.setData(queryKey, (old) =>
-				old ? { ...old, inWatchlist: true } : old,
-			);
-			return { previous };
-		},
-		onSuccess: () => {
-			capture("movie_added_to_watchlist", { movie_id: movieId });
-		},
-		onError: (_err, _vars, context) => {
-			if (context?.previous) {
-				utils.movie.getById.setData(queryKey, context.previous);
-			}
-		},
-		onSettled: invalidate,
-	});
+	const addToWatched = trpc.watched.add.useMutation(
+		useOptimisticMovieMutation({
+			movieId,
+			patch: (m) => ({ ...m, isWatched: true, inWatchlist: false }),
+			analyticsEvent: "movie_marked_watched",
+		}),
+	);
 
-	const removeFromWatchlist = trpc.watchlist.remove.useMutation({
-		onMutate: async () => {
-			await utils.movie.getById.cancel(queryKey);
-			const previous = utils.movie.getById.getData(queryKey);
-			utils.movie.getById.setData(queryKey, (old) =>
-				old ? { ...old, inWatchlist: false } : old,
-			);
-			return { previous };
-		},
-		onSuccess: () => {
-			capture("movie_removed_from_watchlist", { movie_id: movieId });
-		},
-		onError: (_err, _vars, context) => {
-			if (context?.previous) {
-				utils.movie.getById.setData(queryKey, context.previous);
-			}
-		},
-		onSettled: invalidate,
-	});
-
-	const addToWatched = trpc.watched.add.useMutation({
-		onMutate: async () => {
-			await utils.movie.getById.cancel(queryKey);
-			const previous = utils.movie.getById.getData(queryKey);
-			utils.movie.getById.setData(queryKey, (old) =>
-				old ? { ...old, isWatched: true, inWatchlist: false } : old,
-			);
-			return { previous };
-		},
-		onSuccess: () => {
-			capture("movie_marked_watched", { movie_id: movieId });
-		},
-		onError: (_err, _vars, context) => {
-			if (context?.previous) {
-				utils.movie.getById.setData(queryKey, context.previous);
-			}
-		},
-		onSettled: invalidate,
-	});
-
-	const removeFromWatched = trpc.watched.remove.useMutation({
-		onMutate: async () => {
-			await utils.movie.getById.cancel(queryKey);
-			const previous = utils.movie.getById.getData(queryKey);
-			utils.movie.getById.setData(queryKey, (old) =>
-				old ? { ...old, isWatched: false } : old,
-			);
-			return { previous };
-		},
-		onSuccess: () => {
-			capture("movie_unmarked_watched", { movie_id: movieId });
-		},
-		onError: (_err, _vars, context) => {
-			if (context?.previous) {
-				utils.movie.getById.setData(queryKey, context.previous);
-			}
-		},
-		onSettled: invalidate,
-	});
+	const removeFromWatched = trpc.watched.remove.useMutation(
+		useOptimisticMovieMutation({
+			movieId,
+			patch: (m) => ({ ...m, isWatched: false }),
+			analyticsEvent: "movie_unmarked_watched",
+		}),
+	);
 
 	function handleWatchlistToggle() {
 		if (!isOnline) {
