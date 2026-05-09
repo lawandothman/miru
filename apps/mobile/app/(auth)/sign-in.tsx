@@ -4,7 +4,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Svg, { Path } from "react-native-svg";
 import * as AppleAuthentication from "expo-apple-authentication";
 import * as Sentry from "@sentry/react-native";
+import { Mail } from "lucide-react-native";
 import { Spinner } from "@/components/spinner";
+import { EmailOtpForm } from "@/components/auth/email-otp-form";
 import { authClient, signIn, useSession } from "@/lib/auth";
 import { capture } from "@/lib/analytics";
 import { Colors, fontSize, fontFamily, spacing, radius } from "@/lib/constants";
@@ -47,6 +49,7 @@ function GoogleIcon({ size = 20 }: { size?: number }) {
 
 export default function SignInScreen() {
 	const [loading, setLoading] = useState<"google" | "apple" | null>(null);
+	const [mode, setMode] = useState<"providers" | "email">("providers");
 	const { data: session } = useSession();
 	const isFinishingSignIn = loading !== null || Boolean(session);
 
@@ -133,6 +136,10 @@ export default function SignInScreen() {
 					<View style={styles.loadingContainer}>
 						<Spinner size={32} color={Colors.foreground} />
 					</View>
+				) : mode === "email" ? (
+					<View style={styles.actions}>
+						<EmailOtpForm onCancel={() => setMode("providers")} />
+					</View>
 				) : (
 					<View style={styles.actions}>
 						<Pressable
@@ -166,6 +173,22 @@ export default function SignInScreen() {
 								<Text style={styles.socialButtonText}>
 									Continue with Google
 								</Text>
+							</View>
+						</Pressable>
+
+						<Pressable
+							style={({ pressed }) => [
+								styles.socialButton,
+								pressed && styles.pressed,
+							]}
+							onPress={() => setMode("email")}
+							disabled={loading !== null}
+							accessibilityRole="button"
+							accessibilityLabel="Continue with Email"
+						>
+							<View style={styles.socialButtonContent}>
+								<Mail size={20} color={Colors.background} />
+								<Text style={styles.socialButtonText}>Continue with Email</Text>
 							</View>
 						</Pressable>
 					</View>
