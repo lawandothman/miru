@@ -138,7 +138,7 @@ export function EmailOtpForm() {
 				disabled={pending || code.length !== 6}
 				className="h-10 w-full rounded-xl"
 			>
-				{pending ? <Spinner className="size-4" /> : "Verify and sign in"}
+				{pending ? <Spinner className="size-4" /> : "Continue"}
 			</Button>
 			<button
 				type="button"

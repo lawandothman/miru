@@ -143,7 +143,7 @@ export function EmailOtpForm({ onCancel }: EmailOtpFormProps) {
 						{pending ? (
 							<Spinner size={20} color={Colors.background} />
 						) : (
-							<Text style={styles.primaryButtonText}>Verify and sign in</Text>
+							<Text style={styles.primaryButtonText}>Continue</Text>
 						)}
 					</Pressable>
 				</>
