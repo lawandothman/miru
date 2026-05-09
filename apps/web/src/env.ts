@@ -22,6 +22,8 @@ export const env = createEnv({
 		QSTASH_TOKEN: z.string().min(1).optional(),
 		QSTASH_CURRENT_SIGNING_KEY: z.string().min(1).optional(),
 		QSTASH_NEXT_SIGNING_KEY: z.string().min(1).optional(),
+		RESEND_API_KEY: z.string().min(1),
+		EMAIL_FROM: z.string().min(1),
 	},
 	client: {
 		NEXT_PUBLIC_SENTRY_DSN: z.string().url().optional(),

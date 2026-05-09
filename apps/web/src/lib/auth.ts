@@ -1,8 +1,10 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
+import { emailOTP } from "better-auth/plugins";
 import { expo } from "@better-auth/expo";
 import { createDb, schema } from "@miru/db";
+import { sendOtpEmail } from "@/lib/email";
 import { env } from "@/env";
 
 const db = createDb(env.DATABASE_URL);
@@ -56,7 +58,17 @@ export const auth = betterAuth({
 		expiresIn: 60 * 60 * 24 * 30, // 30 days
 		updateAge: 60 * 60 * 24, // refresh daily
 	},
-	plugins: [nextCookies(), expo()],
+	plugins: [
+		nextCookies(),
+		expo(),
+		emailOTP({
+			otpLength: 6,
+			expiresIn: 60 * 5,
+			async sendVerificationOTP({ email, otp }) {
+				await sendOtpEmail(email, otp);
+			},
+		}),
+	],
 	socialProviders: {
 		google: {
 			clientId: env.GOOGLE_CLIENT_ID ?? "",

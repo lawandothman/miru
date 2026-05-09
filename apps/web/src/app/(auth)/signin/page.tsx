@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { signIn } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
+import { EmailOtpForm } from "@/components/auth/email-otp-form";
 import { capture } from "@/lib/analytics";
 
 export default function SignInPage() {
@@ -16,6 +17,16 @@ export default function SignInPage() {
 					>
 						Miru
 					</Link>
+				</div>
+
+				<EmailOtpForm />
+
+				<div className="flex w-full items-center gap-3">
+					<div className="h-px flex-1 bg-border" />
+					<span className="text-xs uppercase tracking-wider text-muted-foreground">
+						or
+					</span>
+					<div className="h-px flex-1 bg-border" />
 				</div>
 
 				<div className="flex w-full flex-col gap-3">
