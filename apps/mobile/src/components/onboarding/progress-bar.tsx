@@ -1,16 +1,15 @@
 import { View, StyleSheet } from "react-native";
 import { Colors, spacing, radius } from "@/lib/constants";
 
-const TOTAL_STEPS = 5;
-
 interface ProgressBarProps {
 	currentStep: number;
+	totalSteps: number;
 }
 
-export function ProgressBar({ currentStep }: ProgressBarProps) {
+export function ProgressBar({ currentStep, totalSteps }: ProgressBarProps) {
 	return (
 		<View style={styles.container}>
-			{Array.from({ length: TOTAL_STEPS }, (_, i) => (
+			{Array.from({ length: totalSteps }, (_, i) => (
 				<View
 					key={i}
 					style={[
