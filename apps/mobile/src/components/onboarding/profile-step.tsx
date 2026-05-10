@@ -21,9 +21,6 @@ export function ProfileStep({ name, onChange }: ProfileStepProps) {
 		>
 			<View style={styles.header}>
 				<Text style={styles.title}>What should we call you?</Text>
-				<Text style={styles.subtitle}>
-					Your name is shown to friends you follow.
-				</Text>
 			</View>
 			<TextInput
 				style={styles.input}
@@ -56,12 +53,6 @@ const styles = StyleSheet.create({
 		fontSize: fontSize["2xl"],
 		fontFamily: fontFamily.displayBold,
 		color: Colors.foreground,
-	},
-	subtitle: {
-		fontSize: fontSize.base,
-		fontFamily: fontFamily.sans,
-		color: Colors.mutedForeground,
-		lineHeight: 22,
 	},
 	input: {
 		backgroundColor: Colors.muted,

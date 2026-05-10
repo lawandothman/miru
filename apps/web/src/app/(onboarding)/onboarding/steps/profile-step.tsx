@@ -46,9 +46,6 @@ export function ProfileStep({ initialName, onComplete }: ProfileStepProps) {
 				<h2 className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">
 					What should we call you?
 				</h2>
-				<p className="text-sm text-muted-foreground sm:text-base">
-					Your name is shown to friends you follow.
-				</p>
 			</div>
 
 			<div className="rounded-2xl border border-border/70 bg-card/40 p-4 sm:p-5">
