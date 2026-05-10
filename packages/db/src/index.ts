@@ -41,4 +41,4 @@ export {
 
 export { getWatchProviderUrl } from "./watch-provider-urls";
 
-export { eq, inArray, sql } from "drizzle-orm";
+export { and, eq, inArray, sql } from "drizzle-orm";
