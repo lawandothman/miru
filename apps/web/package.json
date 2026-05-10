@@ -7,7 +7,7 @@
 		"dev": "next dev --turbopack -H 0.0.0.0",
 		"build": "next build",
 		"start": "next start",
-		"typecheck": "tsc --noEmit"
+		"typecheck": "next typegen && tsc --noEmit"
 	},
 	"dependencies": {
 		"@better-auth/expo": "catalog:better-auth",
