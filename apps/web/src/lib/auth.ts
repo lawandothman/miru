@@ -4,6 +4,8 @@ import { nextCookies } from "better-auth/next-js";
 import { emailOTP } from "better-auth/plugins";
 import { expo } from "@better-auth/expo";
 import { createDb, schema } from "@miru/db";
+import { getAppleClientSecret } from "@/lib/apple-client-secret";
+import { revokeAppleTokenForUser } from "@/lib/apple-revoke";
 import { sendOtpEmail } from "@/lib/email";
 import { env } from "@/env";
 
@@ -76,7 +78,7 @@ export const auth = betterAuth({
 		},
 		apple: {
 			clientId: env.APPLE_CLIENT_ID ?? "",
-			clientSecret: env.APPLE_CLIENT_SECRET ?? "",
+			clientSecret: await getAppleClientSecret(),
 			appBundleIdentifier: "com.miru.app",
 		},
 	},
@@ -93,6 +95,9 @@ export const auth = betterAuth({
 		},
 		deleteUser: {
 			enabled: true,
+			beforeDelete: async (user) => {
+				await revokeAppleTokenForUser(db, user.id);
+			},
 		},
 	},
 });
