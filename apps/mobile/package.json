@@ -23,7 +23,7 @@
 		"@expo/vector-icons": "15.1.1",
 		"@miru/analytics": "workspace:*",
 		"@react-native-async-storage/async-storage": "2.2.0",
-		"@react-navigation/native": "7.2.2",
+		"@react-navigation/native": "7.2.4",
 		"@sentry/react-native": "8.8.0",
 		"@shopify/flash-list": "2.3.1",
 		"@tanstack/query-async-storage-persister": "5.100.5",
