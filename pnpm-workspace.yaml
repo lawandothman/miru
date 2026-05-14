@@ -28,14 +28,12 @@ catalogs:
     "@trpc/server": 11.16.0
     superjson: 2.2.6
 
-ignoredBuiltDependencies:
-  - "@prisma/engines"
-  - core-js
-  - esbuild
-  - msw
-  - prisma
-  - protobufjs
-  - sharp
-
-onlyBuiltDependencies:
-  - "@sentry/cli"
+allowBuilds:
+  "@prisma/engines": false
+  "@sentry/cli": true
+  core-js: false
+  esbuild: false
+  msw: false
+  prisma: false
+  protobufjs: false
+  sharp: false
