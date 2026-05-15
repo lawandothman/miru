@@ -29,7 +29,7 @@ export function MoviePoster({
 				className,
 			)}
 		>
-			<div className="aspect-[2/3] bg-muted">
+			<div className="relative aspect-[2/3] bg-muted">
 				{posterPath ? (
 					<Image
 						src={`https://image.tmdb.org/t/p/w500${posterPath}`}

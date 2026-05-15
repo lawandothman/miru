@@ -30,9 +30,11 @@ interface OnboardingClientProps {
 
 export function OnboardingClient({ initialName }: OnboardingClientProps) {
 	const router = useRouter();
-	const steps: readonly StepName[] = initialName.trim()
-		? ["region", "genre", "streaming", "watchlist", "friends"]
-		: ["profile", "region", "genre", "streaming", "watchlist", "friends"];
+	const [steps] = useState<readonly StepName[]>(() =>
+		initialName.trim()
+			? ["region", "genre", "streaming", "watchlist", "friends"]
+			: ["profile", "region", "genre", "streaming", "watchlist", "friends"],
+	);
 	const totalSteps = steps.length;
 
 	const [step, setStep] = useState(1);
