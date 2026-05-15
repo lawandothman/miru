@@ -11,6 +11,15 @@ import { ensureMovieExists } from "./helpers";
 const INBOX_PAGE_SIZE = 30;
 const STATUSES = ["pending", "accepted", "dismissed"] as const;
 
+function isUniqueViolation(error: unknown): boolean {
+	return (
+		typeof error === "object" &&
+		error !== null &&
+		"code" in error &&
+		(error as { code: unknown }).code === "23505"
+	);
+}
+
 export const recommendationRouter = router({
 	send: protectedProcedure
 		.input(
@@ -76,22 +85,35 @@ export const recommendationRouter = router({
 				columns: { id: true },
 			});
 
+			const duplicateMessage = `You already recommended this to ${recipient.name ?? "this person"}. Wait for them to respond.`;
+
 			if (existing) {
 				throw new TRPCError({
 					code: "CONFLICT",
-					message: `You already recommended this to ${recipient.name ?? "this person"}. Wait for them to respond.`,
+					message: duplicateMessage,
 				});
 			}
 
-			const [inserted] = await ctx.db
-				.insert(schema.movieRecommendations)
-				.values({
-					senderId,
-					recipientId: input.recipientId,
-					movieId: input.movieId,
-					message,
-				})
-				.returning();
+			let inserted: { id: string } | undefined;
+			try {
+				[inserted] = await ctx.db
+					.insert(schema.movieRecommendations)
+					.values({
+						senderId,
+						recipientId: input.recipientId,
+						movieId: input.movieId,
+						message,
+					})
+					.returning();
+			} catch (error) {
+				if (isUniqueViolation(error)) {
+					throw new TRPCError({
+						code: "CONFLICT",
+						message: duplicateMessage,
+					});
+				}
+				throw error;
+			}
 
 			if (!inserted) {
 				throw new TRPCError({
@@ -152,20 +174,22 @@ export const recommendationRouter = router({
 
 			const nextStatus = input.action === "accept" ? "accepted" : "dismissed";
 
-			await ctx.db
-				.update(schema.movieRecommendations)
-				.set({
-					status: nextStatus,
-					respondedAt: new Date(),
-				})
-				.where(eq(schema.movieRecommendations.id, input.recommendationId));
+			await ctx.db.transaction(async (tx) => {
+				await tx
+					.update(schema.movieRecommendations)
+					.set({
+						status: nextStatus,
+						respondedAt: new Date(),
+					})
+					.where(eq(schema.movieRecommendations.id, input.recommendationId));
 
-			if (input.action === "accept") {
-				await ctx.db
-					.insert(schema.watchlistEntries)
-					.values({ userId, movieId: recommendation.movieId })
-					.onConflictDoNothing();
-			}
+				if (input.action === "accept") {
+					await tx
+						.insert(schema.watchlistEntries)
+						.values({ userId, movieId: recommendation.movieId })
+						.onConflictDoNothing();
+				}
+			});
 
 			return { status: nextStatus, movieId: recommendation.movieId };
 		}),
@@ -235,24 +259,22 @@ export const recommendationRouter = router({
 		.query(async ({ ctx, input }) => {
 			const userId = ctx.session.user.id;
 
-			const recommendation = await ctx.db.query.movieRecommendations.findFirst({
-				where: and(
-					eq(schema.movieRecommendations.recipientId, userId),
-					eq(schema.movieRecommendations.movieId, input.movieId),
-					eq(schema.movieRecommendations.status, "pending"),
-				),
-				orderBy: desc(schema.movieRecommendations.createdAt),
-				with: {
-					sender: { columns: { id: true, name: true, image: true } },
-				},
-			});
+			const [recommendation, blockedIds] = await Promise.all([
+				ctx.db.query.movieRecommendations.findFirst({
+					where: and(
+						eq(schema.movieRecommendations.recipientId, userId),
+						eq(schema.movieRecommendations.movieId, input.movieId),
+						eq(schema.movieRecommendations.status, "pending"),
+					),
+					orderBy: desc(schema.movieRecommendations.createdAt),
+					with: {
+						sender: { columns: { id: true, name: true, image: true } },
+					},
+				}),
+				getBlockedUserIds(ctx.db, userId),
+			]);
 
-			if (!recommendation) {
-				return null;
-			}
-
-			const blockedIds = await getBlockedUserIds(ctx.db, userId);
-			if (blockedIds.has(recommendation.sender.id)) {
+			if (!recommendation || blockedIds.has(recommendation.sender.id)) {
 				return null;
 			}
 

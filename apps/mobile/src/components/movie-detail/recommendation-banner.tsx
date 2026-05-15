@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Check, MessageSquareQuote, X } from "lucide-react-native";
 import { UserAvatar } from "@/components/user-avatar";
@@ -14,13 +13,9 @@ interface RecommendationBannerProps {
 export function RecommendationBanner({ movieId }: RecommendationBannerProps) {
 	const utils = trpc.useUtils();
 	const { data } = trpc.recommendation.getForMovie.useQuery({ movieId });
-	const [pendingAction, setPendingAction] = useState<
-		"accept" | "dismiss" | null
-	>(null);
 
 	const respond = trpc.recommendation.respond.useMutation({
-		onMutate: async ({ action }) => {
-			setPendingAction(action);
+		onMutate: async () => {
 			await utils.recommendation.getForMovie.cancel({ movieId });
 			const previous = utils.recommendation.getForMovie.getData({ movieId });
 			utils.recommendation.getForMovie.setData({ movieId }, null);
@@ -44,7 +39,6 @@ export function RecommendationBanner({ movieId }: RecommendationBannerProps) {
 			}
 		},
 		onSettled: () => {
-			setPendingAction(null);
 			utils.recommendation.getForMovie.invalidate({ movieId });
 		},
 	});
@@ -105,9 +99,7 @@ export function RecommendationBanner({ movieId }: RecommendationBannerProps) {
 					accessibilityLabel="Add to watchlist"
 				>
 					<Check size={16} color={Colors.primaryForeground} />
-					<Text style={styles.acceptLabel}>
-						{pendingAction === "accept" ? "Adding…" : "Add to watchlist"}
-					</Text>
+					<Text style={styles.acceptLabel}>Add to watchlist</Text>
 				</Pressable>
 
 				<Pressable
@@ -122,9 +114,7 @@ export function RecommendationBanner({ movieId }: RecommendationBannerProps) {
 					accessibilityLabel="Dismiss recommendation"
 				>
 					<X size={16} color={Colors.foreground} />
-					<Text style={styles.dismissLabel}>
-						{pendingAction === "dismiss" ? "Dismissing…" : "Dismiss"}
-					</Text>
+					<Text style={styles.dismissLabel}>Dismiss</Text>
 				</Pressable>
 			</View>
 		</View>
