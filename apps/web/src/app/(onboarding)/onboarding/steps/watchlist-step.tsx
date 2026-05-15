@@ -95,7 +95,7 @@ export function WatchlistStep({ genreIds, onComplete }: WatchlistStepProps) {
 									isAdded && "ring-2 ring-primary",
 								)}
 							>
-								<div className="aspect-[2/3] bg-muted">
+								<div className="relative aspect-[2/3] bg-muted">
 									{movie.posterPath ? (
 										<Image
 											src={`https://image.tmdb.org/t/p/w342${movie.posterPath}`}
