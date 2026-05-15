@@ -54,6 +54,20 @@ interface NewFollowerPushInput {
 	userId: string;
 }
 
+interface MovieRecommendationPushInput {
+	captureException?: (
+		error: unknown,
+		context?: Record<string, unknown>,
+	) => void;
+	db: Database;
+	expoAccessToken?: string;
+	movieId: number;
+	recipientId: string;
+	recommendationId: string;
+	senderId: string;
+	senderName: string;
+}
+
 async function deletePushTokens(db: Database, tokens: string[]) {
 	await Promise.all(
 		tokens.map((token) =>
@@ -382,6 +396,106 @@ export async function sendNewFollowerPushNotification({
 			context: "new-follower-push",
 			followerId,
 			userId,
+		});
+	}
+}
+
+export async function sendMovieRecommendationPushNotification({
+	captureException,
+	db,
+	expoAccessToken,
+	movieId,
+	recipientId,
+	recommendationId,
+	senderId,
+	senderName,
+}: MovieRecommendationPushInput) {
+	const [movie, recipient] = await Promise.all([
+		db.query.movies.findFirst({
+			where: eq(schema.movies.id, movieId),
+			columns: { title: true, posterPath: true },
+		}),
+		db.query.users.findFirst({
+			where: eq(schema.users.id, recipientId),
+			columns: { pushNotificationsEnabled: true },
+			with: { pushTokens: { columns: { token: true } } },
+		}),
+	]);
+
+	if (!movie) {
+		return;
+	}
+
+	const notification = {
+		type: "movie-recommendation",
+		data: {
+			recommendationId,
+			movieId: String(movieId),
+			movieTitle: movie.title,
+			posterPath: movie.posterPath,
+		},
+	} satisfies TypedNotificationData;
+
+	try {
+		await db.insert(schema.notifications).values({
+			userId: recipientId,
+			actorId: senderId,
+			...notification,
+		});
+	} catch (error) {
+		captureException?.(error, {
+			context: "movie-recommendation-notification-insert",
+			recommendationId,
+			recipientId,
+		});
+	}
+
+	if (
+		!recipient?.pushNotificationsEnabled ||
+		recipient.pushTokens.length === 0
+	) {
+		return;
+	}
+
+	let unreadBadgeCounts = new Map<string, number>();
+
+	try {
+		unreadBadgeCounts = await getUnreadBadgeCounts(db, [recipientId]);
+	} catch (error) {
+		captureException?.(error, {
+			context: "movie-recommendation-badge-count",
+			recommendationId,
+			recipientId,
+		});
+	}
+
+	try {
+		await sendExpoPushMessages(
+			db,
+			buildBadgeAwarePushMessages(
+				recipient.pushTokens.map(({ token }) => ({
+					token,
+					userId: recipientId,
+				})),
+				unreadBadgeCounts,
+				() => ({
+					title: `${senderName} recommended a movie`,
+					body: `Check out ${movie.title}`,
+					sound: "default",
+					priority: "high",
+					data: {
+						type: "movie-recommendation",
+						movieId: String(movieId),
+					},
+				}),
+			),
+			expoAccessToken,
+		);
+	} catch (error) {
+		captureException?.(error, {
+			context: "movie-recommendation-push",
+			recommendationId,
+			recipientId,
 		});
 	}
 }

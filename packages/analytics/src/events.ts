@@ -14,6 +14,11 @@ export type EventProperties = {
 	trailer_viewed: { movie_id: number };
 	search_performed: { query: string };
 	match_viewed: { target_user_id: string };
+	movie_recommendation_sent: {
+		movie_id: number;
+		target_user_id: string;
+		has_message: boolean;
+	};
 };
 
 export type EventName = keyof EventProperties;

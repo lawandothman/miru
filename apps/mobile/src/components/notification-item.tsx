@@ -42,6 +42,9 @@ export function NotificationItem({ item }: NotificationItemProps) {
 			.with({ type: "watchlist-match" }, (n) =>
 				router.push(`/movie/${n.data.movieId}`),
 			)
+			.with({ type: "movie-recommendation" }, (n) =>
+				router.push(`/movie/${n.data.movieId}`),
+			)
 			.exhaustive();
 	}
 
@@ -50,6 +53,15 @@ export function NotificationItem({ item }: NotificationItemProps) {
 			{formatDistanceToNowStrict(item.createdAt, { addSuffix: true })}
 		</Text>
 	);
+
+	const trailingPoster = (path: string | null) =>
+		path ? (
+			<Image
+				source={{ uri: posterUrl(path) }}
+				style={styles.poster}
+				contentFit="cover"
+			/>
+		) : null;
 
 	return (
 		<Pressable
@@ -68,11 +80,16 @@ export function NotificationItem({ item }: NotificationItemProps) {
 						<Text style={styles.bold}>{item.actor.name}</Text> started following
 						you. {time}
 					</Text>
-				) : (
+				) : item.type === "watchlist-match" ? (
 					<Text style={styles.text} numberOfLines={2}>
 						<Text style={styles.bold}>{item.actor.name}</Text> also wants to
 						watch <Text style={styles.bold}>{item.data.movieTitle}</Text>!{" "}
 						{time}
+					</Text>
+				) : (
+					<Text style={styles.text} numberOfLines={2}>
+						<Text style={styles.bold}>{item.actor.name}</Text> recommended{" "}
+						<Text style={styles.bold}>{item.data.movieTitle}</Text>. {time}
 					</Text>
 				)}
 			</View>
@@ -83,13 +100,9 @@ export function NotificationItem({ item }: NotificationItemProps) {
 						userId={item.actor.id}
 						isFollowing={item.actor.isFollowing ?? false}
 					/>
-				) : item.data.posterPath ? (
-					<Image
-						source={{ uri: posterUrl(item.data.posterPath) }}
-						style={styles.poster}
-						contentFit="cover"
-					/>
-				) : null}
+				) : (
+					trailingPoster(item.data.posterPath)
+				)}
 			</View>
 		</Pressable>
 	);

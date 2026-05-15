@@ -8,6 +8,7 @@ import {
 } from "./movies";
 import { notifications, pushTokens } from "./notifications";
 import { userGenrePreferences, userStreamingServices } from "./preferences";
+import { movieRecommendations } from "./recommendations";
 import { blockedUsers, follows } from "./social";
 import { accounts, sessions, users } from "./users";
 import { watchedEntries } from "./watched";
@@ -22,6 +23,10 @@ export const usersRelations = relations(users, ({ many }) => ({
 	genrePreferences: many(userGenrePreferences),
 	notifications: many(notifications, { relationName: "recipient" }),
 	pushTokens: many(pushTokens),
+	receivedRecommendations: many(movieRecommendations, {
+		relationName: "recipient",
+	}),
+	sentRecommendations: many(movieRecommendations, { relationName: "sender" }),
 	sessions: many(sessions),
 	streamingServices: many(userStreamingServices),
 	watchedEntries: many(watchedEntries),
@@ -109,10 +114,31 @@ export const watchlistEntriesRelations = relations(
 
 export const moviesRelations = relations(movies, ({ many }) => ({
 	genres: many(movieGenres),
+	recommendations: many(movieRecommendations),
 	streamProviders: many(movieStreamProviders),
 	watchedEntries: many(watchedEntries),
 	watchlistEntries: many(watchlistEntries),
 }));
+
+export const movieRecommendationsRelations = relations(
+	movieRecommendations,
+	({ one }) => ({
+		movie: one(movies, {
+			fields: [movieRecommendations.movieId],
+			references: [movies.id],
+		}),
+		recipient: one(users, {
+			fields: [movieRecommendations.recipientId],
+			references: [users.id],
+			relationName: "recipient",
+		}),
+		sender: one(users, {
+			fields: [movieRecommendations.senderId],
+			references: [users.id],
+			relationName: "sender",
+		}),
+	}),
+);
 
 export const genresRelations = relations(genres, ({ many }) => ({
 	movies: many(movieGenres),

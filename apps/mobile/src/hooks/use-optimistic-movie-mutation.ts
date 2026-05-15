@@ -52,6 +52,7 @@ export function useOptimisticMovieMutation({
 			utils.watched.getMyWatched.invalidate();
 			utils.social.getDashboardMatches.invalidate();
 			utils.social.getMatchesWith.invalidate();
+			utils.recommendation.getForMovie.invalidate({ movieId });
 		},
 	};
 }
