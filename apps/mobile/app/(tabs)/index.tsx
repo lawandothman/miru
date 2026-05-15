@@ -40,11 +40,10 @@ export default function HomeScreen() {
 	const hasUnread = (unreadCount?.count ?? 0) > 0;
 
 	const currentUserId = session?.user?.id ?? "";
-	const { data: profile, refetch: refetchProfile } =
-		trpc.user.getById.useQuery(
-			{ id: currentUserId },
-			{ enabled: Boolean(currentUserId) },
-		);
+	const { data: profile, refetch: refetchProfile } = trpc.user.getById.useQuery(
+		{ id: currentUserId },
+		{ enabled: Boolean(currentUserId) },
+	);
 	const followingCount = profile?.followingCount ?? null;
 	const hasFollows = followingCount !== null && followingCount > 0;
 

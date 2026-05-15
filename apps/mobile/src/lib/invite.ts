@@ -1,18 +1,15 @@
 import { Platform, Share } from "react-native";
 import { capture } from "@/lib/analytics";
 
-const WEB_BASE = "https://watchmiru.app";
+const INVITE_URL = "https://watchmiru.app";
 
-export function getInviteUrl(userId: string): string {
-	return `${WEB_BASE}/?ref=${encodeURIComponent(userId)}`;
-}
-
-export async function shareInviteLink(userId: string, source: string) {
-	const url = getInviteUrl(userId);
+export async function shareInviteLink(source: string) {
 	const message = "Match watchlists with me on Miru";
 
 	const result = await Share.share(
-		Platform.OS === "ios" ? { message, url } : { message: `${message}\n${url}` },
+		Platform.OS === "ios"
+			? { message, url: INVITE_URL }
+			: { message: `${message}\n${INVITE_URL}` },
 	);
 
 	if (result.action === Share.sharedAction) {
