@@ -166,11 +166,15 @@ export default function MovieDetailScreen() {
 				</View>
 			</ScrollView>
 
-			<ShareSheet
-				movie={movie}
-				visible={shareVisible}
-				onClose={() => setShareVisible(false)}
-			/>
+			{shareVisible ? (
+				<View style={StyleSheet.absoluteFill}>
+					<ShareSheet
+						movie={movie}
+						visible={shareVisible}
+						onClose={() => setShareVisible(false)}
+					/>
+				</View>
+			) : null}
 		</>
 	);
 }

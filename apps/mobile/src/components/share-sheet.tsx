@@ -1,19 +1,24 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
-	KeyboardAvoidingView,
+	Alert,
 	Linking,
-	Modal,
 	Platform,
-	Pressable,
 	Share,
 	StyleSheet,
 	View,
 } from "react-native";
+import {
+	BottomSheet,
+	Group,
+	Host,
+	RNHostView,
+	VStack,
+} from "@expo/ui/swift-ui";
+import { presentationDragIndicator } from "@expo/ui/swift-ui/modifiers";
 import { captureRef } from "react-native-view-shot";
 import RNShare, { Social } from "react-native-share";
 import { TRPCClientError } from "@trpc/client";
 import { ActionsView } from "@/components/share-sheet/actions-view";
-import { NoteView } from "@/components/share-sheet/note-view";
 import { PickerView } from "@/components/share-sheet/picker-view";
 import { StoryCard } from "@/components/story-card";
 import {
@@ -21,7 +26,6 @@ import {
 	type RecommendRecipient,
 } from "@/hooks/use-recommendation-draft";
 import { capture } from "@/lib/analytics";
-import { Colors, radius, spacing } from "@/lib/constants";
 import { triggerStepCompleteHaptic } from "@/lib/haptics";
 import { trpc } from "@/lib/trpc";
 
@@ -93,27 +97,37 @@ export function ShareSheet({
 }) {
 	const storyCardRef = useRef<View>(null);
 	const [storiesSharing, setStoriesSharing] = useState(false);
-	const [storiesAvailable, setStoriesAvailable] = useState(false);
+	const [sendingRecipientId, setSendingRecipientId] = useState<string | null>(
+		null,
+	);
+	const [storiesAvailable, setStoriesAvailable] = useState(
+		() => Platform.OS === "ios" && Boolean(INSTAGRAM_STORIES_APP_ID),
+	);
 	const draft = useRecommendationDraft();
 	const utils = trpc.useUtils();
 	const sendMutation = trpc.recommendation.send.useMutation();
 
+	useEffect(() => {
+		if (Platform.OS !== "ios" || !INSTAGRAM_STORIES_APP_ID) {
+			return;
+		}
+		let cancelled = false;
+		canShareToInstagramStories()
+			.then((available) => {
+				if (!cancelled) setStoriesAvailable(available);
+			})
+			.catch(() => undefined);
+		return () => {
+			cancelled = true;
+		};
+	}, []);
+
 	const handleClose = useCallback(() => {
 		draft.reset();
 		setStoriesSharing(false);
+		setSendingRecipientId(null);
 		onClose();
 	}, [draft, onClose]);
-
-	const handleVisibilityChange = useCallback(
-		(next: boolean) => {
-			if (next) {
-				void canShareToInstagramStories().then(setStoriesAvailable);
-			} else {
-				draft.reset();
-			}
-		},
-		[draft],
-	);
 
 	const handleShareMore = useCallback(async () => {
 		handleClose();
@@ -152,144 +166,108 @@ export function ShareSheet({
 	}, [storiesSharing, movie, handleClose]);
 
 	const handleSelectRecipient = useCallback(
-		(recipient: RecommendRecipient) => {
-			draft.chooseRecipient(recipient);
+		async (recipient: RecommendRecipient) => {
+			if (sendingRecipientId) return;
+			setSendingRecipientId(recipient.id);
+
+			try {
+				await sendMutation.mutateAsync({
+					movieId: movie.id,
+					recipientId: recipient.id,
+				});
+
+				capture("movie_recommendation_sent", {
+					movie_id: movie.id,
+					target_user_id: recipient.id,
+					has_message: false,
+				});
+
+				triggerStepCompleteHaptic();
+				utils.recommendation.listIncoming.invalidate();
+				utils.recommendation.getRecipientCandidates.invalidate({
+					movieId: movie.id,
+				});
+				handleClose();
+				Alert.alert(
+					"Recommendation sent",
+					`${movie.title} is on its way to ${recipient.name ?? "your friend"}.`,
+				);
+			} catch (error) {
+				const message =
+					error instanceof TRPCClientError
+						? error.message
+						: "Couldn't send the recommendation. Try again.";
+				Alert.alert("Couldn't send", message);
+			} finally {
+				setSendingRecipientId(null);
+			}
 		},
-		[draft],
+		[
+			handleClose,
+			movie.id,
+			movie.title,
+			sendMutation,
+			sendingRecipientId,
+			utils,
+		],
 	);
 
-	const handleSendRecommendation = useCallback(async () => {
-		if (!draft.recipient || sendMutation.isPending) {
-			return;
-		}
-
-		const trimmed = draft.message.trim();
-
-		try {
-			await sendMutation.mutateAsync({
-				movieId: movie.id,
-				recipientId: draft.recipient.id,
-				...(trimmed ? { message: trimmed } : {}),
-			});
-
-			capture("movie_recommendation_sent", {
-				movie_id: movie.id,
-				target_user_id: draft.recipient.id,
-				has_message: trimmed.length > 0,
-			});
-
-			triggerStepCompleteHaptic();
-			utils.recommendation.listIncoming.invalidate();
-			utils.recommendation.getRecipientCandidates.invalidate({
-				movieId: movie.id,
-			});
-			handleClose();
-		} catch (error) {
-			if (error instanceof TRPCClientError) {
-				// surface server error via a follow-up alert; keep sheet open
-				// so the user can revise or cancel
-				// oxlint-disable-next-line no-console
-				console.warn("Recommendation send failed", error.message);
-			}
-		}
-	}, [draft.message, draft.recipient, handleClose, movie.id, sendMutation, utils]);
-
 	return (
-		<Modal
-			visible={visible}
-			transparent
-			animationType="slide"
-			onRequestClose={handleClose}
-			onShow={() => handleVisibilityChange(true)}
-			onDismiss={() => handleVisibilityChange(false)}
-			statusBarTranslucent
-		>
-			<View style={styles.backdrop}>
-				<Pressable
-					style={StyleSheet.absoluteFill}
-					onPress={handleClose}
-					accessibilityElementsHidden
-					importantForAccessibility="no-hide-descendants"
-				/>
-
-				<KeyboardAvoidingView
-					behavior={Platform.OS === "ios" ? "padding" : undefined}
-					style={styles.sheetWrapper}
-					pointerEvents="box-none"
-				>
-					<View style={styles.sheet}>
-						<View style={styles.handle} />
-
-						{draft.mode === "actions" ? (
-							<ActionsView
-								movie={movie}
-								showStoriesAction={storiesAvailable}
-								storiesSharing={storiesSharing}
-								onShareLink={() => {
-									void handleShareMore();
-								}}
-								onShareStory={() => {
-									void handleShareStory();
-								}}
-								onRecommend={draft.startPicking}
-							/>
-						) : null}
-
-						{draft.mode === "picker" ? (
-							<PickerView
-								movieId={movie.id}
-								onBack={draft.back}
-								onSelect={handleSelectRecipient}
-							/>
-						) : null}
-
-						{draft.mode === "note" && draft.recipient ? (
-							<NoteView
-								recipient={draft.recipient}
-								message={draft.message}
-								onMessageChange={draft.setMessage}
-								sending={sendMutation.isPending}
-								onBack={draft.back}
-								onSend={() => {
-									void handleSendRecommendation();
-								}}
-							/>
-						) : null}
-					</View>
-				</KeyboardAvoidingView>
-
-				<View style={styles.offscreen} pointerEvents="none">
-					<StoryCard ref={storyCardRef} movie={movie} />
-				</View>
+		<>
+			<View style={styles.offscreen} pointerEvents="none">
+				<StoryCard ref={storyCardRef} movie={movie} />
 			</View>
-		</Modal>
+
+			<Host style={StyleSheet.absoluteFill}>
+				<VStack>
+					<BottomSheet
+						isPresented={visible}
+						onIsPresentedChange={(presented: boolean) => {
+							if (!presented) handleClose();
+						}}
+						fitToContents
+					>
+						<Group modifiers={[presentationDragIndicator("visible")]}>
+							<RNHostView matchContents>
+								<View style={styles.sheet}>
+									{draft.mode === "actions" ? (
+										<ActionsView
+											movie={movie}
+											showStoriesAction={storiesAvailable}
+											storiesSharing={storiesSharing}
+											onShareLink={() => {
+												void handleShareMore();
+											}}
+											onShareStory={() => {
+												void handleShareStory();
+											}}
+											onRecommend={draft.startPicking}
+										/>
+									) : null}
+
+									{draft.mode === "picker" ? (
+										<PickerView
+											movieId={movie.id}
+											onBack={draft.back}
+											onSelect={(recipient) => {
+												void handleSelectRecipient(recipient);
+											}}
+											sendingRecipientId={sendingRecipientId}
+										/>
+									) : null}
+								</View>
+							</RNHostView>
+						</Group>
+					</BottomSheet>
+				</VStack>
+			</Host>
+		</>
 	);
 }
 
 const styles = StyleSheet.create({
-	backdrop: {
-		flex: 1,
-		backgroundColor: "rgba(0,0,0,0.5)",
-		justifyContent: "flex-end",
-	},
-	sheetWrapper: {
-		justifyContent: "flex-end",
-	},
 	sheet: {
-		backgroundColor: Colors.background,
-		borderTopLeftRadius: radius.xl,
-		borderTopRightRadius: radius.xl,
-		paddingBottom: spacing[8],
-		paddingTop: spacing[2],
-		maxHeight: "92%",
-	},
-	handle: {
-		alignSelf: "center",
-		width: 36,
-		height: 4,
-		borderRadius: 2,
-		backgroundColor: Colors.border,
-		marginBottom: spacing[2],
+		width: "100%",
 	},
 	offscreen: {
 		position: "absolute",

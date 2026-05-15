@@ -1,4 +1,12 @@
-import { FlatList, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+	ActivityIndicator,
+	FlatList,
+	Pressable,
+	StyleSheet,
+	Text,
+	TextInput,
+	View,
+} from "react-native";
 import { ChevronLeft, Search } from "lucide-react-native";
 import { useState } from "react";
 import { useDebounce } from "@/hooks/use-debounce";
@@ -13,9 +21,15 @@ interface PickerViewProps {
 	movieId: number;
 	onBack: () => void;
 	onSelect: (recipient: RecommendRecipient) => void;
+	sendingRecipientId: string | null;
 }
 
-export function PickerView({ movieId, onBack, onSelect }: PickerViewProps) {
+export function PickerView({
+	movieId,
+	onBack,
+	onSelect,
+	sendingRecipientId,
+}: PickerViewProps) {
 	const [query, setQuery] = useState("");
 	const debouncedQuery = useDebounce(query, 200);
 
@@ -84,17 +98,21 @@ export function PickerView({ movieId, onBack, onSelect }: PickerViewProps) {
 								: item.inWatchlist
 									? "On their watchlist"
 									: null;
+						const isSendingThis = sendingRecipientId === item.id;
+						const isAnySending = sendingRecipientId !== null;
+						const disabled = item.hasPendingSend || isAnySending;
 						return (
 							<Pressable
 								style={({ pressed }) => [
 									styles.row,
-									pressed && styles.rowPressed,
+									pressed && !disabled && styles.rowPressed,
 									item.hasPendingSend && styles.rowDisabled,
+									isAnySending && !isSendingThis && styles.rowDimmed,
 								]}
 								onPress={() =>
 									onSelect({ id: item.id, name: item.name, image: item.image })
 								}
-								disabled={item.hasPendingSend}
+								disabled={disabled}
 								accessibilityRole="button"
 								accessibilityLabel={`Send to ${item.name ?? "user"}`}
 							>
@@ -109,6 +127,9 @@ export function PickerView({ movieId, onBack, onSelect }: PickerViewProps) {
 										</Text>
 									) : null}
 								</View>
+								{isSendingThis ? (
+									<ActivityIndicator size="small" color={Colors.primary} />
+								) : null}
 							</Pressable>
 						);
 					}}
@@ -185,6 +206,9 @@ const styles = StyleSheet.create({
 	},
 	rowDisabled: {
 		opacity: 0.4,
+	},
+	rowDimmed: {
+		opacity: 0.5,
 	},
 	rowText: {
 		flex: 1,
