@@ -54,7 +54,6 @@ interface MovieRecommendationNotificationData {
 		movieId: string;
 		movieTitle: string;
 		posterPath: string | null;
-		message: string | null;
 	};
 }
 

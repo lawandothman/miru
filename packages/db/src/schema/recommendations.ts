@@ -18,8 +18,6 @@ export const RECOMMENDATION_STATUSES = [
 
 export type RecommendationStatus = (typeof RECOMMENDATION_STATUSES)[number];
 
-export const MAX_RECOMMENDATION_MESSAGE_LENGTH = 280;
-
 export const movieRecommendations = pgTable(
 	"movie_recommendations",
 	{
@@ -35,7 +33,6 @@ export const movieRecommendations = pgTable(
 		movieId: integer("movie_id")
 			.notNull()
 			.references(() => movies.id, { onDelete: "cascade" }),
-		message: text("message"),
 		status: text("status").notNull().default("pending"),
 		createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
 		respondedAt: timestamp("responded_at", { mode: "date" }),

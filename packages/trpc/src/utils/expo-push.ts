@@ -61,7 +61,6 @@ interface MovieRecommendationPushInput {
 	) => void;
 	db: Database;
 	expoAccessToken?: string;
-	message: string | null;
 	movieId: number;
 	recipientId: string;
 	recommendationId: string;
@@ -405,7 +404,6 @@ export async function sendMovieRecommendationPushNotification({
 	captureException,
 	db,
 	expoAccessToken,
-	message,
 	movieId,
 	recipientId,
 	recommendationId,
@@ -435,7 +433,6 @@ export async function sendMovieRecommendationPushNotification({
 			movieId: String(movieId),
 			movieTitle: movie.title,
 			posterPath: movie.posterPath,
-			message,
 		},
 	} satisfies TypedNotificationData;
 
@@ -483,9 +480,7 @@ export async function sendMovieRecommendationPushNotification({
 				unreadBadgeCounts,
 				() => ({
 					title: `${senderName} recommended a movie`,
-					body: message?.trim()
-						? `"${message.trim()}" — ${movie.title}`
-						: `Check out ${movie.title}`,
+					body: `Check out ${movie.title}`,
 					sound: "default",
 					priority: "high",
 					data: {

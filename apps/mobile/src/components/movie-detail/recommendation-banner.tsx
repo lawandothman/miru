@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import { Check, MessageSquareQuote, X } from "lucide-react-native";
+import { Check, X } from "lucide-react-native";
 import { UserAvatar } from "@/components/user-avatar";
 import { capture } from "@/lib/analytics";
 import { Colors, fontFamily, fontSize, radius, spacing } from "@/lib/constants";
@@ -75,17 +75,6 @@ export function RecommendationBanner({ movieId }: RecommendationBannerProps) {
 				</View>
 			</View>
 
-			{data.message ? (
-				<View style={styles.noteRow}>
-					<MessageSquareQuote
-						size={16}
-						color={Colors.mutedForeground}
-						style={styles.quoteIcon}
-					/>
-					<Text style={styles.note}>{data.message}</Text>
-				</View>
-			) : null}
-
 			<View style={styles.actions}>
 				<Pressable
 					style={({ pressed }) => [
@@ -146,22 +135,6 @@ const styles = StyleSheet.create({
 	},
 	bold: {
 		fontFamily: fontFamily.sansSemibold,
-	},
-	noteRow: {
-		flexDirection: "row",
-		gap: spacing[2],
-		paddingLeft: spacing[1],
-	},
-	quoteIcon: {
-		marginTop: 2,
-	},
-	note: {
-		flex: 1,
-		fontSize: fontSize.sm,
-		fontFamily: fontFamily.sans,
-		fontStyle: "italic",
-		color: Colors.mutedForeground,
-		lineHeight: 20,
 	},
 	actions: {
 		flexDirection: "row",

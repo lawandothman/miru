@@ -87,17 +87,10 @@ export function NotificationItem({ item }: NotificationItemProps) {
 						{time}
 					</Text>
 				) : (
-					<View style={styles.recommendation}>
-						<Text style={styles.text} numberOfLines={2}>
-							<Text style={styles.bold}>{item.actor.name}</Text> recommended{" "}
-							<Text style={styles.bold}>{item.data.movieTitle}</Text>. {time}
-						</Text>
-						{item.data.message ? (
-							<Text style={styles.note} numberOfLines={2}>
-								&ldquo;{item.data.message}&rdquo;
-							</Text>
-						) : null}
-					</View>
+					<Text style={styles.text} numberOfLines={2}>
+						<Text style={styles.bold}>{item.actor.name}</Text> recommended{" "}
+						<Text style={styles.bold}>{item.data.movieTitle}</Text>. {time}
+					</Text>
 				)}
 			</View>
 
@@ -140,16 +133,6 @@ const styles = StyleSheet.create({
 	},
 	time: {
 		color: Colors.mutedForeground,
-	},
-	recommendation: {
-		gap: 2,
-	},
-	note: {
-		fontSize: fontSize.sm,
-		fontFamily: fontFamily.sans,
-		fontStyle: "italic",
-		color: Colors.mutedForeground,
-		lineHeight: 18,
 	},
 	trailing: {
 		flexShrink: 0,

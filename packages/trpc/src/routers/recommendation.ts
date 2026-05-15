@@ -1,5 +1,4 @@
 import { schema } from "@miru/db";
-import { MAX_RECOMMENDATION_MESSAGE_LENGTH } from "@miru/db/schema";
 import { TRPCError } from "@trpc/server";
 import { and, desc, eq, ilike, inArray, lt } from "drizzle-orm";
 import { z } from "zod";
@@ -24,18 +23,12 @@ export const recommendationRouter = router({
 	send: protectedProcedure
 		.input(
 			z.object({
-				message: z
-					.string()
-					.trim()
-					.max(MAX_RECOMMENDATION_MESSAGE_LENGTH)
-					.optional(),
 				movieId: z.number().int().positive(),
 				recipientId: z.string().min(1),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
 			const senderId = ctx.session.user.id;
-			const message = input.message?.length ? input.message : null;
 
 			if (input.recipientId === senderId) {
 				throw new TRPCError({
@@ -102,7 +95,6 @@ export const recommendationRouter = router({
 						senderId,
 						recipientId: input.recipientId,
 						movieId: input.movieId,
-						message,
 					})
 					.returning();
 			} catch (error) {
@@ -130,7 +122,6 @@ export const recommendationRouter = router({
 				...(ctx.expoAccessToken
 					? { expoAccessToken: ctx.expoAccessToken }
 					: {}),
-				message,
 				movieId: input.movieId,
 				recipientId: input.recipientId,
 				recommendationId: inserted.id,
@@ -243,7 +234,6 @@ export const recommendationRouter = router({
 			return {
 				recommendations: recommendations.map((r) => ({
 					id: r.id,
-					message: r.message,
 					status: r.status,
 					createdAt: r.createdAt,
 					respondedAt: r.respondedAt,
@@ -280,7 +270,6 @@ export const recommendationRouter = router({
 
 			return {
 				id: recommendation.id,
-				message: recommendation.message,
 				createdAt: recommendation.createdAt,
 				sender: recommendation.sender,
 			};

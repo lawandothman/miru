@@ -1,0 +1,1 @@
+ALTER TABLE "movie_recommendations" DROP COLUMN "message";
