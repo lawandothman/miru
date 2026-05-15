@@ -3,7 +3,6 @@ CREATE TABLE "movie_recommendations" (
 	"sender_id" text NOT NULL,
 	"recipient_id" text NOT NULL,
 	"movie_id" integer NOT NULL,
-	"message" text,
 	"status" text DEFAULT 'pending' NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"responded_at" timestamp

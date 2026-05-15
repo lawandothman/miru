@@ -96,15 +96,8 @@
 		{
 			"idx": 13,
 			"version": "7",
-			"when": 1778838810537,
-			"tag": "0013_perpetual_purple_man",
-			"breakpoints": true
-		},
-		{
-			"idx": 14,
-			"version": "7",
-			"when": 1778872588725,
-			"tag": "0014_massive_rockslide",
+			"when": 1778877946968,
+			"tag": "0013_red_thor_girl",
 			"breakpoints": true
 		}
 	]
