@@ -132,59 +132,6 @@ export const recommendationRouter = router({
 			return { recommendationId: inserted.id };
 		}),
 
-	respond: protectedProcedure
-		.input(
-			z.object({
-				action: z.enum(["accept", "dismiss"]),
-				recommendationId: z.string().min(1),
-			}),
-		)
-		.mutation(async ({ ctx, input }) => {
-			const userId = ctx.session.user.id;
-
-			const recommendation = await ctx.db.query.movieRecommendations.findFirst({
-				where: and(
-					eq(schema.movieRecommendations.id, input.recommendationId),
-					eq(schema.movieRecommendations.recipientId, userId),
-				),
-			});
-
-			if (!recommendation) {
-				throw new TRPCError({
-					code: "NOT_FOUND",
-					message: "Recommendation not found",
-				});
-			}
-
-			if (recommendation.status !== "pending") {
-				throw new TRPCError({
-					code: "BAD_REQUEST",
-					message: "Recommendation already responded to",
-				});
-			}
-
-			const nextStatus = input.action === "accept" ? "accepted" : "dismissed";
-
-			await ctx.db.transaction(async (tx) => {
-				await tx
-					.update(schema.movieRecommendations)
-					.set({
-						status: nextStatus,
-						respondedAt: new Date(),
-					})
-					.where(eq(schema.movieRecommendations.id, input.recommendationId));
-
-				if (input.action === "accept") {
-					await tx
-						.insert(schema.watchlistEntries)
-						.values({ userId, movieId: recommendation.movieId })
-						.onConflictDoNothing();
-				}
-			});
-
-			return { status: nextStatus, movieId: recommendation.movieId };
-		}),
-
 	listIncoming: protectedProcedure
 		.input(
 			z

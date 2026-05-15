@@ -19,8 +19,6 @@ export type EventProperties = {
 		target_user_id: string;
 		has_message: boolean;
 	};
-	movie_recommendation_accepted: { movie_id: number };
-	movie_recommendation_dismissed: { movie_id: number };
 };
 
 export type EventName = keyof EventProperties;
