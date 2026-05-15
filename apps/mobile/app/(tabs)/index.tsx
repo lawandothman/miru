@@ -46,18 +46,21 @@ export default function HomeScreen() {
 			{ enabled: Boolean(currentUserId) },
 		);
 	const followingCount = profile?.followingCount ?? null;
+	const hasFollows = followingCount !== null && followingCount > 0;
 
 	const {
 		data: matches,
-		isLoading,
+		isLoading: matchesLoading,
 		refetch,
-	} = trpc.social.getDashboardMatches.useQuery();
+	} = trpc.social.getDashboardMatches.useQuery(undefined, {
+		enabled: hasFollows,
+	});
 
 	async function handleRefresh() {
 		triggerRefreshHaptic();
 		setRefreshing(true);
 		try {
-			await Promise.all([refetch(), refetchProfile()]);
+			await Promise.all([refetchProfile(), hasFollows ? refetch() : undefined]);
 		} finally {
 			setRefreshing(false);
 		}
@@ -65,10 +68,8 @@ export default function HomeScreen() {
 
 	const insets = useSafeAreaInsets();
 	const hasMatches = Boolean(matches && matches.length > 0);
-	const showFindFriends =
-		!isLoading && !hasMatches && followingCount === 0;
-	const showNoMatchesYet =
-		!isLoading && !hasMatches && followingCount !== null && followingCount > 0;
+	const showFindFriends = followingCount === 0;
+	const showNoMatchesYet = hasFollows && !matchesLoading && !hasMatches;
 
 	return (
 		<View style={[styles.container, { paddingTop: insets.top }]}>
