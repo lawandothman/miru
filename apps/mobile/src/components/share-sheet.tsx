@@ -1,28 +1,29 @@
 import { useCallback, useRef, useState } from "react";
 import {
-	View,
-	Text,
-	Pressable,
-	StyleSheet,
-	Share,
-	Platform,
-	ActivityIndicator,
+	KeyboardAvoidingView,
 	Linking,
+	Modal,
+	Platform,
+	Pressable,
+	Share,
+	StyleSheet,
+	View,
 } from "react-native";
-import {
-	BottomSheet,
-	Host,
-	Group,
-	RNHostView,
-	VStack,
-} from "@expo/ui/swift-ui";
-import { presentationDragIndicator } from "@expo/ui/swift-ui/modifiers";
 import { captureRef } from "react-native-view-shot";
 import RNShare, { Social } from "react-native-share";
-import { Link as LinkIcon } from "lucide-react-native";
-import { StoryCard } from "./story-card";
-import { InstagramIcon } from "./icons/instagram-icon";
-import { Colors, fontFamily, fontSize, spacing, radius } from "@/lib/constants";
+import { TRPCClientError } from "@trpc/client";
+import { ActionsView } from "@/components/share-sheet/actions-view";
+import { NoteView } from "@/components/share-sheet/note-view";
+import { PickerView } from "@/components/share-sheet/picker-view";
+import { StoryCard } from "@/components/story-card";
+import {
+	useRecommendationDraft,
+	type RecommendRecipient,
+} from "@/hooks/use-recommendation-draft";
+import { capture } from "@/lib/analytics";
+import { Colors, radius, spacing } from "@/lib/constants";
+import { triggerStepCompleteHaptic } from "@/lib/haptics";
+import { trpc } from "@/lib/trpc";
 
 interface ShareSheetMovie {
 	id: number;
@@ -38,14 +39,12 @@ interface ShareSheetMovie {
 const WEB_BASE = "https://watchmiru.app";
 const INSTAGRAM_STORIES_APP_ID =
 	process.env.EXPO_PUBLIC_INSTAGRAM_STORIES_APP_ID?.trim();
-const ACTION_ICON_SIZE = 52;
-const INSTAGRAM_ICON_SIZE = 48;
 
 function movieSlug(title: string, tmdbId: number): string {
 	const slug = title
 		.toLowerCase()
 		.normalize("NFD")
-		.replace(/[\u0300-\u036f]/g, "")
+		.replace(/[̀-ͯ]/g, "")
 		.replace(/[^a-z0-9]+/g, "-")
 		.replace(/^-+|-+$/g, "");
 	return `${slug}-${tmdbId}`;
@@ -83,13 +82,6 @@ export async function canShareToInstagramStories() {
 	}
 }
 
-const CARD_WIDTH = 360;
-const CARD_HEIGHT = 640;
-const PREVIEW_HEIGHT = 280;
-const PREVIEW_WIDTH = (CARD_WIDTH / CARD_HEIGHT) * PREVIEW_HEIGHT;
-const previewScale = PREVIEW_HEIGHT / CARD_HEIGHT;
-const storyActionLabel = "Instagram stories";
-
 export function ShareSheet({
 	movie,
 	visible,
@@ -100,22 +92,41 @@ export function ShareSheet({
 	onClose: () => void;
 }) {
 	const storyCardRef = useRef<View>(null);
-	const [sharing, setSharing] = useState(false);
+	const [storiesSharing, setStoriesSharing] = useState(false);
+	const [storiesAvailable, setStoriesAvailable] = useState(false);
+	const draft = useRecommendationDraft();
+	const utils = trpc.useUtils();
+	const sendMutation = trpc.recommendation.send.useMutation();
 
-	const url = getMovieShareUrl(movie);
+	const handleClose = useCallback(() => {
+		draft.reset();
+		setStoriesSharing(false);
+		onClose();
+	}, [draft, onClose]);
+
+	const handleVisibilityChange = useCallback(
+		(next: boolean) => {
+			if (next) {
+				void canShareToInstagramStories().then(setStoriesAvailable);
+			} else {
+				draft.reset();
+			}
+		},
+		[draft],
+	);
 
 	const handleShareMore = useCallback(async () => {
-		onClose();
+		handleClose();
 		try {
 			await shareMovieLink(movie);
 		} catch {
 			// user cancelled native share sheet
 		}
-	}, [movie, onClose]);
+	}, [movie, handleClose]);
 
 	const handleShareStory = useCallback(async () => {
-		if (sharing) return;
-		setSharing(true);
+		if (storiesSharing) return;
+		setStoriesSharing(true);
 		try {
 			const uri = await captureRef(storyCardRef, {
 				format: "png",
@@ -127,156 +138,162 @@ export function ShareSheet({
 					social: Social.InstagramStories,
 					appId: INSTAGRAM_STORIES_APP_ID,
 					backgroundImage: uri,
-					attributionURL: url,
+					attributionURL: getMovieShareUrl(movie),
 				});
 			} else {
 				await shareMovieLink(movie);
 			}
-			onClose();
+			handleClose();
 		} catch {
 			// user cancelled or Instagram not installed
 		} finally {
-			setSharing(false);
+			setStoriesSharing(false);
 		}
-	}, [sharing, url, onClose]);
+	}, [storiesSharing, movie, handleClose]);
+
+	const handleSelectRecipient = useCallback(
+		(recipient: RecommendRecipient) => {
+			draft.chooseRecipient(recipient);
+		},
+		[draft],
+	);
+
+	const handleSendRecommendation = useCallback(async () => {
+		if (!draft.recipient || sendMutation.isPending) {
+			return;
+		}
+
+		const trimmed = draft.message.trim();
+
+		try {
+			await sendMutation.mutateAsync({
+				movieId: movie.id,
+				recipientId: draft.recipient.id,
+				...(trimmed ? { message: trimmed } : {}),
+			});
+
+			capture("movie_recommendation_sent", {
+				movie_id: movie.id,
+				target_user_id: draft.recipient.id,
+				has_message: trimmed.length > 0,
+			});
+
+			triggerStepCompleteHaptic();
+			utils.recommendation.listIncoming.invalidate();
+			utils.recommendation.getRecipientCandidates.invalidate({
+				movieId: movie.id,
+			});
+			handleClose();
+		} catch (error) {
+			if (error instanceof TRPCClientError) {
+				// surface server error via a follow-up alert; keep sheet open
+				// so the user can revise or cancel
+				// oxlint-disable-next-line no-console
+				console.warn("Recommendation send failed", error.message);
+			}
+		}
+	}, [draft.message, draft.recipient, handleClose, movie.id, sendMutation, utils]);
 
 	return (
-		<>
-			{/* Off-screen full-size card for capture */}
-			<View style={styles.offscreen} pointerEvents="none">
-				<StoryCard ref={storyCardRef} movie={movie} />
+		<Modal
+			visible={visible}
+			transparent
+			animationType="slide"
+			onRequestClose={handleClose}
+			onShow={() => handleVisibilityChange(true)}
+			onDismiss={() => handleVisibilityChange(false)}
+			statusBarTranslucent
+		>
+			<View style={styles.backdrop}>
+				<Pressable
+					style={StyleSheet.absoluteFill}
+					onPress={handleClose}
+					accessibilityElementsHidden
+					importantForAccessibility="no-hide-descendants"
+				/>
+
+				<KeyboardAvoidingView
+					behavior={Platform.OS === "ios" ? "padding" : undefined}
+					style={styles.sheetWrapper}
+					pointerEvents="box-none"
+				>
+					<View style={styles.sheet}>
+						<View style={styles.handle} />
+
+						{draft.mode === "actions" ? (
+							<ActionsView
+								movie={movie}
+								showStoriesAction={storiesAvailable}
+								storiesSharing={storiesSharing}
+								onShareLink={() => {
+									void handleShareMore();
+								}}
+								onShareStory={() => {
+									void handleShareStory();
+								}}
+								onRecommend={draft.startPicking}
+							/>
+						) : null}
+
+						{draft.mode === "picker" ? (
+							<PickerView
+								movieId={movie.id}
+								onBack={draft.back}
+								onSelect={handleSelectRecipient}
+							/>
+						) : null}
+
+						{draft.mode === "note" && draft.recipient ? (
+							<NoteView
+								recipient={draft.recipient}
+								message={draft.message}
+								onMessageChange={draft.setMessage}
+								sending={sendMutation.isPending}
+								onBack={draft.back}
+								onSend={() => {
+									void handleSendRecommendation();
+								}}
+							/>
+						) : null}
+					</View>
+				</KeyboardAvoidingView>
+
+				<View style={styles.offscreen} pointerEvents="none">
+					<StoryCard ref={storyCardRef} movie={movie} />
+				</View>
 			</View>
-
-			<Host style={StyleSheet.absoluteFill}>
-				<VStack>
-					<BottomSheet
-						isPresented={visible}
-						onIsPresentedChange={(presented: boolean) => {
-							if (!presented) onClose();
-						}}
-						fitToContents
-					>
-						<Group modifiers={[presentationDragIndicator("visible")]}>
-							<RNHostView matchContents>
-								<View style={styles.sheet}>
-									{/* Story card preview */}
-									<View style={styles.previewContainer}>
-										<View style={styles.previewWrapper}>
-											<View style={styles.previewScaler}>
-												<StoryCard movie={movie} />
-											</View>
-										</View>
-									</View>
-
-									{/* Actions */}
-									<View style={styles.actions}>
-										<Pressable
-											style={({ pressed }) => [
-												styles.actionButton,
-												pressed && styles.pressed,
-											]}
-											onPress={() => {
-												void handleShareMore();
-											}}
-										>
-											<View style={styles.actionIcon}>
-												<LinkIcon size={22} color={Colors.foreground} />
-											</View>
-											<Text style={styles.actionLabel}>Share link</Text>
-										</Pressable>
-
-										<Pressable
-											style={({ pressed }) => [
-												styles.actionButton,
-												pressed && styles.pressed,
-											]}
-											onPress={handleShareStory}
-											disabled={sharing}
-										>
-											<View style={styles.instagramWrap}>
-												{sharing ? (
-													<ActivityIndicator
-														size="small"
-														color={Colors.foreground}
-													/>
-												) : (
-													<InstagramIcon size={INSTAGRAM_ICON_SIZE} />
-												)}
-											</View>
-											<Text style={styles.actionLabel}>{storyActionLabel}</Text>
-										</Pressable>
-									</View>
-								</View>
-							</RNHostView>
-						</Group>
-					</BottomSheet>
-				</VStack>
-			</Host>
-		</>
+		</Modal>
 	);
 }
 
 const styles = StyleSheet.create({
+	backdrop: {
+		flex: 1,
+		backgroundColor: "rgba(0,0,0,0.5)",
+		justifyContent: "flex-end",
+	},
+	sheetWrapper: {
+		justifyContent: "flex-end",
+	},
+	sheet: {
+		backgroundColor: Colors.background,
+		borderTopLeftRadius: radius.xl,
+		borderTopRightRadius: radius.xl,
+		paddingBottom: spacing[8],
+		paddingTop: spacing[2],
+		maxHeight: "92%",
+	},
+	handle: {
+		alignSelf: "center",
+		width: 36,
+		height: 4,
+		borderRadius: 2,
+		backgroundColor: Colors.border,
+		marginBottom: spacing[2],
+	},
 	offscreen: {
 		position: "absolute",
 		left: -9999,
 		top: 0,
-	},
-	sheet: {
-		paddingTop: spacing[4],
-		paddingBottom: spacing[6],
-		paddingHorizontal: spacing[6],
-		gap: spacing[6],
-		alignItems: "center",
-	},
-	previewContainer: {
-		alignItems: "center",
-	},
-	previewWrapper: {
-		width: PREVIEW_WIDTH,
-		height: PREVIEW_HEIGHT,
-		borderRadius: radius.xl,
-		overflow: "hidden",
-	},
-	previewScaler: {
-		width: CARD_WIDTH,
-		height: CARD_HEIGHT,
-		transform: [{ scale: previewScale }],
-		transformOrigin: "top left",
-	},
-	actions: {
-		flexDirection: "row",
-		justifyContent: "center",
-		gap: spacing[8],
-	},
-	actionButton: {
-		alignItems: "center",
-		gap: spacing[2],
-	},
-	pressed: {
-		opacity: 0.6,
-	},
-	actionIcon: {
-		width: ACTION_ICON_SIZE,
-		height: ACTION_ICON_SIZE,
-		borderRadius: ACTION_ICON_SIZE / 2,
-		backgroundColor: Colors.secondary,
-		borderWidth: StyleSheet.hairlineWidth,
-		borderColor: Colors.border,
-		justifyContent: "center",
-		alignItems: "center",
-	},
-	instagramWrap: {
-		width: ACTION_ICON_SIZE,
-		height: ACTION_ICON_SIZE,
-		borderRadius: ACTION_ICON_SIZE / 2,
-		overflow: "hidden",
-		justifyContent: "center",
-		alignItems: "center",
-	},
-	actionLabel: {
-		fontSize: fontSize.xs,
-		fontFamily: fontFamily.sansMedium,
-		color: Colors.mutedForeground,
 	},
 });

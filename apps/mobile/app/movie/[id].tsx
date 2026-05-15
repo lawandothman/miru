@@ -4,11 +4,7 @@ import { StatusBar } from "expo-status-bar";
 import { Film, RefreshCw } from "lucide-react-native";
 import { useEffect, useRef, useState } from "react";
 import { TRPCClientError } from "@trpc/client";
-import {
-	canShareToInstagramStories,
-	ShareSheet,
-	shareMovieLink,
-} from "@/components/share-sheet";
+import { ShareSheet } from "@/components/share-sheet";
 import { MovieActions } from "@/components/movie-actions";
 import { MovieDetailSkeleton } from "@/components/movie-detail-skeleton";
 import { EmptyState } from "@/components/empty-state";
@@ -18,6 +14,7 @@ import { MovieGenres } from "@/components/movie-detail/movie-genres";
 import { MovieOverview } from "@/components/movie-detail/movie-overview";
 import { MovieMatches } from "@/components/movie-detail/movie-matches";
 import { MovieProviders } from "@/components/movie-detail/movie-providers";
+import { RecommendationBanner } from "@/components/movie-detail/recommendation-banner";
 import { useDefaultHeaderOptions } from "@/lib/navigation";
 import { trpc } from "@/lib/trpc";
 import { capture } from "@/lib/analytics";
@@ -48,7 +45,6 @@ export default function MovieDetailScreen() {
 	);
 
 	const [shareVisible, setShareVisible] = useState(false);
-	const [sharePending, setSharePending] = useState(false);
 
 	const tracked = useRef(false);
 	useEffect(() => {
@@ -118,27 +114,9 @@ export default function MovieDetailScreen() {
 		movie.trailerKey && movie.trailerSite === "YouTube"
 			? `https://www.youtube.com/watch?v=${movie.trailerKey}`
 			: null;
-	const shareTarget = { id: movie.id, title: movie.title };
 
-	async function handleSharePress() {
-		if (sharePending) {
-			return;
-		}
-
-		setSharePending(true);
-
-		try {
-			if (await canShareToInstagramStories()) {
-				setShareVisible(true);
-				return;
-			}
-
-			await shareMovieLink(shareTarget);
-		} catch {
-			// Ignore native share cancellations.
-		} finally {
-			setSharePending(false);
-		}
+	function handleSharePress() {
+		setShareVisible(true);
 	}
 
 	function handleTrailerPress() {
@@ -159,10 +137,7 @@ export default function MovieDetailScreen() {
 				<MovieHero
 					backdropPath={movie.backdropPath}
 					onBack={() => router.back()}
-					onShare={() => {
-						void handleSharePress();
-					}}
-					sharePending={sharePending}
+					onShare={handleSharePress}
 				/>
 
 				<MovieInfoRow
@@ -178,6 +153,7 @@ export default function MovieDetailScreen() {
 				/>
 
 				<View style={styles.body}>
+					<RecommendationBanner movieId={movie.id} />
 					<MovieActions
 						movieId={movie.id}
 						inWatchlist={movie.inWatchlist}
@@ -190,15 +166,11 @@ export default function MovieDetailScreen() {
 				</View>
 			</ScrollView>
 
-			{shareVisible ? (
-				<View style={StyleSheet.absoluteFill}>
-					<ShareSheet
-						movie={movie}
-						visible={shareVisible}
-						onClose={() => setShareVisible(false)}
-					/>
-				</View>
-			) : null}
+			<ShareSheet
+				movie={movie}
+				visible={shareVisible}
+				onClose={() => setShareVisible(false)}
+			/>
 		</>
 	);
 }

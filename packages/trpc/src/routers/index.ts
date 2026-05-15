@@ -2,6 +2,7 @@ import { router } from "../trpc";
 import { movieRouter } from "./movie";
 import { notificationRouter } from "./notification";
 import { onboardingRouter } from "./onboarding";
+import { recommendationRouter } from "./recommendation";
 import { socialRouter } from "./social";
 import { userRouter } from "./user";
 import { watchedRouter } from "./watched";
@@ -11,6 +12,7 @@ export const appRouter = router({
 	movie: movieRouter,
 	notification: notificationRouter,
 	onboarding: onboardingRouter,
+	recommendation: recommendationRouter,
 	social: socialRouter,
 	user: userRouter,
 	watched: watchedRouter,

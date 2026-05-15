@@ -25,7 +25,11 @@ export const pushTokens = pgTable(
 	(table) => [index("push_tokens_user_idx").on(table.userId)],
 );
 
-export const NOTIFICATION_TYPES = ["new-follower", "watchlist-match"] as const;
+export const NOTIFICATION_TYPES = [
+	"new-follower",
+	"watchlist-match",
+	"movie-recommendation",
+] as const;
 
 export type NotificationType = (typeof NOTIFICATION_TYPES)[number];
 
@@ -43,9 +47,21 @@ interface WatchlistMatchNotificationData {
 	};
 }
 
+interface MovieRecommendationNotificationData {
+	type: "movie-recommendation";
+	data: {
+		recommendationId: string;
+		movieId: string;
+		movieTitle: string;
+		posterPath: string | null;
+		message: string | null;
+	};
+}
+
 export type TypedNotificationData =
 	| NewFollowerNotificationData
-	| WatchlistMatchNotificationData;
+	| WatchlistMatchNotificationData
+	| MovieRecommendationNotificationData;
 
 export const notifications = pgTable(
 	"notifications",

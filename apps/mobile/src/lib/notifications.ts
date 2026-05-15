@@ -146,5 +146,16 @@ export function getNotificationRoute(data: unknown) {
 		};
 	}
 
+	if (
+		type === "movie-recommendation" &&
+		typeof movieId === "string" &&
+		movieId.length > 0
+	) {
+		return {
+			pathname: "/movie/[id]" as const,
+			params: { id: movieId },
+		};
+	}
+
 	return null;
 }

@@ -18,15 +18,9 @@ interface MovieHeroProps {
 	backdropPath: string | null | undefined;
 	onBack: () => void;
 	onShare: () => void;
-	sharePending: boolean;
 }
 
-export function MovieHero({
-	backdropPath,
-	onBack,
-	onShare,
-	sharePending,
-}: MovieHeroProps) {
+export function MovieHero({ backdropPath, onBack, onShare }: MovieHeroProps) {
 	const insets = useSafeAreaInsets();
 	const resolvedScheme = useResolvedColorScheme();
 	const palette = getThemePalette(resolvedScheme);
@@ -79,7 +73,6 @@ export function MovieHero({
 					accessibilityRole="button"
 					accessibilityLabel="Share movie"
 					onPress={onShare}
-					disabled={sharePending}
 				>
 					<Share2 size={18} color="#fff" />
 				</Pressable>
