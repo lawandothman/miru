@@ -1,4 +1,10 @@
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
+import {
+	ActivityIndicator,
+	Pressable,
+	StyleSheet,
+	Text,
+	View,
+} from "react-native";
 import { Link as LinkIcon, Send } from "lucide-react-native";
 import { InstagramIcon } from "@/components/icons/instagram-icon";
 import { StoryCard } from "@/components/story-card";

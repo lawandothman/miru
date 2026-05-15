@@ -358,10 +358,7 @@ export const recommendationRouter = router({
 						and(
 							eq(schema.movieRecommendations.senderId, userId),
 							eq(schema.movieRecommendations.movieId, input.movieId),
-							inArray(
-								schema.movieRecommendations.recipientId,
-								candidateIds,
-							),
+							inArray(schema.movieRecommendations.recipientId, candidateIds),
 						),
 					)
 					.orderBy(desc(schema.movieRecommendations.createdAt)),

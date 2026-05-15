@@ -33,10 +33,11 @@ export function PickerView({
 	const [query, setQuery] = useState("");
 	const debouncedQuery = useDebounce(query, 200);
 
-	const { data, isLoading } = trpc.recommendation.getRecipientCandidates.useQuery({
-		movieId,
-		query: debouncedQuery.trim() || undefined,
-	});
+	const { data, isLoading } =
+		trpc.recommendation.getRecipientCandidates.useQuery({
+			movieId,
+			query: debouncedQuery.trim() || undefined,
+		});
 
 	const candidates = data ?? [];
 
