@@ -14,8 +14,8 @@ catalogs:
       version: 1.6.5
   default:
     '@lorenzopant/tmdb':
-      specifier: 1.21.2
-      version: 1.21.2
+      specifier: 1.22.1
+      version: 1.22.1
     '@types/node':
       specifier: 25.6.2
       version: 25.6.2
@@ -293,7 +293,7 @@ importers:
         version: 1.6.5(@better-auth/core@1.6.5(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.1)(better-call@1.3.5(zod@4.3.6))(jose@6.2.3)(kysely@0.28.15)(nanostores@1.1.1))(better-auth@1.6.5(@opentelemetry/api@1.9.1)(drizzle-kit@0.31.10)(drizzle-orm@0.45.2(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@types/pg@8.15.6)(@upstash/redis@1.37.0)(kysely@0.28.15)(postgres@3.4.9))(next@16.2.6(@babel/core@7.29.0)(@opentelemetry/api@1.9.1)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(vitest@4.1.6(@opentelemetry/api@1.9.1)(@types/node@25.6.2)(vite@7.3.1(@types/node@25.6.2)(jiti@2.6.1)(lightningcss@1.32.0)(terser@5.46.2)(tsx@4.21.0)(yaml@2.8.2))))(expo-constants@55.0.16)(expo-linking@55.0.15)(expo-network@55.0.13(expo@55.0.23)(react@19.2.5))(expo-web-browser@55.0.15(expo@55.0.23)(react-native@0.83.6(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.5)))
       '@lorenzopant/tmdb':
         specifier: 'catalog:'
-        version: 1.21.2
+        version: 1.22.1
       '@miru/analytics':
         specifier: workspace:*
         version: link:../../packages/analytics
@@ -494,7 +494,7 @@ importers:
     dependencies:
       '@lorenzopant/tmdb':
         specifier: 'catalog:'
-        version: 1.21.2
+        version: 1.22.1
       '@miru/cache':
         specifier: workspace:*
         version: link:../cache
@@ -2253,8 +2253,8 @@ packages:
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
 
-  '@lorenzopant/tmdb@1.21.2':
-    resolution: {integrity: sha512-HvzPAX472IPv7RHVEkkzmwnz7+INCs7jSuQCMFLECH5nmXe0LvSbaiQU+NQ8Gwx6MT8sfb7Lhrc8f8+LUnxpWg==}
+  '@lorenzopant/tmdb@1.22.1':
+    resolution: {integrity: sha512-VmCN16PI+coDNkQ4nDJq82gsh8wkgNs0HShefOWomt95tM2Azzd0L7BlyCsqcBd+UM3K8Zz/X5t2lBalypTQmQ==}
 
   '@neondatabase/serverless@1.1.0':
     resolution: {integrity: sha512-r3ZZhRjEcfEdKIZnoB1RusNgvHuaBRqfCzV4Gi+5A9yUX0S4HTws/ASWqt13wL4y4I+0rqsWGdA2w7EQXHi3+Q==}
@@ -9803,7 +9803,7 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
 
-  '@lorenzopant/tmdb@1.21.2': {}
+  '@lorenzopant/tmdb@1.22.1': {}
 
   '@neondatabase/serverless@1.1.0': {}
 
