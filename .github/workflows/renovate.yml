@@ -2,20 +2,35 @@ name: Renovate
 
 on:
   schedule:
-    - cron: "0 4 * * *" # daily at 4am UTC
+    - cron: "0 */2 * * *" # every 2 hours
+  push:
+    branches: [main]
+  pull_request:
+    types: [edited]
+  issue_comment:
+    types: [created, edited]
   workflow_dispatch:
+
+concurrency:
+  group: renovate
+  cancel-in-progress: false
 
 jobs:
   renovate:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        id: app-token
+        with:
+          app-id: ${{ secrets.RENOVATE_APP_ID }}
+          private-key: ${{ secrets.RENOVATE_APP_PRIVATE_KEY }}
+
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
       - uses: renovatebot/github-action@693b9ef15eec82123529a37c782242f091365961 # v46.1.14
         with:
-          token: ${{ secrets.RENOVATE_TOKEN }}
+          token: ${{ steps.app-token.outputs.token }}
           configurationFile: renovate.json
         env:
           RENOVATE_REPOSITORIES: lawandothman/miru
-          RENOVATE_GIT_AUTHOR: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
           RENOVATE_PLATFORM_COMMIT: "enabled"
