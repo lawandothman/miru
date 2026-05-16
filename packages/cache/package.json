@@ -10,7 +10,7 @@
 		"typecheck": "tsc --noEmit"
 	},
 	"dependencies": {
-		"@upstash/redis": "1.37.0"
+		"@upstash/redis": "1.38.0"
 	},
 	"devDependencies": {
 		"@miru/typescript-config": "workspace:*",
