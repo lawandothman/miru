@@ -23,9 +23,9 @@ catalogs:
     react-dom: 19.2.5
   trpc:
     "@tanstack/react-query": 5.100.10
-    "@trpc/client": 11.16.0
-    "@trpc/react-query": 11.16.0
-    "@trpc/server": 11.16.0
+    "@trpc/client": 11.17.0
+    "@trpc/react-query": 11.17.0
+    "@trpc/server": 11.17.0
     superjson: 2.2.6
 
 allowBuilds:
