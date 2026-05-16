@@ -19,6 +19,7 @@ export type EventProperties = {
 		target_user_id: string;
 		has_message: boolean;
 	};
+	invite_link_shared: { source: string };
 };
 
 export type EventName = keyof EventProperties;

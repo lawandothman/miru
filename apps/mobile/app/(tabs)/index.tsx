@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { EmptyState } from "@/components/empty-state";
+import { FindFriendsEmptyState } from "@/components/home/find-friends-empty-state";
 import { HorizontalMovieList } from "@/components/horizontal-movie-list";
 import { UserAvatar } from "@/components/user-avatar";
 import { useSession } from "@/lib/auth";
@@ -38,24 +39,36 @@ export default function HomeScreen() {
 	const { data: unreadCount } = trpc.notification.getUnreadCount.useQuery();
 	const hasUnread = (unreadCount?.count ?? 0) > 0;
 
+	const currentUserId = session?.user?.id ?? "";
+	const { data: profile, refetch: refetchProfile } = trpc.user.getById.useQuery(
+		{ id: currentUserId },
+		{ enabled: Boolean(currentUserId) },
+	);
+	const followingCount = profile?.followingCount ?? null;
+	const hasFollows = followingCount !== null && followingCount > 0;
+
 	const {
 		data: matches,
-		isLoading,
+		isLoading: matchesLoading,
 		refetch,
-	} = trpc.social.getDashboardMatches.useQuery();
+	} = trpc.social.getDashboardMatches.useQuery(undefined, {
+		enabled: hasFollows,
+	});
 
 	async function handleRefresh() {
 		triggerRefreshHaptic();
 		setRefreshing(true);
 		try {
-			await refetch();
+			await Promise.all([refetchProfile(), hasFollows ? refetch() : undefined]);
 		} finally {
 			setRefreshing(false);
 		}
 	}
 
 	const insets = useSafeAreaInsets();
-	const showEmpty = !isLoading && (!matches || matches.length === 0);
+	const hasMatches = Boolean(matches && matches.length > 0);
+	const showFindFriends = followingCount === 0;
+	const showNoMatchesYet = hasFollows && !matchesLoading && !hasMatches;
 
 	return (
 		<View style={[styles.container, { paddingTop: insets.top }]}>
@@ -87,11 +100,13 @@ export default function HomeScreen() {
 					</Pressable>
 				</View>
 
-				{showEmpty ? (
+				{showFindFriends ? (
+					<FindFriendsEmptyState />
+				) : showNoMatchesYet ? (
 					<EmptyState
 						icon={Film}
 						title="No matches yet"
-						description="Follow friends and add movies to your watchlist to see what you can watch together."
+						description="Add movies to your watchlist so they can match with what your friends want to watch."
 						actionLabel="Discover movies"
 						onAction={() => router.push("/(tabs)/discover")}
 					/>
