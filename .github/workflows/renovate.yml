@@ -7,8 +7,8 @@ on:
     branches: [main]
   pull_request:
     types: [edited]
-  issue_comment:
-    types: [created, edited]
+  issues:
+    types: [edited]
   workflow_dispatch:
 
 concurrency:
