@@ -1,6 +1,12 @@
 import { useState } from "react";
 import { View, Text, Pressable, StyleSheet, Alert } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import Animated, {
+	Extrapolation,
+	interpolate,
+	useAnimatedKeyboard,
+	useAnimatedStyle,
+} from "react-native-reanimated";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import Svg, { Path } from "react-native-svg";
 import * as AppleAuthentication from "expo-apple-authentication";
 import * as Sentry from "@sentry/react-native";
@@ -53,6 +59,31 @@ export default function SignInScreen() {
 	const [mode, setMode] = useState<"providers" | "email">("providers");
 	const { data: session } = useSession();
 	const isFinishingSignIn = loading !== null || Boolean(session);
+	const keyboard = useAnimatedKeyboard();
+	const insets = useSafeAreaInsets();
+
+	const brandingStyle = useAnimatedStyle(() => {
+		const progress = interpolate(
+			keyboard.height.value,
+			[0, 200],
+			[0, 1],
+			Extrapolation.CLAMP,
+		);
+		return {
+			opacity: 1 - progress,
+			transform: [
+				{ scale: 1 - 0.15 * progress },
+				{ translateY: -20 * progress },
+			],
+		};
+	});
+
+	const formStyle = useAnimatedStyle(() => {
+		const lift = Math.max(0, keyboard.height.value - insets.bottom);
+		return {
+			transform: [{ translateY: -lift }],
+		};
+	});
 
 	function handleSignInError(error: unknown, provider: string) {
 		setLoading(null);
@@ -126,14 +157,15 @@ export default function SignInScreen() {
 	return (
 		<SafeAreaView style={styles.container}>
 			<View style={styles.content}>
-				<View style={styles.branding}>
+				<Animated.View style={[styles.branding, brandingStyle]}>
 					<Text style={styles.logo}>Miru</Text>
 					{!isFinishingSignIn ? (
 						<Text style={styles.tagline}>Watch together</Text>
 					) : null}
-				</View>
+				</Animated.View>
 
-				{match({ isFinishingSignIn, mode } as const)
+				<Animated.View style={formStyle}>
+					{match({ isFinishingSignIn, mode } as const)
 					.with({ isFinishingSignIn: true }, () => (
 						<View style={styles.loadingContainer}>
 							<Spinner size={32} color={Colors.foreground} />
@@ -202,6 +234,7 @@ export default function SignInScreen() {
 						</View>
 					))
 					.exhaustive()}
+				</Animated.View>
 			</View>
 		</SafeAreaView>
 	);

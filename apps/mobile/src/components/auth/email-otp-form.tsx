@@ -1,13 +1,5 @@
 import { useState } from "react";
-import {
-	Alert,
-	KeyboardAvoidingView,
-	Platform,
-	Pressable,
-	StyleSheet,
-	Text,
-	TextInput,
-} from "react-native";
+import { Alert, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import * as Sentry from "@sentry/react-native";
 import { Spinner } from "@/components/spinner";
 import { authClient, signIn } from "@/lib/auth";
@@ -73,10 +65,7 @@ export function EmailOtpForm({ onCancel }: EmailOtpFormProps) {
 	}
 
 	return (
-		<KeyboardAvoidingView
-			behavior={Platform.OS === "ios" ? "padding" : undefined}
-			style={styles.container}
-		>
+		<View style={styles.container}>
 			{step === "email" ? (
 				<>
 					<TextInput
@@ -167,7 +156,7 @@ export function EmailOtpForm({ onCancel }: EmailOtpFormProps) {
 					{step === "code" ? "Use a different email" : "Back"}
 				</Text>
 			</Pressable>
-		</KeyboardAvoidingView>
+		</View>
 	);
 }
 
