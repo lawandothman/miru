@@ -2,7 +2,7 @@ name: Renovate
 
 on:
   schedule:
-    - cron: "0 */2 * * *" # every 2 hours
+    - cron: "0 4 * * *" # daily at 4am UTC
   push:
     branches: [main]
   pull_request:
