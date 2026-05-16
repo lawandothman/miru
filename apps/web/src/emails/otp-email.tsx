@@ -7,7 +7,7 @@ import {
 	Preview,
 	Section,
 	Text,
-} from "@react-email/components";
+} from "react-email";
 
 type OtpEmailProps = {
 	code: string;
