@@ -73,6 +73,20 @@
 				"react-native-**"
 			],
 			"groupName": "expo & react-native"
+		},
+		{
+			"description": "Pin native modules to versions Expo SDK ships. Bump with the SDK, not independently. See apps/mobile/node_modules/expo/bundledNativeModules.json.",
+			"matchPackageNames": [
+				"react-native",
+				"react-native-reanimated",
+				"react-native-worklets",
+				"react-native-screens",
+				"react-native-safe-area-context",
+				"react-native-svg",
+				"react-native-web"
+			],
+			"matchUpdateTypes": ["major", "minor"],
+			"enabled": false
 		}
 	]
 }
