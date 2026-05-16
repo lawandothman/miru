@@ -10,11 +10,7 @@ export function FindFriendsEmptyState() {
 	async function handleInvite() {
 		try {
 			await shareInviteLink("home_empty_state");
-		} catch (error) {
-			if (__DEV__) {
-				console.warn("Failed to share invite link", error);
-			}
-		}
+		} catch {}
 	}
 
 	return (
@@ -23,7 +19,7 @@ export function FindFriendsEmptyState() {
 				<View style={styles.iconWrap}>
 					<UserPlus size={28} color={Colors.primary} />
 				</View>
-				<Text style={styles.title}>Find your people</Text>
+				<Text style={styles.title}>Find your friends</Text>
 				<Text style={styles.subtitle}>
 					Follow friends to see what you can watch together. Matches show up
 					here automatically.
