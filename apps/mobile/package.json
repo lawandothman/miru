@@ -22,7 +22,7 @@
 		"@expo/ui": "55.0.16",
 		"@expo/vector-icons": "15.1.1",
 		"@miru/analytics": "workspace:*",
-		"@react-native-async-storage/async-storage": "2.2.0",
+		"@react-native-async-storage/async-storage": "3.0.2",
 		"@react-navigation/native": "7.2.4",
 		"@sentry/react-native": "8.8.0",
 		"@shopify/flash-list": "2.3.1",
