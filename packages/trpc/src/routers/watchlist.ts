@@ -15,23 +15,21 @@ export const watchlistRouter = router({
 
 			const userId = ctx.session.user.id;
 
-			await ctx.db.transaction(async (tx) => {
-				await tx
-					.insert(schema.watchlistEntries)
-					.values({ userId, movieId: input.movieId })
-					.onConflictDoNothing();
+			await ctx.db
+				.insert(schema.watchlistEntries)
+				.values({ userId, movieId: input.movieId })
+				.onConflictDoNothing();
 
-				await tx
-					.update(schema.movieRecommendations)
-					.set({ status: "accepted", respondedAt: new Date() })
-					.where(
-						and(
-							eq(schema.movieRecommendations.recipientId, userId),
-							eq(schema.movieRecommendations.movieId, input.movieId),
-							eq(schema.movieRecommendations.status, "pending"),
-						),
-					);
-			});
+			await ctx.db
+				.update(schema.movieRecommendations)
+				.set({ status: "accepted", respondedAt: new Date() })
+				.where(
+					and(
+						eq(schema.movieRecommendations.recipientId, userId),
+						eq(schema.movieRecommendations.movieId, input.movieId),
+						eq(schema.movieRecommendations.status, "pending"),
+					),
+				);
 
 			await ctx.cache?.del(keys.recommendations(userId));
 
