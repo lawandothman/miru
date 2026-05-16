@@ -20,8 +20,6 @@ export const authClient = createAuthClient({
 	],
 });
 
-hydrateSessionFromCache();
-
 /** Clear locally stored auth state when signOut() fails. */
 export function clearAuthState(): void {
 	SecureStore.deleteItemAsync(COOKIE_KEY).catch(() => undefined);
@@ -29,45 +27,3 @@ export function clearAuthState(): void {
 }
 
 export const { signIn, signOut, useSession } = authClient;
-
-// Seed the session atom from SecureStore so useSession() returns the cached
-// user on cold start — including when offline. Without this, better-auth's
-// initial /get-session fetch is the only signal, and it fails offline.
-function hydrateSessionFromCache(): void {
-	let raw: string | null;
-	try {
-		raw = SecureStore.getItem(SESSION_CACHE_KEY);
-	} catch {
-		return;
-	}
-
-	if (!raw) {
-		return;
-	}
-
-	let parsed: unknown;
-	try {
-		parsed = JSON.parse(raw);
-	} catch {
-		return;
-	}
-
-	if (
-		!parsed ||
-		typeof parsed !== "object" ||
-		!("session" in parsed) ||
-		!("user" in parsed)
-	) {
-		return;
-	}
-
-	const sessionAtom = authClient.$store.atoms.session;
-	const current = sessionAtom.get();
-	sessionAtom.set({
-		...current,
-		data: parsed,
-		error: null,
-		isPending: false,
-		isRefetching: false,
-	});
-}
