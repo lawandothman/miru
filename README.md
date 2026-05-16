@@ -19,8 +19,6 @@
   &nbsp;&nbsp;
   <img src="apps/web/public/screenshots/watchlist.png" width="180" alt="Watchlist — your saved movies" />
   &nbsp;&nbsp;
-  <img src="apps/web/public/screenshots/movie-detail.png" width="180" alt="Movie detail — ratings, trailers, where to stream" />
-  &nbsp;&nbsp;
   <img src="apps/web/public/screenshots/profile.png" width="180" alt="Profile — stats, followers, watched" />
 </p>
 
