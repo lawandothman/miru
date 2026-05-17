@@ -3,9 +3,9 @@ import { View, Text, Pressable, StyleSheet, Alert } from "react-native";
 import Animated, {
 	Extrapolation,
 	interpolate,
-	useAnimatedKeyboard,
 	useAnimatedStyle,
 } from "react-native-reanimated";
+import { useReanimatedKeyboardAnimation } from "react-native-keyboard-controller";
 import {
 	SafeAreaView,
 	useSafeAreaInsets,
@@ -110,12 +110,13 @@ export default function SignInScreen() {
 	const [mode, setMode] = useState<"providers" | "email">("providers");
 	const { data: session } = useSession();
 	const isFinishingSignIn = loading !== null || Boolean(session);
-	const keyboard = useAnimatedKeyboard();
+	const keyboard = useReanimatedKeyboardAnimation();
 	const insets = useSafeAreaInsets();
 
 	const brandingStyle = useAnimatedStyle(() => {
+		const keyboardHeight = -keyboard.height.value;
 		const progress = interpolate(
-			keyboard.height.value,
+			keyboardHeight,
 			[0, 200],
 			[0, 1],
 			Extrapolation.CLAMP,
@@ -130,7 +131,8 @@ export default function SignInScreen() {
 	});
 
 	const formStyle = useAnimatedStyle(() => {
-		const lift = Math.max(0, keyboard.height.value - insets.bottom);
+		const keyboardHeight = -keyboard.height.value;
+		const lift = Math.max(0, keyboardHeight - insets.bottom);
 		return {
 			transform: [{ translateY: -lift }],
 		};
