@@ -74,8 +74,9 @@ function getBootState(
 	session: { user?: unknown } | null | undefined,
 	sessionPending: boolean,
 	cacheRestoring: boolean,
+	hasResolvedSession: boolean,
 ): BootState {
-	if (cacheRestoring || (!session && sessionPending)) {
+	if (cacheRestoring || (!session && sessionPending && !hasResolvedSession)) {
 		return "loading";
 	}
 
@@ -101,7 +102,16 @@ function AuthGuard({
 	const segments = useSegments();
 	const router = useRouter();
 	const cacheRestoring = useIsRestoring();
-	const bootState = getBootState(session, sessionPending, cacheRestoring);
+	const hasResolvedSessionRef = useRef(false);
+	if (!sessionPending && !hasResolvedSessionRef.current) {
+		hasResolvedSessionRef.current = true;
+	}
+	const bootState = getBootState(
+		session,
+		sessionPending,
+		cacheRestoring,
+		hasResolvedSessionRef.current,
+	);
 	const { data: unreadCount } = trpc.notification.getUnreadCount.useQuery(
 		undefined,
 		{
