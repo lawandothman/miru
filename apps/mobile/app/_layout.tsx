@@ -102,15 +102,15 @@ function AuthGuard({
 	const segments = useSegments();
 	const router = useRouter();
 	const cacheRestoring = useIsRestoring();
-	const hasResolvedSessionRef = useRef(false);
-	if (!sessionPending && !hasResolvedSessionRef.current) {
-		hasResolvedSessionRef.current = true;
+	const [hasResolvedSession, setHasResolvedSession] = useState(false);
+	if (!sessionPending && !hasResolvedSession) {
+		setHasResolvedSession(true);
 	}
 	const bootState = getBootState(
 		session,
 		sessionPending,
 		cacheRestoring,
-		hasResolvedSessionRef.current,
+		hasResolvedSession,
 	);
 	const { data: unreadCount } = trpc.notification.getUnreadCount.useQuery(
 		undefined,

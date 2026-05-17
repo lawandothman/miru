@@ -1,5 +1,13 @@
-import { useState } from "react";
-import { Alert, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { useRef, useState } from "react";
+import {
+	Alert,
+	Pressable,
+	StyleSheet,
+	Text,
+	TextInput,
+	View,
+} from "react-native";
+import { OTPInput, type OTPInputRef, type SlotProps } from "input-otp-native";
 import * as Sentry from "@sentry/react-native";
 import { Spinner } from "@/components/spinner";
 import { authClient, signIn } from "@/lib/auth";
@@ -15,9 +23,9 @@ type EmailOtpFormProps = {
 export function EmailOtpForm({ onCancel }: EmailOtpFormProps) {
 	const [step, setStep] = useState<Step>("email");
 	const [email, setEmail] = useState("");
-	const [code, setCode] = useState("");
 	const [pending, setPending] = useState(false);
 	const [error, setError] = useState<string | null>(null);
+	const otpRef = useRef<OTPInputRef>(null);
 
 	async function handleSendCode() {
 		setError(null);
@@ -44,13 +52,14 @@ export function EmailOtpForm({ onCancel }: EmailOtpFormProps) {
 		}
 	}
 
-	async function handleVerify() {
+	async function handleVerify(otpCode: string) {
 		setError(null);
 		setPending(true);
 		try {
-			const result = await signIn.emailOtp({ email, otp: code });
+			const result = await signIn.emailOtp({ email, otp: otpCode });
 			if (result.error) {
 				setError(result.error.message ?? "Invalid code. Try again.");
+				otpRef.current?.clear();
 				return;
 			}
 			capture("signed_in", { method: "email" });
@@ -59,6 +68,7 @@ export function EmailOtpForm({ onCancel }: EmailOtpFormProps) {
 				tags: { flow: "sign-in", provider: "email" },
 			});
 			Alert.alert("Sign in failed", "Something went wrong. Please try again.");
+			otpRef.current?.clear();
 		} finally {
 			setPending(false);
 		}
@@ -104,37 +114,27 @@ export function EmailOtpForm({ onCancel }: EmailOtpFormProps) {
 					<Text style={styles.helperText}>
 						Enter the 6-digit code we sent to {email}
 					</Text>
-					<TextInput
-						style={[styles.input, styles.codeInput]}
-						value={code}
-						onChangeText={(text) =>
-							setCode(text.replace(/\D/g, "").slice(0, 6))
-						}
-						placeholder="123456"
-						placeholderTextColor={Colors.mutedForeground}
-						keyboardType="number-pad"
-						autoComplete="one-time-code"
-						textContentType="oneTimeCode"
+					<OTPInput
+						ref={otpRef}
 						maxLength={6}
+						onComplete={handleVerify}
 						autoFocus
 						editable={!pending}
-						onSubmitEditing={handleVerify}
-					/>
-					<Pressable
-						style={({ pressed }) => [
-							styles.primaryButton,
-							pressed && styles.pressed,
-							(pending || code.length !== 6) && styles.disabled,
-						]}
-						onPress={handleVerify}
-						disabled={pending || code.length !== 6}
-					>
-						{pending ? (
-							<Spinner size={20} color={Colors.background} />
-						) : (
-							<Text style={styles.primaryButtonText}>Continue</Text>
+						containerStyle={styles.otpContainer}
+						render={({ slots }) => (
+							<View style={styles.slots}>
+								{slots.map((slot, index) => (
+									// oxlint-disable-next-line react/no-array-index-key -- slots have fixed positions
+									<Slot key={index} {...slot} />
+								))}
+							</View>
 						)}
-					</Pressable>
+					/>
+					{pending ? (
+						<View style={styles.pendingRow}>
+							<Spinner size={20} color={Colors.mutedForeground} />
+						</View>
+					) : null}
 				</>
 			)}
 
@@ -144,7 +144,6 @@ export function EmailOtpForm({ onCancel }: EmailOtpFormProps) {
 				onPress={() => {
 					if (step === "code") {
 						setStep("email");
-						setCode("");
 						setError(null);
 						return;
 					}
@@ -156,6 +155,14 @@ export function EmailOtpForm({ onCancel }: EmailOtpFormProps) {
 					{step === "code" ? "Use a different email" : "Back"}
 				</Text>
 			</Pressable>
+		</View>
+	);
+}
+
+function Slot({ char, isActive }: SlotProps) {
+	return (
+		<View style={[styles.slot, isActive && styles.slotActive]}>
+			<Text style={styles.slotChar}>{char ?? ""}</Text>
 		</View>
 	);
 }
@@ -173,11 +180,30 @@ const styles = StyleSheet.create({
 		paddingHorizontal: spacing[4],
 		paddingVertical: spacing[4],
 	},
-	codeInput: {
+	otpContainer: {
+		alignItems: "center",
+	},
+	slots: {
+		flexDirection: "row",
+		gap: spacing[2],
+	},
+	slot: {
+		width: 48,
+		height: 56,
+		borderRadius: radius.lg,
+		backgroundColor: Colors.muted,
+		alignItems: "center",
+		justifyContent: "center",
+		borderWidth: 2,
+		borderColor: "transparent",
+	},
+	slotActive: {
+		borderColor: Colors.foreground,
+	},
+	slotChar: {
+		color: Colors.foreground,
 		fontFamily: fontFamily.sansSemibold,
 		fontSize: fontSize["2xl"],
-		letterSpacing: 8,
-		textAlign: "center",
 	},
 	primaryButton: {
 		alignItems: "center",
@@ -202,6 +228,10 @@ const styles = StyleSheet.create({
 		fontFamily: fontFamily.sans,
 		fontSize: fontSize.sm,
 		textAlign: "center",
+	},
+	pendingRow: {
+		alignItems: "center",
+		paddingVertical: spacing[2],
 	},
 	errorText: {
 		color: Colors.destructive,

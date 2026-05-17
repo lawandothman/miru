@@ -6,7 +6,10 @@ import Animated, {
 	useAnimatedKeyboard,
 	useAnimatedStyle,
 } from "react-native-reanimated";
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+	SafeAreaView,
+	useSafeAreaInsets,
+} from "react-native-safe-area-context";
 import Svg, { Path } from "react-native-svg";
 import * as AppleAuthentication from "expo-apple-authentication";
 import * as Sentry from "@sentry/react-native";
@@ -166,74 +169,74 @@ export default function SignInScreen() {
 
 				<Animated.View style={formStyle}>
 					{match({ isFinishingSignIn, mode } as const)
-					.with({ isFinishingSignIn: true }, () => (
-						<View style={styles.loadingContainer}>
-							<Spinner size={32} color={Colors.foreground} />
-						</View>
-					))
-					.with({ mode: "email" }, () => (
-						<View style={styles.actions}>
-							<EmailOtpForm onCancel={() => setMode("providers")} />
-						</View>
-					))
-					.with({ mode: "providers" }, () => (
-						<View style={styles.actions}>
-							<Pressable
-								style={({ pressed }) => [
-									styles.socialButton,
-									pressed && styles.pressed,
-								]}
-								onPress={handleAppleSignIn}
-								disabled={loading !== null}
-								accessibilityRole="button"
-								accessibilityLabel="Continue with Apple"
-							>
-								<View style={styles.socialButtonContent}>
-									<AppleIcon />
-									<Text style={styles.socialButtonText}>
-										Continue with Apple
-									</Text>
-								</View>
-							</Pressable>
+						.with({ isFinishingSignIn: true }, () => (
+							<View style={styles.loadingContainer}>
+								<Spinner size={32} color={Colors.foreground} />
+							</View>
+						))
+						.with({ mode: "email" }, () => (
+							<View style={styles.actions}>
+								<EmailOtpForm onCancel={() => setMode("providers")} />
+							</View>
+						))
+						.with({ mode: "providers" }, () => (
+							<View style={styles.actions}>
+								<Pressable
+									style={({ pressed }) => [
+										styles.socialButton,
+										pressed && styles.pressed,
+									]}
+									onPress={handleAppleSignIn}
+									disabled={loading !== null}
+									accessibilityRole="button"
+									accessibilityLabel="Continue with Apple"
+								>
+									<View style={styles.socialButtonContent}>
+										<AppleIcon />
+										<Text style={styles.socialButtonText}>
+											Continue with Apple
+										</Text>
+									</View>
+								</Pressable>
 
-							<Pressable
-								style={({ pressed }) => [
-									styles.socialButton,
-									pressed && styles.pressed,
-								]}
-								onPress={handleGoogleSignIn}
-								disabled={loading !== null}
-								accessibilityRole="button"
-								accessibilityLabel="Continue with Google"
-							>
-								<View style={styles.socialButtonContent}>
-									<GoogleIcon />
-									<Text style={styles.socialButtonText}>
-										Continue with Google
-									</Text>
-								</View>
-							</Pressable>
+								<Pressable
+									style={({ pressed }) => [
+										styles.socialButton,
+										pressed && styles.pressed,
+									]}
+									onPress={handleGoogleSignIn}
+									disabled={loading !== null}
+									accessibilityRole="button"
+									accessibilityLabel="Continue with Google"
+								>
+									<View style={styles.socialButtonContent}>
+										<GoogleIcon />
+										<Text style={styles.socialButtonText}>
+											Continue with Google
+										</Text>
+									</View>
+								</Pressable>
 
-							<Pressable
-								style={({ pressed }) => [
-									styles.socialButton,
-									pressed && styles.pressed,
-								]}
-								onPress={() => setMode("email")}
-								disabled={loading !== null}
-								accessibilityRole="button"
-								accessibilityLabel="Continue with Email"
-							>
-								<View style={styles.socialButtonContent}>
-									<Mail size={20} color={Colors.background} />
-									<Text style={styles.socialButtonText}>
-										Continue with Email
-									</Text>
-								</View>
-							</Pressable>
-						</View>
-					))
-					.exhaustive()}
+								<Pressable
+									style={({ pressed }) => [
+										styles.socialButton,
+										pressed && styles.pressed,
+									]}
+									onPress={() => setMode("email")}
+									disabled={loading !== null}
+									accessibilityRole="button"
+									accessibilityLabel="Continue with Email"
+								>
+									<View style={styles.socialButtonContent}>
+										<Mail size={20} color={Colors.background} />
+										<Text style={styles.socialButtonText}>
+											Continue with Email
+										</Text>
+									</View>
+								</Pressable>
+							</View>
+						))
+						.exhaustive()}
 				</Animated.View>
 			</View>
 		</SafeAreaView>
