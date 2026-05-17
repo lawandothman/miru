@@ -39,7 +39,7 @@
 		"radix-ui": "1.4.3",
 		"react": "catalog:react",
 		"react-dom": "catalog:react",
-		"react-email": "6.1.1",
+		"react-email": "6.1.4",
 		"resend": "6.12.3",
 		"server-only": "0.0.1",
 		"sonner": "2.0.7",
