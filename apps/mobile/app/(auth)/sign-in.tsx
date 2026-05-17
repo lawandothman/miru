@@ -60,7 +60,7 @@ function GoogleIcon({ size = 20 }: { size?: number }) {
 export default function SignInScreen() {
 	const [loading, setLoading] = useState<"google" | "apple" | null>(null);
 	const [mode, setMode] = useState<"providers" | "email">("providers");
-	const { data: session } = useSession();
+	const { data: session, refetch: refetchSession } = useSession();
 	const isFinishingSignIn = loading !== null || Boolean(session);
 	const keyboard = useAnimatedKeyboard();
 	const insets = useSafeAreaInsets();
@@ -131,6 +131,8 @@ export default function SignInScreen() {
 				},
 			});
 
+			await refetchSession();
+
 			const fullName = [
 				credential.fullName?.givenName,
 				credential.fullName?.familyName,
@@ -139,7 +141,11 @@ export default function SignInScreen() {
 				.join(" ");
 
 			if (fullName) {
-				await authClient.updateUser({ name: fullName });
+				authClient.updateUser({ name: fullName }).catch((error) => {
+					Sentry.captureException(error, {
+						tags: { flow: "sign-in", provider: "apple", step: "update-name" },
+					});
+				});
 			}
 			capture("signed_in", { method: "apple" });
 		} catch (error) {
