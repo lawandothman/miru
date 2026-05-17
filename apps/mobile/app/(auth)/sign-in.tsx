@@ -57,10 +57,58 @@ function GoogleIcon({ size = 20 }: { size?: number }) {
 	);
 }
 
+// Workaround for https://github.com/better-auth/better-auth/issues/1006 after 
+// social signIn the useSession atom doesn't always pick up the new session 
+// via the implicit signal-driven refetch. Force a fresh /get-session and push
+// the result straight into the atom.
+async function syncSessionAtom() {
+	const client = authClient as unknown as {
+		getSession: (args: {
+			query?: { disableCookieCache?: boolean };
+			fetchOptions?: {
+				throw?: boolean;
+				onSuccess?: (ctx: { data: unknown }) => void;
+			};
+		}) => Promise<unknown>;
+		$store?: {
+			atoms?: {
+				session?: {
+					get: () => Record<string, unknown>;
+					set: (value: Record<string, unknown>) => void;
+				};
+			};
+		};
+	};
+
+	try {
+		await client.getSession({
+			query: { disableCookieCache: true },
+			fetchOptions: {
+				throw: true,
+				onSuccess: (ctx) => {
+					const sessionAtom = client.$store?.atoms?.session;
+					if (!sessionAtom) return;
+					sessionAtom.set({
+						...sessionAtom.get(),
+						data: ctx.data,
+						error: null,
+						isPending: false,
+						isRefetching: false,
+					});
+				},
+			},
+		});
+	} catch (error) {
+		Sentry.captureException(error, {
+			tags: { flow: "sign-in", step: "sync-session" },
+		});
+	}
+}
+
 export default function SignInScreen() {
 	const [loading, setLoading] = useState<"google" | "apple" | null>(null);
 	const [mode, setMode] = useState<"providers" | "email">("providers");
-	const { data: session, refetch: refetchSession } = useSession();
+	const { data: session } = useSession();
 	const isFinishingSignIn = loading !== null || Boolean(session);
 	const keyboard = useAnimatedKeyboard();
 	const insets = useSafeAreaInsets();
@@ -131,7 +179,7 @@ export default function SignInScreen() {
 				},
 			});
 
-			await refetchSession();
+			await syncSessionAtom();
 
 			const fullName = [
 				credential.fullName?.givenName,
