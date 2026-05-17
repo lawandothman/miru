@@ -28,6 +28,7 @@ import {
 	initialWindowMetrics,
 	SafeAreaProvider,
 } from "react-native-safe-area-context";
+import { KeyboardProvider } from "react-native-keyboard-controller";
 import { useIsRestoring } from "@tanstack/react-query";
 import { AnimatedSplash } from "@/components/animated-splash";
 import { OfflineBanner } from "@/components/offline-banner";
@@ -390,23 +391,25 @@ function RootLayout() {
 	}
 
 	const content = (
-		<SafeAreaProvider initialMetrics={initialWindowMetrics}>
-			<ThemeProvider value={getNavigationTheme(resolvedScheme)}>
-				<TRPCProvider>
-					<OfflineBanner>
-						<AuthGuard onBootReady={handleBootReady}>
-							<StatusBar style="auto" />
-							<Stack
-								screenOptions={{
-									headerShown: false,
-									headerBackButtonDisplayMode: "minimal",
-								}}
-							/>
-						</AuthGuard>
-					</OfflineBanner>
-				</TRPCProvider>
-			</ThemeProvider>
-		</SafeAreaProvider>
+		<KeyboardProvider>
+			<SafeAreaProvider initialMetrics={initialWindowMetrics}>
+				<ThemeProvider value={getNavigationTheme(resolvedScheme)}>
+					<TRPCProvider>
+						<OfflineBanner>
+							<AuthGuard onBootReady={handleBootReady}>
+								<StatusBar style="auto" />
+								<Stack
+									screenOptions={{
+										headerShown: false,
+										headerBackButtonDisplayMode: "minimal",
+									}}
+								/>
+							</AuthGuard>
+						</OfflineBanner>
+					</TRPCProvider>
+				</ThemeProvider>
+			</SafeAreaProvider>
+		</KeyboardProvider>
 	);
 
 	const tree = (
