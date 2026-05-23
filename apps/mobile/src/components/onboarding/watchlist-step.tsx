@@ -181,7 +181,7 @@ const styles = StyleSheet.create({
 		textAlign: "center",
 	},
 	checkOverlay: {
-		...StyleSheet.absoluteFillObject,
+		...StyleSheet.absoluteFill,
 		backgroundColor: "rgba(0, 0, 0, 0.5)",
 		justifyContent: "center",
 		alignItems: "center",

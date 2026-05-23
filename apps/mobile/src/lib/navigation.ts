@@ -2,7 +2,7 @@ import {
 	DarkTheme as ReactNavigationDarkTheme,
 	DefaultTheme as ReactNavigationDefaultTheme,
 	type Theme,
-} from "@react-navigation/native";
+} from "expo-router/react-navigation";
 import { useMemo } from "react";
 import {
 	fontFamily,

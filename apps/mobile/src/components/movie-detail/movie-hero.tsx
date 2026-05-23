@@ -87,13 +87,13 @@ const styles = StyleSheet.create({
 		position: "relative",
 	},
 	heroImage: {
-		...StyleSheet.absoluteFillObject,
+		...StyleSheet.absoluteFill,
 	},
 	heroPlaceholder: {
 		backgroundColor: Colors.secondary,
 	},
 	heroGradient: {
-		...StyleSheet.absoluteFillObject,
+		...StyleSheet.absoluteFill,
 	},
 	heroNav: {
 		position: "absolute",
