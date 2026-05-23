@@ -1,5 +1,12 @@
 import { useState } from "react";
-import { View, Text, Pressable, StyleSheet, Alert, Platform } from "react-native";
+import {
+	View,
+	Text,
+	Pressable,
+	StyleSheet,
+	Alert,
+	Platform,
+} from "react-native";
 import Animated, {
 	Extrapolation,
 	interpolate,
