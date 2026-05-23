@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { View, Text, Pressable, StyleSheet, Alert } from "react-native";
+import { View, Text, Pressable, StyleSheet, Alert, Platform } from "react-native";
 import Animated, {
 	Extrapolation,
 	interpolate,
@@ -237,23 +237,25 @@ export default function SignInScreen() {
 						))
 						.with({ mode: "providers" }, () => (
 							<View style={styles.actions}>
-								<Pressable
-									style={({ pressed }) => [
-										styles.socialButton,
-										pressed && styles.pressed,
-									]}
-									onPress={handleAppleSignIn}
-									disabled={loading !== null}
-									accessibilityRole="button"
-									accessibilityLabel="Continue with Apple"
-								>
-									<View style={styles.socialButtonContent}>
-										<AppleIcon />
-										<Text style={styles.socialButtonText}>
-											Continue with Apple
-										</Text>
-									</View>
-								</Pressable>
+								{Platform.OS === "ios" ? (
+									<Pressable
+										style={({ pressed }) => [
+											styles.socialButton,
+											pressed && styles.pressed,
+										]}
+										onPress={handleAppleSignIn}
+										disabled={loading !== null}
+										accessibilityRole="button"
+										accessibilityLabel="Continue with Apple"
+									>
+										<View style={styles.socialButtonContent}>
+											<AppleIcon />
+											<Text style={styles.socialButtonText}>
+												Continue with Apple
+											</Text>
+										</View>
+									</Pressable>
+								) : null}
 
 								<Pressable
 									style={({ pressed }) => [
