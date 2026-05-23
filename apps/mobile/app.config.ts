@@ -81,7 +81,6 @@ const config: ExpoConfig = {
 			backgroundColor: "#000000",
 		},
 		package: "com.miru.app",
-		permissions: ["android.permission.RECORD_AUDIO"],
 	},
 	plugins,
 	experiments: {
