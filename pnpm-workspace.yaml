@@ -19,8 +19,8 @@ catalogs:
   react:
     "@types/react": 19.2.14
     "@types/react-dom": 19.2.3
-    react: 19.2.5
-    react-dom: 19.2.5
+    react: 19.2.3
+    react-dom: 19.2.3
   trpc:
     "@tanstack/react-query": 5.100.10
     "@trpc/client": 11.17.0
@@ -33,6 +33,7 @@ allowBuilds:
   "@sentry/cli": true
   core-js: false
   esbuild: false
+  msgpackr-extract: false
   msw: false
   prisma: false
   protobufjs: false
