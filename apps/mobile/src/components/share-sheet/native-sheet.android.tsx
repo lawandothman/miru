@@ -19,12 +19,12 @@ export function NativeSheet({
 	const ref = useRef<ModalBottomSheetRef>(null);
 	const [mounted, setMounted] = useState(visible);
 
+	if (visible && !mounted) {
+		setMounted(true);
+	}
+
 	useEffect(() => {
-		if (visible) {
-			setMounted(true);
-			return;
-		}
-		if (!mounted) return;
+		if (visible || !mounted) return;
 		// Play Compose's hide animation before unmounting on programmatic close.
 		ref.current
 			?.hide()
