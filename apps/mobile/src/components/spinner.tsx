@@ -9,11 +9,7 @@ interface SpinnerProps {
 	strokeWidth?: number;
 }
 
-export function Spinner({
-	size = 24,
-	color,
-	strokeWidth = 2.5,
-}: SpinnerProps) {
+export function Spinner({ size = 24, color, strokeWidth = 2.5 }: SpinnerProps) {
 	const { colors } = useTheme();
 	const resolvedColor = color ?? colors.mutedForeground;
 	const [rotation] = useState(() => new Animated.Value(0));
