@@ -1,13 +1,13 @@
 import { View, Text, Pressable, StyleSheet, Linking } from "react-native";
 import { Image } from "expo-image";
 import {
-	Colors,
 	providerLogoUrl,
 	fontSize,
 	fontFamily,
 	spacing,
 	radius,
 } from "@/lib/constants";
+import { useThemedStyles, type ThemeColors } from "@/lib/theme";
 
 interface StreamProvider {
 	provider: { id: number; name: string; logoPath: string | null };
@@ -19,6 +19,7 @@ interface MovieProvidersProps {
 }
 
 export function MovieProviders({ providers }: MovieProvidersProps) {
+	const styles = useThemedStyles(createStyles);
 	if (providers.length === 0) {
 		return null;
 	}
@@ -51,35 +52,36 @@ export function MovieProviders({ providers }: MovieProvidersProps) {
 	);
 }
 
-const styles = StyleSheet.create({
-	section: {
-		gap: spacing[3],
-	},
-	sectionTitle: {
-		fontSize: fontSize.base,
-		fontFamily: fontFamily.displaySemibold,
-		color: Colors.foreground,
-	},
-	providers: {
-		flexDirection: "row",
-		flexWrap: "wrap",
-		gap: spacing[3],
-	},
-	providerCard: {
-		alignItems: "center",
-		gap: spacing[1],
-		width: 64,
-	},
-	providerLogo: {
-		width: 48,
-		height: 48,
-		borderRadius: radius.lg,
-		backgroundColor: Colors.secondary,
-	},
-	providerName: {
-		fontSize: 10,
-		fontFamily: fontFamily.sans,
-		color: Colors.mutedForeground,
-		textAlign: "center",
-	},
-});
+const createStyles = (colors: ThemeColors) =>
+	StyleSheet.create({
+		section: {
+			gap: spacing[3],
+		},
+		sectionTitle: {
+			fontSize: fontSize.base,
+			fontFamily: fontFamily.displaySemibold,
+			color: colors.foreground,
+		},
+		providers: {
+			flexDirection: "row",
+			flexWrap: "wrap",
+			gap: spacing[3],
+		},
+		providerCard: {
+			alignItems: "center",
+			gap: spacing[1],
+			width: 64,
+		},
+		providerLogo: {
+			width: 48,
+			height: 48,
+			borderRadius: radius.lg,
+			backgroundColor: colors.secondary,
+		},
+		providerName: {
+			fontSize: 10,
+			fontFamily: fontFamily.sans,
+			color: colors.mutedForeground,
+			textAlign: "center",
+		},
+	});

@@ -21,19 +21,20 @@ import { EmptyState } from "@/components/empty-state";
 import { UserAvatar } from "@/components/user-avatar";
 import { FollowButton } from "@/components/follow-button";
 import {
-	Colors,
 	posterUrl,
 	fontSize,
 	fontFamily,
 	spacing,
 	radius,
 } from "@/lib/constants";
+import { useThemedStyles, type ThemeColors } from "@/lib/theme";
 
 export default function SearchScreen() {
 	const [query, setQuery] = useState("");
 	const [submittedQuery, setSubmittedQuery] = useState("");
 	const searchBarRef = useRef<SearchBarCommands>(null);
 	const router = useRouter();
+	const styles = useThemedStyles(createStyles);
 
 	useFocusEffect(
 		useCallback(() => {
@@ -194,6 +195,7 @@ interface UserResult {
 
 function PeopleSection({ people }: { people: UserResult[] }) {
 	const router = useRouter();
+	const styles = useThemedStyles(createStyles);
 
 	return (
 		<View style={styles.section}>
@@ -220,74 +222,75 @@ function PeopleSection({ people }: { people: UserResult[] }) {
 	);
 }
 
-const styles = StyleSheet.create({
-	screen: {
-		flex: 1,
-		backgroundColor: Colors.background,
-	},
-	results: {
-		flex: 1,
-	},
-	resultItem: {
-		flexDirection: "row",
-		alignItems: "center",
-		paddingHorizontal: spacing[4],
-		paddingVertical: spacing[2.5],
-		gap: spacing[3],
-	},
-	resultItemPressed: {
-		backgroundColor: Colors.accent,
-	},
-	resultPoster: {
-		width: 40,
-		height: 60,
-		borderRadius: radius.sm,
-	},
-	posterPlaceholder: {
-		backgroundColor: Colors.secondary,
-	},
-	resultInfo: {
-		flex: 1,
-		gap: 2,
-	},
-	resultTitle: {
-		color: Colors.foreground,
-		fontSize: fontSize.base,
-		fontFamily: fontFamily.sansMedium,
-	},
-	resultYear: {
-		color: Colors.mutedForeground,
-		fontSize: fontSize.sm,
-	},
-	section: {
-		marginBottom: spacing[4],
-	},
-	sectionTitle: {
-		color: Colors.foreground,
-		fontSize: fontSize.lg,
-		fontFamily: fontFamily.displaySemibold,
-		marginBottom: spacing[3],
-	},
-	userRow: {
-		flexDirection: "row",
-		alignItems: "center",
-		justifyContent: "space-between",
-		paddingVertical: spacing[2.5],
-	},
-	userRowPressed: {
-		opacity: 0.7,
-	},
-	userInfo: {
-		flexDirection: "row",
-		alignItems: "center",
-		gap: spacing[3],
-		flex: 1,
-		marginRight: spacing[3],
-	},
-	userName: {
-		color: Colors.foreground,
-		fontSize: fontSize.base,
-		fontFamily: fontFamily.sansMedium,
-		flex: 1,
-	},
-});
+const createStyles = (colors: ThemeColors) =>
+	StyleSheet.create({
+		screen: {
+			flex: 1,
+			backgroundColor: colors.background,
+		},
+		results: {
+			flex: 1,
+		},
+		resultItem: {
+			flexDirection: "row",
+			alignItems: "center",
+			paddingHorizontal: spacing[4],
+			paddingVertical: spacing[2.5],
+			gap: spacing[3],
+		},
+		resultItemPressed: {
+			backgroundColor: colors.accent,
+		},
+		resultPoster: {
+			width: 40,
+			height: 60,
+			borderRadius: radius.sm,
+		},
+		posterPlaceholder: {
+			backgroundColor: colors.secondary,
+		},
+		resultInfo: {
+			flex: 1,
+			gap: 2,
+		},
+		resultTitle: {
+			color: colors.foreground,
+			fontSize: fontSize.base,
+			fontFamily: fontFamily.sansMedium,
+		},
+		resultYear: {
+			color: colors.mutedForeground,
+			fontSize: fontSize.sm,
+		},
+		section: {
+			marginBottom: spacing[4],
+		},
+		sectionTitle: {
+			color: colors.foreground,
+			fontSize: fontSize.lg,
+			fontFamily: fontFamily.displaySemibold,
+			marginBottom: spacing[3],
+		},
+		userRow: {
+			flexDirection: "row",
+			alignItems: "center",
+			justifyContent: "space-between",
+			paddingVertical: spacing[2.5],
+		},
+		userRowPressed: {
+			opacity: 0.7,
+		},
+		userInfo: {
+			flexDirection: "row",
+			alignItems: "center",
+			gap: spacing[3],
+			flex: 1,
+			marginRight: spacing[3],
+		},
+		userName: {
+			color: colors.foreground,
+			fontSize: fontSize.base,
+			fontFamily: fontFamily.sansMedium,
+			flex: 1,
+		},
+	});

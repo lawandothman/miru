@@ -26,15 +26,17 @@ import { Spinner } from "@/components/spinner";
 import { EmailOtpForm } from "@/components/auth/email-otp-form";
 import { authClient, signIn, useSession } from "@/lib/auth";
 import { capture } from "@/lib/analytics";
-import { Colors, fontSize, fontFamily, spacing, radius } from "@/lib/constants";
+import { fontSize, fontFamily, spacing, radius } from "@/lib/constants";
+import { useTheme, useThemedStyles, type ThemeColors } from "@/lib/theme";
 
 function AppleIcon({ size = 20 }: { size?: number }) {
+	const { colors } = useTheme();
 	return (
 		<Svg
 			width={size}
 			height={size}
 			viewBox="0 0 814.01 999.31"
-			fill={Colors.background}
+			fill={colors.background}
 		>
 			<Path d="M788.1,340.9c-5.8,4.5-108.2,62.2-108.2,190.5c0,148.4,130.3,200.9,134.2,202.2c-0.6,3.2-20.7,71.9-68.7,141.9c-42.8,61.6-87.5,123.1-155.5,123.1s-85.5-39.5-164-39.5c-76.5,0-103.7,40.8-165.9,40.8s-105.6-57.5-155.5-127.7c-57.8-81.8-104.4-209.4-104.4-330.4c0-194.3,126.4-297.5,250.8-297.5c66.1,0,121.2,43.4,162.7,43.4c39.5,0,101.1-46,176.3-46c28.5,0,130.9,2.6,198.3,99.2ZM554.1,159.4c31.1-36.9,53.1-88.1,53.1-139.3c0-7.1-0.6-14.3-1.9-20.1c-50.6,1.9-110.8,33.7-147.1,75.8c-28.5,32.4-55.1,83.6-55.1,135.5c0,7.8,1.3,15.6,1.9,18.1c3.2,0.6,8.4,1.3,13.6,1.3C462,230.7,521.7,200.3,554.1,159.4z" />
 		</Svg>
@@ -119,6 +121,8 @@ export default function SignInScreen() {
 	const isFinishingSignIn = loading !== null || Boolean(session);
 	const keyboard = useReanimatedKeyboardAnimation();
 	const insets = useSafeAreaInsets();
+	const { colors } = useTheme();
+	const styles = useThemedStyles(createStyles);
 
 	const brandingStyle = useAnimatedStyle(() => {
 		const keyboardHeight = -keyboard.height.value;
@@ -234,7 +238,7 @@ export default function SignInScreen() {
 					{match({ isFinishingSignIn, mode } as const)
 						.with({ isFinishingSignIn: true }, () => (
 							<View style={styles.loadingContainer}>
-								<Spinner size={32} color={Colors.foreground} />
+								<Spinner size={32} color={colors.foreground} />
 							</View>
 						))
 						.with({ mode: "email" }, () => (
@@ -293,7 +297,7 @@ export default function SignInScreen() {
 									accessibilityLabel="Continue with Email"
 								>
 									<View style={styles.socialButtonContent}>
-										<Mail size={20} color={Colors.background} />
+										<Mail size={20} color={colors.background} />
 										<Text style={styles.socialButtonText}>
 											Continue with Email
 										</Text>
@@ -308,60 +312,61 @@ export default function SignInScreen() {
 	);
 }
 
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		backgroundColor: Colors.background,
-	},
-	content: {
-		flex: 1,
-		justifyContent: "space-between",
-		paddingHorizontal: spacing[6],
-		paddingBottom: spacing[12],
-	},
-	branding: {
-		flex: 1,
-		justifyContent: "center",
-		alignItems: "center",
-	},
-	logo: {
-		fontSize: fontSize["5xl"],
-		fontFamily: fontFamily.displayBold,
-		color: Colors.foreground,
-		letterSpacing: -2,
-	},
-	tagline: {
-		fontSize: fontSize.lg,
-		fontFamily: fontFamily.sans,
-		color: Colors.mutedForeground,
-		marginTop: spacing[2],
-	},
-	actions: {
-		gap: spacing[3],
-	},
-	loadingContainer: {
-		alignItems: "center",
-		justifyContent: "center",
-		paddingVertical: spacing[8],
-	},
-	socialButton: {
-		backgroundColor: Colors.foreground,
-		paddingVertical: spacing[4],
-		borderRadius: radius.lg,
-		alignItems: "center",
-		justifyContent: "center",
-	},
-	socialButtonContent: {
-		flexDirection: "row",
-		alignItems: "center",
-		gap: spacing[3],
-	},
-	pressed: {
-		opacity: 0.8,
-	},
-	socialButtonText: {
-		color: Colors.background,
-		fontSize: fontSize.lg,
-		fontFamily: fontFamily.sansSemibold,
-	},
-});
+const createStyles = (colors: ThemeColors) =>
+	StyleSheet.create({
+		container: {
+			flex: 1,
+			backgroundColor: colors.background,
+		},
+		content: {
+			flex: 1,
+			justifyContent: "space-between",
+			paddingHorizontal: spacing[6],
+			paddingBottom: spacing[12],
+		},
+		branding: {
+			flex: 1,
+			justifyContent: "center",
+			alignItems: "center",
+		},
+		logo: {
+			fontSize: fontSize["5xl"],
+			fontFamily: fontFamily.displayBold,
+			color: colors.foreground,
+			letterSpacing: -2,
+		},
+		tagline: {
+			fontSize: fontSize.lg,
+			fontFamily: fontFamily.sans,
+			color: colors.mutedForeground,
+			marginTop: spacing[2],
+		},
+		actions: {
+			gap: spacing[3],
+		},
+		loadingContainer: {
+			alignItems: "center",
+			justifyContent: "center",
+			paddingVertical: spacing[8],
+		},
+		socialButton: {
+			backgroundColor: colors.foreground,
+			paddingVertical: spacing[4],
+			borderRadius: radius.lg,
+			alignItems: "center",
+			justifyContent: "center",
+		},
+		socialButtonContent: {
+			flexDirection: "row",
+			alignItems: "center",
+			gap: spacing[3],
+		},
+		pressed: {
+			opacity: 0.8,
+		},
+		socialButtonText: {
+			color: colors.background,
+			fontSize: fontSize.lg,
+			fontFamily: fontFamily.sansSemibold,
+		},
+	});

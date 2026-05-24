@@ -3,26 +3,30 @@ import { useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { CarouselSkeleton } from "@/components/carousel-skeleton";
 import { MovieCarousel } from "@/components/movie-carousel";
-import { Colors, spacing } from "@/lib/constants";
+import { spacing } from "@/lib/constants";
+import { useTheme, useThemedStyles, type ThemeColors } from "@/lib/theme";
 import { triggerRefreshHaptic } from "@/lib/haptics";
 import { trpc } from "@/lib/trpc";
 
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		backgroundColor: Colors.background,
-	},
-	scroll: {
-		paddingTop: spacing[4],
-		gap: spacing[6],
-	},
-	skeletons: {
-		gap: spacing[6],
-	},
-});
+const createStyles = (colors: ThemeColors) =>
+	StyleSheet.create({
+		container: {
+			flex: 1,
+			backgroundColor: colors.background,
+		},
+		scroll: {
+			paddingTop: spacing[4],
+			gap: spacing[6],
+		},
+		skeletons: {
+			gap: spacing[6],
+		},
+	});
 
 export default function DiscoverScreen() {
 	const [refreshing, setRefreshing] = useState(false);
+	const { colors } = useTheme();
+	const styles = useThemedStyles(createStyles);
 	const {
 		data: sections,
 		isLoading,
@@ -54,7 +58,7 @@ export default function DiscoverScreen() {
 					<RefreshControl
 						refreshing={refreshing}
 						onRefresh={handleRefresh}
-						tintColor={Colors.mutedForeground}
+						tintColor={colors.mutedForeground}
 					/>
 				}
 			>

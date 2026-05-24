@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Animated, Easing, type ColorValue } from "react-native";
 import Svg, { Circle } from "react-native-svg";
-import { Colors } from "@/lib/constants";
+import { useTheme } from "@/lib/theme";
 
 interface SpinnerProps {
 	size?: number;
@@ -11,9 +11,11 @@ interface SpinnerProps {
 
 export function Spinner({
 	size = 24,
-	color = Colors.mutedForeground,
+	color,
 	strokeWidth = 2.5,
 }: SpinnerProps) {
+	const { colors } = useTheme();
+	const resolvedColor = color ?? colors.mutedForeground;
 	const [rotation] = useState(() => new Animated.Value(0));
 	const r = (size - strokeWidth) / 2;
 	const circumference = 2 * Math.PI * r;
@@ -43,7 +45,7 @@ export function Spinner({
 					cx={size / 2}
 					cy={size / 2}
 					r={r}
-					stroke={color}
+					stroke={resolvedColor}
 					strokeWidth={strokeWidth}
 					fill="none"
 					opacity={0.15}
@@ -52,7 +54,7 @@ export function Spinner({
 					cx={size / 2}
 					cy={size / 2}
 					r={r}
-					stroke={color}
+					stroke={resolvedColor}
 					strokeWidth={strokeWidth}
 					fill="none"
 					strokeDasharray={`${circumference * 0.3} ${circumference * 0.7}`}

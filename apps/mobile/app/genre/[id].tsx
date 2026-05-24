@@ -6,7 +6,7 @@ import { MovieGrid } from "@/components/movie-grid";
 import { MovieGridSkeleton } from "@/components/movie-grid-skeleton";
 import { useDefaultHeaderOptions } from "@/lib/navigation";
 import { offsetPageParam } from "@/lib/pagination";
-import { Colors } from "@/lib/constants";
+import { useThemedStyles, type ThemeColors } from "@/lib/theme";
 
 const PAGE_SIZE = 30;
 
@@ -14,6 +14,7 @@ export default function GenreScreen() {
 	const { id, name } = useLocalSearchParams<{ id: string; name?: string }>();
 	const genreId = Number(id);
 	const headerOptions = useDefaultHeaderOptions();
+	const styles = useThemedStyles(createStyles);
 
 	const { data: genre } = trpc.movie.getGenreById.useQuery(
 		{ id: genreId },
@@ -57,9 +58,10 @@ export default function GenreScreen() {
 	);
 }
 
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		backgroundColor: Colors.background,
-	},
-});
+const createStyles = (colors: ThemeColors) =>
+	StyleSheet.create({
+		container: {
+			flex: 1,
+			backgroundColor: colors.background,
+		},
+	});

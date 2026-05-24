@@ -1,7 +1,8 @@
 import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
 import { Spinner } from "@/components/spinner";
 import { trpc } from "@/lib/trpc";
-import { Colors, fontSize, fontFamily, spacing, radius } from "@/lib/constants";
+import { fontSize, fontFamily, spacing, radius } from "@/lib/constants";
+import { useTheme, useThemedStyles, type ThemeColors } from "@/lib/theme";
 
 interface GenreStepProps {
 	selectedGenres: Set<number>;
@@ -13,6 +14,8 @@ export function GenreStep({
 	onSelectionChange,
 }: GenreStepProps) {
 	const { data: genres, isLoading } = trpc.movie.getGenres.useQuery();
+	const { colors } = useTheme();
+	const styles = useThemedStyles(createStyles);
 
 	function toggle(id: number) {
 		const next = new Set(selectedGenres);
@@ -37,7 +40,7 @@ export function GenreStep({
 
 			{isLoading ? (
 				<View style={styles.loadingContainer}>
-					<Spinner size={32} color={Colors.primary} />
+					<Spinner size={32} color={colors.primary} />
 				</View>
 			) : (
 				<View style={styles.grid}>
@@ -69,53 +72,54 @@ export function GenreStep({
 	);
 }
 
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-	},
-	content: {
-		padding: spacing[4],
-		paddingBottom: spacing[8],
-		gap: spacing[6],
-	},
-	title: {
-		fontSize: fontSize["2xl"],
-		fontFamily: fontFamily.displayBold,
-		color: Colors.foreground,
-	},
-	subtitle: {
-		fontSize: fontSize.base,
-		fontFamily: fontFamily.sans,
-		color: Colors.mutedForeground,
-		lineHeight: 22,
-	},
-	loadingContainer: {
-		paddingVertical: spacing[12],
-		alignItems: "center",
-	},
-	grid: {
-		flexDirection: "row",
-		flexWrap: "wrap",
-		gap: spacing[3],
-	},
-	chip: {
-		paddingHorizontal: spacing[4],
-		paddingVertical: spacing[3],
-		borderRadius: radius.full,
-		backgroundColor: Colors.card,
-		borderWidth: 1,
-		borderColor: Colors.border,
-	},
-	chipSelected: {
-		backgroundColor: Colors.primary,
-		borderColor: Colors.primary,
-	},
-	chipText: {
-		fontSize: fontSize.sm,
-		fontFamily: fontFamily.sansMedium,
-		color: Colors.foreground,
-	},
-	chipTextSelected: {
-		color: Colors.primaryForeground,
-	},
-});
+const createStyles = (colors: ThemeColors) =>
+	StyleSheet.create({
+		container: {
+			flex: 1,
+		},
+		content: {
+			padding: spacing[4],
+			paddingBottom: spacing[8],
+			gap: spacing[6],
+		},
+		title: {
+			fontSize: fontSize["2xl"],
+			fontFamily: fontFamily.displayBold,
+			color: colors.foreground,
+		},
+		subtitle: {
+			fontSize: fontSize.base,
+			fontFamily: fontFamily.sans,
+			color: colors.mutedForeground,
+			lineHeight: 22,
+		},
+		loadingContainer: {
+			paddingVertical: spacing[12],
+			alignItems: "center",
+		},
+		grid: {
+			flexDirection: "row",
+			flexWrap: "wrap",
+			gap: spacing[3],
+		},
+		chip: {
+			paddingHorizontal: spacing[4],
+			paddingVertical: spacing[3],
+			borderRadius: radius.full,
+			backgroundColor: colors.card,
+			borderWidth: 1,
+			borderColor: colors.border,
+		},
+		chipSelected: {
+			backgroundColor: colors.primary,
+			borderColor: colors.primary,
+		},
+		chipText: {
+			fontSize: fontSize.sm,
+			fontFamily: fontFamily.sansMedium,
+			color: colors.foreground,
+		},
+		chipTextSelected: {
+			color: colors.primaryForeground,
+		},
+	});

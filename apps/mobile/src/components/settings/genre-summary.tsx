@@ -2,16 +2,17 @@ import { View, Text, Pressable, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { ChevronRight } from "lucide-react-native";
 import { trpc } from "@/lib/trpc";
+import { fontSize, fontFamily, spacing, radius } from "@/lib/constants";
 import {
-	Colors,
-	fontSize,
-	fontFamily,
-	spacing,
-	radius,
-	dynamicColorAlpha,
-} from "@/lib/constants";
+	useThemedStyles,
+	useTheme,
+	colorWithAlpha,
+	type ThemeColors,
+} from "@/lib/theme";
 
 export function GenreSummary() {
+	const styles = useThemedStyles(createStyles);
+	const { colors } = useTheme();
 	const router = useRouter();
 	const { data: genres } = trpc.movie.getGenres.useQuery();
 	const { data: state } = trpc.onboarding.getState.useQuery();
@@ -42,50 +43,51 @@ export function GenreSummary() {
 					<Text style={styles.placeholderText}>No genres selected</Text>
 				)}
 			</View>
-			<ChevronRight size={18} color={Colors.mutedForeground} />
+			<ChevronRight size={18} color={colors.mutedForeground} />
 		</Pressable>
 	);
 }
 
-const styles = StyleSheet.create({
-	summaryRow: {
-		flexDirection: "row",
-		alignItems: "center",
-		justifyContent: "space-between",
-		gap: spacing[3],
-	},
-	summaryContent: {
-		flex: 1,
-	},
-	pressed: {
-		opacity: 0.7,
-	},
-	placeholderText: {
-		fontSize: fontSize.sm,
-		fontFamily: fontFamily.sans,
-		color: Colors.mutedForeground,
-	},
-	moreText: {
-		fontSize: fontSize.xs,
-		fontFamily: fontFamily.sansMedium,
-		color: Colors.mutedForeground,
-		alignSelf: "center",
-	},
-	chipPreview: {
-		flexDirection: "row",
-		flexWrap: "wrap",
-		gap: spacing[2],
-		alignItems: "center",
-	},
-	chipSmall: {
-		paddingHorizontal: spacing[2],
-		paddingVertical: spacing[1],
-		borderRadius: radius.full,
-		backgroundColor: dynamicColorAlpha("primary", "20"),
-	},
-	chipSmallText: {
-		fontSize: fontSize.xs,
-		fontFamily: fontFamily.sansMedium,
-		color: Colors.primary,
-	},
-});
+const createStyles = (colors: ThemeColors) =>
+	StyleSheet.create({
+		summaryRow: {
+			flexDirection: "row",
+			alignItems: "center",
+			justifyContent: "space-between",
+			gap: spacing[3],
+		},
+		summaryContent: {
+			flex: 1,
+		},
+		pressed: {
+			opacity: 0.7,
+		},
+		placeholderText: {
+			fontSize: fontSize.sm,
+			fontFamily: fontFamily.sans,
+			color: colors.mutedForeground,
+		},
+		moreText: {
+			fontSize: fontSize.xs,
+			fontFamily: fontFamily.sansMedium,
+			color: colors.mutedForeground,
+			alignSelf: "center",
+		},
+		chipPreview: {
+			flexDirection: "row",
+			flexWrap: "wrap",
+			gap: spacing[2],
+			alignItems: "center",
+		},
+		chipSmall: {
+			paddingHorizontal: spacing[2],
+			paddingVertical: spacing[1],
+			borderRadius: radius.full,
+			backgroundColor: colorWithAlpha(colors.primary, "20"),
+		},
+		chipSmallText: {
+			fontSize: fontSize.xs,
+			fontFamily: fontFamily.sansMedium,
+			color: colors.primary,
+		},
+	});

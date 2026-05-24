@@ -4,8 +4,9 @@ import { FlashList, type ListRenderItem } from "@shopify/flash-list";
 import { MoviePoster } from "./movie-poster";
 import { MovieGridSkeleton } from "./movie-grid-skeleton";
 import { Spinner } from "./spinner";
-import { Colors, spacing } from "@/lib/constants";
+import { spacing } from "@/lib/constants";
 import { triggerRefreshHaptic } from "@/lib/haptics";
+import { useTheme, useThemedStyles, type ThemeColors } from "@/lib/theme";
 import type { MovieSummary } from "@/lib/types";
 
 interface MovieGridProps {
@@ -26,16 +27,23 @@ const HALF_GAP = ITEM_GAP / 2;
 const keyExtractor = (item: MovieSummary) => String(item.id);
 
 const renderItem: ListRenderItem<MovieSummary> = ({ item }) => (
-	<View style={styles.item}>
-		<MoviePoster
-			id={item.id}
-			posterPath={item.posterPath}
-			title={item.title}
-			width="100%"
-			aspectRatio={2 / 3}
-		/>
-	</View>
+	<GridItem item={item} />
 );
+
+function GridItem({ item }: { item: MovieSummary }) {
+	const styles = useThemedStyles(createStyles);
+	return (
+		<View style={styles.item}>
+			<MoviePoster
+				id={item.id}
+				posterPath={item.posterPath}
+				title={item.title}
+				width="100%"
+				aspectRatio={2 / 3}
+			/>
+		</View>
+	);
+}
 
 export function MovieGrid({
 	movies,
@@ -47,6 +55,8 @@ export function MovieGrid({
 	ListEmptyComponent,
 	ListHeaderComponent,
 }: MovieGridProps) {
+	const styles = useThemedStyles(createStyles);
+	const { colors } = useTheme();
 	const [refreshing, setRefreshing] = useState(false);
 
 	const handleEndReached = useCallback(() => {
@@ -97,7 +107,7 @@ export function MovieGrid({
 					<RefreshControl
 						refreshing={refreshing}
 						onRefresh={handleRefresh}
-						tintColor={Colors.mutedForeground}
+						tintColor={colors.mutedForeground}
 					/>
 				) : undefined
 			}
@@ -105,17 +115,18 @@ export function MovieGrid({
 	);
 }
 
-const styles = StyleSheet.create({
-	list: {
-		paddingHorizontal: spacing[4] - HALF_GAP,
-		paddingBottom: spacing[8],
-	},
-	item: {
-		flex: 1,
-		padding: HALF_GAP,
-	},
-	footer: {
-		paddingVertical: spacing[4],
-		alignItems: "center",
-	},
-});
+const createStyles = (_colors: ThemeColors) =>
+	StyleSheet.create({
+		list: {
+			paddingHorizontal: spacing[4] - HALF_GAP,
+			paddingBottom: spacing[8],
+		},
+		item: {
+			flex: 1,
+			padding: HALF_GAP,
+		},
+		footer: {
+			paddingVertical: spacing[4],
+			alignItems: "center",
+		},
+	});

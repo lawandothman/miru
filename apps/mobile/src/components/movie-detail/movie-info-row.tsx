@@ -3,13 +3,13 @@ import { Image } from "expo-image";
 import { Play } from "lucide-react-native";
 import { ImdbLogo } from "@/components/imdb-logo";
 import {
-	Colors,
 	posterUrl,
 	fontSize,
 	fontFamily,
 	spacing,
 	radius,
 } from "@/lib/constants";
+import { useThemedStyles, useTheme, type ThemeColors } from "@/lib/theme";
 
 const POSTER_WIDTH = 110;
 const POSTER_HEIGHT = 165;
@@ -37,6 +37,8 @@ export function MovieInfoRow({
 	trailerUrl,
 	onTrailerPress,
 }: MovieInfoRowProps) {
+	const styles = useThemedStyles(createStyles);
+	const { colors } = useTheme();
 	return (
 		<View style={styles.infoRow}>
 			{posterPath && (
@@ -99,8 +101,8 @@ export function MovieInfoRow({
 							>
 								<Play
 									size={10}
-									color={Colors.foreground}
-									fill={Colors.foreground}
+									color={colors.foreground}
+									fill={colors.foreground}
 								/>
 								<Text style={styles.trailerText}>Trailer</Text>
 							</Pressable>
@@ -112,73 +114,74 @@ export function MovieInfoRow({
 	);
 }
 
-const styles = StyleSheet.create({
-	infoRow: {
-		flexDirection: "row",
-		paddingHorizontal: spacing[4],
-		gap: spacing[4],
-		marginTop: -(POSTER_HEIGHT / 2),
-		zIndex: 2,
-	},
-	titleBlock: {
-		flex: 1,
-		justifyContent: "flex-end",
-		paddingBottom: spacing[2],
-		gap: spacing[1],
-	},
-	title: {
-		fontSize: fontSize["2xl"],
-		fontFamily: fontFamily.displayBold,
-		color: Colors.foreground,
-		marginBottom: spacing[3],
-	},
-	metaRow: {
-		flexDirection: "row",
-		alignItems: "center",
-		flexWrap: "wrap",
-		gap: spacing[1],
-		marginTop: spacing[1],
-	},
-	inlineTap: {
-		flexDirection: "row",
-		alignItems: "center",
-		gap: 3,
-	},
-	trailerText: {
-		fontSize: fontSize.xs,
-		fontFamily: fontFamily.sansSemibold,
-		color: Colors.foreground,
-	},
-	metaText: {
-		fontSize: fontSize.xs,
-		fontFamily: fontFamily.sansMedium,
-		color: Colors.mutedForeground,
-	},
-	metaDot: {
-		fontSize: fontSize.xs,
-		color: Colors.mutedForeground,
-		opacity: 0.5,
-		marginHorizontal: 2,
-	},
-	ratingText: {
-		fontSize: fontSize.xs,
-		fontFamily: fontFamily.sansSemibold,
-		color: Colors.gold,
-	},
-	posterShadow: {
-		shadowColor: "#000",
-		shadowOffset: { width: 0, height: 8 },
-		shadowOpacity: 0.5,
-		shadowRadius: 16,
-		elevation: 12,
-	},
-	poster: {
-		width: POSTER_WIDTH,
-		height: POSTER_HEIGHT,
-		borderRadius: radius.lg,
-		backgroundColor: Colors.secondary,
-	},
-	pressed: {
-		opacity: 0.7,
-	},
-});
+const createStyles = (colors: ThemeColors) =>
+	StyleSheet.create({
+		infoRow: {
+			flexDirection: "row",
+			paddingHorizontal: spacing[4],
+			gap: spacing[4],
+			marginTop: -(POSTER_HEIGHT / 2),
+			zIndex: 2,
+		},
+		titleBlock: {
+			flex: 1,
+			justifyContent: "flex-end",
+			paddingBottom: spacing[2],
+			gap: spacing[1],
+		},
+		title: {
+			fontSize: fontSize["2xl"],
+			fontFamily: fontFamily.displayBold,
+			color: colors.foreground,
+			marginBottom: spacing[3],
+		},
+		metaRow: {
+			flexDirection: "row",
+			alignItems: "center",
+			flexWrap: "wrap",
+			gap: spacing[1],
+			marginTop: spacing[1],
+		},
+		inlineTap: {
+			flexDirection: "row",
+			alignItems: "center",
+			gap: 3,
+		},
+		trailerText: {
+			fontSize: fontSize.xs,
+			fontFamily: fontFamily.sansSemibold,
+			color: colors.foreground,
+		},
+		metaText: {
+			fontSize: fontSize.xs,
+			fontFamily: fontFamily.sansMedium,
+			color: colors.mutedForeground,
+		},
+		metaDot: {
+			fontSize: fontSize.xs,
+			color: colors.mutedForeground,
+			opacity: 0.5,
+			marginHorizontal: 2,
+		},
+		ratingText: {
+			fontSize: fontSize.xs,
+			fontFamily: fontFamily.sansSemibold,
+			color: colors.gold,
+		},
+		posterShadow: {
+			shadowColor: "#000",
+			shadowOffset: { width: 0, height: 8 },
+			shadowOpacity: 0.5,
+			shadowRadius: 16,
+			elevation: 12,
+		},
+		poster: {
+			width: POSTER_WIDTH,
+			height: POSTER_HEIGHT,
+			borderRadius: radius.lg,
+			backgroundColor: colors.secondary,
+		},
+		pressed: {
+			opacity: 0.7,
+		},
+	});
