@@ -382,8 +382,8 @@ importers:
         specifier: 6.1.4
         version: 6.1.4(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       resend:
-        specifier: 6.12.3
-        version: 6.12.3(@react-email/render@2.0.8(react-dom@19.2.3(react@19.2.3))(react@19.2.3))
+        specifier: 6.12.4
+        version: 6.12.4(@react-email/render@2.0.8(react-dom@19.2.3(react@19.2.3))(react@19.2.3))
       server-only:
         specifier: 0.0.1
         version: 0.0.1
@@ -6974,8 +6974,8 @@ packages:
   reselect@4.1.8:
     resolution: {integrity: sha512-ab9EmR80F/zQTMNeneUr4cv+jSwPJgIlvEmVwLerwrWVbpLlBuls9XHzIeTFy4cegU2NHBp3va0LKOzU5qFEYQ==}
 
-  resend@6.12.3:
-    resolution: {integrity: sha512-FkEi6YPnVL96/LvH8+QP7NaeaBy5brYXwlRqUCqZZeNL0/iyKij18IPmyPXYauT/2ODn1JG04qKz+qlJfzqzTw==}
+  resend@6.12.4:
+    resolution: {integrity: sha512-lRpJ2Hxd+ht+JPDm97juRcUp9HOMuZyxaRFRFmc9Tx8iNWiei94Dx9v6SWufgKk2667C/uCeKKspMotOHSpCSg==}
     engines: {node: '>=20'}
     peerDependencies:
       '@react-email/render': '*'
@@ -7250,9 +7250,6 @@ packages:
   supports-preserve-symlinks-flag@1.0.0:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
-
-  svix@1.92.2:
-    resolution: {integrity: sha512-ZmuA3UVvlnF9EgxlzmPtF7CKjQb64Z6OFlyfdDfU0sdcC7dJa+3aOYX5B9mA+RS6ch1AxBa4UP/l6KmqfGtWBQ==}
 
   tagged-tag@1.0.0:
     resolution: {integrity: sha512-yEFYrVhod+hdNyx7g5Bnkkb0G6si8HJurOoOEgC8B/O0uXLHlaey/65KRv6cuWBNhBgHKAROVpc7QyYqE5gFng==}
@@ -14263,10 +14260,10 @@ snapshots:
 
   reselect@4.1.8: {}
 
-  resend@6.12.3(@react-email/render@2.0.8(react-dom@19.2.3(react@19.2.3))(react@19.2.3)):
+  resend@6.12.4(@react-email/render@2.0.8(react-dom@19.2.3(react@19.2.3))(react@19.2.3)):
     dependencies:
       postal-mime: 2.7.4
-      svix: 1.92.2
+      standardwebhooks: 1.0.0
     optionalDependencies:
       '@react-email/render': 2.0.8(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
 
@@ -14576,10 +14573,6 @@ snapshots:
       supports-color: 7.2.0
 
   supports-preserve-symlinks-flag@1.0.0: {}
-
-  svix@1.92.2:
-    dependencies:
-      standardwebhooks: 1.0.0
 
   tagged-tag@1.0.0: {}
 
