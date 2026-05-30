@@ -1,10 +1,9 @@
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
+import type { RouterOutputs } from "@miru/trpc";
 import { Colors, fontSize, fontFamily, spacing, radius } from "@/lib/constants";
 
-interface MovieGenre {
-	genre: { id: number; name: string };
-}
+type MovieGenre = RouterOutputs["movie"]["getById"]["genres"][number];
 
 interface MovieGenresProps {
 	genres: MovieGenre[];

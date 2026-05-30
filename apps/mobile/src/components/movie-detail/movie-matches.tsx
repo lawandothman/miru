@@ -1,16 +1,13 @@
 import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
+import type { RouterOutputs } from "@miru/trpc";
 import { UserAvatar } from "@/components/user-avatar";
 import { Colors, fontSize, fontFamily, spacing } from "@/lib/constants";
 
-interface MatchUser {
-	id: string;
-	name: string | null;
-	image: string | null;
-}
+type Match = RouterOutputs["movie"]["getById"]["matches"][number];
 
 interface MovieMatchesProps {
-	matches: MatchUser[];
+	matches: Match[];
 }
 
 export function MovieMatches({ matches }: MovieMatchesProps) {

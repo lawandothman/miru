@@ -1,0 +1,1 @@
+ALTER TABLE "watched_entries" ADD COLUMN "rating" text;

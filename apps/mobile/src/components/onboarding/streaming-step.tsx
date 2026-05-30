@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { Image } from "expo-image";
 import { Check, Search } from "lucide-react-native";
+import type { RouterOutputs } from "@miru/trpc";
 import { Spinner } from "@/components/spinner";
 import { countryName } from "@/lib/region-data";
 import { trpc } from "@/lib/trpc";
@@ -27,11 +28,7 @@ interface StreamingStepProps {
 	onSelectionChange: (providers: Set<number>) => void;
 }
 
-interface Provider {
-	id: number;
-	name: string;
-	logoPath: string | null;
-}
+type Provider = RouterOutputs["movie"]["getWatchProviders"][number];
 
 const NUM_COLUMNS = 4;
 

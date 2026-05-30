@@ -33,6 +33,7 @@ const renderItem: ListRenderItem<MovieSummary> = ({ item }) => (
 			title={item.title}
 			width="100%"
 			aspectRatio={2 / 3}
+			rating={item.rating}
 		/>
 	</View>
 );

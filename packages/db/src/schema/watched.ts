@@ -9,6 +9,10 @@ import {
 import { users } from "./users";
 import { movies } from "./movies";
 
+export const MOVIE_RATINGS = ["disliked", "liked", "loved"] as const;
+
+export type MovieRating = (typeof MOVIE_RATINGS)[number];
+
 export const watchedEntries = pgTable(
 	"watched_entries",
 	{
@@ -16,6 +20,7 @@ export const watchedEntries = pgTable(
 		movieId: integer("movie_id")
 			.notNull()
 			.references(() => movies.id, { onDelete: "cascade" }),
+		rating: text("rating", { enum: MOVIE_RATINGS }),
 		userId: text("user_id")
 			.notNull()
 			.references(() => users.id, { onDelete: "cascade" }),

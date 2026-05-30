@@ -46,7 +46,7 @@ export function MovieActions({
 	const removeFromWatched = trpc.watched.remove.useMutation(
 		useOptimisticMovieMutation({
 			movieId,
-			patch: (m) => ({ ...m, isWatched: false }),
+			patch: (m) => ({ ...m, isWatched: false, myRating: null }),
 			analyticsEvent: "movie_unmarked_watched",
 		}),
 	);

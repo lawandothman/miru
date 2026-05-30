@@ -9,6 +9,7 @@ import {
 	normalizeWatchProviderIds,
 	schema,
 } from "@miru/db";
+import type { MovieRating } from "@miru/db/schema";
 import { TMDBError } from "@lorenzopant/tmdb";
 import { TRPCError } from "@trpc/server";
 import {
@@ -104,10 +105,14 @@ type MovieMatchUser = {
 	name: string | null;
 };
 
+type MovieRatingUser = MovieMatchUser & { rating: MovieRating };
+
 interface MovieUserContext {
 	inWatchlist: boolean;
 	isWatched: boolean;
+	myRating: MovieRating | null;
 	matches: MovieMatchUser[];
+	friendRatings: MovieRatingUser[];
 }
 
 async function fetchMovieUserContext(
@@ -115,54 +120,97 @@ async function fetchMovieUserContext(
 	userId: string,
 	movieId: number,
 ): Promise<MovieUserContext> {
-	const [entry, watchedEntry, friendMatches, friendsWhoWatched, blockedIds] =
-		await Promise.all([
-			db.query.watchlistEntries.findFirst({
-				where: and(
-					eq(schema.watchlistEntries.userId, userId),
-					eq(schema.watchlistEntries.movieId, movieId),
+	const [
+		entry,
+		watchedEntry,
+		friendMatches,
+		friendsWhoWatched,
+		friendRatings,
+		blockedIds,
+	] = await Promise.all([
+		db.query.watchlistEntries.findFirst({
+			where: and(
+				eq(schema.watchlistEntries.userId, userId),
+				eq(schema.watchlistEntries.movieId, movieId),
+			),
+		}),
+		db.query.watchedEntries.findFirst({
+			where: and(
+				eq(schema.watchedEntries.userId, userId),
+				eq(schema.watchedEntries.movieId, movieId),
+			),
+		}),
+		db
+			.select({
+				id: schema.users.id,
+				name: schema.users.name,
+				image: schema.users.image,
+			})
+			.from(schema.watchlistEntries)
+			.innerJoin(
+				schema.follows,
+				and(
+					eq(schema.follows.followerId, userId),
+					eq(schema.follows.followingId, schema.watchlistEntries.userId),
 				),
-			}),
-			db.query.watchedEntries.findFirst({
-				where: and(
-					eq(schema.watchedEntries.userId, userId),
+			)
+			.innerJoin(
+				schema.users,
+				eq(schema.users.id, schema.watchlistEntries.userId),
+			)
+			.where(eq(schema.watchlistEntries.movieId, movieId)),
+		db
+			.select({ userId: schema.watchedEntries.userId })
+			.from(schema.watchedEntries)
+			.where(eq(schema.watchedEntries.movieId, movieId)),
+		db
+			.select({
+				id: schema.users.id,
+				name: schema.users.name,
+				image: schema.users.image,
+				rating: schema.watchedEntries.rating,
+			})
+			.from(schema.watchedEntries)
+			.innerJoin(
+				schema.follows,
+				and(
+					eq(schema.follows.followerId, userId),
+					eq(schema.follows.followingId, schema.watchedEntries.userId),
+				),
+			)
+			.innerJoin(
+				schema.users,
+				eq(schema.users.id, schema.watchedEntries.userId),
+			)
+			.where(
+				and(
 					eq(schema.watchedEntries.movieId, movieId),
+					isNotNull(schema.watchedEntries.rating),
 				),
-			}),
-			db
-				.select({
-					id: schema.users.id,
-					name: schema.users.name,
-					image: schema.users.image,
-				})
-				.from(schema.watchlistEntries)
-				.innerJoin(
-					schema.follows,
-					and(
-						eq(schema.follows.followerId, userId),
-						eq(schema.follows.followingId, schema.watchlistEntries.userId),
-					),
-				)
-				.innerJoin(
-					schema.users,
-					eq(schema.users.id, schema.watchlistEntries.userId),
-				)
-				.where(eq(schema.watchlistEntries.movieId, movieId)),
-			db
-				.select({ userId: schema.watchedEntries.userId })
-				.from(schema.watchedEntries)
-				.where(eq(schema.watchedEntries.movieId, movieId)),
-			getBlockedUserIds(db, userId),
-		]);
+			),
+		getBlockedUserIds(db, userId),
+	]);
 
 	const watchedByFriendSet = new Set(friendsWhoWatched.map((f) => f.userId));
 
 	return {
 		inWatchlist: Boolean(entry),
 		isWatched: Boolean(watchedEntry),
+		myRating: watchedEntry?.rating ?? null,
 		matches: friendMatches.filter(
 			(f) => !watchedByFriendSet.has(f.id) && !blockedIds.has(f.id),
 		),
+		friendRatings: friendRatings.reduce<MovieRatingUser[]>((acc, friend) => {
+			if (friend.rating !== null && !blockedIds.has(friend.id)) {
+				acc.push({
+					id: friend.id,
+					name: friend.name,
+					image: friend.image,
+					rating: friend.rating,
+				});
+			}
+			return acc;
+		}, []),
 	};
 }
 
@@ -245,13 +293,23 @@ export const movieRouter = router({
 				throw new TRPCError({ code: "NOT_FOUND", message: "Movie not found" });
 			}
 
-			const { inWatchlist, isWatched, matches } = userContext ?? {
-				inWatchlist: false,
-				isWatched: false,
-				matches: [],
-			};
+			const { inWatchlist, isWatched, myRating, matches, friendRatings } =
+				userContext ?? {
+					inWatchlist: false,
+					isWatched: false,
+					myRating: null,
+					matches: [],
+					friendRatings: [],
+				};
 
-			return { ...movie, inWatchlist, isWatched, matches };
+			return {
+				...movie,
+				inWatchlist,
+				isWatched,
+				myRating,
+				matches,
+				friendRatings,
+			};
 		}),
 
 	getForYou: protectedProcedure

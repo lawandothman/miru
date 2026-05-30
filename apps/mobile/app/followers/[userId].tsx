@@ -9,15 +9,11 @@ import { UserAvatar } from "@/components/user-avatar";
 import { FollowButton } from "@/components/follow-button";
 import { useDefaultHeaderOptions } from "@/lib/navigation";
 import { Colors, fontSize, fontFamily, spacing } from "@/lib/constants";
+import type { RouterOutputs } from "@miru/trpc";
 
 type Tab = "followers" | "following";
 
-interface UserRow {
-	id: string;
-	name: string | null;
-	image: string | null | undefined;
-	isFollowing: boolean;
-}
+type UserRow = RouterOutputs["social"]["getFollowers"][number];
 
 function UserListItem({ user }: { user: UserRow }) {
 	const router = useRouter();

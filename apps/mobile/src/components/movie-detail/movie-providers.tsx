@@ -1,5 +1,6 @@
 import { View, Text, Pressable, StyleSheet, Linking } from "react-native";
 import { Image } from "expo-image";
+import type { RouterOutputs } from "@miru/trpc";
 import {
 	Colors,
 	providerLogoUrl,
@@ -9,10 +10,8 @@ import {
 	radius,
 } from "@/lib/constants";
 
-interface StreamProvider {
-	provider: { id: number; name: string; logoPath: string | null };
-	url: string | null;
-}
+type StreamProvider =
+	RouterOutputs["movie"]["getById"]["streamProviders"][number];
 
 interface MovieProvidersProps {
 	providers: StreamProvider[];

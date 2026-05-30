@@ -13,6 +13,8 @@ import { MovieInfoRow } from "@/components/movie-detail/movie-info-row";
 import { MovieGenres } from "@/components/movie-detail/movie-genres";
 import { MovieOverview } from "@/components/movie-detail/movie-overview";
 import { MovieMatches } from "@/components/movie-detail/movie-matches";
+import { FriendRatings } from "@/components/movie-detail/friend-ratings";
+import { RateMovie } from "@/components/movie-detail/rate-movie";
 import { MovieProviders } from "@/components/movie-detail/movie-providers";
 import { RecommendationBanner } from "@/components/movie-detail/recommendation-banner";
 import { useDefaultHeaderOptions } from "@/lib/navigation";
@@ -159,9 +161,11 @@ export default function MovieDetailScreen() {
 						inWatchlist={movie.inWatchlist}
 						isWatched={movie.isWatched}
 					/>
+					<RateMovie movieId={movie.id} rating={movie.myRating} />
 					<MovieGenres genres={movie.genres ?? []} />
 					<MovieOverview tagline={movie.tagline} overview={movie.overview} />
 					<MovieMatches matches={movie.matches} />
+					<FriendRatings ratings={movie.friendRatings} />
 					<MovieProviders providers={movie.streamProviders ?? []} />
 				</View>
 			</ScrollView>

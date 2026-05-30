@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, View, Text } from "react-native";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
+import { RatingBadge } from "./rating-badge";
 import {
 	Colors,
 	posterUrl,
@@ -9,6 +10,7 @@ import {
 	radius,
 	spacing,
 } from "@/lib/constants";
+import type { MovieRating } from "@/lib/types";
 
 interface MoviePosterProps {
 	id: number;
@@ -18,6 +20,7 @@ interface MoviePosterProps {
 	height?: number;
 	aspectRatio?: number;
 	transition?: number;
+	rating?: MovieRating | null;
 }
 
 export function MoviePoster({
@@ -28,6 +31,7 @@ export function MoviePoster({
 	height,
 	aspectRatio,
 	transition = 0,
+	rating,
 }: MoviePosterProps) {
 	const sizeStyle = aspectRatio
 		? { width, aspectRatio }
@@ -57,6 +61,9 @@ export function MoviePoster({
 					</Text>
 				</View>
 			)}
+			{rating ? (
+				<RatingBadge rating={rating} size={22} style={styles.rating} />
+			) : null}
 		</Pressable>
 	);
 }
@@ -78,5 +85,10 @@ const styles = StyleSheet.create({
 		fontSize: fontSize.xs,
 		fontFamily: fontFamily.sansMedium,
 		textAlign: "center",
+	},
+	rating: {
+		position: "absolute",
+		top: spacing[1],
+		right: spacing[1],
 	},
 });

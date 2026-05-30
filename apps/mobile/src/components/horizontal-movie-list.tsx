@@ -47,6 +47,7 @@ export function HorizontalMovieList({
 					title={movie.title}
 					width={posterWidth}
 					height={posterHeight}
+					rating={movie.rating}
 				/>
 			))}
 		</ScrollView>

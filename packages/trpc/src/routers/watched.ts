@@ -1,9 +1,35 @@
 import { keys } from "@miru/cache";
-import { schema } from "@miru/db";
+import { type Database, schema } from "@miru/db";
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 import { protectedProcedure, publicProcedure, router } from "../trpc";
 import { ensureMovieExists } from "./helpers";
+
+async function clearWatchlistAndAcceptRecommendations(
+	db: Database,
+	userId: string,
+	movieId: number,
+) {
+	await db
+		.delete(schema.watchlistEntries)
+		.where(
+			and(
+				eq(schema.watchlistEntries.userId, userId),
+				eq(schema.watchlistEntries.movieId, movieId),
+			),
+		);
+
+	await db
+		.update(schema.movieRecommendations)
+		.set({ status: "accepted", respondedAt: new Date() })
+		.where(
+			and(
+				eq(schema.movieRecommendations.recipientId, userId),
+				eq(schema.movieRecommendations.movieId, movieId),
+				eq(schema.movieRecommendations.status, "pending"),
+			),
+		);
+}
 
 export const watchedRouter = router({
 	add: protectedProcedure
@@ -18,25 +44,58 @@ export const watchedRouter = router({
 				.values({ userId, movieId: input.movieId })
 				.onConflictDoNothing();
 
-			await ctx.db
-				.delete(schema.watchlistEntries)
-				.where(
-					and(
-						eq(schema.watchlistEntries.userId, userId),
-						eq(schema.watchlistEntries.movieId, input.movieId),
-					),
-				);
+			await clearWatchlistAndAcceptRecommendations(
+				ctx.db,
+				userId,
+				input.movieId,
+			);
 
+			await ctx.cache?.del(keys.recommendations(userId));
+
+			return { success: true };
+		}),
+
+	rate: protectedProcedure
+		.input(
+			z.object({
+				movieId: z.number().int().positive(),
+				rating: z.enum(schema.MOVIE_RATINGS).nullable(),
+			}),
+		)
+		.mutation(async ({ ctx, input }) => {
+			const userId = ctx.session.user.id;
+
+			// Clearing a rating returns the movie to neutral without un-watching it.
+			if (input.rating === null) {
+				await ctx.db
+					.update(schema.watchedEntries)
+					.set({ rating: null })
+					.where(
+						and(
+							eq(schema.watchedEntries.userId, userId),
+							eq(schema.watchedEntries.movieId, input.movieId),
+						),
+					);
+
+				return { success: true };
+			}
+
+			await ensureMovieExists(ctx.db, ctx.tmdb, input.movieId);
+
+			// Rating a movie also marks it watched, so reuse the watched side-effects.
 			await ctx.db
-				.update(schema.movieRecommendations)
-				.set({ status: "accepted", respondedAt: new Date() })
-				.where(
-					and(
-						eq(schema.movieRecommendations.recipientId, userId),
-						eq(schema.movieRecommendations.movieId, input.movieId),
-						eq(schema.movieRecommendations.status, "pending"),
-					),
-				);
+				.insert(schema.watchedEntries)
+				.values({ userId, movieId: input.movieId, rating: input.rating })
+				.onConflictDoUpdate({
+					target: [schema.watchedEntries.userId, schema.watchedEntries.movieId],
+					set: { rating: input.rating },
+				});
+
+			await clearWatchlistAndAcceptRecommendations(
+				ctx.db,
+				userId,
+				input.movieId,
+			);
 
 			await ctx.cache?.del(keys.recommendations(userId));
 
@@ -65,6 +124,7 @@ export const watchedRouter = router({
 				.map((e) => ({
 					...e.movie,
 					isWatched: true,
+					rating: e.rating,
 					watchedAt: e.createdAt,
 				}));
 		}),
@@ -89,6 +149,7 @@ export const watchedRouter = router({
 				.map((e) => ({
 					...e.movie,
 					isWatched: true,
+					rating: e.rating,
 				}));
 		}),
 

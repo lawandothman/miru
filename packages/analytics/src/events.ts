@@ -8,6 +8,7 @@ export type EventProperties = {
 	movie_removed_from_watchlist: { movie_id: number };
 	movie_marked_watched: { movie_id: number };
 	movie_unmarked_watched: { movie_id: number };
+	movie_rated: { movie_id: number; rating: string };
 	user_followed: { target_user_id: string };
 	user_unfollowed: { target_user_id: string };
 	movie_viewed: { movie_id: number };

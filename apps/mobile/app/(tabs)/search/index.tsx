@@ -13,6 +13,7 @@ import { Image } from "expo-image";
 import { useRouter, Stack, useFocusEffect } from "expo-router";
 import type { SearchBarCommands } from "react-native-screens";
 import { Search } from "lucide-react-native";
+import type { RouterOutputs } from "@miru/trpc";
 import { trpc } from "@/lib/trpc";
 import { useDebounce } from "@/hooks/use-debounce";
 import { capture } from "@/lib/analytics";
@@ -185,12 +186,7 @@ export default function SearchScreen() {
 	);
 }
 
-interface UserResult {
-	id: string;
-	name: string | null;
-	image: string | null;
-	isFollowing: boolean;
-}
+type UserResult = RouterOutputs["social"]["searchUsers"][number];
 
 function PeopleSection({ people }: { people: UserResult[] }) {
 	const router = useRouter();
