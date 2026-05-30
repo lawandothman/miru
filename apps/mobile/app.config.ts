@@ -80,7 +80,7 @@ const config: ExpoConfig = {
 			foregroundImage: "./assets/adaptive-icon.png",
 			backgroundColor: "#000000",
 		},
-		package: "com.miru.app",
+		package: "app.miru",
 	},
 	plugins,
 	experiments: {
