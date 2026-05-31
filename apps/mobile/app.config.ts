@@ -81,6 +81,19 @@ const config: ExpoConfig = {
 			backgroundColor: "#000000",
 		},
 		package: "app.miru",
+		intentFilters: [
+			{
+				action: "VIEW",
+				autoVerify: true,
+				data: [
+					{
+						scheme: "https",
+						host: "watchmiru.app",
+					},
+				],
+				category: ["BROWSABLE", "DEFAULT"],
+			},
+		],
 	},
 	plugins,
 	experiments: {
