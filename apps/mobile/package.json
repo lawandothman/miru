@@ -11,7 +11,8 @@
 		"android": "expo run:android",
 		"build:splash": "node scripts/build-splash.mjs",
 		"sentry:upload-sourcemaps": "sentry-cli sourcemaps upload --org lwnd --project miru-mobile dist",
-		"typecheck": "tsc --noEmit"
+		"typecheck": "tsc --noEmit",
+		"eas-build-pre-install": "git fetch --unshallow --tags 2>/dev/null || git fetch --tags"
 	},
 	"dependencies": {
 		"@better-auth/expo": "catalog:better-auth",
