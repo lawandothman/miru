@@ -413,20 +413,18 @@ function RootLayout() {
 	const content = (
 		<KeyboardProvider>
 			<SafeAreaProvider initialMetrics={initialWindowMetrics}>
-				<ThemeProvider>
-					<ThemedAppShell onBootReady={handleBootReady} />
-				</ThemeProvider>
+				<ThemedAppShell onBootReady={handleBootReady} />
 			</SafeAreaProvider>
 		</KeyboardProvider>
 	);
 
 	const tree = (
-		<>
+		<ThemeProvider>
 			{content}
 			{!splashDismissed ? (
 				<AnimatedSplash ready={bootReady} onExit={handleSplashExit} />
 			) : null}
-		</>
+		</ThemeProvider>
 	);
 
 	if (!posthog) {
