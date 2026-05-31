@@ -24,7 +24,10 @@
 		"production": {
 			"extends": "base",
 			"autoIncrement": true,
-			"channel": "production"
+			"channel": "production",
+			"env": {
+				"APP_VERSION": "1.9.0"
+			}
 		}
 	},
 	"submit": {
