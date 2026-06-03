@@ -17,6 +17,7 @@ import { MovieProviders } from "@/components/movie-detail/movie-providers";
 import { RecommendationBanner } from "@/components/movie-detail/recommendation-banner";
 import { useDefaultHeaderOptions } from "@/lib/navigation";
 import { movieIdFromSlug } from "@/lib/movie-slug";
+import { useGoBack } from "@/hooks/use-go-back";
 import { trpc } from "@/lib/trpc";
 import { capture } from "@/lib/analytics";
 import { spacing } from "@/lib/constants";
@@ -32,6 +33,7 @@ function isNotFoundError(error: unknown): boolean {
 export default function MovieDetailScreen() {
 	const { id } = useLocalSearchParams<{ id: string }>();
 	const router = useRouter();
+	const goBack = useGoBack();
 	const headerOptions = useDefaultHeaderOptions();
 	const tmdbId = movieIdFromSlug(id);
 	const styles = useThemedStyles(createStyles);
@@ -139,7 +141,7 @@ export default function MovieDetailScreen() {
 			>
 				<MovieHero
 					backdropPath={movie.backdropPath}
-					onBack={() => router.back()}
+					onBack={goBack}
 					onShare={handleSharePress}
 				/>
 
