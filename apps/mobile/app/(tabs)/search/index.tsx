@@ -137,9 +137,7 @@ export default function SearchScreen() {
 
 			<View style={styles.screen}>
 				{Platform.OS === "android" ? (
-					<View
-						style={[styles.androidSearchBar, { marginTop: insets.top }]}
-					>
+					<View style={[styles.androidSearchBar, { marginTop: insets.top }]}>
 						<Search
 							size={20}
 							color={colors.mutedForeground}

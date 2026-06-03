@@ -15,8 +15,8 @@ export default function DeleteAccountPage() {
 
 				<div className="mt-8 max-w-prose space-y-6 leading-relaxed text-muted-foreground">
 					<p>
-						You can permanently delete your Miru account and all associated
-						data at any time. This page explains how.
+						You can permanently delete your Miru account and all associated data
+						at any time. This page explains how.
 					</p>
 
 					<h2 className="font-display text-xl font-semibold text-foreground">
@@ -28,23 +28,22 @@ export default function DeleteAccountPage() {
 						<li>Tap the settings icon, then tap Delete account.</li>
 						<li>Confirm the deletion when prompted.</li>
 					</ol>
-					<p>
-						Your account is removed immediately and cannot be recovered.
-					</p>
+					<p>Your account is removed immediately and cannot be recovered.</p>
 
 					<h2 className="font-display text-xl font-semibold text-foreground">
 						What gets deleted
 					</h2>
-					<p>
-						When you delete your account, we permanently remove:
-					</p>
+					<p>When you delete your account, we permanently remove:</p>
 					<ul className="list-disc space-y-2 pl-6">
 						<li>Your name, email address, and profile photo</li>
 						<li>Your watchlist and saved movies</li>
 						<li>Your genre, region, and streaming-service preferences</li>
 						<li>Recommendations you have sent or received</li>
 						<li>Your follow / follower relationships with other users</li>
-						<li>Your authentication credentials (Google or Apple sign-in linkage, email OTP records)</li>
+						<li>
+							Your authentication credentials (Google or Apple sign-in linkage,
+							email OTP records)
+						</li>
 						<li>Push notification tokens linked to your account</li>
 					</ul>
 
@@ -55,7 +54,10 @@ export default function DeleteAccountPage() {
 						We retain anonymised, aggregated analytics events and crash logs
 						that cannot be linked back to you personally. These are kept for
 						product-improvement and security purposes in line with our{" "}
-						<a href="/privacy" className="underline">Privacy Policy</a>.
+						<a href="/privacy" className="underline">
+							Privacy Policy
+						</a>
+						.
 					</p>
 
 					<h2 className="font-display text-xl font-semibold text-foreground">
@@ -64,15 +66,11 @@ export default function DeleteAccountPage() {
 					<p>
 						If you are unable to sign in or no longer have the app installed,
 						email{" "}
-						<a
-							href="mailto:support@watchmiru.app"
-							className="underline"
-						>
+						<a href="mailto:support@watchmiru.app" className="underline">
 							support@watchmiru.app
 						</a>{" "}
-						from the address linked to your Miru account and request
-						deletion. We will verify ownership and remove your account within
-						30 days.
+						from the address linked to your Miru account and request deletion.
+						We will verify ownership and remove your account within 30 days.
 					</p>
 				</div>
 			</main>
