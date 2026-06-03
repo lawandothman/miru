@@ -16,6 +16,7 @@ import { MovieMatches } from "@/components/movie-detail/movie-matches";
 import { MovieProviders } from "@/components/movie-detail/movie-providers";
 import { RecommendationBanner } from "@/components/movie-detail/recommendation-banner";
 import { useDefaultHeaderOptions } from "@/lib/navigation";
+import { movieIdFromSlug } from "@/lib/movie-slug";
 import { trpc } from "@/lib/trpc";
 import { capture } from "@/lib/analytics";
 import { spacing } from "@/lib/constants";
@@ -32,7 +33,7 @@ export default function MovieDetailScreen() {
 	const { id } = useLocalSearchParams<{ id: string }>();
 	const router = useRouter();
 	const headerOptions = useDefaultHeaderOptions();
-	const tmdbId = Number(id);
+	const tmdbId = movieIdFromSlug(id);
 	const styles = useThemedStyles(createStyles);
 
 	const {

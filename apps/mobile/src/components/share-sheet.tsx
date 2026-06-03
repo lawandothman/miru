@@ -20,6 +20,7 @@ import {
 } from "@/hooks/use-recommendation-draft";
 import { capture } from "@/lib/analytics";
 import { triggerStepCompleteHaptic } from "@/lib/haptics";
+import { movieSlug } from "@/lib/movie-slug";
 import { trpc } from "@/lib/trpc";
 
 interface ShareSheetMovie {
@@ -36,16 +37,6 @@ interface ShareSheetMovie {
 const WEB_BASE = "https://watchmiru.app";
 const INSTAGRAM_STORIES_APP_ID =
 	process.env.EXPO_PUBLIC_INSTAGRAM_STORIES_APP_ID?.trim();
-
-function movieSlug(title: string, tmdbId: number): string {
-	const slug = title
-		.toLowerCase()
-		.normalize("NFD")
-		.replace(/[̀-ͯ]/g, "")
-		.replace(/[^a-z0-9]+/g, "-")
-		.replace(/^-+|-+$/g, "");
-	return `${slug}-${tmdbId}`;
-}
 
 export function getMovieShareUrl(movie: Pick<ShareSheetMovie, "id" | "title">) {
 	return `${WEB_BASE}/movie/${movieSlug(movie.title, movie.id)}`;
