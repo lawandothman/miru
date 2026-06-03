@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { MarketingShell } from "@/components/marketing-shell";
+import Link from "next/link";
 
 export const metadata: Metadata = {
 	title: "Delete your account",
@@ -54,9 +55,9 @@ export default function DeleteAccountPage() {
 						We retain anonymised, aggregated analytics events and crash logs
 						that cannot be linked back to you personally. These are kept for
 						product-improvement and security purposes in line with our{" "}
-						<a href="/privacy" className="underline">
+						<Link href="/privacy" className="underline">
 							Privacy Policy
-						</a>
+						</Link>
 						.
 					</p>
 
@@ -66,9 +67,9 @@ export default function DeleteAccountPage() {
 					<p>
 						If you are unable to sign in or no longer have the app installed,
 						email{" "}
-						<a href="mailto:support@watchmiru.app" className="underline">
+						<Link href="mailto:support@watchmiru.app" className="underline">
 							support@watchmiru.app
-						</a>{" "}
+						</Link>{" "}
 						from the address linked to your Miru account and request deletion.
 						We will verify ownership and remove your account within 30 days.
 					</p>
