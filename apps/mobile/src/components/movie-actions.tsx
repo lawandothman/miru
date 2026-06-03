@@ -2,9 +2,10 @@ import { Alert, View, Pressable, Text, StyleSheet } from "react-native";
 import { Bookmark, BookmarkPlus, Eye } from "lucide-react-native";
 import { trpc } from "@/lib/trpc";
 import { useOptimisticMovieMutation } from "@/hooks/use-optimistic-movie-mutation";
-import { Colors, fontSize, fontFamily, spacing, radius } from "@/lib/constants";
+import { fontSize, fontFamily, spacing, radius } from "@/lib/constants";
 import { triggerWatchlistHaptic, triggerWatchedHaptic } from "@/lib/haptics";
 import { useIsOnline } from "@/lib/network";
+import { useTheme, useThemedStyles, type ThemeColors } from "@/lib/theme";
 
 interface MovieActionsProps {
 	movieId: number;
@@ -18,6 +19,8 @@ export function MovieActions({
 	isWatched,
 }: MovieActionsProps) {
 	const isOnline = useIsOnline();
+	const styles = useThemedStyles(createStyles);
+	const { colors } = useTheme();
 
 	const addToWatchlist = trpc.watchlist.add.useMutation(
 		useOptimisticMovieMutation({
@@ -105,11 +108,11 @@ export function MovieActions({
 				{inWatchlist ? (
 					<Bookmark
 						size={18}
-						color={Colors.primaryForeground}
-						fill={Colors.primaryForeground}
+						color={colors.primaryForeground}
+						fill={colors.primaryForeground}
 					/>
 				) : (
-					<BookmarkPlus size={18} color={Colors.foreground} />
+					<BookmarkPlus size={18} color={colors.foreground} />
 				)}
 				<Text
 					style={[styles.buttonText, inWatchlist && styles.buttonTextActive]}
@@ -133,7 +136,7 @@ export function MovieActions({
 			>
 				<Eye
 					size={18}
-					color={isWatched ? Colors.primaryForeground : Colors.foreground}
+					color={isWatched ? colors.primaryForeground : colors.foreground}
 				/>
 				<Text style={[styles.buttonText, isWatched && styles.buttonTextActive]}>
 					Watched
@@ -143,36 +146,37 @@ export function MovieActions({
 	);
 }
 
-const styles = StyleSheet.create({
-	container: {
-		flexDirection: "row",
-		gap: spacing[3],
-	},
-	button: {
-		flex: 1,
-		flexDirection: "row",
-		alignItems: "center",
-		justifyContent: "center",
-		gap: spacing[2],
-		paddingVertical: spacing[3],
-		borderRadius: radius.lg,
-		backgroundColor: Colors.secondary,
-	},
-	buttonActive: {
-		backgroundColor: Colors.primary,
-	},
-	pressed: {
-		opacity: 0.8,
-	},
-	offline: {
-		opacity: 0.5,
-	},
-	buttonText: {
-		fontSize: fontSize.sm,
-		fontFamily: fontFamily.sansSemibold,
-		color: Colors.foreground,
-	},
-	buttonTextActive: {
-		color: Colors.primaryForeground,
-	},
-});
+const createStyles = (colors: ThemeColors) =>
+	StyleSheet.create({
+		container: {
+			flexDirection: "row",
+			gap: spacing[3],
+		},
+		button: {
+			flex: 1,
+			flexDirection: "row",
+			alignItems: "center",
+			justifyContent: "center",
+			gap: spacing[2],
+			paddingVertical: spacing[3],
+			borderRadius: radius.lg,
+			backgroundColor: colors.secondary,
+		},
+		buttonActive: {
+			backgroundColor: colors.primary,
+		},
+		pressed: {
+			opacity: 0.8,
+		},
+		offline: {
+			opacity: 0.5,
+		},
+		buttonText: {
+			fontSize: fontSize.sm,
+			fontFamily: fontFamily.sansSemibold,
+			color: colors.foreground,
+		},
+		buttonTextActive: {
+			color: colors.primaryForeground,
+		},
+	});

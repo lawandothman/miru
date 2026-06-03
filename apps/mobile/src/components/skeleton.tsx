@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import { Animated, Easing, type ViewStyle } from "react-native";
-import { Colors, radius } from "@/lib/constants";
+import { radius } from "@/lib/constants";
+import { useTheme } from "@/lib/theme";
 
 interface SkeletonProps {
 	style?: ViewStyle;
 }
 
 export function Skeleton({ style }: SkeletonProps) {
+	const { colors } = useTheme();
 	const [opacity] = useState(() => new Animated.Value(0.35));
 
 	useEffect(() => {
@@ -34,7 +36,7 @@ export function Skeleton({ style }: SkeletonProps) {
 		<Animated.View
 			style={[
 				{
-					backgroundColor: Colors.secondary,
+					backgroundColor: colors.secondary,
 					borderRadius: radius.md,
 					opacity,
 				},

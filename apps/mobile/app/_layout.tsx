@@ -22,7 +22,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { PostHogProvider } from "posthog-react-native";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ThemeProvider } from "expo-router/react-navigation";
+import { ThemeProvider as NavigationThemeProvider } from "expo-router/react-navigation";
 import { AppState, Platform } from "react-native";
 import {
 	initialWindowMetrics,
@@ -44,7 +44,7 @@ import { getNavigationTheme } from "@/lib/navigation";
 import { navigationIntegration, Sentry } from "@/lib/sentry";
 import { trpc } from "@/lib/trpc";
 import { TRPCProvider } from "@/lib/trpc-provider";
-import { useResolvedColorScheme } from "@/lib/constants";
+import { ThemeProvider, useTheme } from "@/lib/theme";
 
 if (!isRunningInExpoGo()) {
 	SplashScreen.preventAutoHideAsync();
@@ -364,6 +364,27 @@ function AuthGuard({
 	return <>{children}</>;
 }
 
+function ThemedAppShell({ onBootReady }: { onBootReady: () => void }) {
+	const { scheme } = useTheme();
+	return (
+		<NavigationThemeProvider value={getNavigationTheme(scheme)}>
+			<TRPCProvider>
+				<OfflineBanner>
+					<AuthGuard onBootReady={onBootReady}>
+						<StatusBar style="auto" />
+						<Stack
+							screenOptions={{
+								headerShown: false,
+								headerBackButtonDisplayMode: "minimal",
+							}}
+						/>
+					</AuthGuard>
+				</OfflineBanner>
+			</TRPCProvider>
+		</NavigationThemeProvider>
+	);
+}
+
 function RootLayout() {
 	const [fontsLoaded] = useFonts({
 		DMSans_400Regular,
@@ -376,7 +397,6 @@ function RootLayout() {
 	});
 	const [bootReady, setBootReady] = useState(false);
 	const [splashDismissed, setSplashDismissed] = useState(false);
-	const resolvedScheme = useResolvedColorScheme();
 	const navigationRef = useNavigationContainerRef();
 
 	useEffect(() => {
@@ -393,32 +413,18 @@ function RootLayout() {
 	const content = (
 		<KeyboardProvider>
 			<SafeAreaProvider initialMetrics={initialWindowMetrics}>
-				<ThemeProvider value={getNavigationTheme(resolvedScheme)}>
-					<TRPCProvider>
-						<OfflineBanner>
-							<AuthGuard onBootReady={handleBootReady}>
-								<StatusBar style="auto" />
-								<Stack
-									screenOptions={{
-										headerShown: false,
-										headerBackButtonDisplayMode: "minimal",
-									}}
-								/>
-							</AuthGuard>
-						</OfflineBanner>
-					</TRPCProvider>
-				</ThemeProvider>
+				<ThemedAppShell onBootReady={handleBootReady} />
 			</SafeAreaProvider>
 		</KeyboardProvider>
 	);
 
 	const tree = (
-		<>
+		<ThemeProvider>
 			{content}
 			{!splashDismissed ? (
 				<AnimatedSplash ready={bootReady} onExit={handleSplashExit} />
 			) : null}
-		</>
+		</ThemeProvider>
 	);
 
 	if (!posthog) {

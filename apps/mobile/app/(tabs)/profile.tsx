@@ -8,7 +8,8 @@ import { trpc } from "@/lib/trpc";
 import { UserAvatar } from "@/components/user-avatar";
 import { UserStats } from "@/components/user-stats";
 import { MovieGrid } from "@/components/movie-grid";
-import { Colors, fontSize, fontFamily, spacing, radius } from "@/lib/constants";
+import { fontSize, fontFamily, spacing, radius } from "@/lib/constants";
+import { useTheme, useThemedStyles, type ThemeColors } from "@/lib/theme";
 import { offsetPageParam } from "@/lib/pagination";
 
 type Tab = "watchlist" | "watched";
@@ -19,6 +20,8 @@ export default function ProfileScreen() {
 	const router = useRouter();
 	const userId = session?.user?.id;
 	const [activeTab, setActiveTab] = useState<Tab>("watchlist");
+	const { colors } = useTheme();
+	const styles = useThemedStyles(createStyles);
 
 	const { data: profile } = trpc.user.getById.useQuery(
 		{ id: userId ?? "" },
@@ -67,7 +70,7 @@ export default function ProfileScreen() {
 								accessibilityRole="button"
 								accessibilityLabel="Settings"
 							>
-								<Settings size={22} color={Colors.mutedForeground} />
+								<Settings size={22} color={colors.mutedForeground} />
 							</Pressable>
 						</View>
 						<View style={styles.header}>
@@ -131,59 +134,60 @@ export default function ProfileScreen() {
 	);
 }
 
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		backgroundColor: Colors.background,
-	},
-	headerWrapper: {
-		gap: spacing[4],
-		paddingBottom: spacing[4],
-	},
-	settingsRow: {
-		flexDirection: "row",
-		justifyContent: "flex-end",
-		paddingHorizontal: spacing[2],
-		paddingTop: spacing[2],
-	},
-	settingsButton: {
-		padding: spacing[2],
-	},
-	pressed: {
-		opacity: 0.7,
-	},
-	header: {
-		alignItems: "center",
-		gap: spacing[3],
-	},
-	name: {
-		fontSize: fontSize["2xl"],
-		fontFamily: fontFamily.displayBold,
-		color: Colors.foreground,
-	},
-	tabs: {
-		flexDirection: "row",
-		marginHorizontal: spacing[4],
-		backgroundColor: Colors.secondary,
-		borderRadius: radius.lg,
-		padding: 4,
-	},
-	tab: {
-		flex: 1,
-		paddingVertical: spacing[2],
-		alignItems: "center",
-		borderRadius: radius.md,
-	},
-	tabActive: {
-		backgroundColor: Colors.background,
-	},
-	tabText: {
-		fontSize: fontSize.sm,
-		fontFamily: fontFamily.sansMedium,
-		color: Colors.mutedForeground,
-	},
-	tabTextActive: {
-		color: Colors.foreground,
-		fontFamily: fontFamily.sansSemibold,
-	},
-});
+const createStyles = (colors: ThemeColors) =>
+	StyleSheet.create({
+		container: {
+			flex: 1,
+			backgroundColor: colors.background,
+		},
+		headerWrapper: {
+			gap: spacing[4],
+			paddingBottom: spacing[4],
+		},
+		settingsRow: {
+			flexDirection: "row",
+			justifyContent: "flex-end",
+			paddingHorizontal: spacing[2],
+			paddingTop: spacing[2],
+		},
+		settingsButton: {
+			padding: spacing[2],
+		},
+		pressed: {
+			opacity: 0.7,
+		},
+		header: {
+			alignItems: "center",
+			gap: spacing[3],
+		},
+		name: {
+			fontSize: fontSize["2xl"],
+			fontFamily: fontFamily.displayBold,
+			color: colors.foreground,
+		},
+		tabs: {
+			flexDirection: "row",
+			marginHorizontal: spacing[4],
+			backgroundColor: colors.secondary,
+			borderRadius: radius.lg,
+			padding: 4,
+		},
+		tab: {
+			flex: 1,
+			paddingVertical: spacing[2],
+			alignItems: "center",
+			borderRadius: radius.md,
+		},
+		tabActive: {
+			backgroundColor: colors.background,
+		},
+		tabText: {
+			fontSize: fontSize.sm,
+			fontFamily: fontFamily.sansMedium,
+			color: colors.mutedForeground,
+		},
+		tabTextActive: {
+			color: colors.foreground,
+			fontFamily: fontFamily.sansSemibold,
+		},
+	});

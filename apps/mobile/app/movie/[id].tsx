@@ -18,7 +18,8 @@ import { RecommendationBanner } from "@/components/movie-detail/recommendation-b
 import { useDefaultHeaderOptions } from "@/lib/navigation";
 import { trpc } from "@/lib/trpc";
 import { capture } from "@/lib/analytics";
-import { Colors, spacing } from "@/lib/constants";
+import { spacing } from "@/lib/constants";
+import { useThemedStyles, type ThemeColors } from "@/lib/theme";
 
 function isNotFoundError(error: unknown): boolean {
 	return (
@@ -32,6 +33,7 @@ export default function MovieDetailScreen() {
 	const router = useRouter();
 	const headerOptions = useDefaultHeaderOptions();
 	const tmdbId = Number(id);
+	const styles = useThemedStyles(createStyles);
 
 	const {
 		data: movie,
@@ -179,21 +181,22 @@ export default function MovieDetailScreen() {
 	);
 }
 
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		backgroundColor: Colors.background,
-	},
-	scroll: {
-		paddingBottom: spacing[16],
-	},
-	emptyScreen: {
-		flex: 1,
-		paddingBottom: spacing[8],
-	},
-	body: {
-		paddingHorizontal: spacing[4],
-		paddingTop: spacing[5],
-		gap: spacing[5],
-	},
-});
+const createStyles = (colors: ThemeColors) =>
+	StyleSheet.create({
+		container: {
+			flex: 1,
+			backgroundColor: colors.background,
+		},
+		scroll: {
+			paddingBottom: spacing[16],
+		},
+		emptyScreen: {
+			flex: 1,
+			paddingBottom: spacing[8],
+		},
+		body: {
+			paddingHorizontal: spacing[4],
+			paddingTop: spacing[5],
+			gap: spacing[5],
+		},
+	});

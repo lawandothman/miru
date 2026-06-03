@@ -7,18 +7,11 @@ import {
 	StyleSheet,
 	View,
 } from "react-native";
-import {
-	BottomSheet,
-	Group,
-	Host,
-	RNHostView,
-	VStack,
-} from "@expo/ui/swift-ui";
-import { presentationDragIndicator } from "@expo/ui/swift-ui/modifiers";
 import { captureRef } from "react-native-view-shot";
 import RNShare, { Social } from "react-native-share";
 import { TRPCClientError } from "@trpc/client";
 import { ActionsView } from "@/components/share-sheet/actions-view";
+import { NativeSheet } from "@/components/share-sheet/native-sheet";
 import { PickerView } from "@/components/share-sheet/picker-view";
 import { StoryCard } from "@/components/story-card";
 import {
@@ -218,49 +211,35 @@ export function ShareSheet({
 				<StoryCard ref={storyCardRef} movie={movie} />
 			</View>
 
-			<Host style={StyleSheet.absoluteFill}>
-				<VStack>
-					<BottomSheet
-						isPresented={visible}
-						onIsPresentedChange={(presented: boolean) => {
-							if (!presented) handleClose();
-						}}
-						fitToContents
-					>
-						<Group modifiers={[presentationDragIndicator("visible")]}>
-							<RNHostView matchContents>
-								<View style={styles.sheet}>
-									{draft.mode === "actions" ? (
-										<ActionsView
-											movie={movie}
-											showStoriesAction={storiesAvailable}
-											storiesSharing={storiesSharing}
-											onShareLink={() => {
-												void handleShareMore();
-											}}
-											onShareStory={() => {
-												void handleShareStory();
-											}}
-											onRecommend={draft.startPicking}
-										/>
-									) : null}
+			<NativeSheet visible={visible} onClose={handleClose}>
+				<View style={styles.sheet}>
+					{draft.mode === "actions" ? (
+						<ActionsView
+							movie={movie}
+							showStoriesAction={storiesAvailable}
+							storiesSharing={storiesSharing}
+							onShareLink={() => {
+								void handleShareMore();
+							}}
+							onShareStory={() => {
+								void handleShareStory();
+							}}
+							onRecommend={draft.startPicking}
+						/>
+					) : null}
 
-									{draft.mode === "picker" ? (
-										<PickerView
-											movieId={movie.id}
-											onBack={draft.back}
-											onSelect={(recipient) => {
-												void handleSelectRecipient(recipient);
-											}}
-											sendingRecipientId={sendingRecipientId}
-										/>
-									) : null}
-								</View>
-							</RNHostView>
-						</Group>
-					</BottomSheet>
-				</VStack>
-			</Host>
+					{draft.mode === "picker" ? (
+						<PickerView
+							movieId={movie.id}
+							onBack={draft.back}
+							onSelect={(recipient) => {
+								void handleSelectRecipient(recipient);
+							}}
+							sendingRecipientId={sendingRecipientId}
+						/>
+					) : null}
+				</View>
+			</NativeSheet>
 		</>
 	);
 }

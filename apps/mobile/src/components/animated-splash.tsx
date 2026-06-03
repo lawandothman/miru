@@ -8,7 +8,8 @@ import Animated, {
 	withDelay,
 	withTiming,
 } from "react-native-reanimated";
-import { Colors, fontFamily, fontSize, spacing } from "@/lib/constants";
+import { fontFamily, fontSize, spacing } from "@/lib/constants";
+import { useThemedStyles, type ThemeColors } from "@/lib/theme";
 import { useSplashScheme } from "@/hooks/use-splash-scheme";
 import { splashBackgroundFor, SplashMark } from "@/components/splash-mark";
 
@@ -42,6 +43,7 @@ type Props = {
 export function AnimatedSplash({ ready, onExit }: Props) {
 	const scheme = useSplashScheme();
 	const background = splashBackgroundFor(scheme);
+	const styles = useThemedStyles(createStyles);
 
 	const [introCompleted, setIntroCompleted] = useState(false);
 
@@ -134,6 +136,7 @@ function WordmarkLetter({
 	index: number;
 	isLast: boolean;
 }) {
+	const styles = useThemedStyles(createStyles);
 	const opacity = useSharedValue(0);
 	const translateY = useSharedValue(LETTER_TRANSLATE_Y);
 	const scale = useSharedValue(LETTER_SCALE_FROM);
@@ -165,33 +168,34 @@ function WordmarkLetter({
 	);
 }
 
-const styles = StyleSheet.create({
-	title: {
-		position: "absolute",
-		left: 0,
-		right: 0,
-		bottom: "18%",
-		alignItems: "center",
-	},
-	wordmarkRow: {
-		flexDirection: "row",
-	},
-	wordmark: {
-		fontSize: fontSize["5xl"],
-		fontFamily: fontFamily.displayBold,
-		color: Colors.foreground,
-		// Scale pivots from the baseline so letters rise into place.
-		transformOrigin: "bottom",
-	},
-	// Approximates `letterSpacing: -2` across split-per-letter Text nodes
-	// (RN kerns within a single text run, not between sibling views).
-	wordmarkTracking: {
-		marginRight: -2,
-	},
-	tagline: {
-		fontSize: fontSize.lg,
-		fontFamily: fontFamily.sans,
-		color: Colors.mutedForeground,
-		marginTop: spacing[2],
-	},
-});
+const createStyles = (colors: ThemeColors) =>
+	StyleSheet.create({
+		title: {
+			position: "absolute",
+			left: 0,
+			right: 0,
+			bottom: "18%",
+			alignItems: "center",
+		},
+		wordmarkRow: {
+			flexDirection: "row",
+		},
+		wordmark: {
+			fontSize: fontSize["5xl"],
+			fontFamily: fontFamily.displayBold,
+			color: colors.foreground,
+			// Scale pivots from the baseline so letters rise into place.
+			transformOrigin: "bottom",
+		},
+		// Approximates `letterSpacing: -2` across split-per-letter Text nodes
+		// (RN kerns within a single text run, not between sibling views).
+		wordmarkTracking: {
+			marginRight: -2,
+		},
+		tagline: {
+			fontSize: fontSize.lg,
+			fontFamily: fontFamily.sans,
+			color: colors.mutedForeground,
+			marginTop: spacing[2],
+		},
+	});

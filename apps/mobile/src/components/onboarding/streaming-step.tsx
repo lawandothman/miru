@@ -13,13 +13,13 @@ import { Spinner } from "@/components/spinner";
 import { countryName } from "@/lib/region-data";
 import { trpc } from "@/lib/trpc";
 import {
-	Colors,
 	fontSize,
 	fontFamily,
 	spacing,
 	radius,
 	providerLogoUrl,
 } from "@/lib/constants";
+import { useTheme, useThemedStyles, type ThemeColors } from "@/lib/theme";
 
 interface StreamingStepProps {
 	country: string | null;
@@ -44,6 +44,8 @@ export function StreamingStep({
 		country ? { country } : undefined,
 	);
 	const [search, setSearch] = useState("");
+	const { colors } = useTheme();
+	const styles = useThemedStyles(createStyles);
 
 	function toggle(id: number) {
 		const next = new Set(selectedProviders);
@@ -106,14 +108,14 @@ export function StreamingStep({
 						</Text>
 						{isSelected && (
 							<View style={styles.checkBadge}>
-								<Check size={12} color={Colors.primaryForeground} />
+								<Check size={12} color={colors.primaryForeground} />
 							</View>
 						)}
 					</Pressable>
 				</View>
 			);
 		},
-		[selectedProviders],
+		[selectedProviders, styles, colors],
 	);
 
 	return (
@@ -127,13 +129,13 @@ export function StreamingStep({
 
 			<View style={styles.searchContainer}>
 				<View style={styles.searchBar}>
-					<Search size={18} color={Colors.mutedForeground} />
+					<Search size={18} color={colors.mutedForeground} />
 					<TextInput
 						style={styles.searchInput}
 						value={search}
 						onChangeText={setSearch}
 						placeholder="Search services"
-						placeholderTextColor={Colors.mutedForeground}
+						placeholderTextColor={colors.mutedForeground}
 						autoCapitalize="none"
 						autoCorrect={false}
 						accessibilityLabel="Search streaming services"
@@ -143,7 +145,7 @@ export function StreamingStep({
 
 			{isLoading ? (
 				<View style={styles.loadingContainer}>
-					<Spinner size={32} color={Colors.primary} />
+					<Spinner size={32} color={colors.primary} />
 				</View>
 			) : (
 				<FlatList
@@ -168,111 +170,112 @@ export function StreamingStep({
 	);
 }
 
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-	},
-	header: {
-		paddingHorizontal: spacing[4],
-		gap: spacing[2],
-	},
-	title: {
-		fontSize: fontSize["2xl"],
-		fontFamily: fontFamily.displayBold,
-		color: Colors.foreground,
-	},
-	subtitle: {
-		fontSize: fontSize.base,
-		fontFamily: fontFamily.sans,
-		color: Colors.mutedForeground,
-		lineHeight: 22,
-	},
-	searchContainer: {
-		paddingHorizontal: spacing[4],
-		paddingTop: spacing[4],
-		paddingBottom: spacing[2],
-	},
-	searchBar: {
-		flexDirection: "row",
-		alignItems: "center",
-		gap: spacing[2],
-		backgroundColor: Colors.card,
-		borderRadius: radius.lg,
-		paddingHorizontal: spacing[3],
-		paddingVertical: spacing[2],
-		borderWidth: 1,
-		borderColor: Colors.border,
-	},
-	searchInput: {
-		flex: 1,
-		fontSize: fontSize.base,
-		fontFamily: fontFamily.sans,
-		color: Colors.foreground,
-		paddingVertical: spacing[1],
-	},
-	loadingContainer: {
-		flex: 1,
-		justifyContent: "center",
-		alignItems: "center",
-	},
-	emptyContainer: {
-		paddingVertical: spacing[12],
-		alignItems: "center",
-	},
-	emptyText: {
-		fontSize: fontSize.sm,
-		fontFamily: fontFamily.sans,
-		color: Colors.mutedForeground,
-		textAlign: "center",
-	},
-	gridContainer: {
-		padding: spacing[4],
-		paddingBottom: spacing[8],
-	},
-	providerCell: {
-		flex: 1 / NUM_COLUMNS,
-		alignItems: "center",
-		marginBottom: spacing[3],
-	},
-	providerItem: {
-		alignItems: "center",
-		width: 80,
-		gap: spacing[1],
-		position: "relative",
-	},
-	providerLogo: {
-		width: 56,
-		height: 56,
-		borderRadius: radius.lg,
-	},
-	providerFallback: {
-		backgroundColor: Colors.secondary,
-		alignItems: "center",
-		justifyContent: "center",
-	},
-	providerFallbackText: {
-		fontSize: fontSize.lg,
-		fontFamily: fontFamily.sansBold,
-		color: Colors.mutedForeground,
-	},
-	providerName: {
-		fontSize: 10,
-		fontFamily: fontFamily.sans,
-		color: Colors.mutedForeground,
-		textAlign: "center",
-		lineHeight: 13,
-	},
-	checkBadge: {
-		position: "absolute",
-		top: 0,
-		right: 8,
-		backgroundColor: Colors.primary,
-		borderRadius: radius.full,
-		width: 20,
-		height: 20,
-		alignItems: "center",
-		justifyContent: "center",
-		borderWidth: 2,
-		borderColor: Colors.background,
-	},
-});
+const createStyles = (colors: ThemeColors) =>
+	StyleSheet.create({
+		container: {
+			flex: 1,
+		},
+		header: {
+			paddingHorizontal: spacing[4],
+			gap: spacing[2],
+		},
+		title: {
+			fontSize: fontSize["2xl"],
+			fontFamily: fontFamily.displayBold,
+			color: colors.foreground,
+		},
+		subtitle: {
+			fontSize: fontSize.base,
+			fontFamily: fontFamily.sans,
+			color: colors.mutedForeground,
+			lineHeight: 22,
+		},
+		searchContainer: {
+			paddingHorizontal: spacing[4],
+			paddingTop: spacing[4],
+			paddingBottom: spacing[2],
+		},
+		searchBar: {
+			flexDirection: "row",
+			alignItems: "center",
+			gap: spacing[2],
+			backgroundColor: colors.card,
+			borderRadius: radius.lg,
+			paddingHorizontal: spacing[3],
+			paddingVertical: spacing[2],
+			borderWidth: 1,
+			borderColor: colors.border,
+		},
+		searchInput: {
+			flex: 1,
+			fontSize: fontSize.base,
+			fontFamily: fontFamily.sans,
+			color: colors.foreground,
+			paddingVertical: spacing[1],
+		},
+		loadingContainer: {
+			flex: 1,
+			justifyContent: "center",
+			alignItems: "center",
+		},
+		emptyContainer: {
+			paddingVertical: spacing[12],
+			alignItems: "center",
+		},
+		emptyText: {
+			fontSize: fontSize.sm,
+			fontFamily: fontFamily.sans,
+			color: colors.mutedForeground,
+			textAlign: "center",
+		},
+		gridContainer: {
+			padding: spacing[4],
+			paddingBottom: spacing[8],
+		},
+		providerCell: {
+			flex: 1 / NUM_COLUMNS,
+			alignItems: "center",
+			marginBottom: spacing[3],
+		},
+		providerItem: {
+			alignItems: "center",
+			width: 80,
+			gap: spacing[1],
+			position: "relative",
+		},
+		providerLogo: {
+			width: 56,
+			height: 56,
+			borderRadius: radius.lg,
+		},
+		providerFallback: {
+			backgroundColor: colors.secondary,
+			alignItems: "center",
+			justifyContent: "center",
+		},
+		providerFallbackText: {
+			fontSize: fontSize.lg,
+			fontFamily: fontFamily.sansBold,
+			color: colors.mutedForeground,
+		},
+		providerName: {
+			fontSize: 10,
+			fontFamily: fontFamily.sans,
+			color: colors.mutedForeground,
+			textAlign: "center",
+			lineHeight: 13,
+		},
+		checkBadge: {
+			position: "absolute",
+			top: 0,
+			right: 8,
+			backgroundColor: colors.primary,
+			borderRadius: radius.full,
+			width: 20,
+			height: 20,
+			alignItems: "center",
+			justifyContent: "center",
+			borderWidth: 2,
+			borderColor: colors.background,
+		},
+	});

@@ -8,7 +8,8 @@ import { useSession } from "@/lib/auth";
 import { UserAvatar } from "@/components/user-avatar";
 import { FollowButton } from "@/components/follow-button";
 import { useDefaultHeaderOptions } from "@/lib/navigation";
-import { Colors, fontSize, fontFamily, spacing } from "@/lib/constants";
+import { fontSize, fontFamily, spacing } from "@/lib/constants";
+import { useThemedStyles, type ThemeColors } from "@/lib/theme";
 
 type Tab = "followers" | "following";
 
@@ -23,6 +24,7 @@ function UserListItem({ user }: { user: UserRow }) {
 	const router = useRouter();
 	const { data: session } = useSession();
 	const isOwnProfile = session?.user?.id === user.id;
+	const styles = useThemedStyles(createStyles);
 
 	return (
 		<Pressable
@@ -48,6 +50,7 @@ export default function FollowersScreen() {
 	const [activeTab, setActiveTab] = useState<Tab>(
 		tab === "following" ? "following" : "followers",
 	);
+	const styles = useThemedStyles(createStyles);
 
 	const { data: profile } = trpc.user.getById.useQuery(
 		{ id: userId ?? "" },
@@ -137,65 +140,66 @@ export default function FollowersScreen() {
 	);
 }
 
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		backgroundColor: Colors.background,
-	},
-	tabs: {
-		flexDirection: "row",
-		borderBottomWidth: 1,
-		borderBottomColor: Colors.border,
-	},
-	tab: {
-		flex: 1,
-		paddingVertical: spacing[3],
-		alignItems: "center",
-		borderBottomWidth: 2,
-		borderBottomColor: "transparent",
-	},
-	tabActive: {
-		borderBottomColor: Colors.foreground,
-	},
-	tabText: {
-		fontSize: fontSize.sm,
-		fontFamily: fontFamily.sansMedium,
-		color: Colors.mutedForeground,
-	},
-	tabTextActive: {
-		color: Colors.foreground,
-		fontFamily: fontFamily.sansSemibold,
-	},
-	list: {
-		paddingVertical: spacing[2],
-	},
-	userRow: {
-		flexDirection: "row",
-		alignItems: "center",
-		paddingHorizontal: spacing[4],
-		paddingVertical: spacing[3],
-		gap: spacing[3],
-	},
-	pressed: {
-		opacity: 0.7,
-	},
-	userName: {
-		flex: 1,
-		fontSize: fontSize.base,
-		fontFamily: fontFamily.sansSemibold,
-		color: Colors.foreground,
-	},
-	loading: {
-		flex: 1,
-		justifyContent: "center",
-		alignItems: "center",
-	},
-	empty: {
-		paddingTop: spacing[12],
-		alignItems: "center",
-	},
-	emptyText: {
-		fontSize: fontSize.sm,
-		color: Colors.mutedForeground,
-	},
-});
+const createStyles = (colors: ThemeColors) =>
+	StyleSheet.create({
+		container: {
+			flex: 1,
+			backgroundColor: colors.background,
+		},
+		tabs: {
+			flexDirection: "row",
+			borderBottomWidth: 1,
+			borderBottomColor: colors.border,
+		},
+		tab: {
+			flex: 1,
+			paddingVertical: spacing[3],
+			alignItems: "center",
+			borderBottomWidth: 2,
+			borderBottomColor: "transparent",
+		},
+		tabActive: {
+			borderBottomColor: colors.foreground,
+		},
+		tabText: {
+			fontSize: fontSize.sm,
+			fontFamily: fontFamily.sansMedium,
+			color: colors.mutedForeground,
+		},
+		tabTextActive: {
+			color: colors.foreground,
+			fontFamily: fontFamily.sansSemibold,
+		},
+		list: {
+			paddingVertical: spacing[2],
+		},
+		userRow: {
+			flexDirection: "row",
+			alignItems: "center",
+			paddingHorizontal: spacing[4],
+			paddingVertical: spacing[3],
+			gap: spacing[3],
+		},
+		pressed: {
+			opacity: 0.7,
+		},
+		userName: {
+			flex: 1,
+			fontSize: fontSize.base,
+			fontFamily: fontFamily.sansSemibold,
+			color: colors.foreground,
+		},
+		loading: {
+			flex: 1,
+			justifyContent: "center",
+			alignItems: "center",
+		},
+		empty: {
+			paddingTop: spacing[12],
+			alignItems: "center",
+		},
+		emptyText: {
+			fontSize: fontSize.sm,
+			color: colors.mutedForeground,
+		},
+	});
