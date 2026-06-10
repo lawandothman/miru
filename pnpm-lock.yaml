@@ -382,8 +382,8 @@ importers:
         specifier: catalog:react
         version: 19.2.3(react@19.2.3)
       react-email:
-        specifier: 6.1.4
-        version: 6.1.4(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+        specifier: 6.6.0
+        version: 6.6.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       resend:
         specifier: 6.12.3
         version: 6.12.3(@react-email/render@2.0.8(react-dom@19.2.3(react@19.2.3))(react@19.2.3))
@@ -6775,8 +6775,8 @@ packages:
     peerDependencies:
       react: ^19.2.3
 
-  react-email@6.1.4:
-    resolution: {integrity: sha512-UKCfry4W7zkAWoJX1ngaWgPrUazOebxI8IYrO8TBEqgFmmz97VqZ84ell2x36Fdvtzd/UI5e4ZOywlsXeydwgQ==}
+  react-email@6.6.0:
+    resolution: {integrity: sha512-YNOLCMcGqwcvRTzFo2qMVD5D8Ro9aw0Y+PxO1LhqQT+qbkRvdUxmrVXffUxEcDeIFAcoOe7luCbkwIZPpPDFxQ==}
     engines: {node: '>=20.0.0'}
     hasBin: true
     peerDependencies:
@@ -10690,9 +10690,7 @@ snapshots:
       metro-runtime: 0.84.4
     transitivePeerDependencies:
       - '@babel/core'
-      - bufferutil
       - supports-color
-      - utf-8-validate
 
   '@react-native/normalize-colors@0.74.89': {}
 
@@ -14002,7 +14000,7 @@ snapshots:
       react: 19.2.3
       scheduler: 0.27.0
 
-  react-email@6.1.4(react-dom@19.2.3(react@19.2.3))(react@19.2.3):
+  react-email@6.6.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3):
     dependencies:
       '@babel/parser': 7.27.0
       '@babel/traverse': 7.27.0
