@@ -41,4 +41,6 @@ export {
 
 export { getWatchProviderUrl } from "./watch-provider-urls";
 
+export { type AtomicExecutor, runAtomic } from "./transaction";
+
 export { and, eq, inArray, sql } from "drizzle-orm";

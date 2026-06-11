@@ -1,5 +1,5 @@
 import { keys } from "@miru/cache";
-import { schema } from "@miru/db";
+import { runAtomic, schema } from "@miru/db";
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 import { protectedProcedure, publicProcedure, router } from "../trpc";
@@ -13,30 +13,30 @@ export const watchedRouter = router({
 
 			const userId = ctx.session.user.id;
 
-			await ctx.db
-				.insert(schema.watchedEntries)
-				.values({ userId, movieId: input.movieId })
-				.onConflictDoNothing();
-
-			await ctx.db
-				.delete(schema.watchlistEntries)
-				.where(
-					and(
-						eq(schema.watchlistEntries.userId, userId),
-						eq(schema.watchlistEntries.movieId, input.movieId),
+			await runAtomic(ctx.db, (tx) => [
+				tx
+					.insert(schema.watchedEntries)
+					.values({ userId, movieId: input.movieId })
+					.onConflictDoNothing(),
+				tx
+					.delete(schema.watchlistEntries)
+					.where(
+						and(
+							eq(schema.watchlistEntries.userId, userId),
+							eq(schema.watchlistEntries.movieId, input.movieId),
+						),
 					),
-				);
-
-			await ctx.db
-				.update(schema.movieRecommendations)
-				.set({ status: "accepted", respondedAt: new Date() })
-				.where(
-					and(
-						eq(schema.movieRecommendations.recipientId, userId),
-						eq(schema.movieRecommendations.movieId, input.movieId),
-						eq(schema.movieRecommendations.status, "pending"),
+				tx
+					.update(schema.movieRecommendations)
+					.set({ status: "accepted", respondedAt: new Date() })
+					.where(
+						and(
+							eq(schema.movieRecommendations.recipientId, userId),
+							eq(schema.movieRecommendations.movieId, input.movieId),
+							eq(schema.movieRecommendations.status, "pending"),
+						),
 					),
-				);
+			]);
 
 			await ctx.cache?.del(keys.recommendations(userId));
 
