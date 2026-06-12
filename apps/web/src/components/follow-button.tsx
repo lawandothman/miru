@@ -1,12 +1,12 @@
 "use client";
 
 import { UserMinus, UserPlus } from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { trpc } from "@/lib/trpc/client";
-import { useRouter } from "next/navigation";
-import { cn } from "@/lib/utils";
 import { capture } from "@/lib/analytics";
+import { trpc } from "@/lib/trpc/client";
+import { cn } from "@/lib/utils";
 
 interface FollowButtonProps {
 	userId: string;
@@ -19,71 +19,35 @@ export function FollowButton({
 	isFollowing,
 	className,
 }: FollowButtonProps) {
-	const router = useRouter();
 	const utils = trpc.useUtils();
+	const [following, setFollowing] = useState(isFollowing);
 
-	const queryKey = { id: userId };
+	// Following touches follower/following lists, dashboard matches, and the
+	// target's follower count. Invalidate those so they refetch on next view;
+	// the button itself flips instantly from local state.
+	const invalidate = () => {
+		void utils.social.invalidate();
+		void utils.user.getById.invalidate({ id: userId });
+	};
 
 	const follow = trpc.social.follow.useMutation({
-		onMutate: async () => {
-			await utils.user.getById.cancel(queryKey);
-			const previous = utils.user.getById.getData(queryKey);
-			utils.user.getById.setData(queryKey, (old) =>
-				old
-					? {
-							...old,
-							isFollowing: true,
-							followerCount: old.followerCount + 1,
-						}
-					: old,
-			);
-			return { previous };
-		},
-		onSuccess: () => {
-			capture("user_followed", { target_user_id: userId });
-		},
-		onError: (_err, _vars, context) => {
-			if (context?.previous) {
-				utils.user.getById.setData(queryKey, context.previous);
-			}
+		onMutate: () => setFollowing(true),
+		onSuccess: () => capture("user_followed", { target_user_id: userId }),
+		onError: () => {
+			setFollowing(false);
 			toast.error("Failed to follow user");
 		},
-		onSettled: () => {
-			utils.social.invalidate();
-			utils.user.getById.invalidate(queryKey);
-			router.refresh();
-		},
+		onSettled: invalidate,
 	});
 
 	const unfollow = trpc.social.unfollow.useMutation({
-		onMutate: async () => {
-			await utils.user.getById.cancel(queryKey);
-			const previous = utils.user.getById.getData(queryKey);
-			utils.user.getById.setData(queryKey, (old) =>
-				old
-					? {
-							...old,
-							isFollowing: false,
-							followerCount: Math.max(0, old.followerCount - 1),
-						}
-					: old,
-			);
-			return { previous };
-		},
-		onSuccess: () => {
-			capture("user_unfollowed", { target_user_id: userId });
-		},
-		onError: (_err, _vars, context) => {
-			if (context?.previous) {
-				utils.user.getById.setData(queryKey, context.previous);
-			}
+		onMutate: () => setFollowing(false),
+		onSuccess: () => capture("user_unfollowed", { target_user_id: userId }),
+		onError: () => {
+			setFollowing(true);
 			toast.error("Failed to unfollow user");
 		},
-		onSettled: () => {
-			utils.social.invalidate();
-			utils.user.getById.invalidate(queryKey);
-			router.refresh();
-		},
+		onSettled: invalidate,
 	});
 
 	const isPending = follow.isPending || unfollow.isPending;
@@ -92,21 +56,21 @@ export function FollowButton({
 		<Button
 			type="button"
 			onClick={() =>
-				isFollowing
+				following
 					? unfollow.mutate({ friendId: userId })
 					: follow.mutate({ friendId: userId })
 			}
 			disabled={isPending}
-			variant={isFollowing ? "outline" : "default"}
+			variant={following ? "outline" : "default"}
 			size="sm"
 			className={cn("gap-1.5", className)}
 		>
-			{isFollowing ? (
+			{following ? (
 				<UserMinus className="size-3.5" />
 			) : (
 				<UserPlus className="size-3.5" />
 			)}
-			{isFollowing ? "Unfollow" : "Follow"}
+			{following ? "Unfollow" : "Follow"}
 		</Button>
 	);
 }
