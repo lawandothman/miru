@@ -144,8 +144,8 @@ importers:
         specifier: catalog:better-auth
         version: 1.6.18(@opentelemetry/api@1.9.1)(drizzle-kit@0.31.10)(drizzle-orm@0.45.2(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@upstash/redis@1.38.0)(kysely@0.28.17)(postgres@3.4.9))(next@16.2.9(@babel/core@7.29.0)(@opentelemetry/api@1.9.1)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(vitest@4.1.8(@opentelemetry/api@1.9.1)(@types/node@25.9.3)(vite@7.3.1(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.21.0)(yaml@2.8.2)))
       date-fns:
-        specifier: 4.1.0
-        version: 4.1.0
+        specifier: 4.4.0
+        version: 4.4.0
       expo:
         specifier: 56.0.11
         version: 56.0.11(@babel/core@7.29.0)(@expo/dom-webview@56.0.5)(@expo/metro-runtime@56.0.15)(expo-router@56.2.10)(react-dom@19.2.7(react@19.2.7))(react-native-web@0.21.2(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react-native-worklets@0.8.3(@babel/core@7.29.0)(@react-native/metro-config@0.85.3(@babel/core@7.29.0))(react-native@0.85.3(@babel/core@7.29.0)(@react-native/metro-config@0.85.3(@babel/core@7.29.0))(@types/react@19.2.17)(react@19.2.7))(react@19.2.7))(react-native@0.85.3(@babel/core@7.29.0)(@react-native/metro-config@0.85.3(@babel/core@7.29.0))(@types/react@19.2.17)(react@19.2.7))(react@19.2.7)(typescript@6.0.3)
@@ -511,8 +511,8 @@ importers:
         specifier: 'catalog:'
         version: 2.11.0
       date-fns:
-        specifier: 4.1.0
-        version: 4.1.0
+        specifier: 4.4.0
+        version: 4.4.0
       drizzle-orm:
         specifier: 'catalog:'
         version: 0.45.2(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@upstash/redis@1.38.0)(kysely@0.28.17)(postgres@3.4.9)
@@ -1033,14 +1033,8 @@ packages:
       '@better-auth/utils': 0.4.1
       '@better-fetch/fetch': 1.3.0
 
-  '@better-auth/utils@0.4.0':
-    resolution: {integrity: sha512-RpMtLUIQAEWMgdPLNVbIF5ON2mm+CH0U3rCdUCU1VyeAUui4m38DyK7/aXMLZov2YDjG684pS1D0MBllrmgjQA==}
-
   '@better-auth/utils@0.4.1':
     resolution: {integrity: sha512-SZBPRPF3z0nBvE5ygOkxae35wnnXPRShmqFo78S+qslLeFoPu/pMgnXAuNKFMMybac3tiLaVg1e3MQW5MC+1iA==}
-
-  '@better-fetch/fetch@1.1.21':
-    resolution: {integrity: sha512-/ImESw0sskqlVR94jB+5+Pxjf+xBwDZF/N5+y2/q4EqD7IARUTSpPfIo8uf39SYpCxyOCtbyYpUrZ3F/k0zT4A==}
 
   '@better-fetch/fetch@1.3.0':
     resolution: {integrity: sha512-Lgkl18IrUURFqa1nE38GNDWXf7XGzfxXQDCE/alCQV0yZ98YrPGtlmW61ch1T4YRt3lxrSAGA+Ft73FzuWWb3A==}
@@ -4701,8 +4695,8 @@ packages:
   csstype@3.2.3:
     resolution: {integrity: sha512-z1HGKcYy2xA8AGQfwrn0PAy+PB7X/GSj3UVJW9qKyn43xWa+gl5nXmU4qqLMRzWVLFC8KusUX8T/0kCiOYpAIQ==}
 
-  date-fns@4.1.0:
-    resolution: {integrity: sha512-Ukq0owbQXxa/U3EGtsdVBkR1w7KOQ5gIBqdH2hkvknzZPYvBxb/aa6E8L7tmjFtkwZBu3UXBbjIgPo/Ez4xaNg==}
+  date-fns@4.4.0:
+    resolution: {integrity: sha512-+1UMbeh68lH1SegH83CGWwpb6OHHbpSgr3+s5Eww5M4CAgswBpoWS0AjTOfEJ33HiYKz1hdj/KTFprzXHmq/6w==}
 
   debounce-fn@6.0.0:
     resolution: {integrity: sha512-rBMW+F2TXryBwB54Q0d8drNEI+TfoS9JpNTAoVpukbWEhjXQq4rySFYLaqXMFXwdv61Zb2OHtj5bviSoimqxRQ==}
@@ -8022,15 +8016,9 @@ snapshots:
       '@better-auth/utils': 0.4.1
       '@better-fetch/fetch': 1.3.0
 
-  '@better-auth/utils@0.4.0':
-    dependencies:
-      '@noble/hashes': 2.0.1
-
   '@better-auth/utils@0.4.1':
     dependencies:
       '@noble/hashes': 2.0.1
-
-  '@better-fetch/fetch@1.1.21': {}
 
   '@better-fetch/fetch@1.3.0': {}
 
@@ -11154,8 +11142,8 @@ snapshots:
 
   better-call@1.3.6(zod@4.4.3):
     dependencies:
-      '@better-auth/utils': 0.4.0
-      '@better-fetch/fetch': 1.1.21
+      '@better-auth/utils': 0.4.1
+      '@better-fetch/fetch': 1.3.0
       rou3: 0.7.12
       set-cookie-parser: 3.0.1
     optionalDependencies:
@@ -11432,7 +11420,7 @@ snapshots:
 
   csstype@3.2.3: {}
 
-  date-fns@4.1.0: {}
+  date-fns@4.4.0: {}
 
   debounce-fn@6.0.0:
     dependencies:
