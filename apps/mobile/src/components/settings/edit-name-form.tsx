@@ -9,13 +9,16 @@ import {
 } from "react-native";
 import { authClient } from "@/lib/auth";
 import { Spinner } from "@/components/spinner";
-import { Colors, fontSize, fontFamily, spacing, radius } from "@/lib/constants";
+import { fontSize, fontFamily, spacing, radius } from "@/lib/constants";
+import { useThemedStyles, useTheme, type ThemeColors } from "@/lib/theme";
 
 interface EditNameFormProps {
 	currentName: string;
 }
 
 export function EditNameForm({ currentName }: EditNameFormProps) {
+	const styles = useThemedStyles(createStyles);
+	const { colors } = useTheme();
 	const [name, setName] = useState(currentName);
 	const [isPending, setIsPending] = useState(false);
 
@@ -40,7 +43,7 @@ export function EditNameForm({ currentName }: EditNameFormProps) {
 				value={name}
 				onChangeText={setName}
 				placeholder="Your name"
-				placeholderTextColor={Colors.mutedForeground}
+				placeholderTextColor={colors.mutedForeground}
 				returnKeyType="done"
 				onSubmitEditing={() => hasChanged && handleSave()}
 			/>
@@ -54,7 +57,7 @@ export function EditNameForm({ currentName }: EditNameFormProps) {
 					disabled={isPending}
 				>
 					{isPending ? (
-						<Spinner size={16} color={Colors.primaryForeground} />
+						<Spinner size={16} color={colors.primaryForeground} />
 					) : (
 						<Text style={styles.saveButtonText}>Save</Text>
 					)}
@@ -64,36 +67,37 @@ export function EditNameForm({ currentName }: EditNameFormProps) {
 	);
 }
 
-const styles = StyleSheet.create({
-	nameRow: {
-		flexDirection: "row",
-		gap: spacing[3],
-		alignItems: "center",
-	},
-	textInput: {
-		flex: 1,
-		backgroundColor: Colors.secondary,
-		borderRadius: radius.lg,
-		paddingHorizontal: spacing[3],
-		paddingVertical: spacing[2],
-		fontSize: fontSize.base,
-		fontFamily: fontFamily.sans,
-		color: Colors.foreground,
-	},
-	saveButton: {
-		backgroundColor: Colors.primary,
-		borderRadius: radius.lg,
-		paddingHorizontal: spacing[4],
-		paddingVertical: spacing[2],
-		alignItems: "center",
-		justifyContent: "center",
-	},
-	saveButtonText: {
-		fontSize: fontSize.sm,
-		fontFamily: fontFamily.sansSemibold,
-		color: Colors.primaryForeground,
-	},
-	pressed: {
-		opacity: 0.7,
-	},
-});
+const createStyles = (colors: ThemeColors) =>
+	StyleSheet.create({
+		nameRow: {
+			flexDirection: "row",
+			gap: spacing[3],
+			alignItems: "center",
+		},
+		textInput: {
+			flex: 1,
+			backgroundColor: colors.secondary,
+			borderRadius: radius.lg,
+			paddingHorizontal: spacing[3],
+			paddingVertical: spacing[2],
+			fontSize: fontSize.base,
+			fontFamily: fontFamily.sans,
+			color: colors.foreground,
+		},
+		saveButton: {
+			backgroundColor: colors.primary,
+			borderRadius: radius.lg,
+			paddingHorizontal: spacing[4],
+			paddingVertical: spacing[2],
+			alignItems: "center",
+			justifyContent: "center",
+		},
+		saveButtonText: {
+			fontSize: fontSize.sm,
+			fontFamily: fontFamily.sansSemibold,
+			color: colors.primaryForeground,
+		},
+		pressed: {
+			opacity: 0.7,
+		},
+	});

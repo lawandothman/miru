@@ -1,0 +1,12 @@
+[
+	{
+		"relation": ["delegate_permission/common.handle_all_urls"],
+		"target": {
+			"namespace": "android_app",
+			"package_name": "app.miru",
+			"sha256_cert_fingerprints": [
+				"71:38:00:94:04:CA:8A:5B:DB:16:1C:9B:D7:CA:B8:80:07:AC:58:39:5D:F3:7B:23:4A:CC:E6:34:70:EB:0F:32"
+			]
+		}
+	}
+]

@@ -1,6 +1,7 @@
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
-import { Colors, fontSize, fontFamily, spacing, radius } from "@/lib/constants";
+import { fontSize, fontFamily, spacing, radius } from "@/lib/constants";
+import { useThemedStyles, type ThemeColors } from "@/lib/theme";
 
 interface MovieGenre {
 	genre: { id: number; name: string };
@@ -11,6 +12,7 @@ interface MovieGenresProps {
 }
 
 export function MovieGenres({ genres }: MovieGenresProps) {
+	const styles = useThemedStyles(createStyles);
 	const router = useRouter();
 
 	if (genres.length === 0) {
@@ -40,26 +42,27 @@ export function MovieGenres({ genres }: MovieGenresProps) {
 	);
 }
 
-const styles = StyleSheet.create({
-	genres: {
-		flexDirection: "row",
-		flexWrap: "wrap",
-		gap: spacing[2],
-	},
-	genreBadge: {
-		backgroundColor: Colors.secondary,
-		paddingHorizontal: spacing[3],
-		paddingVertical: spacing[1],
-		borderRadius: radius.full,
-		borderWidth: StyleSheet.hairlineWidth,
-		borderColor: Colors.border,
-	},
-	genreText: {
-		fontSize: fontSize.xs,
-		fontFamily: fontFamily.sansMedium,
-		color: Colors.foreground,
-	},
-	pressed: {
-		opacity: 0.7,
-	},
-});
+const createStyles = (colors: ThemeColors) =>
+	StyleSheet.create({
+		genres: {
+			flexDirection: "row",
+			flexWrap: "wrap",
+			gap: spacing[2],
+		},
+		genreBadge: {
+			backgroundColor: colors.secondary,
+			paddingHorizontal: spacing[3],
+			paddingVertical: spacing[1],
+			borderRadius: radius.full,
+			borderWidth: StyleSheet.hairlineWidth,
+			borderColor: colors.border,
+		},
+		genreText: {
+			fontSize: fontSize.xs,
+			fontFamily: fontFamily.sansMedium,
+			color: colors.foreground,
+		},
+		pressed: {
+			opacity: 0.7,
+		},
+	});

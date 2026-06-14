@@ -1,6 +1,7 @@
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
-import { Colors, fontSize, fontFamily, spacing } from "@/lib/constants";
+import { fontSize, fontFamily, spacing } from "@/lib/constants";
+import { useThemedStyles, type ThemeColors } from "@/lib/theme";
 
 interface UserStatsProps {
 	userId: string;
@@ -14,6 +15,7 @@ export function UserStats({
 	followingCount,
 }: UserStatsProps) {
 	const router = useRouter();
+	const styles = useThemedStyles(createStyles);
 
 	return (
 		<View style={styles.stats}>
@@ -35,25 +37,26 @@ export function UserStats({
 	);
 }
 
-const styles = StyleSheet.create({
-	stats: {
-		flexDirection: "row",
-		gap: spacing[8],
-		marginTop: spacing[2],
-	},
-	stat: {
-		alignItems: "center",
-	},
-	pressed: {
-		opacity: 0.6,
-	},
-	statValue: {
-		fontSize: fontSize.lg,
-		fontFamily: fontFamily.sansBold,
-		color: Colors.foreground,
-	},
-	statLabel: {
-		fontSize: fontSize.xs,
-		color: Colors.mutedForeground,
-	},
-});
+const createStyles = (colors: ThemeColors) =>
+	StyleSheet.create({
+		stats: {
+			flexDirection: "row",
+			gap: spacing[8],
+			marginTop: spacing[2],
+		},
+		stat: {
+			alignItems: "center",
+		},
+		pressed: {
+			opacity: 0.6,
+		},
+		statValue: {
+			fontSize: fontSize.lg,
+			fontFamily: fontFamily.sansBold,
+			color: colors.foreground,
+		},
+		statLabel: {
+			fontSize: fontSize.xs,
+			color: colors.mutedForeground,
+		},
+	});

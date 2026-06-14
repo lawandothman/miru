@@ -7,18 +7,11 @@ import {
 	StyleSheet,
 	View,
 } from "react-native";
-import {
-	BottomSheet,
-	Group,
-	Host,
-	RNHostView,
-	VStack,
-} from "@expo/ui/swift-ui";
-import { presentationDragIndicator } from "@expo/ui/swift-ui/modifiers";
 import { captureRef } from "react-native-view-shot";
 import RNShare, { Social } from "react-native-share";
 import { TRPCClientError } from "@trpc/client";
 import { ActionsView } from "@/components/share-sheet/actions-view";
+import { NativeSheet } from "@/components/share-sheet/native-sheet";
 import { PickerView } from "@/components/share-sheet/picker-view";
 import { StoryCard } from "@/components/story-card";
 import {
@@ -27,6 +20,7 @@ import {
 } from "@/hooks/use-recommendation-draft";
 import { capture } from "@/lib/analytics";
 import { triggerStepCompleteHaptic } from "@/lib/haptics";
+import { movieSlug } from "@/lib/movie-slug";
 import { trpc } from "@/lib/trpc";
 
 interface ShareSheetMovie {
@@ -43,16 +37,6 @@ interface ShareSheetMovie {
 const WEB_BASE = "https://watchmiru.app";
 const INSTAGRAM_STORIES_APP_ID =
 	process.env.EXPO_PUBLIC_INSTAGRAM_STORIES_APP_ID?.trim();
-
-function movieSlug(title: string, tmdbId: number): string {
-	const slug = title
-		.toLowerCase()
-		.normalize("NFD")
-		.replace(/[̀-ͯ]/g, "")
-		.replace(/[^a-z0-9]+/g, "-")
-		.replace(/^-+|-+$/g, "");
-	return `${slug}-${tmdbId}`;
-}
 
 export function getMovieShareUrl(movie: Pick<ShareSheetMovie, "id" | "title">) {
 	return `${WEB_BASE}/movie/${movieSlug(movie.title, movie.id)}`;
@@ -218,49 +202,35 @@ export function ShareSheet({
 				<StoryCard ref={storyCardRef} movie={movie} />
 			</View>
 
-			<Host style={StyleSheet.absoluteFill}>
-				<VStack>
-					<BottomSheet
-						isPresented={visible}
-						onIsPresentedChange={(presented: boolean) => {
-							if (!presented) handleClose();
-						}}
-						fitToContents
-					>
-						<Group modifiers={[presentationDragIndicator("visible")]}>
-							<RNHostView matchContents>
-								<View style={styles.sheet}>
-									{draft.mode === "actions" ? (
-										<ActionsView
-											movie={movie}
-											showStoriesAction={storiesAvailable}
-											storiesSharing={storiesSharing}
-											onShareLink={() => {
-												void handleShareMore();
-											}}
-											onShareStory={() => {
-												void handleShareStory();
-											}}
-											onRecommend={draft.startPicking}
-										/>
-									) : null}
+			<NativeSheet visible={visible} onClose={handleClose}>
+				<View style={styles.sheet}>
+					{draft.mode === "actions" ? (
+						<ActionsView
+							movie={movie}
+							showStoriesAction={storiesAvailable}
+							storiesSharing={storiesSharing}
+							onShareLink={() => {
+								void handleShareMore();
+							}}
+							onShareStory={() => {
+								void handleShareStory();
+							}}
+							onRecommend={draft.startPicking}
+						/>
+					) : null}
 
-									{draft.mode === "picker" ? (
-										<PickerView
-											movieId={movie.id}
-											onBack={draft.back}
-											onSelect={(recipient) => {
-												void handleSelectRecipient(recipient);
-											}}
-											sendingRecipientId={sendingRecipientId}
-										/>
-									) : null}
-								</View>
-							</RNHostView>
-						</Group>
-					</BottomSheet>
-				</VStack>
-			</Host>
+					{draft.mode === "picker" ? (
+						<PickerView
+							movieId={movie.id}
+							onBack={draft.back}
+							onSelect={(recipient) => {
+								void handleSelectRecipient(recipient);
+							}}
+							sendingRecipientId={sendingRecipientId}
+						/>
+					) : null}
+				</View>
+			</NativeSheet>
 		</>
 	);
 }

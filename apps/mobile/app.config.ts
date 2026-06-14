@@ -80,8 +80,20 @@ const config: ExpoConfig = {
 			foregroundImage: "./assets/adaptive-icon.png",
 			backgroundColor: "#000000",
 		},
-		package: "com.miru.app",
-		permissions: ["android.permission.RECORD_AUDIO"],
+		package: "app.miru",
+		intentFilters: [
+			{
+				action: "VIEW",
+				autoVerify: true,
+				data: [
+					{
+						scheme: "https",
+						host: "watchmiru.app",
+					},
+				],
+				category: ["BROWSABLE", "DEFAULT"],
+			},
+		],
 	},
 	plugins,
 	experiments: {

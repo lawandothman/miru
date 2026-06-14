@@ -3,13 +3,13 @@ import type React from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
 import {
 	backdropUrl,
-	Colors,
 	fontFamily,
 	fontSize,
 	posterUrl,
 	radius,
 	spacing,
 } from "@/lib/constants";
+import { useThemedStyles, type ThemeColors } from "@/lib/theme";
 
 const CARD_WIDTH = 360;
 const CARD_HEIGHT = 640;
@@ -33,6 +33,7 @@ export function StoryCard({
 	movie: StoryCardMovie;
 	ref?: React.Ref<View>;
 }) {
+	const styles = useThemedStyles(createStyles);
 	const year = movie.releaseDate?.slice(0, 4);
 	const hours = movie.runtime ? Math.floor(movie.runtime / 60) : null;
 	const mins = movie.runtime ? movie.runtime % 60 : null;
@@ -124,126 +125,127 @@ export function StoryCard({
 	);
 }
 
-const styles = StyleSheet.create({
-	card: {
-		width: CARD_WIDTH,
-		height: CARD_HEIGHT,
-		backgroundColor: "#000",
-		overflow: "hidden",
-	},
-	backdrop: {
-		width: CARD_WIDTH,
-		height: CARD_HEIGHT,
-	},
-	overlay: {
-		...StyleSheet.absoluteFill,
-		backgroundColor: "rgba(0,0,0,0.4)",
-	},
+const createStyles = (colors: ThemeColors) =>
+	StyleSheet.create({
+		card: {
+			width: CARD_WIDTH,
+			height: CARD_HEIGHT,
+			backgroundColor: "#000",
+			overflow: "hidden",
+		},
+		backdrop: {
+			width: CARD_WIDTH,
+			height: CARD_HEIGHT,
+		},
+		overlay: {
+			...StyleSheet.absoluteFill,
+			backgroundColor: "rgba(0,0,0,0.4)",
+		},
 
-	/* Content */
-	content: {
-		flex: 1,
-		alignItems: "center",
-		justifyContent: "center",
-		paddingHorizontal: spacing[6],
-		gap: spacing[4],
-		paddingBottom: spacing[8],
-	},
+		/* Content */
+		content: {
+			flex: 1,
+			alignItems: "center",
+			justifyContent: "center",
+			paddingHorizontal: spacing[6],
+			gap: spacing[4],
+			paddingBottom: spacing[8],
+		},
 
-	/* Poster */
-	posterShadow: {
-		shadowColor: "#000",
-		shadowOffset: { width: 0, height: 12 },
-		shadowOpacity: 0.7,
-		shadowRadius: 24,
-		elevation: 20,
-		marginBottom: spacing[2],
-	},
-	poster: {
-		width: STORY_POSTER_W,
-		height: STORY_POSTER_H,
-		borderRadius: radius.xl,
-		backgroundColor: Colors.secondary,
-	},
-	posterPlaceholder: {
-		justifyContent: "center",
-		alignItems: "center",
-		paddingHorizontal: spacing[4],
-	},
-	placeholderText: {
-		fontSize: fontSize.sm,
-		fontFamily: fontFamily.displayBold,
-		color: Colors.mutedForeground,
-		textAlign: "center",
-	},
+		/* Poster */
+		posterShadow: {
+			shadowColor: "#000",
+			shadowOffset: { width: 0, height: 12 },
+			shadowOpacity: 0.7,
+			shadowRadius: 24,
+			elevation: 20,
+			marginBottom: spacing[2],
+		},
+		poster: {
+			width: STORY_POSTER_W,
+			height: STORY_POSTER_H,
+			borderRadius: radius.xl,
+			backgroundColor: colors.secondary,
+		},
+		posterPlaceholder: {
+			justifyContent: "center",
+			alignItems: "center",
+			paddingHorizontal: spacing[4],
+		},
+		placeholderText: {
+			fontSize: fontSize.sm,
+			fontFamily: fontFamily.displayBold,
+			color: colors.mutedForeground,
+			textAlign: "center",
+		},
 
-	/* Title */
-	title: {
-		fontSize: 22,
-		fontFamily: fontFamily.displayBold,
-		color: "#fff",
-		textAlign: "center",
-		lineHeight: 28,
-	},
+		/* Title */
+		title: {
+			fontSize: 22,
+			fontFamily: fontFamily.displayBold,
+			color: "#fff",
+			textAlign: "center",
+			lineHeight: 28,
+		},
 
-	/* Meta */
-	metaRow: {
-		flexDirection: "row",
-		alignItems: "center",
-		gap: spacing[1],
-	},
-	metaText: {
-		fontSize: fontSize.sm,
-		fontFamily: fontFamily.sansMedium,
-		color: "rgba(255,255,255,0.6)",
-	},
-	dot: {
-		fontSize: fontSize.sm,
-		color: "rgba(255,255,255,0.3)",
-		marginHorizontal: 2,
-	},
-	ratingText: {
-		fontSize: fontSize.sm,
-		fontFamily: fontFamily.sansSemibold,
-		color: Colors.gold,
-	},
+		/* Meta */
+		metaRow: {
+			flexDirection: "row",
+			alignItems: "center",
+			gap: spacing[1],
+		},
+		metaText: {
+			fontSize: fontSize.sm,
+			fontFamily: fontFamily.sansMedium,
+			color: "rgba(255,255,255,0.6)",
+		},
+		dot: {
+			fontSize: fontSize.sm,
+			color: "rgba(255,255,255,0.3)",
+			marginHorizontal: 2,
+		},
+		ratingText: {
+			fontSize: fontSize.sm,
+			fontFamily: fontFamily.sansSemibold,
+			color: colors.gold,
+		},
 
-	/* Genres */
-	genres: {
-		flexDirection: "row",
-		flexWrap: "wrap",
-		justifyContent: "center",
-		gap: spacing[2],
-	},
-	genreBadge: {
-		backgroundColor: "rgba(255,255,255,0.08)",
-		paddingHorizontal: spacing[3],
-		paddingVertical: spacing[1],
-		borderRadius: radius.full,
-		borderWidth: StyleSheet.hairlineWidth,
-		borderColor: "rgba(255,255,255,0.15)",
-	},
-	genreText: {
-		fontSize: fontSize.xs,
-		fontFamily: fontFamily.sansMedium,
-		color: "rgba(255,255,255,0.7)",
-	},
+		/* Genres */
+		genres: {
+			flexDirection: "row",
+			flexWrap: "wrap",
+			justifyContent: "center",
+			gap: spacing[2],
+		},
+		genreBadge: {
+			backgroundColor: "rgba(255,255,255,0.08)",
+			paddingHorizontal: spacing[3],
+			paddingVertical: spacing[1],
+			borderRadius: radius.full,
+			borderWidth: StyleSheet.hairlineWidth,
+			borderColor: "rgba(255,255,255,0.15)",
+		},
+		genreText: {
+			fontSize: fontSize.xs,
+			fontFamily: fontFamily.sansMedium,
+			color: "rgba(255,255,255,0.7)",
+		},
 
-	/* Branding */
-	branding: {
-		alignItems: "center",
-		paddingBottom: spacing[8],
-		gap: spacing[1],
-	},
-	brandName: {
-		fontSize: fontSize.lg,
-		fontFamily: fontFamily.displayBold,
-		color: "#fff",
-		letterSpacing: 2,
-	},
-	brandUrl: {
-		fontSize: fontSize.xs,
-		fontFamily: fontFamily.sans,
-		color: "rgba(255,255,255,0.4)",
-	},
-});
+		/* Branding */
+		branding: {
+			alignItems: "center",
+			paddingBottom: spacing[8],
+			gap: spacing[1],
+		},
+		brandName: {
+			fontSize: fontSize.lg,
+			fontFamily: fontFamily.displayBold,
+			color: "#fff",
+			letterSpacing: 2,
+		},
+		brandUrl: {
+			fontSize: fontSize.xs,
+			fontFamily: fontFamily.sans,
+			color: "rgba(255,255,255,0.4)",
+		},
+	});

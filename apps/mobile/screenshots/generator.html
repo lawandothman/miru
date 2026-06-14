@@ -157,7 +157,7 @@
 				height: 100%;
 				border-radius: 12px 12px 0 0;
 				object-fit: cover;
-				object-position: bottom;
+				object-position: top;
 				box-shadow: 0 -2px 60px rgba(255, 255, 255, 0.03);
 			}
 
@@ -202,15 +202,19 @@
 		</style>
 	</head>
 	<body>
-		<h1>App Store Screenshots</h1>
+		<h1>App Store & Play Store Screenshots</h1>
 		<p class="instructions">
 			Drag and drop a screenshot into each slot, or click to browse. Edit
-			headlines inline. Click Export to download all as 1284x2778 PNGs.
+			headlines inline. Click Export to download all slides at the selected
+			platform's resolution.
 		</p>
 
 		<div class="controls">
 			<button onclick="exportIphone()">Export iPhone (1284x2778)</button>
 			<button onclick="exportIpad()">Export iPad 13" (2048x2732)</button>
+			<button onclick="exportAndroid()">Export Android (1080x2400)</button>
+			<button onclick="exportTablet7()">Export Tablet 7" (1080x1920)</button>
+			<button onclick="exportTablet10()">Export Tablet 10" (1440x2560)</button>
 		</div>
 
 		<div class="slides-container" id="slides"></div>
@@ -437,8 +441,10 @@
 					maxTextWidth,
 				);
 
-				// Phone frame — narrower on iPad so the phone screenshot looks natural
-				const frameWidthRatio = w > 1500 ? 0.55 : 0.82;
+				// Phone frame — phone-aspect canvases (tall, h/w > 1.9) get a wide
+				// frame; tablet-aspect canvases (squarer 9:16 or 4:3) get a narrower
+				// frame so the phone screenshot doesn't look stretched.
+				const frameWidthRatio = h / w > 1.9 ? 0.82 : 0.55;
 				const frameWidth = Math.round(w * frameWidthRatio);
 				const frameX = Math.round((w - frameWidth) / 2);
 				const frameTop = textAreaBottom + Math.round(24 * sf);
@@ -473,22 +479,26 @@
 				// Draw screenshot if available
 				const img = screenshotImages[slideIndex];
 				if (img) {
-					// Cover: scale to fill both width and height, anchor to bottom
+					// Cover: scale to fill both width and height, anchor to TOP
+					// so greeting/header content stays visible and the tab bar
+					// overflows the bottom (the rounded-corner clip + frame end
+					// crop it away).
 					const scaleW = frameWidth / img.width;
 					const scaleH = frameHeight / img.height;
 					const imgScale = Math.max(scaleW, scaleH);
 					const drawW = img.width * imgScale;
 					const drawH = img.height * imgScale;
 					const drawX = frameX + (frameWidth - drawW) / 2;
-					const drawY = frameTop + (frameHeight - drawH);
+					const drawY = frameTop;
 					ctx.drawImage(img, drawX, drawY, drawW, drawH);
 				} else {
 					ctx.fillStyle = "#0d0d0d";
 					ctx.fillRect(frameX, frameTop, frameWidth, frameHeight);
 				}
 
-				// Gradient overlay at top of phone frame to hide status bar
-				const fadeH = Math.round(120 * sf);
+				// Gradient overlay at top of phone frame — narrow band that masks
+				// the status bar only, without bleeding into greeting/title content.
+				const fadeH = Math.round(60 * sf);
 				const fadeGrad = ctx.createLinearGradient(
 					0,
 					frameTop,
@@ -523,6 +533,22 @@
 
 			async function exportIpad() {
 				await exportSlides(2048, 2732, "ipad");
+			}
+
+			async function exportAndroid() {
+				// 1080x2400 — Pixel-class phone aspect; Play Store accepts up to
+				// 3840px on longest side, but 1080x2400 matches what users see.
+				await exportSlides(1080, 2400, "android");
+			}
+
+			async function exportTablet7() {
+				// 1080x1920 — 9:16 portrait, smallest Play-conformant 7" tablet size.
+				await exportSlides(1080, 1920, "tablet7");
+			}
+
+			async function exportTablet10() {
+				// 1440x2560 — 9:16 portrait, comfortable 10" tablet resolution.
+				await exportSlides(1440, 2560, "tablet10");
 			}
 
 			render();

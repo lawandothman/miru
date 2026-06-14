@@ -5,7 +5,7 @@ import { Alert, Pressable, StyleSheet } from "react-native";
 import { Spinner } from "./spinner";
 import { API_URL } from "@/lib/api-url";
 import { authClient } from "@/lib/auth";
-import { Colors } from "@/lib/constants";
+import { useTheme } from "@/lib/theme";
 import { UserAvatar } from "./user-avatar";
 
 interface AvatarUploadProps {
@@ -17,6 +17,7 @@ interface AvatarUploadProps {
 export function AvatarUpload({ imageUrl, name, size = 64 }: AvatarUploadProps) {
 	const [isUploading, setIsUploading] = useState(false);
 	const [previewUri, setPreviewUri] = useState<string | null>(null);
+	const { colors } = useTheme();
 
 	async function handlePress() {
 		if (isUploading) {
@@ -94,7 +95,7 @@ export function AvatarUpload({ imageUrl, name, size = 64 }: AvatarUploadProps) {
 		>
 			<UserAvatar imageUrl={previewUri ?? imageUrl} name={name} size={size} />
 			{isUploading ? (
-				<Spinner size={16} color={Colors.foreground} />
+				<Spinner size={16} color={colors.foreground} />
 			) : (
 				<Camera
 					size={size * 0.3}

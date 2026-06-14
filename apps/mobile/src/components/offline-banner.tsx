@@ -5,13 +5,15 @@ import {
 	useSafeAreaInsets,
 } from "react-native-safe-area-context";
 import { useIsOnline } from "@/lib/network";
-import { Colors, fontFamily, fontSize, spacing } from "@/lib/constants";
+import { fontFamily, fontSize, spacing } from "@/lib/constants";
+import { useThemedStyles, type ThemeColors } from "@/lib/theme";
 
 const BAR_HEIGHT = 22;
 
 export function OfflineBanner({ children }: { children: ReactNode }) {
 	const isOnline = useIsOnline();
 	const insets = useSafeAreaInsets();
+	const styles = useThemedStyles(createStyles);
 
 	if (isOnline) {
 		return <Fragment>{children}</Fragment>;
@@ -42,25 +44,26 @@ export function OfflineBanner({ children }: { children: ReactNode }) {
 	);
 }
 
-const styles = StyleSheet.create({
-	root: {
-		flex: 1,
-	},
-	content: {
-		flex: 1,
-	},
-	bar: {
-		backgroundColor: Colors.muted,
-	},
-	barContent: {
-		height: BAR_HEIGHT,
-		alignItems: "center",
-		justifyContent: "center",
-		paddingHorizontal: spacing[3],
-	},
-	text: {
-		fontSize: fontSize.xs,
-		fontFamily: fontFamily.sansMedium,
-		color: Colors.mutedForeground,
-	},
-});
+const createStyles = (colors: ThemeColors) =>
+	StyleSheet.create({
+		root: {
+			flex: 1,
+		},
+		content: {
+			flex: 1,
+		},
+		bar: {
+			backgroundColor: colors.muted,
+		},
+		barContent: {
+			height: BAR_HEIGHT,
+			alignItems: "center",
+			justifyContent: "center",
+			paddingHorizontal: spacing[3],
+		},
+		text: {
+			fontSize: fontSize.xs,
+			fontFamily: fontFamily.sansMedium,
+			color: colors.mutedForeground,
+		},
+	});

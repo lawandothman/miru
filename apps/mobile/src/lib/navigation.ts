@@ -4,15 +4,15 @@ import {
 	type Theme,
 } from "expo-router/react-navigation";
 import { useMemo } from "react";
+import { fontFamily } from "@/lib/constants";
 import {
-	fontFamily,
-	getThemePalette,
+	getThemeColors,
+	useTheme,
 	type ResolvedColorScheme,
-	useResolvedColorScheme,
-} from "@/lib/constants";
+} from "@/lib/theme";
 
-function createDefaultHeaderOptions(scheme: "light" | "dark") {
-	const palette = getThemePalette(scheme);
+function createDefaultHeaderOptions(scheme: ResolvedColorScheme) {
+	const palette = getThemeColors(scheme);
 
 	return {
 		headerShown: true,
@@ -28,16 +28,12 @@ function createDefaultHeaderOptions(scheme: "light" | "dark") {
 }
 
 export function useDefaultHeaderOptions() {
-	const resolvedScheme = useResolvedColorScheme();
-
-	return useMemo(
-		() => createDefaultHeaderOptions(resolvedScheme),
-		[resolvedScheme],
-	);
+	const { scheme } = useTheme();
+	return useMemo(() => createDefaultHeaderOptions(scheme), [scheme]);
 }
 
 export function getNavigationTheme(scheme: ResolvedColorScheme): Theme {
-	const palette = getThemePalette(scheme);
+	const palette = getThemeColors(scheme);
 	const baseTheme =
 		scheme === "light" ? ReactNavigationDefaultTheme : ReactNavigationDarkTheme;
 

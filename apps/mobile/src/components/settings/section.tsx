@@ -1,5 +1,6 @@
 import { View, Text, StyleSheet } from "react-native";
-import { Colors, fontSize, fontFamily, spacing, radius } from "@/lib/constants";
+import { fontSize, fontFamily, spacing, radius } from "@/lib/constants";
+import { useThemedStyles, useTheme, type ThemeColors } from "@/lib/theme";
 
 interface SettingsSectionProps {
 	title: string;
@@ -12,10 +13,12 @@ export function SettingsSection({
 	icon: Icon,
 	children,
 }: SettingsSectionProps) {
+	const styles = useThemedStyles(createStyles);
+	const { colors } = useTheme();
 	return (
 		<View style={styles.section}>
 			<View style={styles.sectionHeader}>
-				{Icon && <Icon size={14} color={Colors.mutedForeground} />}
+				{Icon && <Icon size={14} color={colors.mutedForeground} />}
 				<Text style={styles.sectionTitle}>{title}</Text>
 			</View>
 			<View style={styles.sectionCard}>{children}</View>
@@ -23,26 +26,27 @@ export function SettingsSection({
 	);
 }
 
-const styles = StyleSheet.create({
-	section: {
-		gap: spacing[2],
-	},
-	sectionHeader: {
-		flexDirection: "row",
-		alignItems: "center",
-		gap: spacing[2],
-		paddingHorizontal: spacing[1],
-	},
-	sectionTitle: {
-		fontSize: fontSize.xs,
-		fontFamily: fontFamily.displaySemibold,
-		color: Colors.mutedForeground,
-		textTransform: "uppercase",
-		letterSpacing: 1.5,
-	},
-	sectionCard: {
-		backgroundColor: Colors.card,
-		borderRadius: radius.xl,
-		padding: spacing[4],
-	},
-});
+const createStyles = (colors: ThemeColors) =>
+	StyleSheet.create({
+		section: {
+			gap: spacing[2],
+		},
+		sectionHeader: {
+			flexDirection: "row",
+			alignItems: "center",
+			gap: spacing[2],
+			paddingHorizontal: spacing[1],
+		},
+		sectionTitle: {
+			fontSize: fontSize.xs,
+			fontFamily: fontFamily.displaySemibold,
+			color: colors.mutedForeground,
+			textTransform: "uppercase",
+			letterSpacing: 1.5,
+		},
+		sectionCard: {
+			backgroundColor: colors.card,
+			borderRadius: radius.xl,
+			padding: spacing[4],
+		},
+	});
