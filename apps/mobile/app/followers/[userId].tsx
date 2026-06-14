@@ -9,7 +9,10 @@ import { UserAvatar } from "@/components/user-avatar";
 import { FollowButton } from "@/components/follow-button";
 import { useDefaultHeaderOptions } from "@/lib/navigation";
 import { fontSize, fontFamily, spacing } from "@/lib/constants";
+import { offsetPageParam } from "@/lib/pagination";
 import { useThemedStyles, type ThemeColors } from "@/lib/theme";
+
+const PAGE_SIZE = 20;
 
 type Tab = "followers" | "following";
 
@@ -57,21 +60,20 @@ export default function FollowersScreen() {
 		{ enabled: Boolean(userId) },
 	);
 
-	const { data: followers, isLoading: followersLoading } =
-		trpc.social.getFollowers.useQuery(
-			{ userId: userId ?? "" },
-			{ enabled: Boolean(userId) },
-		);
+	const followersQuery = trpc.social.getFollowers.useInfiniteQuery(
+		{ userId: userId ?? "", limit: PAGE_SIZE },
+		{ enabled: Boolean(userId), getNextPageParam: offsetPageParam(PAGE_SIZE) },
+	);
 
-	const { data: following, isLoading: followingLoading } =
-		trpc.social.getFollowing.useQuery(
-			{ userId: userId ?? "" },
-			{ enabled: Boolean(userId) },
-		);
+	const followingQuery = trpc.social.getFollowing.useInfiniteQuery(
+		{ userId: userId ?? "", limit: PAGE_SIZE },
+		{ enabled: Boolean(userId), getNextPageParam: offsetPageParam(PAGE_SIZE) },
+	);
 
-	const activeData = activeTab === "followers" ? followers : following;
-	const isLoading =
-		activeTab === "followers" ? followersLoading : followingLoading;
+	const activeQuery =
+		activeTab === "followers" ? followersQuery : followingQuery;
+	const activeData = activeQuery.data?.pages.flat() ?? [];
+	const isLoading = activeQuery.isLoading;
 	const headerOptions = useDefaultHeaderOptions();
 
 	return (
@@ -120,10 +122,23 @@ export default function FollowersScreen() {
 					</View>
 				) : (
 					<FlatList
-						data={activeData ?? []}
+						data={activeData}
 						keyExtractor={(item) => item.id}
 						renderItem={({ item }) => <UserListItem user={item} />}
 						contentContainerStyle={styles.list}
+						onEndReachedThreshold={0.5}
+						onEndReached={() => {
+							if (activeQuery.hasNextPage && !activeQuery.isFetchingNextPage) {
+								activeQuery.fetchNextPage();
+							}
+						}}
+						ListFooterComponent={
+							activeQuery.isFetchingNextPage ? (
+								<View style={styles.footer}>
+									<Spinner />
+								</View>
+							) : null
+						}
 						ListEmptyComponent={
 							<View style={styles.empty}>
 								<Text style={styles.emptyText}>
@@ -192,6 +207,10 @@ const createStyles = (colors: ThemeColors) =>
 		loading: {
 			flex: 1,
 			justifyContent: "center",
+			alignItems: "center",
+		},
+		footer: {
+			paddingVertical: spacing[4],
 			alignItems: "center",
 		},
 		empty: {
