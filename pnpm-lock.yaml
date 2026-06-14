@@ -14,8 +14,8 @@ catalogs:
       version: 1.6.11
   default:
     '@lorenzopant/tmdb':
-      specifier: 1.22.1
-      version: 1.22.1
+      specifier: 1.22.2
+      version: 1.22.2
     '@types/node':
       specifier: 25.9.3
       version: 25.9.3
@@ -299,7 +299,7 @@ importers:
         version: 1.6.11(cf2c4276e8305a4cfd5845e0a11c81fc)
       '@lorenzopant/tmdb':
         specifier: 'catalog:'
-        version: 1.22.1
+        version: 1.22.2
       '@miru/analytics':
         specifier: workspace:*
         version: link:../../packages/analytics
@@ -497,7 +497,7 @@ importers:
     dependencies:
       '@lorenzopant/tmdb':
         specifier: 'catalog:'
-        version: 1.22.1
+        version: 1.22.2
       '@miru/cache':
         specifier: workspace:*
         version: link:../cache
@@ -2121,8 +2121,8 @@ packages:
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
 
-  '@lorenzopant/tmdb@1.22.1':
-    resolution: {integrity: sha512-VmCN16PI+coDNkQ4nDJq82gsh8wkgNs0HShefOWomt95tM2Azzd0L7BlyCsqcBd+UM3K8Zz/X5t2lBalypTQmQ==}
+  '@lorenzopant/tmdb@1.22.2':
+    resolution: {integrity: sha512-lHbB9yLRjjvEWpBj6tmIKRwN39qixMfBFD56Z7FkGySqdHu1OgC8XmPCw4XllOcoL3LG5qFCvG/jI/MjfXkWgQ==}
 
   '@msgpackr-extract/msgpackr-extract-darwin-arm64@3.0.3':
     resolution: {integrity: sha512-QZHtlVgbAdy2zAqNA9Gu1UpIuI8Xvsd1v8ic6B2pZmeFnFcMWiPLfWXh7TVw4eGEZ/C9TH281KwhVoeQUKbyjw==}
@@ -9268,7 +9268,7 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
 
-  '@lorenzopant/tmdb@1.22.1': {}
+  '@lorenzopant/tmdb@1.22.2': {}
 
   '@msgpackr-extract/msgpackr-extract-darwin-arm64@3.0.3':
     optional: true
