@@ -12,14 +12,13 @@ import { Check } from "lucide-react-native";
 import { trpc } from "@/lib/trpc";
 import { useDefaultHeaderOptions } from "@/lib/navigation";
 import { COUNTRIES, countryFlag } from "@/lib/region-data";
+import { fontSize, fontFamily, spacing, radius } from "@/lib/constants";
 import {
-	Colors,
-	dynamicColorAlpha,
-	fontSize,
-	fontFamily,
-	spacing,
-	radius,
-} from "@/lib/constants";
+	colorWithAlpha,
+	useTheme,
+	useThemedStyles,
+	type ThemeColors,
+} from "@/lib/theme";
 
 const ITEM_HEIGHT = 49;
 
@@ -28,6 +27,8 @@ export default function SettingsRegionScreen() {
 	const utils = trpc.useUtils();
 	const headerOptions = useDefaultHeaderOptions();
 	const { data: state } = trpc.onboarding.getState.useQuery();
+	const { colors } = useTheme();
+	const styles = useThemedStyles(createStyles);
 
 	const current = state?.country ?? null;
 
@@ -60,11 +61,11 @@ export default function SettingsRegionScreen() {
 				>
 					<Text style={styles.flag}>{countryFlag(c.code)}</Text>
 					<Text style={styles.countryName}>{c.name}</Text>
-					{isSelected && <Check size={18} color={Colors.primary} />}
+					{isSelected && <Check size={18} color={colors.primary} />}
 				</Pressable>
 			);
 		},
-		[current, setCountry.isPending],
+		[current, setCountry.isPending, styles, colors],
 	);
 
 	return (
@@ -98,44 +99,45 @@ export default function SettingsRegionScreen() {
 	);
 }
 
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		backgroundColor: Colors.background,
-		padding: spacing[4],
-		gap: spacing[4],
-	},
-	description: {
-		fontSize: fontSize.sm,
-		fontFamily: fontFamily.sans,
-		color: Colors.mutedForeground,
-		lineHeight: 20,
-	},
-	list: {
-		backgroundColor: Colors.card,
-		borderRadius: radius.xl,
-		overflow: "hidden",
-	},
-	item: {
-		flexDirection: "row",
-		alignItems: "center",
-		gap: spacing[3],
-		paddingHorizontal: spacing[4],
-		paddingVertical: spacing[3],
-		height: ITEM_HEIGHT,
-		borderBottomWidth: StyleSheet.hairlineWidth,
-		borderBottomColor: Colors.border,
-	},
-	itemSelected: {
-		backgroundColor: dynamicColorAlpha("primary", "15"),
-	},
-	flag: {
-		fontSize: fontSize.xl,
-	},
-	countryName: {
-		flex: 1,
-		fontSize: fontSize.base,
-		fontFamily: fontFamily.sans,
-		color: Colors.foreground,
-	},
-});
+const createStyles = (colors: ThemeColors) =>
+	StyleSheet.create({
+		container: {
+			flex: 1,
+			backgroundColor: colors.background,
+			padding: spacing[4],
+			gap: spacing[4],
+		},
+		description: {
+			fontSize: fontSize.sm,
+			fontFamily: fontFamily.sans,
+			color: colors.mutedForeground,
+			lineHeight: 20,
+		},
+		list: {
+			backgroundColor: colors.card,
+			borderRadius: radius.xl,
+			overflow: "hidden",
+		},
+		item: {
+			flexDirection: "row",
+			alignItems: "center",
+			gap: spacing[3],
+			paddingHorizontal: spacing[4],
+			paddingVertical: spacing[3],
+			height: ITEM_HEIGHT,
+			borderBottomWidth: StyleSheet.hairlineWidth,
+			borderBottomColor: colors.border,
+		},
+		itemSelected: {
+			backgroundColor: colorWithAlpha(colors.primary, "15"),
+		},
+		flag: {
+			fontSize: fontSize.xl,
+		},
+		countryName: {
+			flex: 1,
+			fontSize: fontSize.base,
+			fontFamily: fontFamily.sans,
+			color: colors.foreground,
+		},
+	});

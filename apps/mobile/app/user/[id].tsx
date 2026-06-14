@@ -24,7 +24,8 @@ import { UserProfileSkeleton } from "@/components/user-profile-skeleton";
 import { EmptyState } from "@/components/empty-state";
 import { Spinner } from "@/components/spinner";
 import { useDefaultHeaderOptions } from "@/lib/navigation";
-import { Colors, fontSize, fontFamily, spacing } from "@/lib/constants";
+import { fontSize, fontFamily, spacing } from "@/lib/constants";
+import { useThemedStyles, type ThemeColors } from "@/lib/theme";
 
 export default function UserProfileScreen() {
 	const { id } = useLocalSearchParams<{ id: string }>();
@@ -32,6 +33,7 @@ export default function UserProfileScreen() {
 	const isOwnProfile = session?.user?.id === id;
 	const userId = id ?? "";
 	const headerOptions = useDefaultHeaderOptions();
+	const styles = useThemedStyles(createStyles);
 
 	const tracked = useRef(false);
 	useEffect(() => {
@@ -273,32 +275,33 @@ export default function UserProfileScreen() {
 	);
 }
 
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		backgroundColor: Colors.background,
-	},
-	scroll: {
-		paddingBottom: spacing[8],
-		gap: spacing[6],
-	},
-	header: {
-		alignItems: "center",
-		paddingTop: spacing[6],
-		gap: spacing[3],
-	},
-	name: {
-		fontSize: fontSize["2xl"],
-		fontFamily: fontFamily.displayBold,
-		color: Colors.foreground,
-	},
-	blockedText: {
-		fontSize: fontSize.sm,
-		fontFamily: fontFamily.sans,
-		color: Colors.mutedForeground,
-	},
-	loadingState: {
-		paddingVertical: spacing[8],
-		alignItems: "center",
-	},
-});
+const createStyles = (colors: ThemeColors) =>
+	StyleSheet.create({
+		container: {
+			flex: 1,
+			backgroundColor: colors.background,
+		},
+		scroll: {
+			paddingBottom: spacing[8],
+			gap: spacing[6],
+		},
+		header: {
+			alignItems: "center",
+			paddingTop: spacing[6],
+			gap: spacing[3],
+		},
+		name: {
+			fontSize: fontSize["2xl"],
+			fontFamily: fontFamily.displayBold,
+			color: colors.foreground,
+		},
+		blockedText: {
+			fontSize: fontSize.sm,
+			fontFamily: fontFamily.sans,
+			color: colors.mutedForeground,
+		},
+		loadingState: {
+			paddingVertical: spacing[8],
+			alignItems: "center",
+		},
+	});

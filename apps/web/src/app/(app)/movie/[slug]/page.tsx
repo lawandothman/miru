@@ -1,20 +1,25 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { cache } from "react";
 import type { Metadata } from "next";
 import { trpc } from "@/lib/trpc/server";
 import { movieIdFromSlug, movieSlug } from "@/lib/movie-slug";
 import { POSTER_BLUR_DATA_URL } from "@/lib/image-placeholder";
 import { ShareButton } from "@/components/share-button";
 import { TrackEvent } from "@/components/track-event";
-import { WatchedButton } from "@/components/watched-button";
-import { WatchlistButton } from "@/components/watchlist-button";
+import { MovieActions } from "@/components/movie-actions";
 import { UserAvatar } from "@/components/user-avatar";
 import { Badge } from "@/components/ui/badge";
 
 interface MoviePageProps {
 	params: Promise<{ slug: string }>;
 }
+
+const getMovie = cache(async (tmdbId: number) => {
+	const api = await trpc();
+	return api.movie.getById({ tmdbId });
+});
 
 export async function generateMetadata({
 	params,
@@ -25,9 +30,8 @@ export async function generateMetadata({
 		return { title: "Movie" };
 	}
 
-	const api = await trpc();
 	try {
-		const movie = await api.movie.getById({ tmdbId });
+		const movie = await getMovie(tmdbId);
 		const year = movie.releaseDate?.split("-")[0];
 		const title = year ? `${movie.title} (${year})` : movie.title;
 		const canonical = movieSlug(movie.title, tmdbId);
@@ -59,11 +63,9 @@ export default async function MoviePage({ params }: MoviePageProps) {
 		notFound();
 	}
 
-	const api = await trpc();
-
 	let movie;
 	try {
-		movie = await api.movie.getById({ tmdbId });
+		movie = await getMovie(tmdbId);
 	} catch {
 		notFound();
 	}
@@ -121,6 +123,7 @@ export default async function MoviePage({ params }: MoviePageProps) {
 						alt=""
 						width={1920}
 						height={1080}
+						sizes="100vw"
 						className="h-[280px] w-full object-cover object-top opacity-40 sm:h-[380px]"
 						priority
 						unoptimized
@@ -179,11 +182,11 @@ export default async function MoviePage({ params }: MoviePageProps) {
 									)}
 							</div>
 							<div className="mt-4 flex gap-2">
-								<WatchlistButton
+								<MovieActions
 									movieId={movie.id}
 									inWatchlist={movie.inWatchlist}
+									isWatched={movie.isWatched}
 								/>
-								<WatchedButton movieId={movie.id} isWatched={movie.isWatched} />
 								<ShareButton
 									title={movie.title}
 									text={`Check out ${movie.title} on Miru`}

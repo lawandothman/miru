@@ -1,7 +1,8 @@
 import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { UserAvatar } from "@/components/user-avatar";
-import { Colors, fontSize, fontFamily, spacing } from "@/lib/constants";
+import { fontSize, fontFamily, spacing } from "@/lib/constants";
+import { useThemedStyles, type ThemeColors } from "@/lib/theme";
 
 interface MatchUser {
 	id: string;
@@ -14,6 +15,7 @@ interface MovieMatchesProps {
 }
 
 export function MovieMatches({ matches }: MovieMatchesProps) {
+	const styles = useThemedStyles(createStyles);
 	const router = useRouter();
 
 	if (matches.length === 0) {
@@ -48,30 +50,31 @@ export function MovieMatches({ matches }: MovieMatchesProps) {
 	);
 }
 
-const styles = StyleSheet.create({
-	section: {
-		gap: spacing[3],
-	},
-	sectionTitle: {
-		fontSize: fontSize.base,
-		fontFamily: fontFamily.displaySemibold,
-		color: Colors.foreground,
-	},
-	matchesScroll: {
-		gap: spacing[3],
-	},
-	matchCard: {
-		alignItems: "center",
-		gap: spacing[1],
-		width: 64,
-	},
-	matchName: {
-		fontSize: fontSize.xs,
-		fontFamily: fontFamily.sans,
-		color: Colors.mutedForeground,
-		textAlign: "center",
-	},
-	pressed: {
-		opacity: 0.7,
-	},
-});
+const createStyles = (colors: ThemeColors) =>
+	StyleSheet.create({
+		section: {
+			gap: spacing[3],
+		},
+		sectionTitle: {
+			fontSize: fontSize.base,
+			fontFamily: fontFamily.displaySemibold,
+			color: colors.foreground,
+		},
+		matchesScroll: {
+			gap: spacing[3],
+		},
+		matchCard: {
+			alignItems: "center",
+			gap: spacing[1],
+			width: 64,
+		},
+		matchName: {
+			fontSize: fontSize.xs,
+			fontFamily: fontFamily.sans,
+			color: colors.mutedForeground,
+			textAlign: "center",
+		},
+		pressed: {
+			opacity: 0.7,
+		},
+	});

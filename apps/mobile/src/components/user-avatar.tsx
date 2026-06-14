@@ -1,6 +1,7 @@
 import { View, Text, StyleSheet } from "react-native";
 import { Image } from "expo-image";
-import { Colors, fontFamily } from "@/lib/constants";
+import { fontFamily } from "@/lib/constants";
+import { useThemedStyles, type ThemeColors } from "@/lib/theme";
 
 interface UserAvatarProps {
 	imageUrl: string | null | undefined;
@@ -9,6 +10,7 @@ interface UserAvatarProps {
 }
 
 export function UserAvatar({ imageUrl, name, size = 40 }: UserAvatarProps) {
+	const styles = useThemedStyles(createStyles);
 	const initials = (name ?? "?")
 		.split(" ")
 		.map((w) => w[0])
@@ -46,17 +48,18 @@ export function UserAvatar({ imageUrl, name, size = 40 }: UserAvatarProps) {
 	);
 }
 
-const styles = StyleSheet.create({
-	image: {
-		backgroundColor: Colors.secondary,
-	},
-	fallback: {
-		backgroundColor: Colors.secondary,
-		justifyContent: "center",
-		alignItems: "center",
-	},
-	initials: {
-		color: Colors.mutedForeground,
-		fontFamily: fontFamily.sansSemibold,
-	},
-});
+const createStyles = (colors: ThemeColors) =>
+	StyleSheet.create({
+		image: {
+			backgroundColor: colors.secondary,
+		},
+		fallback: {
+			backgroundColor: colors.secondary,
+			justifyContent: "center",
+			alignItems: "center",
+		},
+		initials: {
+			color: colors.mutedForeground,
+			fontFamily: fontFamily.sansSemibold,
+		},
+	});

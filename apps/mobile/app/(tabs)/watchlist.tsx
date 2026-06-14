@@ -5,13 +5,15 @@ import { useRouter } from "expo-router";
 import { trpc } from "@/lib/trpc";
 import { MovieGrid } from "@/components/movie-grid";
 import { EmptyState } from "@/components/empty-state";
-import { Colors, fontSize, fontFamily, spacing } from "@/lib/constants";
+import { fontSize, fontFamily, spacing } from "@/lib/constants";
+import { useThemedStyles, type ThemeColors } from "@/lib/theme";
 import { offsetPageParam } from "@/lib/pagination";
 
 const PAGE_SIZE = 30;
 
 export default function WatchlistScreen() {
 	const router = useRouter();
+	const styles = useThemedStyles(createStyles);
 	const { data, fetchNextPage, hasNextPage, refetch } =
 		trpc.watchlist.getMyWatchlist.useInfiniteQuery(
 			{ limit: PAGE_SIZE },
@@ -45,17 +47,18 @@ export default function WatchlistScreen() {
 	);
 }
 
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		backgroundColor: Colors.background,
-	},
-	title: {
-		fontSize: fontSize["2xl"],
-		fontFamily: fontFamily.displayBold,
-		color: Colors.foreground,
-		paddingHorizontal: spacing[4],
-		paddingTop: spacing[2],
-		paddingBottom: spacing[3],
-	},
-});
+const createStyles = (colors: ThemeColors) =>
+	StyleSheet.create({
+		container: {
+			flex: 1,
+			backgroundColor: colors.background,
+		},
+		title: {
+			fontSize: fontSize["2xl"],
+			fontFamily: fontFamily.displayBold,
+			color: colors.foreground,
+			paddingHorizontal: spacing[4],
+			paddingTop: spacing[2],
+			paddingBottom: spacing[3],
+		},
+	});

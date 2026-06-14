@@ -3,13 +3,8 @@ import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ChevronLeft, Share2 } from "lucide-react-native";
-import {
-	backdropUrl,
-	Colors,
-	getThemePalette,
-	spacing,
-	useResolvedColorScheme,
-} from "@/lib/constants";
+import { backdropUrl, spacing } from "@/lib/constants";
+import { useTheme, useThemedStyles, type ThemeColors } from "@/lib/theme";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const HERO_HEIGHT = SCREEN_WIDTH * 0.75;
@@ -22,8 +17,8 @@ interface MovieHeroProps {
 
 export function MovieHero({ backdropPath, onBack, onShare }: MovieHeroProps) {
 	const insets = useSafeAreaInsets();
-	const resolvedScheme = useResolvedColorScheme();
-	const palette = getThemePalette(resolvedScheme);
+	const { scheme, colors } = useTheme();
+	const styles = useThemedStyles(createStyles);
 
 	return (
 		<View style={styles.heroContainer}>
@@ -40,10 +35,10 @@ export function MovieHero({ backdropPath, onBack, onShare }: MovieHeroProps) {
 			<LinearGradient
 				colors={[
 					"transparent",
-					resolvedScheme === "light"
+					scheme === "light"
 						? "rgba(250, 250, 250, 0.6)"
 						: "rgba(1, 1, 1, 0.6)",
-					palette.background,
+					colors.background,
 				]}
 				locations={[0, 0.55, 1]}
 				style={styles.heroGradient}
@@ -81,36 +76,37 @@ export function MovieHero({ backdropPath, onBack, onShare }: MovieHeroProps) {
 	);
 }
 
-const styles = StyleSheet.create({
-	heroContainer: {
-		height: HERO_HEIGHT,
-		position: "relative",
-	},
-	heroImage: {
-		...StyleSheet.absoluteFill,
-	},
-	heroPlaceholder: {
-		backgroundColor: Colors.secondary,
-	},
-	heroGradient: {
-		...StyleSheet.absoluteFill,
-	},
-	heroNav: {
-		position: "absolute",
-		left: spacing[4],
-		right: spacing[4],
-		flexDirection: "row",
-		justifyContent: "space-between",
-	},
-	heroButton: {
-		width: 44,
-		height: 44,
-		borderRadius: 22,
-		backgroundColor: "rgba(0,0,0,0.45)",
-		justifyContent: "center",
-		alignItems: "center",
-	},
-	heroButtonPressed: {
-		opacity: 0.7,
-	},
-});
+const createStyles = (colors: ThemeColors) =>
+	StyleSheet.create({
+		heroContainer: {
+			height: HERO_HEIGHT,
+			position: "relative",
+		},
+		heroImage: {
+			...StyleSheet.absoluteFill,
+		},
+		heroPlaceholder: {
+			backgroundColor: colors.secondary,
+		},
+		heroGradient: {
+			...StyleSheet.absoluteFill,
+		},
+		heroNav: {
+			position: "absolute",
+			left: spacing[4],
+			right: spacing[4],
+			flexDirection: "row",
+			justifyContent: "space-between",
+		},
+		heroButton: {
+			width: 44,
+			height: 44,
+			borderRadius: 22,
+			backgroundColor: "rgba(0,0,0,0.45)",
+			justifyContent: "center",
+			alignItems: "center",
+		},
+		heroButtonPressed: {
+			opacity: 0.7,
+		},
+	});

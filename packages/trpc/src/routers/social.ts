@@ -1,19 +1,33 @@
 import { type Database, schema } from "@miru/db";
 import { TRPCError } from "@trpc/server";
-import { and, count, desc, eq, ilike, isNull, ne, or, sql } from "drizzle-orm";
+import {
+	and,
+	count,
+	desc,
+	eq,
+	ilike,
+	isNull,
+	ne,
+	notInArray,
+	or,
+	sql,
+} from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { z } from "zod";
 import { annotateFollowStatus, getBlockedUserIds } from "../helpers";
+import {
+	type DashboardMatch,
+	filterUnwatchedMatches,
+	parseDashboardMatches,
+} from "../matching";
 import { protectedProcedure, publicProcedure, router } from "../trpc";
 import { newFollowerJob } from "../jobs";
 
-type DashboardMatch = {
-	id: number;
-	posterPath: string | null;
-	title: string;
-};
-
-async function fetchDashboardMatches(db: Database, userId: string) {
+async function fetchDashboardMatches(
+	db: Database,
+	userId: string,
+	{ limit, offset }: { limit: number; offset: number },
+) {
 	const myWatchlist = alias(schema.watchlistEntries, "my_watchlist");
 	const myWatched = alias(schema.watchedEntries, "my_watched");
 	const friendWatched = alias(schema.watchedEntries, "friend_watched");
@@ -96,14 +110,13 @@ async function fetchDashboardMatches(db: Database, userId: string) {
 			),
 		)
 		.groupBy(schema.users.id, schema.users.name, schema.users.image)
-		.orderBy(desc(count(schema.movies.id)), schema.users.id);
+		.orderBy(desc(count(schema.movies.id)), schema.users.id)
+		.limit(limit)
+		.offset(offset);
 
 	return rows.map(({ matchCount: _, matches, ...row }) => ({
 		...row,
-		matches:
-			typeof matches === "string"
-				? (JSON.parse(matches) as DashboardMatch[])
-				: matches,
+		matches: parseDashboardMatches(matches),
 	}));
 }
 
@@ -174,9 +187,21 @@ export const socialRouter = router({
 			.where(eq(schema.blockedUsers.blockerId, ctx.session.user.id));
 	}),
 
-	getDashboardMatches: protectedProcedure.query(async ({ ctx }) => {
-		return fetchDashboardMatches(ctx.db, ctx.session.user.id);
-	}),
+	getDashboardMatches: protectedProcedure
+		.input(
+			z
+				.object({
+					cursor: z.number().int().min(0).nullish(),
+					limit: z.number().int().min(1).max(50).default(30),
+				})
+				.optional(),
+		)
+		.query(async ({ ctx, input }) => {
+			return fetchDashboardMatches(ctx.db, ctx.session.user.id, {
+				limit: input?.limit ?? 30,
+				offset: input?.cursor ?? 0,
+			});
+		}),
 
 	follow: protectedProcedure
 		.input(z.object({ friendId: z.string().min(1) }))
@@ -233,61 +258,82 @@ export const socialRouter = router({
 		}),
 
 	getFollowers: publicProcedure
-		.input(z.object({ userId: z.string().min(1) }))
+		.input(
+			z.object({
+				userId: z.string().min(1),
+				cursor: z.number().int().min(0).nullish(),
+				limit: z.number().int().min(1).max(100).default(20),
+			}),
+		)
 		.query(async ({ ctx, input }) => {
-			const blockedIdsPromise = ctx.session?.user
-				? getBlockedUserIds(ctx.db, ctx.session.user.id)
-				: Promise.resolve(new Set<string>());
+			const offset = input.cursor ?? 0;
+			const blockedIds = ctx.session?.user
+				? await getBlockedUserIds(ctx.db, ctx.session.user.id)
+				: new Set<string>();
+			const blockedArray = [...blockedIds];
 
-			const [blockedIds, followers] = await Promise.all([
-				blockedIdsPromise,
-				ctx.db
-					.select({
-						id: schema.users.id,
-						name: schema.users.name,
-						image: schema.users.image,
-					})
-					.from(schema.follows)
-					.innerJoin(
-						schema.users,
-						eq(schema.users.id, schema.follows.followerId),
-					)
-					.where(eq(schema.follows.followingId, input.userId)),
-			]);
+			const followers = await ctx.db
+				.select({
+					id: schema.users.id,
+					name: schema.users.name,
+					image: schema.users.image,
+				})
+				.from(schema.follows)
+				.innerJoin(schema.users, eq(schema.users.id, schema.follows.followerId))
+				.where(
+					and(
+						eq(schema.follows.followingId, input.userId),
+						blockedArray.length > 0
+							? notInArray(schema.users.id, blockedArray)
+							: undefined,
+					),
+				)
+				.orderBy(desc(schema.follows.createdAt), schema.users.id)
+				.limit(input.limit)
+				.offset(offset);
 
-			return annotateFollowStatus(
-				ctx,
-				followers.filter((f) => !blockedIds.has(f.id)),
-			);
+			return annotateFollowStatus(ctx, followers);
 		}),
 
 	getFollowing: publicProcedure
-		.input(z.object({ userId: z.string().min(1) }))
+		.input(
+			z.object({
+				userId: z.string().min(1),
+				cursor: z.number().int().min(0).nullish(),
+				limit: z.number().int().min(1).max(100).default(20),
+			}),
+		)
 		.query(async ({ ctx, input }) => {
-			const blockedIdsPromise = ctx.session?.user
-				? getBlockedUserIds(ctx.db, ctx.session.user.id)
-				: Promise.resolve(new Set<string>());
+			const offset = input.cursor ?? 0;
+			const blockedIds = ctx.session?.user
+				? await getBlockedUserIds(ctx.db, ctx.session.user.id)
+				: new Set<string>();
+			const blockedArray = [...blockedIds];
 
-			const [blockedIds, following] = await Promise.all([
-				blockedIdsPromise,
-				ctx.db
-					.select({
-						id: schema.users.id,
-						name: schema.users.name,
-						image: schema.users.image,
-					})
-					.from(schema.follows)
-					.innerJoin(
-						schema.users,
-						eq(schema.users.id, schema.follows.followingId),
-					)
-					.where(eq(schema.follows.followerId, input.userId)),
-			]);
+			const following = await ctx.db
+				.select({
+					id: schema.users.id,
+					name: schema.users.name,
+					image: schema.users.image,
+				})
+				.from(schema.follows)
+				.innerJoin(
+					schema.users,
+					eq(schema.users.id, schema.follows.followingId),
+				)
+				.where(
+					and(
+						eq(schema.follows.followerId, input.userId),
+						blockedArray.length > 0
+							? notInArray(schema.users.id, blockedArray)
+							: undefined,
+					),
+				)
+				.orderBy(desc(schema.follows.createdAt), schema.users.id)
+				.limit(input.limit)
+				.offset(offset);
 
-			return annotateFollowStatus(
-				ctx,
-				following.filter((f) => !blockedIds.has(f.id)),
-			);
+			return annotateFollowStatus(ctx, following);
 		}),
 
 	getMatchesWith: protectedProcedure
@@ -337,14 +383,11 @@ export const socialRouter = router({
 						.where(eq(schema.watchedEntries.userId, input.friendId)),
 				]);
 
-			const myWatchedSet = new Set(myWatchedEntries.map((e) => e.movieId));
-			const friendWatchedSet = new Set(
+			return filterUnwatchedMatches(
+				matches,
+				myWatchedEntries.map((e) => e.movieId),
 				friendWatchedEntries.map((e) => e.movieId),
 			);
-
-			return matches
-				.filter((m) => !myWatchedSet.has(m.id) && !friendWatchedSet.has(m.id))
-				.map((m) => ({ ...m, inWatchlist: true }));
 		}),
 
 	searchUsers: publicProcedure

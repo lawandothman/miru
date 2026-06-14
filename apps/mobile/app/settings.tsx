@@ -30,11 +30,14 @@ import { GenreSummary } from "@/components/settings/genre-summary";
 import { StreamingSummary } from "@/components/settings/streaming-summary";
 import { RegionSummary } from "@/components/settings/region-summary";
 import { NotificationPreferences } from "@/components/settings/notification-preferences";
-import { Colors, fontSize, fontFamily, spacing, radius } from "@/lib/constants";
+import { fontSize, fontFamily, spacing, radius } from "@/lib/constants";
+import { useTheme, useThemedStyles, type ThemeColors } from "@/lib/theme";
 
 export default function SettingsScreen() {
 	const { data: session } = useSession();
 	const headerOptions = useDefaultHeaderOptions();
+	const { colors } = useTheme();
+	const styles = useThemedStyles(createStyles);
 
 	const queryClient = useQueryClient();
 	const unregisterPushToken =
@@ -122,7 +125,7 @@ export default function SettingsScreen() {
 							}
 						}}
 					>
-						<LogOut size={18} color={Colors.foreground} />
+						<LogOut size={18} color={colors.foreground} />
 						<Text style={styles.signOutText}>Sign out</Text>
 					</Pressable>
 					<View style={styles.separator} />
@@ -160,7 +163,7 @@ export default function SettingsScreen() {
 							);
 						}}
 					>
-						<Trash2 size={18} color={Colors.destructive} />
+						<Trash2 size={18} color={colors.destructive} />
 						<Text style={styles.deleteText}>Delete account</Text>
 					</Pressable>
 				</SettingsSection>
@@ -169,60 +172,61 @@ export default function SettingsScreen() {
 	);
 }
 
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		backgroundColor: Colors.background,
-	},
-	content: {
-		padding: spacing[4],
-		paddingTop: spacing[6],
-		paddingBottom: spacing[12],
-		gap: spacing[8],
-	},
-	profileHeader: {
-		flexDirection: "row",
-		alignItems: "center",
-		gap: spacing[4],
-		backgroundColor: Colors.card,
-		borderRadius: radius.xl,
-		padding: spacing[5],
-	},
-	profileInfo: {
-		flex: 1,
-	},
-	profileName: {
-		fontSize: fontSize.lg,
-		fontFamily: fontFamily.displaySemibold,
-		color: Colors.foreground,
-	},
-	profileEmail: {
-		fontSize: fontSize.sm,
-		fontFamily: fontFamily.sans,
-		color: Colors.mutedForeground,
-		marginTop: 2,
-	},
-	pressed: {
-		opacity: 0.7,
-	},
-	actionRow: {
-		flexDirection: "row",
-		alignItems: "center",
-		gap: spacing[3],
-		paddingVertical: spacing[3],
-	},
-	separator: {
-		height: StyleSheet.hairlineWidth,
-		backgroundColor: Colors.border,
-	},
-	signOutText: {
-		fontSize: fontSize.base,
-		fontFamily: fontFamily.sansMedium,
-		color: Colors.foreground,
-	},
-	deleteText: {
-		fontSize: fontSize.base,
-		fontFamily: fontFamily.sansMedium,
-		color: Colors.destructive,
-	},
-});
+const createStyles = (colors: ThemeColors) =>
+	StyleSheet.create({
+		container: {
+			flex: 1,
+			backgroundColor: colors.background,
+		},
+		content: {
+			padding: spacing[4],
+			paddingTop: spacing[6],
+			paddingBottom: spacing[12],
+			gap: spacing[8],
+		},
+		profileHeader: {
+			flexDirection: "row",
+			alignItems: "center",
+			gap: spacing[4],
+			backgroundColor: colors.card,
+			borderRadius: radius.xl,
+			padding: spacing[5],
+		},
+		profileInfo: {
+			flex: 1,
+		},
+		profileName: {
+			fontSize: fontSize.lg,
+			fontFamily: fontFamily.displaySemibold,
+			color: colors.foreground,
+		},
+		profileEmail: {
+			fontSize: fontSize.sm,
+			fontFamily: fontFamily.sans,
+			color: colors.mutedForeground,
+			marginTop: 2,
+		},
+		pressed: {
+			opacity: 0.7,
+		},
+		actionRow: {
+			flexDirection: "row",
+			alignItems: "center",
+			gap: spacing[3],
+			paddingVertical: spacing[3],
+		},
+		separator: {
+			height: StyleSheet.hairlineWidth,
+			backgroundColor: colors.border,
+		},
+		signOutText: {
+			fontSize: fontSize.base,
+			fontFamily: fontFamily.sansMedium,
+			color: colors.foreground,
+		},
+		deleteText: {
+			fontSize: fontSize.base,
+			fontFamily: fontFamily.sansMedium,
+			color: colors.destructive,
+		},
+	});

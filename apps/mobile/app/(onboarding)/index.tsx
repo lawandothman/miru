@@ -13,7 +13,8 @@ import { StreamingStep } from "@/components/onboarding/streaming-step";
 import { WatchlistStep } from "@/components/onboarding/watchlist-step";
 import { FriendsStep } from "@/components/onboarding/friends-step";
 import { capture } from "@/lib/analytics";
-import { Colors, fontSize, fontFamily, spacing, radius } from "@/lib/constants";
+import { fontSize, fontFamily, spacing, radius } from "@/lib/constants";
+import { useTheme, useThemedStyles, type ThemeColors } from "@/lib/theme";
 import {
 	triggerStepCompleteHaptic,
 	triggerWatchlistHaptic,
@@ -41,6 +42,8 @@ export default function OnboardingScreen() {
 	const utils = trpc.useUtils();
 	const { data: session, refetch: refetchSession } = useSession();
 	const initialName = session?.user?.name ?? "";
+	const { colors } = useTheme();
+	const styles = useThemedStyles(createStyles);
 
 	const [steps] = useState<readonly StepName[]>(() =>
 		initialName.trim()
@@ -239,7 +242,7 @@ export default function OnboardingScreen() {
 					accessibilityLabel={isSaving ? "Saving" : buttonLabel}
 				>
 					{isSaving ? (
-						<Spinner size={16} color={Colors.primaryForeground} />
+						<Spinner size={16} color={colors.primaryForeground} />
 					) : (
 						<Text style={styles.continueText}>{buttonLabel}</Text>
 					)}
@@ -249,58 +252,59 @@ export default function OnboardingScreen() {
 	);
 }
 
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		backgroundColor: Colors.background,
-	},
-	stepContainer: {
-		flex: 1,
-		paddingTop: spacing[6],
-	},
-	actionBar: {
-		flexDirection: "row",
-		gap: spacing[3],
-		paddingHorizontal: spacing[4],
-		paddingTop: spacing[4],
-		borderTopWidth: StyleSheet.hairlineWidth,
-		borderTopColor: Colors.border,
-	},
-	skipButton: {
-		paddingVertical: spacing[3],
-		paddingHorizontal: spacing[5],
-		borderRadius: radius.lg,
-		backgroundColor: Colors.secondary,
-		alignItems: "center",
-		justifyContent: "center",
-	},
-	skipText: {
-		fontSize: fontSize.base,
-		fontFamily: fontFamily.sansSemibold,
-		color: Colors.foreground,
-	},
-	continueButton: {
-		paddingVertical: spacing[3],
-		borderRadius: radius.lg,
-		backgroundColor: Colors.primary,
-		alignItems: "center",
-		justifyContent: "center",
-	},
-	continueButtonFull: {
-		flex: 1,
-	},
-	continueButtonFlex: {
-		flex: 1,
-	},
-	continueButtonDisabled: {
-		opacity: 0.4,
-	},
-	continueText: {
-		fontSize: fontSize.base,
-		fontFamily: fontFamily.sansSemibold,
-		color: Colors.primaryForeground,
-	},
-	pressed: {
-		opacity: 0.8,
-	},
-});
+const createStyles = (colors: ThemeColors) =>
+	StyleSheet.create({
+		container: {
+			flex: 1,
+			backgroundColor: colors.background,
+		},
+		stepContainer: {
+			flex: 1,
+			paddingTop: spacing[6],
+		},
+		actionBar: {
+			flexDirection: "row",
+			gap: spacing[3],
+			paddingHorizontal: spacing[4],
+			paddingTop: spacing[4],
+			borderTopWidth: StyleSheet.hairlineWidth,
+			borderTopColor: colors.border,
+		},
+		skipButton: {
+			paddingVertical: spacing[3],
+			paddingHorizontal: spacing[5],
+			borderRadius: radius.lg,
+			backgroundColor: colors.secondary,
+			alignItems: "center",
+			justifyContent: "center",
+		},
+		skipText: {
+			fontSize: fontSize.base,
+			fontFamily: fontFamily.sansSemibold,
+			color: colors.foreground,
+		},
+		continueButton: {
+			paddingVertical: spacing[3],
+			borderRadius: radius.lg,
+			backgroundColor: colors.primary,
+			alignItems: "center",
+			justifyContent: "center",
+		},
+		continueButtonFull: {
+			flex: 1,
+		},
+		continueButtonFlex: {
+			flex: 1,
+		},
+		continueButtonDisabled: {
+			opacity: 0.4,
+		},
+		continueText: {
+			fontSize: fontSize.base,
+			fontFamily: fontFamily.sansSemibold,
+			color: colors.primaryForeground,
+		},
+		pressed: {
+			opacity: 0.8,
+		},
+	});

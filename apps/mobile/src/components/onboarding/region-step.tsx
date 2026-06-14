@@ -6,14 +6,13 @@ import {
 	countryFlag,
 	detectCountryFromTimezone,
 } from "@/lib/region-data";
+import { fontSize, fontFamily, spacing, radius } from "@/lib/constants";
 import {
-	Colors,
-	dynamicColorAlpha,
-	fontSize,
-	fontFamily,
-	spacing,
-	radius,
-} from "@/lib/constants";
+	colorWithAlpha,
+	useTheme,
+	useThemedStyles,
+	type ThemeColors,
+} from "@/lib/theme";
 
 interface RegionStepProps {
 	country: string | null;
@@ -26,6 +25,8 @@ export function RegionStep({ country, onSelect }: RegionStepProps) {
 	const [selected, setSelected] = useState<string | null>(
 		() => country ?? detectCountryFromTimezone(),
 	);
+	const { colors } = useTheme();
+	const styles = useThemedStyles(createStyles);
 
 	useEffect(() => {
 		if (!country && selected) {
@@ -51,11 +52,11 @@ export function RegionStep({ country, onSelect }: RegionStepProps) {
 				>
 					<Text style={styles.flag}>{countryFlag(c.code)}</Text>
 					<Text style={styles.countryName}>{c.name}</Text>
-					{isSelected && <Check size={18} color={Colors.primary} />}
+					{isSelected && <Check size={18} color={colors.primary} />}
 				</Pressable>
 			);
 		},
-		[selected],
+		[selected, styles, colors],
 	);
 
 	return (
@@ -85,52 +86,53 @@ export function RegionStep({ country, onSelect }: RegionStepProps) {
 	);
 }
 
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		padding: spacing[4],
-		paddingBottom: spacing[8],
-		gap: spacing[4],
-	},
-	header: {
-		gap: spacing[2],
-	},
-	title: {
-		fontSize: fontSize["2xl"],
-		fontFamily: fontFamily.displayBold,
-		color: Colors.foreground,
-	},
-	subtitle: {
-		fontSize: fontSize.base,
-		fontFamily: fontFamily.sans,
-		color: Colors.mutedForeground,
-		lineHeight: 22,
-	},
-	list: {
-		backgroundColor: Colors.card,
-		borderRadius: radius.xl,
-		overflow: "hidden",
-	},
-	item: {
-		flexDirection: "row",
-		alignItems: "center",
-		gap: spacing[3],
-		paddingHorizontal: spacing[4],
-		paddingVertical: spacing[3],
-		height: ITEM_HEIGHT,
-		borderBottomWidth: StyleSheet.hairlineWidth,
-		borderBottomColor: Colors.border,
-	},
-	itemSelected: {
-		backgroundColor: dynamicColorAlpha("primary", "15"),
-	},
-	flag: {
-		fontSize: fontSize.xl,
-	},
-	countryName: {
-		flex: 1,
-		fontSize: fontSize.base,
-		fontFamily: fontFamily.sans,
-		color: Colors.foreground,
-	},
-});
+const createStyles = (colors: ThemeColors) =>
+	StyleSheet.create({
+		container: {
+			flex: 1,
+			padding: spacing[4],
+			paddingBottom: spacing[8],
+			gap: spacing[4],
+		},
+		header: {
+			gap: spacing[2],
+		},
+		title: {
+			fontSize: fontSize["2xl"],
+			fontFamily: fontFamily.displayBold,
+			color: colors.foreground,
+		},
+		subtitle: {
+			fontSize: fontSize.base,
+			fontFamily: fontFamily.sans,
+			color: colors.mutedForeground,
+			lineHeight: 22,
+		},
+		list: {
+			backgroundColor: colors.card,
+			borderRadius: radius.xl,
+			overflow: "hidden",
+		},
+		item: {
+			flexDirection: "row",
+			alignItems: "center",
+			gap: spacing[3],
+			paddingHorizontal: spacing[4],
+			paddingVertical: spacing[3],
+			height: ITEM_HEIGHT,
+			borderBottomWidth: StyleSheet.hairlineWidth,
+			borderBottomColor: colors.border,
+		},
+		itemSelected: {
+			backgroundColor: colorWithAlpha(colors.primary, "15"),
+		},
+		flag: {
+			fontSize: fontSize.xl,
+		},
+		countryName: {
+			flex: 1,
+			fontSize: fontSize.base,
+			fontFamily: fontFamily.sans,
+			color: colors.foreground,
+		},
+	});

@@ -1,5 +1,6 @@
 import { View, StyleSheet } from "react-native";
-import { Colors, spacing, radius } from "@/lib/constants";
+import { spacing, radius } from "@/lib/constants";
+import { useThemedStyles, type ThemeColors } from "@/lib/theme";
 
 interface ProgressBarProps {
 	currentStep: number;
@@ -7,6 +8,7 @@ interface ProgressBarProps {
 }
 
 export function ProgressBar({ currentStep, totalSteps }: ProgressBarProps) {
+	const styles = useThemedStyles(createStyles);
 	return (
 		<View style={styles.container}>
 			{Array.from({ length: totalSteps }, (_, i) => (
@@ -22,21 +24,22 @@ export function ProgressBar({ currentStep, totalSteps }: ProgressBarProps) {
 	);
 }
 
-const styles = StyleSheet.create({
-	container: {
-		flexDirection: "row",
-		gap: spacing[1.5],
-		paddingHorizontal: spacing[4],
-	},
-	segment: {
-		flex: 1,
-		height: 4,
-		borderRadius: radius.full,
-	},
-	filled: {
-		backgroundColor: Colors.primary,
-	},
-	unfilled: {
-		backgroundColor: Colors.muted,
-	},
-});
+const createStyles = (colors: ThemeColors) =>
+	StyleSheet.create({
+		container: {
+			flexDirection: "row",
+			gap: spacing[1.5],
+			paddingHorizontal: spacing[4],
+		},
+		segment: {
+			flex: 1,
+			height: 4,
+			borderRadius: radius.full,
+		},
+		filled: {
+			backgroundColor: colors.primary,
+		},
+		unfilled: {
+			backgroundColor: colors.muted,
+		},
+	});

@@ -12,7 +12,8 @@ import * as Sentry from "@sentry/react-native";
 import { Spinner } from "@/components/spinner";
 import { authClient, signIn } from "@/lib/auth";
 import { capture } from "@/lib/analytics";
-import { Colors, fontFamily, fontSize, radius, spacing } from "@/lib/constants";
+import { fontFamily, fontSize, radius, spacing } from "@/lib/constants";
+import { useThemedStyles, useTheme, type ThemeColors } from "@/lib/theme";
 
 type Step = "email" | "code";
 
@@ -21,6 +22,8 @@ type EmailOtpFormProps = {
 };
 
 export function EmailOtpForm({ onCancel }: EmailOtpFormProps) {
+	const styles = useThemedStyles(createStyles);
+	const { colors } = useTheme();
 	const [step, setStep] = useState<Step>("email");
 	const [email, setEmail] = useState("");
 	const [pending, setPending] = useState(false);
@@ -83,7 +86,7 @@ export function EmailOtpForm({ onCancel }: EmailOtpFormProps) {
 						value={email}
 						onChangeText={setEmail}
 						placeholder="you@example.com"
-						placeholderTextColor={Colors.mutedForeground}
+						placeholderTextColor={colors.mutedForeground}
 						keyboardType="email-address"
 						autoCapitalize="none"
 						autoCorrect={false}
@@ -103,7 +106,7 @@ export function EmailOtpForm({ onCancel }: EmailOtpFormProps) {
 						disabled={pending || email.length === 0}
 					>
 						{pending ? (
-							<Spinner size={20} color={Colors.background} />
+							<Spinner size={20} color={colors.background} />
 						) : (
 							<Text style={styles.primaryButtonText}>Send code</Text>
 						)}
@@ -132,7 +135,7 @@ export function EmailOtpForm({ onCancel }: EmailOtpFormProps) {
 					/>
 					{pending ? (
 						<View style={styles.pendingRow}>
-							<Spinner size={20} color={Colors.mutedForeground} />
+							<Spinner size={20} color={colors.mutedForeground} />
 						</View>
 					) : null}
 				</>
@@ -160,6 +163,7 @@ export function EmailOtpForm({ onCancel }: EmailOtpFormProps) {
 }
 
 function Slot({ char, isActive }: SlotProps) {
+	const styles = useThemedStyles(createStyles);
 	return (
 		<View style={[styles.slot, isActive && styles.slotActive]}>
 			<Text style={styles.slotChar}>{char ?? ""}</Text>
@@ -167,83 +171,84 @@ function Slot({ char, isActive }: SlotProps) {
 	);
 }
 
-const styles = StyleSheet.create({
-	container: {
-		gap: spacing[3],
-	},
-	input: {
-		backgroundColor: Colors.muted,
-		borderRadius: radius.lg,
-		color: Colors.foreground,
-		fontFamily: fontFamily.sans,
-		fontSize: fontSize.lg,
-		paddingHorizontal: spacing[4],
-		paddingVertical: spacing[4],
-	},
-	otpContainer: {
-		alignItems: "center",
-	},
-	slots: {
-		flexDirection: "row",
-		gap: spacing[2],
-	},
-	slot: {
-		width: 48,
-		height: 56,
-		borderRadius: radius.lg,
-		backgroundColor: Colors.muted,
-		alignItems: "center",
-		justifyContent: "center",
-		borderWidth: 2,
-		borderColor: "transparent",
-	},
-	slotActive: {
-		borderColor: Colors.foreground,
-	},
-	slotChar: {
-		color: Colors.foreground,
-		fontFamily: fontFamily.sansSemibold,
-		fontSize: fontSize["2xl"],
-	},
-	primaryButton: {
-		alignItems: "center",
-		backgroundColor: Colors.foreground,
-		borderRadius: radius.lg,
-		justifyContent: "center",
-		paddingVertical: spacing[4],
-	},
-	primaryButtonText: {
-		color: Colors.background,
-		fontFamily: fontFamily.sansSemibold,
-		fontSize: fontSize.lg,
-	},
-	pressed: {
-		opacity: 0.8,
-	},
-	disabled: {
-		opacity: 0.5,
-	},
-	helperText: {
-		color: Colors.mutedForeground,
-		fontFamily: fontFamily.sans,
-		fontSize: fontSize.sm,
-		textAlign: "center",
-	},
-	pendingRow: {
-		alignItems: "center",
-		paddingVertical: spacing[2],
-	},
-	errorText: {
-		color: Colors.destructive,
-		fontFamily: fontFamily.sans,
-		fontSize: fontSize.sm,
-		textAlign: "center",
-	},
-	linkText: {
-		color: Colors.mutedForeground,
-		fontFamily: fontFamily.sans,
-		fontSize: fontSize.sm,
-		paddingVertical: spacing[2],
-		textAlign: "center",
-	},
-});
+const createStyles = (colors: ThemeColors) =>
+	StyleSheet.create({
+		container: {
+			gap: spacing[3],
+		},
+		input: {
+			backgroundColor: colors.muted,
+			borderRadius: radius.lg,
+			color: colors.foreground,
+			fontFamily: fontFamily.sans,
+			fontSize: fontSize.lg,
+			paddingHorizontal: spacing[4],
+			paddingVertical: spacing[4],
+		},
+		otpContainer: {
+			alignItems: "center",
+		},
+		slots: {
+			flexDirection: "row",
+			gap: spacing[2],
+		},
+		slot: {
+			width: 48,
+			height: 56,
+			borderRadius: radius.lg,
+			backgroundColor: colors.muted,
+			alignItems: "center",
+			justifyContent: "center",
+			borderWidth: 2,
+			borderColor: "transparent",
+		},
+		slotActive: {
+			borderColor: colors.foreground,
+		},
+		slotChar: {
+			color: colors.foreground,
+			fontFamily: fontFamily.sansSemibold,
+			fontSize: fontSize["2xl"],
+		},
+		primaryButton: {
+			alignItems: "center",
+			backgroundColor: colors.foreground,
+			borderRadius: radius.lg,
+			justifyContent: "center",
+			paddingVertical: spacing[4],
+		},
+		primaryButtonText: {
+			color: colors.background,
+			fontFamily: fontFamily.sansSemibold,
+			fontSize: fontSize.lg,
+		},
+		pressed: {
+			opacity: 0.8,
+		},
+		disabled: {
+			opacity: 0.5,
+		},
+		helperText: {
+			color: colors.mutedForeground,
+			fontFamily: fontFamily.sans,
+			fontSize: fontSize.sm,
+			textAlign: "center",
+		},
+		pendingRow: {
+			alignItems: "center",
+			paddingVertical: spacing[2],
+		},
+		errorText: {
+			color: colors.destructive,
+			fontFamily: fontFamily.sans,
+			fontSize: fontSize.sm,
+			textAlign: "center",
+		},
+		linkText: {
+			color: colors.mutedForeground,
+			fontFamily: fontFamily.sans,
+			fontSize: fontSize.sm,
+			paddingVertical: spacing[2],
+			textAlign: "center",
+		},
+	});
