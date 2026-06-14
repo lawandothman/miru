@@ -3,7 +3,7 @@ packages:
   - packages/*
 
 catalog:
-  "@lorenzopant/tmdb": 1.22.1
+  "@lorenzopant/tmdb": 1.22.2
   "@types/node": 25.9.3
   "@upstash/qstash": 2.11.0
   drizzle-orm: 0.45.2
@@ -14,8 +14,8 @@ catalog:
 
 catalogs:
   better-auth:
-    "@better-auth/expo": 1.6.11
-    better-auth: 1.6.11
+    "@better-auth/expo": 1.6.18
+    better-auth: 1.6.18
   react:
     "@types/react": 19.2.14
     "@types/react-dom": 19.2.3
