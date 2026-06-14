@@ -19,7 +19,7 @@
 		"@miru/db": "workspace:*",
 		"@trpc/server": "catalog:trpc",
 		"@upstash/qstash": "catalog:",
-		"date-fns": "4.1.0",
+		"date-fns": "4.4.0",
 		"drizzle-orm": "catalog:",
 		"superjson": "catalog:trpc",
 		"ts-pattern": "catalog:",
