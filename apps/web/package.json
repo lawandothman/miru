@@ -23,7 +23,7 @@
 		"@trpc/react-query": "catalog:trpc",
 		"@trpc/server": "catalog:trpc",
 		"@upstash/qstash": "catalog:",
-		"@vercel/blob": "2.3.3",
+		"@vercel/blob": "2.4.0",
 		"@vercel/speed-insights": "2.0.0",
 		"better-auth": "catalog:better-auth",
 		"class-variance-authority": "0.7.1",
