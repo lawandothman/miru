@@ -17,10 +17,10 @@ catalogs:
     "@better-auth/expo": 1.6.11
     better-auth: 1.6.11
   react:
-    "@types/react": 19.2.14
+    "@types/react": 19.2.17
     "@types/react-dom": 19.2.3
-    react: 19.2.3
-    react-dom: 19.2.3
+    react: 19.2.7
+    react-dom: 19.2.7
   trpc:
     "@tanstack/react-query": 5.101.0
     "@trpc/client": 11.17.0
