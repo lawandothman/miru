@@ -7,13 +7,13 @@ import { match } from "ts-pattern";
 import { FollowButton } from "@/components/follow-button";
 import { UserAvatar } from "@/components/user-avatar";
 import {
-	Colors,
 	fontFamily,
 	fontSize,
 	posterUrl,
 	radius,
 	spacing,
 } from "@/lib/constants";
+import { useThemedStyles, type ThemeColors } from "@/lib/theme";
 
 interface NotificationActor {
 	id: string;
@@ -35,6 +35,7 @@ interface NotificationItemProps {
 
 export function NotificationItem({ item }: NotificationItemProps) {
 	const router = useRouter();
+	const styles = useThemedStyles(createStyles);
 
 	function handlePress() {
 		match(item)
@@ -108,39 +109,40 @@ export function NotificationItem({ item }: NotificationItemProps) {
 	);
 }
 
-const styles = StyleSheet.create({
-	container: {
-		flexDirection: "row",
-		alignItems: "center",
-		paddingHorizontal: spacing[4],
-		paddingVertical: spacing[3],
-		gap: spacing[3],
-	},
-	unread: {
-		backgroundColor: Colors.card,
-	},
-	content: {
-		flex: 1,
-	},
-	text: {
-		fontSize: fontSize.sm,
-		fontFamily: fontFamily.sans,
-		color: Colors.foreground,
-		lineHeight: 20,
-	},
-	bold: {
-		fontFamily: fontFamily.sansSemibold,
-	},
-	time: {
-		color: Colors.mutedForeground,
-	},
-	trailing: {
-		flexShrink: 0,
-	},
-	poster: {
-		width: 44,
-		height: 44,
-		borderRadius: radius.sm,
-		backgroundColor: Colors.secondary,
-	},
-});
+const createStyles = (colors: ThemeColors) =>
+	StyleSheet.create({
+		container: {
+			flexDirection: "row",
+			alignItems: "center",
+			paddingHorizontal: spacing[4],
+			paddingVertical: spacing[3],
+			gap: spacing[3],
+		},
+		unread: {
+			backgroundColor: colors.card,
+		},
+		content: {
+			flex: 1,
+		},
+		text: {
+			fontSize: fontSize.sm,
+			fontFamily: fontFamily.sans,
+			color: colors.foreground,
+			lineHeight: 20,
+		},
+		bold: {
+			fontFamily: fontFamily.sansSemibold,
+		},
+		time: {
+			color: colors.mutedForeground,
+		},
+		trailing: {
+			flexShrink: 0,
+		},
+		poster: {
+			width: 44,
+			height: 44,
+			borderRadius: radius.sm,
+			backgroundColor: colors.secondary,
+		},
+	});

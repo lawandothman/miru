@@ -1,13 +1,14 @@
 import { Stack } from "expo-router";
-import { Colors } from "@/lib/constants";
+import { useTheme } from "@/lib/theme";
 
 export default function DiscoverLayout() {
+	const { colors } = useTheme();
 	return (
 		<Stack
 			screenOptions={{
 				headerShown: false,
-				contentStyle: { backgroundColor: Colors.background },
-				navigationBarColor: Colors.background,
+				contentStyle: { backgroundColor: colors.background },
+				navigationBarColor: colors.background,
 			}}
 		/>
 	);

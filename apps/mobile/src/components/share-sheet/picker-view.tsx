@@ -14,7 +14,8 @@ import type { RecommendRecipient } from "@/hooks/use-recommendation-draft";
 import { EmptyState } from "@/components/empty-state";
 import { Spinner } from "@/components/spinner";
 import { UserAvatar } from "@/components/user-avatar";
-import { Colors, fontFamily, fontSize, radius, spacing } from "@/lib/constants";
+import { fontFamily, fontSize, radius, spacing } from "@/lib/constants";
+import { useThemedStyles, useTheme, type ThemeColors } from "@/lib/theme";
 import { trpc } from "@/lib/trpc";
 
 interface PickerViewProps {
@@ -30,6 +31,8 @@ export function PickerView({
 	onSelect,
 	sendingRecipientId,
 }: PickerViewProps) {
+	const styles = useThemedStyles(createStyles);
+	const { colors } = useTheme();
 	const [query, setQuery] = useState("");
 	const debouncedQuery = useDebounce(query, 200);
 
@@ -50,20 +53,20 @@ export function PickerView({
 					accessibilityRole="button"
 					accessibilityLabel="Back"
 				>
-					<ChevronLeft size={22} color={Colors.foreground} />
+					<ChevronLeft size={22} color={colors.foreground} />
 				</Pressable>
 				<Text style={styles.title}>Send to a friend</Text>
 				<View style={styles.headerSpacer} />
 			</View>
 
 			<View style={styles.searchBar}>
-				<Search size={18} color={Colors.mutedForeground} />
+				<Search size={18} color={colors.mutedForeground} />
 				<TextInput
 					style={styles.searchInput}
 					value={query}
 					onChangeText={setQuery}
 					placeholder="Search friends"
-					placeholderTextColor={Colors.mutedForeground}
+					placeholderTextColor={colors.mutedForeground}
 					autoCapitalize="none"
 					autoCorrect={false}
 				/>
@@ -129,7 +132,7 @@ export function PickerView({
 									) : null}
 								</View>
 								{isSendingThis ? (
-									<ActivityIndicator size="small" color={Colors.primary} />
+									<ActivityIndicator size="small" color={colors.primary} />
 								) : null}
 							</Pressable>
 						);
@@ -140,101 +143,102 @@ export function PickerView({
 	);
 }
 
-const styles = StyleSheet.create({
-	container: {
-		paddingTop: spacing[2],
-		paddingBottom: spacing[4],
-		gap: spacing[3],
-		minHeight: 480,
-		maxHeight: 640,
-	},
-	header: {
-		flexDirection: "row",
-		alignItems: "center",
-		paddingHorizontal: spacing[4],
-		gap: spacing[2],
-	},
-	backBtn: {
-		width: 36,
-		height: 36,
-		borderRadius: 18,
-		justifyContent: "center",
-		alignItems: "center",
-	},
-	headerSpacer: {
-		width: 36,
-	},
-	title: {
-		flex: 1,
-		fontSize: fontSize.lg,
-		fontFamily: fontFamily.displaySemibold,
-		color: Colors.foreground,
-		textAlign: "center",
-	},
-	searchBar: {
-		flexDirection: "row",
-		alignItems: "center",
-		gap: spacing[2],
-		marginHorizontal: spacing[4],
-		paddingHorizontal: spacing[3],
-		paddingVertical: spacing[2],
-		backgroundColor: Colors.card,
-		borderRadius: radius.lg,
-		borderWidth: 1,
-		borderColor: Colors.border,
-	},
-	searchInput: {
-		flex: 1,
-		fontSize: fontSize.base,
-		fontFamily: fontFamily.sans,
-		color: Colors.foreground,
-		paddingVertical: spacing[1],
-	},
-	list: {
-		paddingHorizontal: spacing[4],
-		paddingTop: spacing[1],
-		paddingBottom: spacing[4],
-		gap: spacing[1],
-	},
-	row: {
-		flexDirection: "row",
-		alignItems: "center",
-		gap: spacing[3],
-		paddingVertical: spacing[2],
-	},
-	rowPressed: {
-		opacity: 0.7,
-	},
-	rowDisabled: {
-		opacity: 0.4,
-	},
-	rowDimmed: {
-		opacity: 0.5,
-	},
-	rowText: {
-		flex: 1,
-		gap: 2,
-	},
-	rowName: {
-		fontSize: fontSize.base,
-		fontFamily: fontFamily.sansMedium,
-		color: Colors.foreground,
-	},
-	rowStatus: {
-		fontSize: fontSize.xs,
-		fontFamily: fontFamily.sans,
-		color: Colors.mutedForeground,
-	},
-	loading: {
-		paddingVertical: spacing[8],
-		alignItems: "center",
-	},
-	empty: {
-		paddingTop: spacing[6],
-		paddingBottom: spacing[8],
-		minHeight: 280,
-	},
-	pressed: {
-		opacity: 0.6,
-	},
-});
+const createStyles = (colors: ThemeColors) =>
+	StyleSheet.create({
+		container: {
+			paddingTop: spacing[2],
+			paddingBottom: spacing[4],
+			gap: spacing[3],
+			minHeight: 480,
+			maxHeight: 640,
+		},
+		header: {
+			flexDirection: "row",
+			alignItems: "center",
+			paddingHorizontal: spacing[4],
+			gap: spacing[2],
+		},
+		backBtn: {
+			width: 36,
+			height: 36,
+			borderRadius: 18,
+			justifyContent: "center",
+			alignItems: "center",
+		},
+		headerSpacer: {
+			width: 36,
+		},
+		title: {
+			flex: 1,
+			fontSize: fontSize.lg,
+			fontFamily: fontFamily.displaySemibold,
+			color: colors.foreground,
+			textAlign: "center",
+		},
+		searchBar: {
+			flexDirection: "row",
+			alignItems: "center",
+			gap: spacing[2],
+			marginHorizontal: spacing[4],
+			paddingHorizontal: spacing[3],
+			paddingVertical: spacing[2],
+			backgroundColor: colors.card,
+			borderRadius: radius.lg,
+			borderWidth: 1,
+			borderColor: colors.border,
+		},
+		searchInput: {
+			flex: 1,
+			fontSize: fontSize.base,
+			fontFamily: fontFamily.sans,
+			color: colors.foreground,
+			paddingVertical: spacing[1],
+		},
+		list: {
+			paddingHorizontal: spacing[4],
+			paddingTop: spacing[1],
+			paddingBottom: spacing[4],
+			gap: spacing[1],
+		},
+		row: {
+			flexDirection: "row",
+			alignItems: "center",
+			gap: spacing[3],
+			paddingVertical: spacing[2],
+		},
+		rowPressed: {
+			opacity: 0.7,
+		},
+		rowDisabled: {
+			opacity: 0.4,
+		},
+		rowDimmed: {
+			opacity: 0.5,
+		},
+		rowText: {
+			flex: 1,
+			gap: 2,
+		},
+		rowName: {
+			fontSize: fontSize.base,
+			fontFamily: fontFamily.sansMedium,
+			color: colors.foreground,
+		},
+		rowStatus: {
+			fontSize: fontSize.xs,
+			fontFamily: fontFamily.sans,
+			color: colors.mutedForeground,
+		},
+		loading: {
+			paddingVertical: spacing[8],
+			alignItems: "center",
+		},
+		empty: {
+			paddingTop: spacing[6],
+			paddingBottom: spacing[8],
+			minHeight: 280,
+		},
+		pressed: {
+			opacity: 0.6,
+		},
+	});

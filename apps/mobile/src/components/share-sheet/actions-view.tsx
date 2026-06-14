@@ -8,7 +8,8 @@ import {
 import { Link as LinkIcon, Send } from "lucide-react-native";
 import { InstagramIcon } from "@/components/icons/instagram-icon";
 import { StoryCard } from "@/components/story-card";
-import { Colors, fontFamily, fontSize, radius, spacing } from "@/lib/constants";
+import { fontFamily, fontSize, radius, spacing } from "@/lib/constants";
+import { useThemedStyles, useTheme, type ThemeColors } from "@/lib/theme";
 
 const ACTION_ICON_SIZE = 52;
 const INSTAGRAM_ICON_SIZE = 48;
@@ -45,6 +46,8 @@ export function ActionsView({
 	onShareStory,
 	onRecommend,
 }: ActionsViewProps) {
+	const styles = useThemedStyles(createStyles);
+	const { colors } = useTheme();
 	return (
 		<View style={styles.container}>
 			<View style={styles.previewWrapper}>
@@ -61,7 +64,7 @@ export function ActionsView({
 					accessibilityLabel="Share link"
 				>
 					<View style={styles.icon}>
-						<LinkIcon size={22} color={Colors.foreground} />
+						<LinkIcon size={22} color={colors.foreground} />
 					</View>
 					<Text style={styles.label}>Share link</Text>
 				</Pressable>
@@ -76,7 +79,7 @@ export function ActionsView({
 					>
 						<View style={styles.instagramWrap}>
 							{storiesSharing ? (
-								<ActivityIndicator size="small" color={Colors.foreground} />
+								<ActivityIndicator size="small" color={colors.foreground} />
 							) : (
 								<InstagramIcon size={INSTAGRAM_ICON_SIZE} />
 							)}
@@ -92,7 +95,7 @@ export function ActionsView({
 					accessibilityLabel="Send to a friend"
 				>
 					<View style={styles.icon}>
-						<Send size={22} color={Colors.foreground} />
+						<Send size={22} color={colors.foreground} />
 					</View>
 					<Text style={styles.label}>Send to friend</Text>
 				</Pressable>
@@ -101,61 +104,62 @@ export function ActionsView({
 	);
 }
 
-const styles = StyleSheet.create({
-	container: {
-		paddingTop: spacing[4],
-		paddingBottom: spacing[6],
-		paddingHorizontal: spacing[6],
-		gap: spacing[6],
-		alignItems: "center",
-	},
-	previewWrapper: {
-		width: PREVIEW_WIDTH,
-		height: PREVIEW_HEIGHT,
-		borderRadius: radius.xl,
-		overflow: "hidden",
-	},
-	previewScaler: {
-		width: CARD_WIDTH,
-		height: CARD_HEIGHT,
-		transform: [{ scale: previewScale }],
-		transformOrigin: "top left",
-	},
-	actions: {
-		flexDirection: "row",
-		justifyContent: "center",
-		gap: spacing[6],
-	},
-	button: {
-		alignItems: "center",
-		gap: spacing[2],
-		minWidth: 80,
-	},
-	pressed: {
-		opacity: 0.6,
-	},
-	icon: {
-		width: ACTION_ICON_SIZE,
-		height: ACTION_ICON_SIZE,
-		borderRadius: ACTION_ICON_SIZE / 2,
-		backgroundColor: Colors.secondary,
-		borderWidth: StyleSheet.hairlineWidth,
-		borderColor: Colors.border,
-		justifyContent: "center",
-		alignItems: "center",
-	},
-	instagramWrap: {
-		width: ACTION_ICON_SIZE,
-		height: ACTION_ICON_SIZE,
-		borderRadius: ACTION_ICON_SIZE / 2,
-		overflow: "hidden",
-		justifyContent: "center",
-		alignItems: "center",
-	},
-	label: {
-		fontSize: fontSize.xs,
-		fontFamily: fontFamily.sansMedium,
-		color: Colors.mutedForeground,
-		textAlign: "center",
-	},
-});
+const createStyles = (colors: ThemeColors) =>
+	StyleSheet.create({
+		container: {
+			paddingTop: spacing[4],
+			paddingBottom: spacing[6],
+			paddingHorizontal: spacing[6],
+			gap: spacing[6],
+			alignItems: "center",
+		},
+		previewWrapper: {
+			width: PREVIEW_WIDTH,
+			height: PREVIEW_HEIGHT,
+			borderRadius: radius.xl,
+			overflow: "hidden",
+		},
+		previewScaler: {
+			width: CARD_WIDTH,
+			height: CARD_HEIGHT,
+			transform: [{ scale: previewScale }],
+			transformOrigin: "top left",
+		},
+		actions: {
+			flexDirection: "row",
+			justifyContent: "center",
+			gap: spacing[6],
+		},
+		button: {
+			alignItems: "center",
+			gap: spacing[2],
+			minWidth: 80,
+		},
+		pressed: {
+			opacity: 0.6,
+		},
+		icon: {
+			width: ACTION_ICON_SIZE,
+			height: ACTION_ICON_SIZE,
+			borderRadius: ACTION_ICON_SIZE / 2,
+			backgroundColor: colors.secondary,
+			borderWidth: StyleSheet.hairlineWidth,
+			borderColor: colors.border,
+			justifyContent: "center",
+			alignItems: "center",
+		},
+		instagramWrap: {
+			width: ACTION_ICON_SIZE,
+			height: ACTION_ICON_SIZE,
+			borderRadius: ACTION_ICON_SIZE / 2,
+			overflow: "hidden",
+			justifyContent: "center",
+			alignItems: "center",
+		},
+		label: {
+			fontSize: fontSize.xs,
+			fontFamily: fontFamily.sansMedium,
+			color: colors.mutedForeground,
+			textAlign: "center",
+		},
+	});

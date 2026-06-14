@@ -15,10 +15,11 @@ import {
 	type NotificationItemData,
 } from "@/components/notification-item";
 import { Spinner } from "@/components/spinner";
-import { Colors, fontFamily, fontSize, spacing } from "@/lib/constants";
+import { fontFamily, fontSize, spacing } from "@/lib/constants";
 import { triggerRefreshHaptic } from "@/lib/haptics";
 import { useDefaultHeaderOptions } from "@/lib/navigation";
 import { trpc } from "@/lib/trpc";
+import { useTheme, useThemedStyles, type ThemeColors } from "@/lib/theme";
 
 interface Section {
 	title: string;
@@ -62,6 +63,8 @@ export default function NotificationsScreen() {
 	const utils = trpc.useUtils();
 	const [refreshing, setRefreshing] = useState(false);
 	const headerOptions = useDefaultHeaderOptions();
+	const { colors } = useTheme();
+	const styles = useThemedStyles(createStyles);
 
 	const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
 		trpc.notification.list.useInfiniteQuery(
@@ -132,7 +135,7 @@ export default function NotificationsScreen() {
 						<RefreshControl
 							refreshing={refreshing}
 							onRefresh={handleRefresh}
-							tintColor={Colors.mutedForeground}
+							tintColor={colors.mutedForeground}
 						/>
 					}
 					onEndReached={handleEndReached}
@@ -156,23 +159,24 @@ export default function NotificationsScreen() {
 	);
 }
 
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		backgroundColor: Colors.background,
-	},
-	listContent: {
-		flexGrow: 1,
-	},
-	sectionHeader: {
-		paddingHorizontal: spacing[4],
-		paddingTop: spacing[5],
-		paddingBottom: spacing[2],
-		backgroundColor: Colors.background,
-	},
-	sectionTitle: {
-		fontSize: fontSize.base,
-		fontFamily: fontFamily.displayBold,
-		color: Colors.foreground,
-	},
-});
+const createStyles = (colors: ThemeColors) =>
+	StyleSheet.create({
+		container: {
+			flex: 1,
+			backgroundColor: colors.background,
+		},
+		listContent: {
+			flexGrow: 1,
+		},
+		sectionHeader: {
+			paddingHorizontal: spacing[4],
+			paddingTop: spacing[5],
+			paddingBottom: spacing[2],
+			backgroundColor: colors.background,
+		},
+		sectionTitle: {
+			fontSize: fontSize.base,
+			fontFamily: fontFamily.displayBold,
+			color: colors.foreground,
+		},
+	});

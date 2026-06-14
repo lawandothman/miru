@@ -15,7 +15,8 @@ import { FindFriendsEmptyState } from "@/components/home/find-friends-empty-stat
 import { HorizontalMovieList } from "@/components/horizontal-movie-list";
 import { UserAvatar } from "@/components/user-avatar";
 import { useSession } from "@/lib/auth";
-import { Colors, fontFamily, fontSize, radius, spacing } from "@/lib/constants";
+import { fontFamily, fontSize, radius, spacing } from "@/lib/constants";
+import { useTheme, useThemedStyles, type ThemeColors } from "@/lib/theme";
 import { triggerRefreshHaptic } from "@/lib/haptics";
 import { trpc } from "@/lib/trpc";
 
@@ -35,6 +36,8 @@ export default function HomeScreen() {
 	const router = useRouter();
 	const [refreshing, setRefreshing] = useState(false);
 	const firstName = session?.user?.name?.split(" ")[0] ?? "";
+	const { colors } = useTheme();
+	const styles = useThemedStyles(createStyles);
 
 	const { data: unreadCount } = trpc.notification.getUnreadCount.useQuery();
 	const hasUnread = (unreadCount?.count ?? 0) > 0;
@@ -81,7 +84,7 @@ export default function HomeScreen() {
 					<RefreshControl
 						refreshing={refreshing}
 						onRefresh={handleRefresh}
-						tintColor={Colors.mutedForeground}
+						tintColor={colors.mutedForeground}
 					/>
 				}
 			>
@@ -95,7 +98,7 @@ export default function HomeScreen() {
 						accessibilityLabel="Notifications"
 						style={styles.bellButton}
 					>
-						<Bell size={24} color={Colors.foreground} />
+						<Bell size={24} color={colors.foreground} />
 						{hasUnread && <View style={styles.badge} />}
 					</Pressable>
 				</View>
@@ -149,63 +152,64 @@ export default function HomeScreen() {
 	);
 }
 
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		backgroundColor: Colors.background,
-	},
-	scroll: {
-		flexGrow: 1,
-		paddingHorizontal: spacing[4],
-	},
-	header: {
-		flexDirection: "row",
-		alignItems: "center",
-		justifyContent: "space-between",
-		paddingTop: spacing[4],
-		paddingBottom: spacing[6],
-	},
-	greeting: {
-		fontSize: fontSize["2xl"],
-		fontFamily: fontFamily.displayBold,
-		color: Colors.foreground,
-		flex: 1,
-	},
-	bellButton: {
-		padding: spacing[2],
-	},
-	badge: {
-		position: "absolute",
-		top: 6,
-		right: 6,
-		width: 10,
-		height: 10,
-		borderRadius: 5,
-		backgroundColor: Colors.destructive,
-		borderWidth: 2,
-		borderColor: Colors.background,
-	},
-	matchList: {
-		gap: spacing[6],
-	},
-	friendCard: {
-		backgroundColor: Colors.card,
-		borderRadius: radius.xl,
-		padding: spacing[4],
-		gap: spacing[4],
-	},
-	friendHeader: {
-		flexDirection: "row",
-		alignItems: "center",
-		gap: spacing[4],
-	},
-	friendName: {
-		fontSize: fontSize.base,
-		fontFamily: fontFamily.sansSemibold,
-		color: Colors.foreground,
-	},
-	matchCount: {
-		fontSize: fontSize.xs,
-		color: Colors.mutedForeground,
-	},
-});
+const createStyles = (colors: ThemeColors) =>
+	StyleSheet.create({
+		container: {
+			flex: 1,
+			backgroundColor: colors.background,
+		},
+		scroll: {
+			flexGrow: 1,
+			paddingHorizontal: spacing[4],
+		},
+		header: {
+			flexDirection: "row",
+			alignItems: "center",
+			justifyContent: "space-between",
+			paddingTop: spacing[4],
+			paddingBottom: spacing[6],
+		},
+		greeting: {
+			fontSize: fontSize["2xl"],
+			fontFamily: fontFamily.displayBold,
+			color: colors.foreground,
+			flex: 1,
+		},
+		bellButton: {
+			padding: spacing[2],
+		},
+		badge: {
+			position: "absolute",
+			top: 6,
+			right: 6,
+			width: 10,
+			height: 10,
+			borderRadius: 5,
+			backgroundColor: colors.destructive,
+			borderWidth: 2,
+			borderColor: colors.background,
+		},
+		matchList: {
+			gap: spacing[6],
+		},
+		friendCard: {
+			backgroundColor: colors.card,
+			borderRadius: radius.xl,
+			padding: spacing[4],
+			gap: spacing[4],
+		},
+		friendHeader: {
+			flexDirection: "row",
+			alignItems: "center",
+			gap: spacing[4],
+		},
+		friendName: {
+			fontSize: fontSize.base,
+			fontFamily: fontFamily.sansSemibold,
+			color: colors.foreground,
+		},
+		matchCount: {
+			fontSize: fontSize.xs,
+			color: colors.mutedForeground,
+		},
+	});

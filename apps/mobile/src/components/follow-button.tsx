@@ -3,9 +3,10 @@ import { UserPlus, UserMinus } from "lucide-react-native";
 import { trpc } from "@/lib/trpc";
 import { useSession } from "@/lib/auth";
 import { capture } from "@/lib/analytics";
-import { Colors, fontSize, fontFamily, spacing, radius } from "@/lib/constants";
+import { fontSize, fontFamily, spacing, radius } from "@/lib/constants";
 import { triggerFollowHaptic } from "@/lib/haptics";
 import { useIsOnline } from "@/lib/network";
+import { useTheme, useThemedStyles, type ThemeColors } from "@/lib/theme";
 
 interface FollowButtonProps {
 	userId: string;
@@ -16,6 +17,8 @@ export function FollowButton({ userId, isFollowing }: FollowButtonProps) {
 	const utils = trpc.useUtils();
 	const { data: session } = useSession();
 	const isOnline = useIsOnline();
+	const styles = useThemedStyles(createStyles);
+	const { colors } = useTheme();
 
 	const queryKey = { id: userId };
 
@@ -103,7 +106,7 @@ export function FollowButton({ userId, isFollowing }: FollowButtonProps) {
 	}
 
 	const Icon = isFollowing ? UserMinus : UserPlus;
-	const iconColor = isFollowing ? Colors.foreground : Colors.primaryForeground;
+	const iconColor = isFollowing ? colors.foreground : colors.primaryForeground;
 
 	return (
 		<Pressable
@@ -129,39 +132,40 @@ export function FollowButton({ userId, isFollowing }: FollowButtonProps) {
 	);
 }
 
-const styles = StyleSheet.create({
-	button: {
-		flexDirection: "row",
-		paddingHorizontal: spacing[5],
-		paddingVertical: spacing[2],
-		borderRadius: radius.lg,
-		alignItems: "center",
-		justifyContent: "center",
-		gap: spacing[1.5],
-		minWidth: 100,
-	},
-	notFollowing: {
-		backgroundColor: Colors.primary,
-	},
-	following: {
-		backgroundColor: Colors.secondary,
-		borderWidth: 1,
-		borderColor: Colors.border,
-	},
-	pressed: {
-		opacity: 0.8,
-	},
-	offline: {
-		opacity: 0.5,
-	},
-	text: {
-		fontSize: fontSize.sm,
-		fontFamily: fontFamily.sansSemibold,
-	},
-	notFollowingText: {
-		color: Colors.primaryForeground,
-	},
-	followingText: {
-		color: Colors.foreground,
-	},
-});
+const createStyles = (colors: ThemeColors) =>
+	StyleSheet.create({
+		button: {
+			flexDirection: "row",
+			paddingHorizontal: spacing[5],
+			paddingVertical: spacing[2],
+			borderRadius: radius.lg,
+			alignItems: "center",
+			justifyContent: "center",
+			gap: spacing[1.5],
+			minWidth: 100,
+		},
+		notFollowing: {
+			backgroundColor: colors.primary,
+		},
+		following: {
+			backgroundColor: colors.secondary,
+			borderWidth: 1,
+			borderColor: colors.border,
+		},
+		pressed: {
+			opacity: 0.8,
+		},
+		offline: {
+			opacity: 0.5,
+		},
+		text: {
+			fontSize: fontSize.sm,
+			fontFamily: fontFamily.sansSemibold,
+		},
+		notFollowingText: {
+			color: colors.primaryForeground,
+		},
+		followingText: {
+			color: colors.foreground,
+		},
+	});

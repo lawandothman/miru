@@ -4,15 +4,17 @@ import { useRouter } from "expo-router";
 import { ChevronRight } from "lucide-react-native";
 import { trpc } from "@/lib/trpc";
 import {
-	Colors,
 	fontSize,
 	fontFamily,
 	spacing,
 	radius,
 	providerLogoUrl,
 } from "@/lib/constants";
+import { useThemedStyles, useTheme, type ThemeColors } from "@/lib/theme";
 
 export function StreamingSummary() {
+	const styles = useThemedStyles(createStyles);
+	const { colors } = useTheme();
 	const router = useRouter();
 	const { data: providers } = trpc.movie.getWatchProviders.useQuery();
 	const { data: state } = trpc.onboarding.getState.useQuery();
@@ -49,43 +51,44 @@ export function StreamingSummary() {
 					<Text style={styles.placeholderText}>No services selected</Text>
 				)}
 			</View>
-			<ChevronRight size={18} color={Colors.mutedForeground} />
+			<ChevronRight size={18} color={colors.mutedForeground} />
 		</Pressable>
 	);
 }
 
-const styles = StyleSheet.create({
-	summaryRow: {
-		flexDirection: "row",
-		alignItems: "center",
-		justifyContent: "space-between",
-		gap: spacing[3],
-	},
-	summaryContent: {
-		flex: 1,
-	},
-	pressed: {
-		opacity: 0.7,
-	},
-	placeholderText: {
-		fontSize: fontSize.sm,
-		fontFamily: fontFamily.sans,
-		color: Colors.mutedForeground,
-	},
-	moreText: {
-		fontSize: fontSize.xs,
-		fontFamily: fontFamily.sansMedium,
-		color: Colors.mutedForeground,
-		alignSelf: "center",
-	},
-	logoPreview: {
-		flexDirection: "row",
-		gap: spacing[2],
-		alignItems: "center",
-	},
-	logoSmall: {
-		width: 36,
-		height: 36,
-		borderRadius: radius.md,
-	},
-});
+const createStyles = (colors: ThemeColors) =>
+	StyleSheet.create({
+		summaryRow: {
+			flexDirection: "row",
+			alignItems: "center",
+			justifyContent: "space-between",
+			gap: spacing[3],
+		},
+		summaryContent: {
+			flex: 1,
+		},
+		pressed: {
+			opacity: 0.7,
+		},
+		placeholderText: {
+			fontSize: fontSize.sm,
+			fontFamily: fontFamily.sans,
+			color: colors.mutedForeground,
+		},
+		moreText: {
+			fontSize: fontSize.xs,
+			fontFamily: fontFamily.sansMedium,
+			color: colors.mutedForeground,
+			alignSelf: "center",
+		},
+		logoPreview: {
+			flexDirection: "row",
+			gap: spacing[2],
+			alignItems: "center",
+		},
+		logoSmall: {
+			width: 36,
+			height: 36,
+			borderRadius: radius.md,
+		},
+	});

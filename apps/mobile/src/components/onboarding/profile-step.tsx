@@ -6,7 +6,8 @@ import {
 	TextInput,
 	View,
 } from "react-native";
-import { Colors, fontFamily, fontSize, radius, spacing } from "@/lib/constants";
+import { fontFamily, fontSize, radius, spacing } from "@/lib/constants";
+import { useTheme, useThemedStyles, type ThemeColors } from "@/lib/theme";
 
 interface ProfileStepProps {
 	name: string;
@@ -14,6 +15,8 @@ interface ProfileStepProps {
 }
 
 export function ProfileStep({ name, onChange }: ProfileStepProps) {
+	const { colors } = useTheme();
+	const styles = useThemedStyles(createStyles);
 	return (
 		<KeyboardAvoidingView
 			behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -27,7 +30,7 @@ export function ProfileStep({ name, onChange }: ProfileStepProps) {
 				value={name}
 				onChangeText={onChange}
 				placeholder="e.g. Alex Doe"
-				placeholderTextColor={Colors.mutedForeground}
+				placeholderTextColor={colors.mutedForeground}
 				autoComplete="name"
 				autoCapitalize="words"
 				autoCorrect={false}
@@ -40,27 +43,28 @@ export function ProfileStep({ name, onChange }: ProfileStepProps) {
 	);
 }
 
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		padding: spacing[4],
-		gap: spacing[6],
-	},
-	header: {
-		gap: spacing[2],
-	},
-	title: {
-		fontSize: fontSize["2xl"],
-		fontFamily: fontFamily.displayBold,
-		color: Colors.foreground,
-	},
-	input: {
-		backgroundColor: Colors.muted,
-		borderRadius: radius.lg,
-		color: Colors.foreground,
-		fontFamily: fontFamily.sans,
-		fontSize: fontSize.lg,
-		paddingHorizontal: spacing[4],
-		paddingVertical: spacing[4],
-	},
-});
+const createStyles = (colors: ThemeColors) =>
+	StyleSheet.create({
+		container: {
+			flex: 1,
+			padding: spacing[4],
+			gap: spacing[6],
+		},
+		header: {
+			gap: spacing[2],
+		},
+		title: {
+			fontSize: fontSize["2xl"],
+			fontFamily: fontFamily.displayBold,
+			color: colors.foreground,
+		},
+		input: {
+			backgroundColor: colors.muted,
+			borderRadius: radius.lg,
+			color: colors.foreground,
+			fontFamily: fontFamily.sans,
+			fontSize: fontSize.lg,
+			paddingHorizontal: spacing[4],
+			paddingVertical: spacing[4],
+		},
+	});

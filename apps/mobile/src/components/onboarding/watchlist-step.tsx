@@ -11,13 +11,13 @@ import { Check } from "lucide-react-native";
 import { Spinner } from "@/components/spinner";
 import { trpc } from "@/lib/trpc";
 import {
-	Colors,
 	fontSize,
 	fontFamily,
 	spacing,
 	radius,
 	posterUrl,
 } from "@/lib/constants";
+import { useTheme, useThemedStyles, type ThemeColors } from "@/lib/theme";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const NUM_COLUMNS = 3;
@@ -44,6 +44,8 @@ export function WatchlistStep({
 			{ genreIds, limit: 20 },
 			{ enabled: genreIds.length > 0 },
 		);
+	const { colors } = useTheme();
+	const styles = useThemedStyles(createStyles);
 
 	return (
 		<View style={styles.container}>
@@ -56,7 +58,7 @@ export function WatchlistStep({
 
 			{isLoading ? (
 				<View style={styles.loadingContainer}>
-					<Spinner size={32} color={Colors.primary} />
+					<Spinner size={32} color={colors.primary} />
 				</View>
 			) : (movies?.length ?? 0) === 0 ? (
 				<View style={styles.emptyContainer}>
@@ -98,7 +100,7 @@ export function WatchlistStep({
 								{isAdded && (
 									<View style={styles.checkOverlay}>
 										<View style={styles.checkCircle}>
-											<Check size={20} color={Colors.primaryForeground} />
+											<Check size={20} color={colors.primaryForeground} />
 										</View>
 									</View>
 								)}
@@ -111,87 +113,88 @@ export function WatchlistStep({
 	);
 }
 
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-	},
-	header: {
-		paddingHorizontal: HORIZONTAL_PADDING,
-		gap: spacing[2],
-		paddingBottom: spacing[4],
-	},
-	title: {
-		fontSize: fontSize["2xl"],
-		fontFamily: fontFamily.displayBold,
-		color: Colors.foreground,
-	},
-	subtitle: {
-		fontSize: fontSize.base,
-		fontFamily: fontFamily.sans,
-		color: Colors.mutedForeground,
-		lineHeight: 22,
-	},
-	loadingContainer: {
-		flex: 1,
-		justifyContent: "center",
-		alignItems: "center",
-	},
-	emptyContainer: {
-		flex: 1,
-		paddingHorizontal: HORIZONTAL_PADDING,
-		alignItems: "center",
-		justifyContent: "center",
-	},
-	emptyText: {
-		fontSize: fontSize.sm,
-		fontFamily: fontFamily.sans,
-		color: Colors.mutedForeground,
-		lineHeight: 20,
-		textAlign: "center",
-	},
-	gridContent: {
-		paddingHorizontal: HORIZONTAL_PADDING,
-		paddingBottom: spacing[8],
-		gap: ITEM_GAP,
-	},
-	row: {
-		gap: ITEM_GAP,
-	},
-	posterContainer: {
-		width: POSTER_WIDTH,
-		height: POSTER_HEIGHT,
-		borderRadius: radius.lg,
-		overflow: "hidden",
-		position: "relative",
-	},
-	poster: {
-		width: "100%",
-		height: "100%",
-	},
-	posterFallback: {
-		backgroundColor: Colors.card,
-		justifyContent: "center",
-		alignItems: "center",
-		padding: spacing[2],
-	},
-	posterFallbackText: {
-		fontSize: fontSize.xs,
-		fontFamily: fontFamily.sans,
-		color: Colors.mutedForeground,
-		textAlign: "center",
-	},
-	checkOverlay: {
-		...StyleSheet.absoluteFill,
-		backgroundColor: "rgba(0, 0, 0, 0.5)",
-		justifyContent: "center",
-		alignItems: "center",
-	},
-	checkCircle: {
-		width: 40,
-		height: 40,
-		borderRadius: 20,
-		backgroundColor: Colors.primary,
-		justifyContent: "center",
-		alignItems: "center",
-	},
-});
+const createStyles = (colors: ThemeColors) =>
+	StyleSheet.create({
+		container: {
+			flex: 1,
+		},
+		header: {
+			paddingHorizontal: HORIZONTAL_PADDING,
+			gap: spacing[2],
+			paddingBottom: spacing[4],
+		},
+		title: {
+			fontSize: fontSize["2xl"],
+			fontFamily: fontFamily.displayBold,
+			color: colors.foreground,
+		},
+		subtitle: {
+			fontSize: fontSize.base,
+			fontFamily: fontFamily.sans,
+			color: colors.mutedForeground,
+			lineHeight: 22,
+		},
+		loadingContainer: {
+			flex: 1,
+			justifyContent: "center",
+			alignItems: "center",
+		},
+		emptyContainer: {
+			flex: 1,
+			paddingHorizontal: HORIZONTAL_PADDING,
+			alignItems: "center",
+			justifyContent: "center",
+		},
+		emptyText: {
+			fontSize: fontSize.sm,
+			fontFamily: fontFamily.sans,
+			color: colors.mutedForeground,
+			lineHeight: 20,
+			textAlign: "center",
+		},
+		gridContent: {
+			paddingHorizontal: HORIZONTAL_PADDING,
+			paddingBottom: spacing[8],
+			gap: ITEM_GAP,
+		},
+		row: {
+			gap: ITEM_GAP,
+		},
+		posterContainer: {
+			width: POSTER_WIDTH,
+			height: POSTER_HEIGHT,
+			borderRadius: radius.lg,
+			overflow: "hidden",
+			position: "relative",
+		},
+		poster: {
+			width: "100%",
+			height: "100%",
+		},
+		posterFallback: {
+			backgroundColor: colors.card,
+			justifyContent: "center",
+			alignItems: "center",
+			padding: spacing[2],
+		},
+		posterFallbackText: {
+			fontSize: fontSize.xs,
+			fontFamily: fontFamily.sans,
+			color: colors.mutedForeground,
+			textAlign: "center",
+		},
+		checkOverlay: {
+			...StyleSheet.absoluteFill,
+			backgroundColor: "rgba(0, 0, 0, 0.5)",
+			justifyContent: "center",
+			alignItems: "center",
+		},
+		checkCircle: {
+			width: 40,
+			height: 40,
+			borderRadius: 20,
+			backgroundColor: colors.primary,
+			justifyContent: "center",
+			alignItems: "center",
+		},
+	});

@@ -38,3 +38,6 @@ allowBuilds:
   prisma: false
   protobufjs: false
   sharp: false
+
+patchedDependencies:
+  "@react-native/gradle-plugin@0.85.3": patches/@react-native__gradle-plugin@0.85.3.patch

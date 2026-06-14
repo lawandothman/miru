@@ -16,11 +16,13 @@ import {
 	DrawerTitle,
 	DrawerDescription,
 } from "@/components/ui/drawer";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { UserAvatar } from "@/components/user-avatar";
 import { FollowButton } from "@/components/follow-button";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useSession } from "@/lib/auth-client";
+import { PAGE_SIZE } from "@/lib/constants";
 import { trpc } from "@/lib/trpc/client";
 
 type Mode = "followers" | "following";
@@ -95,17 +97,27 @@ export function FollowersDialog({
 function UserList({ userId, mode }: { userId: string; mode: Mode }) {
 	const { data: session } = useSession();
 	const currentUserId = session?.user?.id;
-	const followers = trpc.social.getFollowers.useQuery(
-		{ userId },
-		{ enabled: mode === "followers" },
+	const followers = trpc.social.getFollowers.useInfiniteQuery(
+		{ userId, limit: PAGE_SIZE },
+		{
+			enabled: mode === "followers",
+			initialCursor: 0,
+			getNextPageParam: (lastPage, allPages) =>
+				lastPage.length === PAGE_SIZE ? allPages.length * PAGE_SIZE : undefined,
+		},
 	);
-	const following = trpc.social.getFollowing.useQuery(
-		{ userId },
-		{ enabled: mode === "following" },
+	const following = trpc.social.getFollowing.useInfiniteQuery(
+		{ userId, limit: PAGE_SIZE },
+		{
+			enabled: mode === "following",
+			initialCursor: 0,
+			getNextPageParam: (lastPage, allPages) =>
+				lastPage.length === PAGE_SIZE ? allPages.length * PAGE_SIZE : undefined,
+		},
 	);
 
 	const data = mode === "followers" ? followers : following;
-	const users = data.data ?? [];
+	const users = data.data?.pages.flat() ?? [];
 
 	return (
 		<div className="overflow-y-auto">
@@ -150,6 +162,17 @@ function UserList({ userId, mode }: { userId: string; mode: Mode }) {
 							)}
 						</div>
 					))}
+					{data.hasNextPage && (
+						<Button
+							variant="ghost"
+							size="sm"
+							className="w-full"
+							onClick={() => data.fetchNextPage()}
+							disabled={data.isFetchingNextPage}
+						>
+							{data.isFetchingNextPage ? "Loading…" : "Show more"}
+						</Button>
+					)}
 				</div>
 			)}
 		</div>

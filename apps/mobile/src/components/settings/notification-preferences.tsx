@@ -6,15 +6,17 @@ import {
 	getNotificationPermissionsStatus,
 } from "@/lib/notifications";
 import { trpc } from "@/lib/trpc";
+import { fontSize, fontFamily, spacing } from "@/lib/constants";
 import {
-	Colors,
-	fontSize,
-	fontFamily,
-	spacing,
-	dynamicColorAlpha,
-} from "@/lib/constants";
+	useThemedStyles,
+	useTheme,
+	colorWithAlpha,
+	type ThemeColors,
+} from "@/lib/theme";
 
 export function NotificationPreferences() {
+	const styles = useThemedStyles(createStyles);
+	const { colors } = useTheme();
 	const utils = trpc.useUtils();
 	const { data: preferences } = trpc.notification.getPreferences.useQuery();
 	const registerPushToken = trpc.notification.registerPushToken.useMutation();
@@ -114,10 +116,10 @@ export function NotificationPreferences() {
 					onValueChange={handleToggle}
 					disabled={isUpdating}
 					trackColor={{
-						false: Colors.secondary,
-						true: dynamicColorAlpha("primary", "80") as string,
+						false: colors.secondary,
+						true: colorWithAlpha(colors.primary, "80"),
 					}}
-					thumbColor={enabled ? Colors.primary : Colors.mutedForeground}
+					thumbColor={enabled ? colors.primary : colors.mutedForeground}
 					accessibilityLabel="Push notifications"
 					accessibilityRole="switch"
 				/>
@@ -127,33 +129,34 @@ export function NotificationPreferences() {
 	);
 }
 
-const styles = StyleSheet.create({
-	notificationBlock: {
-		gap: spacing[2],
-	},
-	notificationRow: {
-		flexDirection: "row",
-		alignItems: "center",
-		justifyContent: "space-between",
-		gap: spacing[4],
-	},
-	notificationCopy: {
-		flex: 1,
-		gap: spacing[1],
-	},
-	notificationTitle: {
-		fontSize: fontSize.base,
-		fontFamily: fontFamily.sansMedium,
-		color: Colors.foreground,
-	},
-	notificationHint: {
-		fontSize: fontSize.sm,
-		fontFamily: fontFamily.sans,
-		color: Colors.mutedForeground,
-	},
-	systemStatusText: {
-		fontSize: fontSize.xs,
-		fontFamily: fontFamily.sans,
-		color: Colors.mutedForeground,
-	},
-});
+const createStyles = (colors: ThemeColors) =>
+	StyleSheet.create({
+		notificationBlock: {
+			gap: spacing[2],
+		},
+		notificationRow: {
+			flexDirection: "row",
+			alignItems: "center",
+			justifyContent: "space-between",
+			gap: spacing[4],
+		},
+		notificationCopy: {
+			flex: 1,
+			gap: spacing[1],
+		},
+		notificationTitle: {
+			fontSize: fontSize.base,
+			fontFamily: fontFamily.sansMedium,
+			color: colors.foreground,
+		},
+		notificationHint: {
+			fontSize: fontSize.sm,
+			fontFamily: fontFamily.sans,
+			color: colors.mutedForeground,
+		},
+		systemStatusText: {
+			fontSize: fontSize.xs,
+			fontFamily: fontFamily.sans,
+			color: colors.mutedForeground,
+		},
+	});

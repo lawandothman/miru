@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View } from "react-native";
 import { UserAvatar } from "@/components/user-avatar";
-import { Colors, fontFamily, fontSize, radius, spacing } from "@/lib/constants";
+import { fontFamily, fontSize, radius, spacing } from "@/lib/constants";
+import { useThemedStyles, type ThemeColors } from "@/lib/theme";
 import { trpc } from "@/lib/trpc";
 
 interface RecommendationBannerProps {
@@ -8,6 +9,7 @@ interface RecommendationBannerProps {
 }
 
 export function RecommendationBanner({ movieId }: RecommendationBannerProps) {
+	const styles = useThemedStyles(createStyles);
 	const { data } = trpc.recommendation.getForMovie.useQuery({ movieId });
 
 	if (!data) {
@@ -30,26 +32,27 @@ export function RecommendationBanner({ movieId }: RecommendationBannerProps) {
 	);
 }
 
-const styles = StyleSheet.create({
-	container: {
-		flexDirection: "row",
-		alignItems: "center",
-		gap: spacing[3],
-		backgroundColor: Colors.card,
-		borderRadius: radius.xl,
-		borderWidth: 1,
-		borderColor: Colors.border,
-		paddingVertical: spacing[3],
-		paddingHorizontal: spacing[4],
-	},
-	label: {
-		flex: 1,
-		fontSize: fontSize.sm,
-		fontFamily: fontFamily.sans,
-		color: Colors.foreground,
-		lineHeight: 20,
-	},
-	bold: {
-		fontFamily: fontFamily.sansSemibold,
-	},
-});
+const createStyles = (colors: ThemeColors) =>
+	StyleSheet.create({
+		container: {
+			flexDirection: "row",
+			alignItems: "center",
+			gap: spacing[3],
+			backgroundColor: colors.card,
+			borderRadius: radius.xl,
+			borderWidth: 1,
+			borderColor: colors.border,
+			paddingVertical: spacing[3],
+			paddingHorizontal: spacing[4],
+		},
+		label: {
+			flex: 1,
+			fontSize: fontSize.sm,
+			fontFamily: fontFamily.sans,
+			color: colors.foreground,
+			lineHeight: 20,
+		},
+		bold: {
+			fontFamily: fontFamily.sansSemibold,
+		},
+	});

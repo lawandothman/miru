@@ -72,6 +72,40 @@ jobs:
           BUILD_ID=$(echo "$BUILD_JSON" | jq -r '.[0].id')
           echo "build-id=$BUILD_ID" >> "$GITHUB_OUTPUT"
 
+  build-android:
+    name: Build Android
+    needs: validate-release
+    runs-on: ubuntu-latest
+    outputs:
+      build-id: ${{ steps.eas-build.outputs.build-id }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - uses: pnpm/action-setup@0e279bb959325dab635dd2c09392533439d90093 # v6
+
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        with:
+          node-version: 24.14.0
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - run: pnpm install --frozen-lockfile
+
+      - uses: expo/expo-github-action@c7b66a9c327a43a8fa7c0158e7f30d6040d2481e # v8
+        with:
+          eas-version: ${{ env.EAS_CLI_VERSION }}
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Build on EAS
+        id: eas-build
+        env:
+          APP_VERSION: ${{ needs.validate-release.outputs.app-version }}
+        run: |
+          cd apps/mobile
+          BUILD_JSON=$(eas build --profile production --platform android --non-interactive --wait --json)
+          BUILD_ID=$(echo "$BUILD_JSON" | jq -r '.[0].id')
+          echo "build-id=$BUILD_ID" >> "$GITHUB_OUTPUT"
+
   submit:
     name: Submit to TestFlight
     needs:
@@ -106,6 +140,7 @@ jobs:
     needs:
       - validate-release
       - build
+      - build-android
       - submit
     runs-on: ubuntu-latest
     steps:
@@ -143,6 +178,7 @@ jobs:
     name: GitHub Release
     needs:
       - build
+      - build-android
       - submit
       - ota-update
     runs-on: ubuntu-latest

@@ -2,10 +2,13 @@ import { Text, Pressable, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { ChevronRight } from "lucide-react-native";
 import { trpc } from "@/lib/trpc";
-import { Colors, fontSize, fontFamily, spacing } from "@/lib/constants";
+import { fontSize, fontFamily, spacing } from "@/lib/constants";
+import { useThemedStyles, useTheme, type ThemeColors } from "@/lib/theme";
 import { COUNTRIES, countryFlag } from "@/lib/region-data";
 
 export function RegionSummary() {
+	const styles = useThemedStyles(createStyles);
+	const { colors } = useTheme();
 	const router = useRouter();
 	const { data: state } = trpc.onboarding.getState.useQuery();
 
@@ -21,24 +24,25 @@ export function RegionSummary() {
 					? `${countryFlag(current.code)} ${current.name}`
 					: "Select a region"}
 			</Text>
-			<ChevronRight size={18} color={Colors.mutedForeground} />
+			<ChevronRight size={18} color={colors.mutedForeground} />
 		</Pressable>
 	);
 }
 
-const styles = StyleSheet.create({
-	summaryRow: {
-		flexDirection: "row",
-		alignItems: "center",
-		justifyContent: "space-between",
-		gap: spacing[3],
-	},
-	pressed: {
-		opacity: 0.7,
-	},
-	regionSummaryText: {
-		fontSize: fontSize.base,
-		fontFamily: fontFamily.sans,
-		color: Colors.foreground,
-	},
-});
+const createStyles = (colors: ThemeColors) =>
+	StyleSheet.create({
+		summaryRow: {
+			flexDirection: "row",
+			alignItems: "center",
+			justifyContent: "space-between",
+			gap: spacing[3],
+		},
+		pressed: {
+			opacity: 0.7,
+		},
+		regionSummaryText: {
+			fontSize: fontSize.base,
+			fontFamily: fontFamily.sans,
+			color: colors.foreground,
+		},
+	});
