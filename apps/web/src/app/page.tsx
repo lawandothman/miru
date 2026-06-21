@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { AppStoreButton } from "./_components/landing/app-store-button";
+import { GooglePlayButton } from "./_components/landing/google-play-button";
 
 function PhoneFrame({
 	src,
@@ -88,8 +89,9 @@ export default async function Home() {
 									Build your watchlist, follow friends, and instantly see which
 									movies you both want to watch.
 								</p>
-								<div className="mt-10 flex justify-center lg:justify-start">
+								<div className="mt-10 flex flex-wrap items-center justify-center gap-3 lg:justify-start">
 									<AppStoreButton />
+									<GooglePlayButton />
 								</div>
 							</div>
 
@@ -198,8 +200,9 @@ export default async function Home() {
 							Download Miru and see which movies your friends actually want to
 							watch.
 						</p>
-						<div className="mt-10">
+						<div className="mt-10 flex flex-wrap items-center justify-center gap-3">
 							<AppStoreButton />
+							<GooglePlayButton />
 						</div>
 					</div>
 				</section>
