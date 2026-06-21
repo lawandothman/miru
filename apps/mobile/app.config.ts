@@ -89,6 +89,12 @@ const config: ExpoConfig = {
 					{
 						scheme: "https",
 						host: "watchmiru.app",
+						pathPrefix: "/movie/",
+					},
+					{
+						scheme: "https",
+						host: "watchmiru.app",
+						pathPrefix: "/user/",
 					},
 				],
 				category: ["BROWSABLE", "DEFAULT"],
