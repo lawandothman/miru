@@ -82,6 +82,8 @@ const config: ExpoConfig = {
 			backgroundColor: "#000000",
 		},
 		package: "app.miru",
+		googleServicesFile:
+			process.env.GOOGLE_SERVICES_JSON ?? "./google-services.json",
 		intentFilters: [
 			{
 				action: "VIEW",
