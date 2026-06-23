@@ -56,6 +56,7 @@ const config: ExpoConfig = {
 	name: "Miru",
 	slug: "miru",
 	version: appVersion,
+	platforms: ["ios", "android"],
 	orientation: "portrait",
 	icon: "./assets/icon.png",
 	scheme: "miru",
