@@ -22,7 +22,7 @@ function PhoneFrame({
 		<div className={className}>
 			<div className="relative mx-auto aspect-[1359/2736] w-[280px] sm:w-[320px]">
 				<div className="-z-10 absolute inset-x-4 -bottom-8 top-8 rounded-[3rem] bg-primary/5 blur-3xl" />
-				<div className="absolute inset-x-[6.623%] inset-y-[3.289%] overflow-hidden">
+				<div className="absolute inset-x-[6.623%] inset-y-[3.289%] overflow-hidden rounded-[2rem] sm:rounded-[2.25rem]">
 					<Image
 						src={src}
 						alt={alt}
