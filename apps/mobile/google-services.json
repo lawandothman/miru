@@ -1,0 +1,29 @@
+{
+	"project_info": {
+		"project_number": "53830491506",
+		"project_id": "miru-c15be",
+		"storage_bucket": "miru-c15be.firebasestorage.app"
+	},
+	"client": [
+		{
+			"client_info": {
+				"mobilesdk_app_id": "1:53830491506:android:cb99a8ff5efedb9017d1eb",
+				"android_client_info": {
+					"package_name": "app.miru"
+				}
+			},
+			"oauth_client": [],
+			"api_key": [
+				{
+					"current_key": "AIzaSyADkcuD5w28PKxbr0UIHycmRKs_8CVq5DE"
+				}
+			],
+			"services": {
+				"appinvite_service": {
+					"other_platform_oauth_client": []
+				}
+			}
+		}
+	],
+	"configuration_version": "1"
+}
