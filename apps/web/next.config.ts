@@ -5,6 +5,9 @@ import { withSentryConfig } from "@sentry/nextjs";
 const nextConfig: NextConfig = {
 	reactCompiler: true,
 	typedRoutes: true,
+	experimental: {
+		useTypeScriptCli: true,
+	},
 	images: {
 		remotePatterns: [
 			{
