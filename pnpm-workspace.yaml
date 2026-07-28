@@ -39,5 +39,19 @@ allowBuilds:
   protobufjs: false
   sharp: false
 
-patchedDependencies:
-  "@react-native/gradle-plugin@0.85.3": patches/@react-native__gradle-plugin@0.85.3.patch
+minimumReleaseAgeExclude:
+  - "@react-native/assets-registry@0.86.2"
+  - "@react-native/babel-plugin-codegen@0.86.2"
+  - "@react-native/babel-preset@0.86.2"
+  - "@react-native/codegen@0.86.2"
+  - "@react-native/community-cli-plugin@0.86.2"
+  - "@react-native/debugger-frontend@0.86.2"
+  - "@react-native/debugger-shell@0.86.2"
+  - "@react-native/dev-middleware@0.86.2"
+  - "@react-native/gradle-plugin@0.86.2"
+  - "@react-native/js-polyfills@0.86.2"
+  - "@react-native/metro-babel-transformer@0.86.2"
+  - "@react-native/metro-config@0.86.2"
+  - "@react-native/normalize-colors@0.86.2"
+  - "@react-native/virtualized-lists@0.86.2"
+  - react-native@0.86.2
