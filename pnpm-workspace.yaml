@@ -31,7 +31,7 @@ catalogs:
 overrides:
   "@esbuild-kit/core-utils>esbuild": 0.25.12
   "glob@9>minimatch": 10.2.5
-  "@tailwindcss/postcss>postcss": 8.5.18
+  "@tailwindcss/postcss>postcss": 8.5.23
   "next>postcss": 8.5.18
   "next>sharp": 0.35.3
   "xcode>uuid": 11.1.1
