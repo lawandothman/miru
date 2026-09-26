@@ -33,7 +33,7 @@ overrides:
   "glob@9>minimatch": 10.2.5
   "@tailwindcss/postcss>postcss": 8.5.18
   "next>postcss": 8.5.18
-  "next>sharp": 0.35.3
+  "next>sharp": 0.35.4
   "xcode>uuid": 11.1.1
 
 allowBuilds:
