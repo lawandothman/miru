@@ -70,7 +70,7 @@ catalogs:
 overrides:
   '@esbuild-kit/core-utils>esbuild': 0.25.12
   glob@9>minimatch: 10.2.5
-  '@tailwindcss/postcss>postcss': 8.5.18
+  '@tailwindcss/postcss>postcss': 8.5.23
   next>postcss: 8.5.18
   next>sharp: 0.35.3
   xcode>uuid: 11.1.1
@@ -6319,6 +6319,10 @@ packages:
     resolution: {integrity: sha512-xdB1oSLHbz1vRWgCDalrCqEFTWzFlhqFC5tIHLMOSUIjhm3XXQ1qrFy8S/ESr1JYRRXqM3c1QFiMZUJdUTqyMQ==}
     engines: {node: ^10 || ^12 || >=14}
 
+  postcss@8.5.23:
+    resolution: {integrity: sha512-g50586zr4bZmwFiTlflMu8E0bDTb5I5gertgwAKmsdUlTQIhZtunzUlD1WSzwcVWPoAVpsrA6vlfCD7oXvRwgg==}
+    engines: {node: ^10 || ^12 || >=14}
+
   postgres@3.4.9:
     resolution: {integrity: sha512-GD3qdB0x1z9xgFI6cdRD6xu2Sp2WCOEoe3mtnyB5Ee0XrrL5Pe+e4CCnJrRMnL1zYtRDZmQQVbvOttLnKDLnaw==}
     engines: {node: '>=12'}
@@ -10518,7 +10522,7 @@ snapshots:
       '@alloc/quick-lru': 5.2.0
       '@tailwindcss/node': 4.3.1
       '@tailwindcss/oxide': 4.3.1
-      postcss: 8.5.18
+      postcss: 8.5.23
       tailwindcss: 4.3.1
 
   '@tanstack/query-async-storage-persister@5.101.0':
@@ -13124,6 +13128,12 @@ snapshots:
   postcss-value-parser@4.2.0: {}
 
   postcss@8.5.18:
+    dependencies:
+      nanoid: 3.3.16
+      picocolors: 1.1.1
+      source-map-js: 1.2.1
+
+  postcss@8.5.23:
     dependencies:
       nanoid: 3.3.16
       picocolors: 1.1.1
