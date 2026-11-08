@@ -5,6 +5,7 @@ import {
 	Pressable,
 	StyleSheet,
 	Alert,
+	AppState,
 	Platform,
 } from "react-native";
 import Animated, {
@@ -26,6 +27,11 @@ import { Spinner } from "@/components/spinner";
 import { EmailOtpForm } from "@/components/auth/email-otp-form";
 import { authClient, signIn, useSession } from "@/lib/auth";
 import { capture } from "@/lib/analytics";
+import {
+	classifySignInFailure,
+	createForegroundLossFlag,
+	retryTransientSignIn,
+} from "@/lib/sign-in-failure";
 import { fontSize, fontFamily, spacing, radius } from "@/lib/constants";
 import { useTheme, useThemedStyles, type ThemeColors } from "@/lib/theme";
 
@@ -151,23 +157,50 @@ export default function SignInScreen() {
 
 	function handleSignInError(error: unknown, provider: string) {
 		setLoading(null);
+		const failure = classifySignInFailure(error);
+		if (failure.kind === "cancelled" || failure.message === null) {
+			return;
+		}
 		Sentry.captureException(error, {
-			tags: { flow: "sign-in", provider },
+			tags: {
+				flow: "sign-in",
+				provider,
+				failure: failure.kind,
+				...(failure.code ? { auth_error_code: failure.code } : {}),
+			},
 		});
-		Alert.alert("Sign in failed", "Something went wrong. Please try again.");
+		Alert.alert("Sign in failed", failure.message);
 	}
 
 	async function handleGoogleSignIn() {
 		setLoading("google");
+		// openAuthSessionAsync runs inside the same signIn.social promise and
+		// backgrounds the app. Retry only while this flag stays foregrounded,
+		// so a reset during the browser session is not launched again.
+		const foreground = createForegroundLossFlag(
+			() => AppState.currentState,
+			(listener) => {
+				const subscription = AppState.addEventListener("change", listener);
+				return () => subscription.remove();
+			},
+		);
 		try {
-			await signIn.social({
-				provider: "google",
-				callbackURL: "/",
-				errorCallbackURL: "/(auth)/sign-in",
-			});
+			await retryTransientSignIn(
+				() => {
+					foreground.reset();
+					return signIn.social({
+						provider: "google",
+						callbackURL: "/",
+						errorCallbackURL: "/(auth)/sign-in",
+					});
+				},
+				{ canRetry: () => foreground.stayedForeground() },
+			);
 			capture("signed_in", { method: "google" });
 		} catch (error) {
 			handleSignInError(error, "google");
+		} finally {
+			foreground.stop();
 		}
 	}
 
@@ -210,16 +243,6 @@ export default function SignInScreen() {
 			}
 			capture("signed_in", { method: "apple" });
 		} catch (error) {
-			const code =
-				error instanceof Error && "code" in error
-					? (error as { code: string }).code
-					: undefined;
-
-			if (code === "ERR_REQUEST_CANCELED") {
-				setLoading(null);
-				return;
-			}
-
 			handleSignInError(error, "apple");
 		}
 	}
