@@ -139,8 +139,8 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
 					transformer: superjson,
 					fetch: (url, options) =>
 						fetch(url, { ...options, credentials: "omit" }),
-					headers() {
-						const cookies = authClient.getCookie();
+					async headers() {
+						const cookies = await authClient.getCookie();
 						if (cookies) {
 							return { Cookie: cookies };
 						}

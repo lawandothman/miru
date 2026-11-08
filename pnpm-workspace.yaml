@@ -14,8 +14,8 @@ catalog:
 
 catalogs:
   better-auth:
-    "@better-auth/expo": 1.6.22
-    better-auth: 1.6.22
+    "@better-auth/expo": 1.7.7
+    better-auth: 1.7.7
   react:
     "@types/react": 19.2.17
     "@types/react-dom": 19.2.3
@@ -31,9 +31,9 @@ catalogs:
 overrides:
   "@esbuild-kit/core-utils>esbuild": 0.25.12
   "glob@9>minimatch": 10.2.5
-  "@tailwindcss/postcss>postcss": 8.5.18
-  "next>postcss": 8.5.18
-  "next>sharp": 0.35.3
+  "@tailwindcss/postcss>postcss": 8.5.23
+  "next>postcss": 8.5.23
+  "next>sharp": 0.35.4
   "xcode>uuid": 11.1.1
 
 allowBuilds:

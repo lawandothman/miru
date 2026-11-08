@@ -60,7 +60,7 @@ export function AvatarUpload({ imageUrl, name, size = 64 }: AvatarUploadProps) {
 				type: mimeType,
 			} as unknown as Blob);
 
-			const cookies = authClient.getCookie();
+			const cookies = await authClient.getCookie();
 			const res = await fetch(`${API_URL}/api/upload-avatar`, {
 				method: "POST",
 				body: formData,
