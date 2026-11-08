@@ -16,7 +16,10 @@ export const env = createEnv({
 		BLOB_READ_WRITE_TOKEN: z.string().optional(),
 		EXPO_ACCESS_TOKEN: z.string().optional(),
 		SENTRY_AUTH_TOKEN: z.string().optional(),
-		CRON_SECRET: z.string().optional(),
+		CRON_SECRET:
+			process.env["VERCEL_ENV"] === "production"
+				? z.string().min(1)
+				: z.string().min(1).optional(),
 		VERCEL_URL: z.string().optional(),
 		UPSTASH_REDIS_REST_URL: z.string().url().optional(),
 		UPSTASH_REDIS_REST_TOKEN: z.string().min(1).optional(),
