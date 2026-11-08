@@ -11,6 +11,7 @@
 		"android": "expo run:android",
 		"build:splash": "node scripts/build-splash.mjs",
 		"sentry:upload-sourcemaps": "sentry-cli sourcemaps upload --org lwnd --project miru-mobile dist",
+		"test": "vitest run",
 		"typecheck": "tsc --noEmit"
 	},
 	"dependencies": {
