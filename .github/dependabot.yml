@@ -1,0 +1,23 @@
+# Dependabot version updates are effectively disabled (PR limit 0).
+# Renovate owns dependency PRs for this repo.
+#
+# Also disable Dependabot security updates in GitHub UI (required — API needs admin):
+# https://github.com/lawandothman/miru/settings/security_analysis
+# → Dependabot security updates → Disable
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 0
+  - package-ecosystem: npm
+    directory: /apps/web
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 0
+  - package-ecosystem: npm
+    directory: /apps/mobile
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 0

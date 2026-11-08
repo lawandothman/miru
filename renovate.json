@@ -1,7 +1,6 @@
 {
 	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
 	"extends": ["config:recommended"],
-	"recreateWhen": "always",
 	"rangeStrategy": "pin",
 	"labels": ["dependencies"],
 	"semanticCommits": "enabled",
@@ -11,7 +10,8 @@
 	"postUpdateOptions": ["pnpmDedupe"],
 	"minimumReleaseAge": "3 days",
 	"internalChecksFilter": "strict",
-	"prHourlyLimit": 0,
+	"prHourlyLimit": 2,
+	"prConcurrentLimit": 3,
 	"packageRules": [
 		{
 			"matchDepTypes": ["devDependencies"],
