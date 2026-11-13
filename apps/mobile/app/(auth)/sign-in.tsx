@@ -30,6 +30,8 @@ import { capture } from "@/lib/analytics";
 import {
 	classifySignInFailure,
 	createForegroundLossFlag,
+	createSignInAttemptGate,
+	preBrowserFetchOptions,
 	retryTransientSignIn,
 } from "@/lib/sign-in-failure";
 import { fontSize, fontFamily, spacing, radius } from "@/lib/constants";
@@ -120,6 +122,8 @@ async function syncSessionAtom() {
 	}
 }
 
+const signInAttempts = createSignInAttemptGate();
+
 export default function SignInScreen() {
 	const [loading, setLoading] = useState<"google" | "apple" | null>(null);
 	const [mode, setMode] = useState<"providers" | "email">("providers");
@@ -173,10 +177,15 @@ export default function SignInScreen() {
 	}
 
 	async function handleGoogleSignIn() {
+		if (!signInAttempts.tryEnter()) {
+			return;
+		}
 		setLoading("google");
 		// openAuthSessionAsync runs inside the same signIn.social promise and
 		// backgrounds the app. Retry only while this flag stays foregrounded,
 		// so a reset during the browser session is not launched again.
+		// The fetch timeout covers only the POST; better-fetch clears it
+		// before that browser opens.
 		const foreground = createForegroundLossFlag(
 			() => AppState.currentState,
 			(listener) => {
@@ -188,11 +197,14 @@ export default function SignInScreen() {
 			await retryTransientSignIn(
 				() => {
 					foreground.reset();
-					return signIn.social({
-						provider: "google",
-						callbackURL: "/",
-						errorCallbackURL: "/(auth)/sign-in",
-					});
+					return signIn.social(
+						{
+							provider: "google",
+							callbackURL: "/",
+							errorCallbackURL: "/(auth)/sign-in",
+						},
+						preBrowserFetchOptions(),
+					);
 				},
 				{ canRetry: () => foreground.stayedForeground() },
 			);
@@ -201,6 +213,7 @@ export default function SignInScreen() {
 			handleSignInError(error, "google");
 		} finally {
 			foreground.stop();
+			signInAttempts.leave();
 		}
 	}
 
@@ -218,12 +231,15 @@ export default function SignInScreen() {
 				throw new Error("No identity token returned");
 			}
 
-			await signIn.social({
-				provider: "apple",
-				idToken: {
-					token: credential.identityToken,
+			await signIn.social(
+				{
+					provider: "apple",
+					idToken: {
+						token: credential.identityToken,
+					},
 				},
-			});
+				preBrowserFetchOptions(),
+			);
 
 			await syncSessionAtom();
 
